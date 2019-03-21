@@ -6,3 +6,5 @@ CharSet Manager/.vs/CharSet Manager/v15/.suo
 *.exe
 bin/
 *.suo
+.vs
+

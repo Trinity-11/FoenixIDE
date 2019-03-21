@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDE", "FoenixIDE Simu
 		{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B} = {EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharSet", "CharSet Manager\CharSet\CharSet.csproj", "{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
