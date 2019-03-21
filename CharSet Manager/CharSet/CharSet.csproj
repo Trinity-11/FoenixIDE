@@ -63,13 +63,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Content Include="PET-ASCII 8x16.png" />
-    <Content Include="PET-ASCII.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PET-ASCII.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <EmbeddedResource Include="CharSetMain.resx">
       <DependentUpon>CharSetMain.cs</DependentUpon>
     </EmbeddedResource>
