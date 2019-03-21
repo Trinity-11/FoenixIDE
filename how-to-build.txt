@@ -1,0 +1,11 @@
+The simulator loads the kernel ROM from a hex file. The ROM is a separate build and is located in \Nu64\Kernel. 
+
+1. You must assemble the kernel in the Kernel directory. 
+   * run assemble.bat. 
+   * confirm that assembly completed successfully.
+2. The Vsual Studio project should already have a build step to copy kernel.hex into the ROMs directory. 
+   If not, copy kernel.hex into \Nu64\Nu64 Simulator\ROMs
+3. Build the project with Visual Studio. The Windows executable should compile, and kernel.hex will be
+   copied to the output. 
+
+At that point, you should be able to run the program. If you need to update the kernel ROM, you can assemble it separately. 

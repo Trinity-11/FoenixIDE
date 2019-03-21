@@ -1,0 +1,13 @@
+Nu64BASIC
+The 8-bit computer simulator
+(c) 2018 Tom P. Wilson
+wilsontp@gmail.com
+
+You may modify and use Nu64BASIC in conjunction with the 
+Nu64 project and with the C256 Foenix project. 
+
+Permission is hereby granted to use and distribute 
+this product under the terms of the GNU Public License v3.0.
+
+You must maintain this notice and the original Copyright
+notices in any files included with this product. 

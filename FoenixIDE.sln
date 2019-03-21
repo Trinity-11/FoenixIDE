@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6F8BC56C-269E-4E6D-BC71-9A5A646BC9EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Manuals", "Manuals", "{7474CB74-A9F1-47F4-926F-286A7E678AC0}"
+	ProjectSection(SolutionItems) = preProject
+		Manuals\6502.org_ Tutorial_ 65C816 Opcodes.html = Manuals\6502.org_ Tutorial_ 65C816 Opcodes.html
+		Manuals\65816 Opcodes.html = Manuals\65816 Opcodes.html
+		Manuals\65816 Programmanual.pdf = Manuals\65816 Programmanual.pdf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{C85DDE13-AC64-4B5B-BCDC-4D76ABC0067F}"
+	ProjectSection(SolutionItems) = preProject
+		Tools\WDCTools Version 2.1.zip = Tools\WDCTools Version 2.1.zip
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Character Editor", "Character Editor\Character Editor.csproj", "{372968C7-3555-4B1D-B4C2-8374FD45F6B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDE.Common", "FoenixIDE.Common\FoenixIDE.Common.csproj", "{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDE", "FoenixIDE Simulator\FoenixIDE.csproj", "{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B} = {EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7474CB74-A9F1-47F4-926F-286A7E678AC0} = {6F8BC56C-269E-4E6D-BC71-9A5A646BC9EE}
+		{C85DDE13-AC64-4B5B-BCDC-4D76ABC0067F} = {6F8BC56C-269E-4E6D-BC71-9A5A646BC9EE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D744402-F800-4C82-9020-2BB6B283C3A3}
+	EndGlobalSection
+EndGlobal
