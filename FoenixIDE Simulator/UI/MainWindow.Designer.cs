@@ -112,8 +112,8 @@ namespace FoenixIDE.UI
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(137, 34);
-            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(288, 34);
+            this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // windowsToolStripMenuItem
@@ -128,15 +128,15 @@ namespace FoenixIDE.UI
             // cPUToolStripMenuItem
             // 
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(181, 34);
-            this.cPUToolStripMenuItem.Text = "CPU";
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(288, 34);
+            this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.cPUToolStripMenuItem_Click);
             // 
             // memoryToolStripMenuItem
             // 
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(181, 34);
-            this.memoryToolStripMenuItem.Text = "Memory";
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(288, 34);
+            this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.memoryToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
@@ -145,7 +145,7 @@ namespace FoenixIDE.UI
             this.resetToolStripMenuItem1,
             this.debugToolStripMenuItem});
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt)
+            this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.R)));
             this.resetToolStripMenuItem.Size = new System.Drawing.Size(75, 34);
             this.resetToolStripMenuItem.Text = "Reset";
@@ -153,15 +153,15 @@ namespace FoenixIDE.UI
             // resetToolStripMenuItem1
             // 
             this.resetToolStripMenuItem1.Name = "resetToolStripMenuItem1";
-            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(218, 34);
-            this.resetToolStripMenuItem1.Text = "Start/Restart";
+            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(288, 34);
+            this.resetToolStripMenuItem1.Text = "Start/&Restart";
             this.resetToolStripMenuItem1.Click += new System.EventHandler(this.resetToolStripMenuItem1_Click);
             // 
             // debugToolStripMenuItem
             // 
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
-            this.debugToolStripMenuItem.Size = new System.Drawing.Size(218, 34);
-            this.debugToolStripMenuItem.Text = "Start/Debug";
+            this.debugToolStripMenuItem.Size = new System.Drawing.Size(288, 34);
+            this.debugToolStripMenuItem.Text = "Start/&Debug";
             this.debugToolStripMenuItem.Click += new System.EventHandler(this.debugToolStripMenuItem_Click);
             // 
             // executeTimer
@@ -180,7 +180,7 @@ namespace FoenixIDE.UI
             this.panel1.BackColor = System.Drawing.Color.LightBlue;
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 72);
-            this.panel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.panel1.Margin = new System.Windows.Forms.Padding(6);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(29, 2017);
             this.panel1.TabIndex = 3;
@@ -190,7 +190,7 @@ namespace FoenixIDE.UI
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel2.Location = new System.Drawing.Point(2142, 72);
-            this.panel2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.panel2.Margin = new System.Windows.Forms.Padding(6);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(29, 2017);
             this.panel2.TabIndex = 4;
@@ -200,7 +200,7 @@ namespace FoenixIDE.UI
             this.panel3.BackColor = System.Drawing.Color.LightBlue;
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel3.Location = new System.Drawing.Point(29, 2059);
-            this.panel3.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.panel3.Margin = new System.Windows.Forms.Padding(6);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(2113, 30);
             this.panel3.TabIndex = 5;
@@ -210,7 +210,7 @@ namespace FoenixIDE.UI
             this.panel4.BackColor = System.Drawing.Color.LightBlue;
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(0, 42);
-            this.panel4.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.panel4.Margin = new System.Windows.Forms.Padding(6);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(2171, 30);
             this.panel4.TabIndex = 6;
@@ -226,7 +226,7 @@ namespace FoenixIDE.UI
             this.gpu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.gpu.LinesVisible = 0;
             this.gpu.Location = new System.Drawing.Point(29, 72);
-            this.gpu.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+            this.gpu.Margin = new System.Windows.Forms.Padding(7);
             this.gpu.Name = "gpu";
             this.gpu.Size = new System.Drawing.Size(2113, 1987);
             this.gpu.TabIndex = 0;
@@ -249,7 +249,7 @@ namespace FoenixIDE.UI
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(300, 300);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Foenix IDE";

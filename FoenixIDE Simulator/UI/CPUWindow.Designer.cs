@@ -315,7 +315,7 @@
             this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "RegisterWindow";
+            this.Text = "CPU Window";
             this.Load += new System.EventHandler(this.CPUWindow_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();

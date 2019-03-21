@@ -1,4 +1,4 @@
-﻿namespace Nu256
+﻿namespace FoenixIDE.Simulator.Editor
 {
     partial class EditWindow
     {
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.editBox1 = new Nu256.Editor.EditBox();
+            this.editBox1 = new FoenixIDE.Simulator.Editor.EditBox();
             this.menuStrip1 = new global::System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new global::System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new global::System.Windows.Forms.ToolStripMenuItem();

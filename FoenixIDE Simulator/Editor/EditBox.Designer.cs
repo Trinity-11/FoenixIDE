@@ -1,4 +1,4 @@
-﻿namespace Nu256.Editor
+﻿namespace FoenixIDE.Simulator.Editor
 {
     partial class EditBox
     {

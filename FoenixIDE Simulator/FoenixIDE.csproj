@@ -56,7 +56,6 @@
     <Compile Include="Basic\Immediate.cs" />
     <Compile Include="Basic\Parser.cs" />
     <Compile Include="DeviceEnum.cs" />
-    <Compile Include="Display\TerminalSequences.cs" />
     <Compile Include="KeyboardMap.cs" />
     <Compile Include="MemoryBuffer.cs" />
     <Compile Include="MemoryLocations\MemoryMap_IO.cs" />

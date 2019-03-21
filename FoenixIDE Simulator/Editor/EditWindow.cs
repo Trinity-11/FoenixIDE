@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Nu256
+namespace FoenixIDE.Simulator.Editor
 {
     public partial class EditWindow : Form
     {
