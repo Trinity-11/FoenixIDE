@@ -472,7 +472,7 @@ namespace FoenixIDE
 
         public void PrintGreeting()
         {
-            PrintLine("         Nu64 Programming Simulator");
+            PrintLine("         FoenixIDE Programming Simulator");
         }
 
         public void ShowFlag()
@@ -482,7 +482,7 @@ namespace FoenixIDE
             //PrintLine(" \xa0\xa6\xa6\xa6\xa6\xa0");
             //PrintLine(" \xdf\xa0\xf9\xf9\xa0\xa9");
             PrintLine(" \xf2\xee\xee\xee\xee\xf3\xa8");
-            PrintLine(" \xA1NU64\xef\xa6");
+            PrintLine(" \xA1FoenixIDE\xef\xa6");
             PrintLine(" \xf0\xa2\xa2\xa2\xa2\xf1\xa6");
             PrintLine("  \xf9\xf9\xf9\xf9\xf9\xf9");
         }
