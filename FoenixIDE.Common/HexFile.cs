@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace FoenixIDE.Common
 {
@@ -10,7 +11,20 @@ namespace FoenixIDE.Common
             int address = 0;
 
             if (!System.IO.File.Exists(Filename))
-                throw new System.IO.FileNotFoundException("Could not find Hex file \"" + Filename + "\"");
+            {
+                OpenFileDialog f = new OpenFileDialog();
+                f.Title = "Select a kernel file";
+                f.Filter = "Hex Files|*.hex|All Files|*.*";
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    Filename = f.FileName;
+                }
+                else
+                {
+                    throw new System.IO.FileNotFoundException("Could not find Hex file \"" + Filename + "\"");
+                }
+            }
+                
 
             string[] lines = System.IO.File.ReadAllLines(Filename);
 

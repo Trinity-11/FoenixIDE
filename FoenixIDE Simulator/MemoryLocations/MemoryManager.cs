@@ -79,6 +79,7 @@ namespace FoenixIDE
             {
                 Device = VIDEO;
                 DeviceAddress = Address - VIDEO.StartAddress;
+                return;
             }
 
             if (Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)

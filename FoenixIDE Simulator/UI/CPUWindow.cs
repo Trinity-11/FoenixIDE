@@ -246,29 +246,29 @@ namespace FoenixIDE.UI
             PrintClear();
         }
 
-        int TopOfStack = 0xd6ff;
         public void UpdateStackDisplay()
         {
-            if (CPU.Stack.Value > TopOfStack)
-                TopOfStack = CPU.Stack.Value;
-
             stackText.Clear();
-            stackText.AppendText("Top: $" + TopOfStack.ToString("X4") + "\r\n");
+            stackText.AppendText("Top: $" + CPU.Stack.TopOfStack.ToString("X4") + "\r\n");
             stackText.AppendText("SP : $" + CPU.Stack.Value.ToString("X4") + "\r\n");
-            stackText.AppendText("N  : " + (TopOfStack - CPU.Stack.Value).ToString().PadLeft(4) + "\r\n");
+            stackText.AppendText("N  : " + (CPU.Stack.TopOfStack - CPU.Stack.Value).ToString().PadLeft(4) + "\r\n");
             stackText.AppendText("───────────\r\n");
 
-            int i = TopOfStack;
-            if (CPU.Stack.Value == 0)
-                i = 0;
-            else if (CPU.Stack.Value - i > 1000)
-                i = CPU.Stack.Value - 1000;
-            while (i > CPU.Stack.Value)
+            // Display all values on the stack
+            if (CPU.Stack.Value != CPU.Stack.TopOfStack)
             {
-                stackText.AppendText(i.ToString("X4") + " " + CPU.Memory[i].ToString("X2") + "\r\n");
-                i--;
+                int i = CPU.Stack.TopOfStack - CPU.Stack.Value;
+                if (i > 100)
+                {
+                    i = 100;
+                }
+                while (i > 0)
+                {
+                    int address = CPU.Stack.Value + i;
+                    stackText.AppendText(address.ToString("X4") + " " + CPU.Memory[address].ToString("X2") + "\r\n");
+                    i--;
+                }
             }
-
         }
 
         const int COUNTER_STEPS = 1000;
@@ -395,6 +395,8 @@ namespace FoenixIDE.UI
         {
             StepCounter = 0;
             messageText.Clear();
+            CPU.Stack.Reset();
+            stackText.Clear();
             //this.listing = global::System.IO.File.ReadAllLines(@"ROMs\kernel.lst");
         }
     }

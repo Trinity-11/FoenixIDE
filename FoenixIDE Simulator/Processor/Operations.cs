@@ -738,6 +738,7 @@ namespace FoenixIDE.Processor
                     break;
                 case OpcodeList.TCS_Implied:
                     cpu.Stack.Value = cpu.A.Value16;
+                    cpu.Stack.TopOfStack = cpu.A.Value16;
                     break;
                 case OpcodeList.TSC_Implied:
                     cpu.A.Value16 = cpu.Stack.Value;
@@ -756,6 +757,7 @@ namespace FoenixIDE.Processor
                     break;
                 case OpcodeList.TXS_Implied:
                     cpu.Stack.Value = cpu.X.Value;
+                    cpu.Stack.TopOfStack = cpu.X.Value;
                     break;
                 case OpcodeList.TXY_Implied:
                     cpu.Y.Value = cpu.X.Value;

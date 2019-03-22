@@ -10,6 +10,8 @@ namespace FoenixIDE.Processor
     {
         protected int _value;
         private int byteLength = 2;
+        public int TopOfStack = 0xd6ff;
+
         /// <summary>
         /// Forces the upper 8 bits to 0 when the register changes to 8 bit mode, or when writing or reading 
         /// the value in 8 bit mode. If this is false, the value is hidden, but preserved. If this is true, 
@@ -176,8 +178,8 @@ namespace FoenixIDE.Processor
 
         public virtual void Reset()
         {
-            this.Value = 0;
-            this.byteLength = 1;
+            this.Value = TopOfStack;
+            this.byteLength = 2;
         }
     }
 

@@ -88,12 +88,10 @@ namespace FoenixIDE
             gpu.Refresh();
 
             this.ReadyHandler = Monitor;
-            // Set address $00000 to $FF to see if it was written to.
-            Memory.WriteByte(0, 0xff);
             HexFile.Load(Memory, @"ROMs\kernel.hex");
 
             // If the memory at 0 is still $FF, then copy from Page18 to Page00
-            if (Memory.ReadByte(0) == 0xFF)
+            if (Memory.ReadByte(0xFF00) == 0)
             {
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
             }
