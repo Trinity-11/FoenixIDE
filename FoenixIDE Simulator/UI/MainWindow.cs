@@ -40,6 +40,10 @@ namespace FoenixIDE.UI
             this.Top = 0;
             this.Left = 0;
             this.Width = DebugWindow.Left;
+            if (this.Width > 1200)
+            {
+                this.Width = 1200;
+            }
             this.Height = Convert.ToInt32(this.Width * 0.75);
 
             BootTimer.Interval = 100;

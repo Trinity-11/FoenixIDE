@@ -53,12 +53,8 @@ namespace FoenixIDE.Display
             }
         }
 
-        // Video page 0 is 0x1000. Each page is 8192 (128x64) bytes long.
-        private int characterMatrixStart = MemoryLocations.MemoryMap.SCREEN_PAGE0;
         //private int colorMatrixStart = 6096;
         //private int attributeStart = 8096;
-        // character bitmaps are stored in the reserved video memory space.
-        private int fontSetStart = 0xAF_8000;
 
         public List<CharacterSet> CharacterSetSlots = new List<CharacterSet>();
 
@@ -69,11 +65,8 @@ namespace FoenixIDE.Display
         /// One frame = 1/60 second.
         /// </summary>
         public int RefreshTimer = 0;
-        public int BlinkRate = 20;
+        public int BlinkRate = 10;
 
-        //        int columns = 80;
-        //        int LINES = 25;
-        //        int bufferSize = 2000;
         public ColorCodes CurrentColor = ColorCodes.White;
 
         Font TextFont = SystemFonts.DefaultFont;
@@ -498,12 +491,27 @@ namespace FoenixIDE.Display
             float x;
             float y;
 
-            ColorMap[] colorMap = new ColorMap[1];
-            colorMap[0] = new ColorMap();
-            colorMap[0].OldColor = Color.White;
-            colorMap[0].NewColor = Color.LightGreen;
-            ImageAttributes attr = new ImageAttributes();
-            attr.SetRemapTable(colorMap);
+            // Read the color lookup tables
+            Color[] fgColorLUT = new Color[16];
+            Color[] bgColorLUT = new Color[16];
+            int fgLUT = MemoryLocations.MemoryMap.FG_CHAR_LUT_PTR - IO.StartAddress;
+            int bgLUT = MemoryLocations.MemoryMap.BG_CHAR_LUT_PTR - IO.StartAddress;
+            for (int c = 0; c < 16; c++)
+            {
+                // Foreground
+                byte red = IO.ReadByte(fgLUT++);
+                byte green = IO.ReadByte(fgLUT++);
+                byte blue = IO.ReadByte(fgLUT++);
+                fgLUT++;
+                fgColorLUT[c] = Color.FromArgb(red, green, blue);
+
+                // Background
+                red = IO.ReadByte(bgLUT++);
+                green = IO.ReadByte(bgLUT++);
+                blue = IO.ReadByte(bgLUT++);
+                bgLUT++;
+                bgColorLUT[c] = Color.FromArgb(red, green, blue);
+            }
 
             float charWidth = 8;
             float charHeight = 8;
@@ -511,28 +519,38 @@ namespace FoenixIDE.Display
             g.CompositingQuality = global::System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
             g.InterpolationMode = global::System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
 
-            g.Clear(Color.Blue);
+            g.Clear(Color.Black);
 
             //this._cursorCol = Memory.ReadByte(MemoryMap_DirectPage.CURSORX);
             //this._cursorRow = Memory.ReadByte(MemoryMap_DirectPage.CURSORY);
 
             int col = 0, line = 0;
-            int screenStart = characterMatrixStart - IO.StartAddress;
-            int lineStart = screenStart;
+
+            int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
+            int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
             for (line = 0; line < LinesVisible; line++)
             {
-                int addr = lineStart;
+                int textAddr = lineStart;
+                int colorAddr = colorStart;
                 for (col = 0; col < ColumnsVisible; col++)
                 {
                     x = col * charWidth;
                     y = line * charHeight;
-                    byte c = IO.ReadByte(addr++);
-                    Bitmap bmp = CharacterSetSlots[0].Bitmaps[c];
+                    byte character = IO.ReadByte(textAddr++);
+
+                    byte color = IO.ReadByte(colorAddr++);
+                    byte bgColor = (byte)((color & 0xF0) >> 4);
+                    byte fgColor = (byte)(color & 0x0F);
+
+                    Bitmap bmp = CharacterSetSlots[0].Bitmaps[character];
                     RectangleF rect = new RectangleF((int)x, (int)y, bmp.Width, bmp.Height);
-                    //g.DrawImage(bmp, rect, 0, 0, rect.Width, rect.Height, GraphicsUnit.Pixel, attr);
+                    Pen fgPen = new Pen(fgColorLUT[fgColor]);
+                    Pen bgPen = new Pen(bgColorLUT[bgColor]);
+                    g.DrawRectangle(bgPen, x, y, bmp.Width, bmp.Height);
                     g.DrawImage(bmp, rect);
                 }
                 lineStart += COLS_PER_LINE;
+                colorStart += COLS_PER_LINE;
             }
 
             if (CursorState && CursorEnabled)
@@ -620,9 +638,9 @@ namespace FoenixIDE.Display
 
         public void WriteByte(int Address, byte Data)
         {
-            if (VRAM == null)
+            if (IO == null)
                 return;
-            VRAM.WriteByte(Address - VRAM.StartAddress, Data);
+            IO.WriteByte(Address - VRAM.StartAddress, Data);
             //else if (Address >= characterMatrixStart && Address < (characterMatrixStart + CharacterData.Length))
             //{
             //    CharacterData[Address - characterMatrixStart] = (char)Data;

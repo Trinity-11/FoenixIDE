@@ -16,6 +16,10 @@ namespace FoenixIDE.MemoryLocations
 
         public const int FONT_MEMORY_BANK_START = 0xAF_8000;
         public const int FONT_MEMORY_BANK_END = 0xAF_BFFF;
+
+        public const int FG_CHAR_LUT_PTR = 0xAF_1F40; // 15 color lookup table
+        public const int BG_CHAR_LUT_PTR = 0xAF_1F80; // 15 color lookup table
+
         #endregion
     }
 }
