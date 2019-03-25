@@ -996,7 +996,7 @@ namespace FoenixIDE.Processor
             if (cpu.Flags.Decimal)
                 throw new NotImplementedException("Decimal mode subtraction not implemented.");
             else
-                val = val - cpu.A.Value - 1 + cpu.Flags.CarryBit;
+                val = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;
 
             cpu.Flags.Carry = (val >= 0 && val <= cpu.A.MaxUnsigned);
             cpu.Flags.oVerflow = (val < cpu.A.MinSigned || val > cpu.A.MaxSigned);
