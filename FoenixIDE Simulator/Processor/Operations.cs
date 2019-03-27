@@ -717,7 +717,7 @@ namespace FoenixIDE.Processor
                     return ptr;
                 case AddressModes.JmpAbsoluteIndexedIndirectWithX:
                     addr = SignatureBytes + cpu.X.Value;
-                    ptr = cpu.Memory.ReadWord(addr);
+                    ptr = cpu.Memory.ReadWord(cpu.ProgramBank.GetLongAddress(addr));
                     return cpu.ProgramBank.GetLongAddress(ptr);
                 case AddressModes.Accumulator:
                     return 0; 
