@@ -175,6 +175,23 @@ namespace FoenixIDE.UI
                 kernel.CPU.CPUThread.Join(1000);
             }
         }
+
+        private void menuOpen_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Hex Filed|*.hex";
+            dialog.CheckFileExists = true;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                DebugWindow.Close();
+                MemoryWindow.Close();
+                kernel = new FoenixSystem(this.gpu);
+                kernel.setKernel(dialog.FileName);
+                kernel.Reset();
+                ShowDebugWindow();
+                ShowMemoryWindow();
+            }
+        }
     }
 }
 

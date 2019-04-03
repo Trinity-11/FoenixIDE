@@ -192,9 +192,27 @@ namespace FoenixIDE.Processor
 
         private int GetDirectPageIndirectIndexedLong(int Address, Register Y)
         {
-            int addr = cpu.DirectPage.GetLongAddress(Address) + Y.Value;
-            int ptr = cpu.Memory.ReadLong(addr);
+            int addr =  cpu.DirectPage.GetLongAddress(Address);
+
+            // This effective address can overflow into the next bank.
+            int ptr = cpu.DataBank.GetLongAddress(0) + cpu.Memory.ReadLong(addr) + Y.Value;
             return cpu.Memory.ReadWord(ptr);
+        }
+
+        /// <summary>
+        /// LDA (D),Y - returns value pointed to by (D),Y, where D is in Direct page. Final value will be in Data bank. 
+        /// </summary>
+        /// <param name="Address">Address in direct page</param>
+        /// <param name="X">Register to index</param>
+        /// <returns></returns>
+        private int GetDirectPageIndirectIndexed(int Address, Register Y)
+        {
+            // The indirect address must be in Bank 0
+            int addr = cpu.DirectPage.GetLongAddress(Address) & 0xFFFF;
+
+            int ptr = cpu.Memory.ReadWord(addr) + Y.Value;
+            ptr = cpu.DataBank.GetLongAddress(ptr);
+            return cpu.Memory.ReadWord(ptr);               
         }
 
         /// <summary>
@@ -210,21 +228,6 @@ namespace FoenixIDE.Processor
             ptr = cpu.DataBank.GetLongAddress(ptr);
             return cpu.Memory.ReadWord(ptr);
         }
-
-        /// <summary>
-        /// LDA (D),Y - returns value pointed to by (D),Y, where D is in Direct page. Final value will be in Data bank. 
-        /// </summary>
-        /// <param name="Address">Address in direct page</param>
-        /// <param name="X">Register to index</param>
-        /// <returns></returns>
-        private int GetDirectPageIndirectIndexed(int Address, Register Y)
-        {
-            int addr = cpu.DirectPage.GetLongAddress(Address) + Y.Value;
-            int ptr = cpu.Memory.ReadWord(addr);
-            ptr = cpu.DataBank.GetLongAddress(ptr);
-            return cpu.Memory.ReadWord(ptr);
-        }
-
 
         private int GetAbsoluteLong(int Address)
         {

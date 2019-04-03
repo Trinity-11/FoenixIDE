@@ -34,15 +34,16 @@ namespace FoenixIDE
         public DeviceEnum OutputDevice = DeviceEnum.Screen;
 
         public Thread CPUThread = null;
+        private String defaultKernel = @"ROMs\kernel.hex";
 
         public FoenixSystem(Gpu gpu)
         {
             Memory = new MemoryManager
             {
-                RAM = new MemoryRAM(MemoryMap.RAM_START, MemoryMap.RAM_SIZE), // 2MB SRAM
+                RAM = new MemoryRAM(MemoryMap.RAM_START, MemoryMap.RAM_SIZE), // 2MB RAM
                 IO = new MemoryRAM(MemoryMap.IO_START, MemoryMap.IO_SIZE),   // 64K IO space
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
-                FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB DRAM
+                FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
             };
             this.CPU = new CPU(Memory);
             this.CPU.SimulatorCommand += CPU_SimulatorCommand;
@@ -88,10 +89,10 @@ namespace FoenixIDE
             gpu.Refresh();
 
             this.ReadyHandler = Monitor;
-            HexFile.Load(Memory, @"ROMs\kernel.hex");
+            HexFile.Load(Memory, defaultKernel);
 
             // If the memory at 0 is still $FF, then copy from Page18 to Page00
-            if (Memory.ReadByte(0xFF00) == 0)
+            if (Memory.ReadByte(0xFF00) == 0 && Memory.ReadByte(0x18000) != 0)
             {
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
             }
@@ -483,6 +484,11 @@ namespace FoenixIDE
             PrintLine(" \xA1FoenixIDE\xef\xa6");
             PrintLine(" \xf0\xa2\xa2\xa2\xa2\xf1\xa6");
             PrintLine("  \xf9\xf9\xf9\xf9\xf9\xf9");
+        }
+
+        public void setKernel(String value)
+        {
+            defaultKernel = value;
         }
 
     }

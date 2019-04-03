@@ -116,7 +116,7 @@ namespace FoenixIDE.Processor
                     arg = "[" + sig + "]";
                     break;
                 case AddressModes.DirectPageIndirectLongIndexedWithY:
-                    arg = "[" + sig + "],Y";
+                    arg = "[DP+" + sig + "],Y";
                     break;
                 case AddressModes.ProgramCounterRelative:
                 case AddressModes.ProgramCounterRelativeLong:
