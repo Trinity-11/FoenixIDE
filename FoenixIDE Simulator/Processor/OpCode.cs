@@ -129,7 +129,7 @@ namespace FoenixIDE.Processor
                     arg = sig;
                     break;
                 case AddressModes.StackRelative:
-                    arg = sig;
+                    arg = sig + ",S";
                     break;
                 case AddressModes.StackRelativeIndirectIndexedWithY:
                     arg = "(" + sig + ",S),Y";

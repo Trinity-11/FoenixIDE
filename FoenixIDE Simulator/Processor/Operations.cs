@@ -166,9 +166,9 @@ namespace FoenixIDE.Processor
                 case AddressModes.StackDirectPageIndirect:
                     throw new NotImplementedException();
                 case AddressModes.StackRelative:
-                    throw new NotImplementedException();
+                    return GetAbsoluteLong(cpu.Stack.Value + signatureBytes);
                 case AddressModes.StackRelativeIndirectIndexedWithY:
-                    throw new NotImplementedException();
+                    return GetAbsoluteLong(cpu.Memory.ReadWord(cpu.Stack.Value + signatureBytes) + cpu.Y.Value);
                 case AddressModes.StackProgramCounterRelativeLong:
                     throw new NotImplementedException();
             }

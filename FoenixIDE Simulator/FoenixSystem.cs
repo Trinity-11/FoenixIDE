@@ -92,7 +92,7 @@ namespace FoenixIDE
             HexFile.Load(Memory, defaultKernel);
 
             // If the memory at 0 is still $FF, then copy from Page18 to Page00
-            if (Memory.ReadByte(0xFF00) == 0 && Memory.ReadByte(0x18000) != 0)
+            if (Memory.ReadLong(0x18_0000) != 0)
             {
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
             }
