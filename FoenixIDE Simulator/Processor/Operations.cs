@@ -195,7 +195,7 @@ namespace FoenixIDE.Processor
             int addr =  cpu.DirectPage.GetLongAddress(Address);
 
             // This effective address can overflow into the next bank.
-            int ptr = cpu.DataBank.GetLongAddress(0) + cpu.Memory.ReadLong(addr) + Y.Value;
+            int ptr = cpu.Memory.ReadLong(addr) + Y.Value;
             return cpu.Memory.ReadWord(ptr);
         }
 
@@ -979,6 +979,10 @@ namespace FoenixIDE.Processor
         public void Compare(AddressModes addressMode, int signature, Register Reg)
         {
             int val = GetValue(addressMode, signature, Reg.Width);
+            if (Reg.Width == 1 && val > 255)
+            {
+                val = val & 0xFF;
+            }
 
             cpu.Flags.Zero = Reg.Value == val;
             cpu.Flags.Carry = Reg.Value >= val;
