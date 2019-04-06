@@ -403,6 +403,7 @@ namespace FoenixIDE.Display
             DrawBitmapText(e.Graphics);
         }
 
+        /*
         private void DrawVectorText(Graphics g)
         {
             float x;
@@ -462,19 +463,12 @@ namespace FoenixIDE.Display
             //        StringFormat.GenericTypographic);
             //}
         }
+        */
 
         int lastWidth = 0;
         private void DrawBitmapText(Graphics controlGraphics)
         {
-            if (lastWidth != ColumnsVisible
-                && ColumnsVisible > 0
-                && LinesVisible > 0)
-            {
-                frameBuffer = new Bitmap(8 * ColumnsVisible, 8 * LinesVisible, PixelFormat.Format32bppArgb);
-                lastWidth = ColumnsVisible;
-            }
-
-            Graphics g = Graphics.FromImage(frameBuffer);
+            
             if (VRAM == null)
             {
                 controlGraphics.Clear(Color.Blue);
@@ -488,6 +482,15 @@ namespace FoenixIDE.Display
                 return;
             }
 
+            if (lastWidth != ColumnsVisible
+                && ColumnsVisible > 0
+                && LinesVisible > 0)
+            {
+                frameBuffer = new Bitmap(8 * ColumnsVisible, 8 * LinesVisible, PixelFormat.Format32bppArgb);
+                lastWidth = ColumnsVisible;
+            }
+
+            Graphics g = Graphics.FromImage(frameBuffer);
             float x;
             float y;
 
@@ -499,16 +502,16 @@ namespace FoenixIDE.Display
             for (int c = 0; c < 16; c++)
             {
                 // Foreground
-                byte red = IO.ReadByte(fgLUT++);
-                byte green = IO.ReadByte(fgLUT++);
                 byte blue = IO.ReadByte(fgLUT++);
+                byte green = IO.ReadByte(fgLUT++);
+                byte red = IO.ReadByte(fgLUT++);
                 fgLUT++;
                 fgColorLUT[c] = Color.FromArgb(red, green, blue);
 
                 // Background
-                red = IO.ReadByte(bgLUT++);
-                green = IO.ReadByte(bgLUT++);
                 blue = IO.ReadByte(bgLUT++);
+                green = IO.ReadByte(bgLUT++);
+                red = IO.ReadByte(bgLUT++);
                 bgLUT++;
                 bgColorLUT[c] = Color.FromArgb(red, green, blue);
             }
@@ -518,11 +521,6 @@ namespace FoenixIDE.Display
 
             g.CompositingQuality = global::System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
             g.InterpolationMode = global::System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-
-            g.Clear(Color.Black);
-
-            //this._cursorCol = Memory.ReadByte(MemoryMap_DirectPage.CURSORX);
-            //this._cursorRow = Memory.ReadByte(MemoryMap_DirectPage.CURSORY);
 
             int col = 0, line = 0;
 
@@ -539,14 +537,23 @@ namespace FoenixIDE.Display
                     byte character = IO.ReadByte(textAddr++);
 
                     byte color = IO.ReadByte(colorAddr++);
-                    byte bgColor = (byte)((color & 0xF0) >> 4);
-                    byte fgColor = (byte)(color & 0x0F);
+                    byte fgColor = (byte)((color & 0xF0) >> 4);
+                    byte bgColor = (byte)(color & 0x0F);
 
                     Bitmap bmp = CharacterSetSlots[0].Bitmaps[character];
+                    ColorPalette pal = bmp.Palette;
+                    if (bgColor != 0)
+                    {
+                        pal.Entries[0] = bgColorLUT[bgColor];
+                    }
+                    if (fgColor != 0)
+                    {
+                        pal.Entries[1] = fgColorLUT[fgColor];
+                    }
+                    
+                    bmp.Palette = pal;
+
                     RectangleF rect = new RectangleF((int)x, (int)y, bmp.Width, bmp.Height);
-                    Pen fgPen = new Pen(fgColorLUT[fgColor]);
-                    Pen bgPen = new Pen(bgColorLUT[bgColor]);
-                    g.DrawRectangle(bgPen, x, y, bmp.Width, bmp.Height);
                     g.DrawImage(bmp, rect);
                 }
                 lineStart += COLS_PER_LINE;

@@ -688,7 +688,7 @@ namespace FoenixIDE.Processor
                 case AddressModes.DirectPageIndirectLongIndexedWithY:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.Memory.ReadLong(addr) + cpu.Y.Value;
-                    return cpu.ProgramBank.GetLongAddress(ptr);
+                    return ptr;
                 case AddressModes.ProgramCounterRelative:
                     ptr = MakeSignedByte((byte)SignatureBytes);
                     addr = cpu.PC.Value + ptr;

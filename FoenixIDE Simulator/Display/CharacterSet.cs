@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace FoenixIDE.Display
 {
@@ -109,20 +110,17 @@ namespace FoenixIDE.Display
 
             for (int charCode = 0; charCode < 256; charCode++)
             {
-                Bitmap img = new Bitmap(charWidth, charHeight);
-                Bitmaps[charCode] = img;
-                Graphics g = Graphics.FromImage(img);
+                Bitmap bmp = new Bitmap(charWidth, charHeight, PixelFormat.Format1bppIndexed);
+                Bitmaps[charCode] = bmp;
+
+                BitmapData bitmapData = bmp.LockBits(new Rectangle(0, 0, charWidth, charHeight), ImageLockMode.WriteOnly, PixelFormat.Format1bppIndexed);
+                IntPtr p = bitmapData.Scan0;
                 for (int y = 0; y < charHeight; y++)
                 {
-                    byte b = Read(charCode, y);
-                    int bit = 1<<(charWidth-1);
-                    for (int x = 0; x < charWidth; x++)
-                    {
-                        if ((b & bit) == bit)
-                            g.FillRectangle(brush, x, y, 1, 1);
-                        bit = bit >> 1;
-                    }
+                    System.Runtime.InteropServices.Marshal.WriteByte(p, y * bitmapData.Stride, Read(charCode, y));
+                    
                 }
+                bmp.UnlockBits(bitmapData);
             }
         }
     }
