@@ -139,6 +139,12 @@
     </Compile>
     <Compile Include="RingBuffer.cs" />
     <Compile Include="SystemLog.cs" />
+    <Compile Include="UI\UploaderWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\UploaderWindow.Designer.cs">
+      <DependentUpon>UploaderWindow.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Editor\EditBox.resx">
       <DependentUpon>EditBox.cs</DependentUpon>
     </EmbeddedResource>
@@ -172,6 +178,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\RegisterDisplay.resx">
       <DependentUpon>RegisterDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\UploaderWindow.resx">
+      <DependentUpon>UploaderWindow.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

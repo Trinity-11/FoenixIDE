@@ -13,10 +13,12 @@ namespace FoenixIDE.UI
     public partial class MainWindow : Form
     {
         public FoenixSystem kernel;
-        public UI.CPUWindow DebugWindow;
         public Timer BootTimer = new Timer();
         public int CyclesPerTick = 35000;
-        public MemoryWindow MemoryWindow;
+
+        public UI.CPUWindow debugWindow;
+        public MemoryWindow memoryWindow;
+        public UploaderWindow uploaderWindow;
 
 
         public MainWindow()
@@ -39,7 +41,7 @@ namespace FoenixIDE.UI
 
             this.Top = 0;
             this.Left = 0;
-            this.Width = DebugWindow.Left;
+            this.Width = debugWindow.Left;
             if (this.Width > 1200)
             {
                 this.Width = 1200;
@@ -53,22 +55,49 @@ namespace FoenixIDE.UI
 
         private void ShowDebugWindow()
         {
-            DebugWindow = new UI.CPUWindow();
-            DebugWindow.CPU = kernel.CPU;
-            kernel.CPU.DebugPause = true;
-            DebugWindow.Kernel = kernel;
-            DebugWindow.Left = Screen.PrimaryScreen.WorkingArea.Width - DebugWindow.Width;
-            DebugWindow.Top = Screen.PrimaryScreen.WorkingArea.Top;
-            DebugWindow.Show();
+            if (debugWindow == null || debugWindow.IsDisposed)
+            {
+                debugWindow = new UI.CPUWindow();
+                debugWindow.CPU = kernel.CPU;
+                kernel.CPU.DebugPause = true;
+                debugWindow.Kernel = kernel;
+                debugWindow.Left = Screen.PrimaryScreen.WorkingArea.Width - debugWindow.Width;
+                debugWindow.Top = Screen.PrimaryScreen.WorkingArea.Top;
+                debugWindow.Show();
+            } 
+            else
+            {
+                debugWindow.BringToFront();
+            }
         }
 
         void ShowMemoryWindow()
         {
-            MemoryWindow = new MemoryWindow();
-            MemoryWindow.Memory = kernel.CPU.Memory;
-            MemoryWindow.Left = DebugWindow.Left;
-            MemoryWindow.Top = DebugWindow.Top + DebugWindow.Height;
-            MemoryWindow.Show();
+            if (memoryWindow == null || memoryWindow.IsDisposed)
+            {
+                memoryWindow = new MemoryWindow();
+                memoryWindow.Memory = kernel.CPU.Memory;
+                memoryWindow.Left = debugWindow.Left;
+                memoryWindow.Top = debugWindow.Top + debugWindow.Height;
+                memoryWindow.Show();
+            }
+            else
+            {
+                memoryWindow.BringToFront();
+            }
+        }
+
+        void ShowUploaderWindow()
+        {
+            if (uploaderWindow == null || uploaderWindow.IsDisposed)
+            {
+                uploaderWindow = new UploaderWindow();
+                uploaderWindow.Show();
+            }
+            else
+            {
+                uploaderWindow.BringToFront();
+            }
         }
 
         private void BootTimer_Tick(object sender, EventArgs e)
@@ -134,10 +163,7 @@ namespace FoenixIDE.UI
 
         private void gpu_VisibleChanged(object sender, EventArgs e)
         {
-            if (gpu.Visible)
-            {
-                BootTimer.Enabled = true;
-            }
+            BootTimer.Enabled = gpu.Visible;
         }
 
         private void cPUToolStripMenuItem_Click(object sender, EventArgs e)
@@ -150,9 +176,14 @@ namespace FoenixIDE.UI
             ShowMemoryWindow();
         }
 
+        private void uploaderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowUploaderWindow();
+        }
+
         private void resetToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            DebugWindow.ClearTrace();
+            debugWindow.ClearTrace();
             kernel.CPU.DebugPause = false;
             kernel.Reset();
             kernel.Run();
@@ -160,7 +191,7 @@ namespace FoenixIDE.UI
 
         private void debugToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DebugWindow.ClearTrace();
+            debugWindow.ClearTrace();
             kernel.CPU.DebugPause = true;
             kernel.Reset();
         }
@@ -183,8 +214,8 @@ namespace FoenixIDE.UI
             dialog.CheckFileExists = true;
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                DebugWindow.Close();
-                MemoryWindow.Close();
+                debugWindow.Close();
+                memoryWindow.Close();
                 kernel = new FoenixSystem(this.gpu);
                 kernel.setKernel(dialog.FileName);
                 kernel.Reset();
