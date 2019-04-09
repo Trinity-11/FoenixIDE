@@ -13,7 +13,7 @@ namespace CharSet
     public partial class CharViewer : UserControl
     {
         Brush brush = null;  //new SolidBrush(SystemColors.WindowText);
-        int StartIndex = 0;
+        
         public int BytesPerCharacter = 8;
 
         public CharViewer()
@@ -22,7 +22,7 @@ namespace CharSet
         }
 
         public byte[] InputData = null;
-        //public byte[] CustomData = null;
+
         public byte[] OutputData = new byte[1024 * 8];
 
         public byte[] LoadBin(string Filename)

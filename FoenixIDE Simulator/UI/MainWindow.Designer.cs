@@ -245,6 +245,7 @@ namespace FoenixIDE.UI
             this.gpu.LinesVisible = 0;
             this.gpu.Location = new System.Drawing.Point(29, 72);
             this.gpu.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
+            this.gpu.MinimumSize = new System.Drawing.Size(640, 480);
             this.gpu.Name = "gpu";
             this.gpu.Size = new System.Drawing.Size(2113, 1438);
             this.gpu.TabIndex = 0;
@@ -268,6 +269,7 @@ namespace FoenixIDE.UI
             this.Location = new System.Drawing.Point(300, 300);
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(6);
+            this.MinimumSize = new System.Drawing.Size(713, 645);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Foenix IDE";

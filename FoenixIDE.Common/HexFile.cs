@@ -5,10 +5,11 @@ namespace FoenixIDE.Common
 {
     public class HexFile
     {
-        public static void Load(IMappable memory, string Filename)
+        public static String Load(IMappable memory, string Filename)
         {
             int bank = 0;
             int address = 0;
+            String processedFileName = Filename;
 
             if (!System.IO.File.Exists(Filename))
             {
@@ -17,16 +18,17 @@ namespace FoenixIDE.Common
                 f.Filter = "Hex Files|*.hex|All Files|*.*";
                 if (f.ShowDialog() == DialogResult.OK)
                 {
-                    Filename = f.FileName;
+                    processedFileName = f.FileName;
                 }
                 else
                 {
+                    processedFileName = null;
                     throw new System.IO.FileNotFoundException("Could not find Hex file \"" + Filename + "\"");
                 }
             }
                 
 
-            string[] lines = System.IO.File.ReadAllLines(Filename);
+            string[] lines = System.IO.File.ReadAllLines(processedFileName);
 
             foreach (string l in lines)
             {
@@ -69,6 +71,7 @@ namespace FoenixIDE.Common
                         throw new NotImplementedException("Record type not implemented: " + rectype);
                 }
             }
+            return processedFileName;
         }
 
         static int GetByte(string data, int startPos, int bytes)

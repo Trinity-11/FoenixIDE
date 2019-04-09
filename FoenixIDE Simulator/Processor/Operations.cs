@@ -676,7 +676,7 @@ namespace FoenixIDE.Processor
                 case AddressModes.DirectPageIndirect:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.Memory.ReadWord(addr);
-                    return cpu.ProgramBank.GetLongAddress(ptr);
+                    return cpu.DataBank.GetLongAddress(ptr);
                 case AddressModes.DirectPageIndirectIndexedWithY:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.Memory.ReadWord(addr) + cpu.Y.Value;

@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDE", "FoenixIDE Simu
 		{EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B} = {EC7B8DCD-41A5-458C-A0C9-23A8FDFE948B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharSet", "CharSet Manager\CharSet\CharSet.csproj", "{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharSet Manager", "CharSet Manager\CharSet\CharSet Manager.csproj", "{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

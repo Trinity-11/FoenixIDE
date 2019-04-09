@@ -89,10 +89,10 @@ namespace FoenixIDE
             gpu.Refresh();
 
             this.ReadyHandler = Monitor;
-            HexFile.Load(Memory, defaultKernel);
+            defaultKernel = HexFile.Load(Memory, defaultKernel);
 
-            // If the memory at 0 is still $FF, then copy from Page18 to Page00
-            if (Memory.ReadLong(0x18_0000) != 0)
+            // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
+            if (Memory.ReadLong(0xFFE0) == 0 && Memory.ReadLong(0x18_FFE0) != 0)
             {
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
             }
