@@ -27,7 +27,28 @@ namespace FoenixIDE.UI
 
         private void MemoryWindow_Load(object sender, EventArgs e)
         {
+            toolTip1.SetToolTip(NextButton, "Next Page");
+            toolTip1.SetToolTip(PreviousButton, "Previous Page");
 
+            // MCR Tooltips
+            toolTip1.SetToolTip(MCRBit7Button, "Disable Video");
+            toolTip1.SetToolTip(MCRBit6Button, "Enable Gamma");
+            toolTip1.SetToolTip(MCRBit5Button, "Enable Sprites");
+            toolTip1.SetToolTip(MCRBit4Button, "Enable Tilemap");
+            toolTip1.SetToolTip(MCRBit3Button, "Enable Bitmap");
+            toolTip1.SetToolTip(MCRBit2Button, "Enable Graphics Mode");
+            toolTip1.SetToolTip(MCRBit1Button, "Enable Text Overlay");
+            toolTip1.SetToolTip(MCRBit0Button, "Enable Text");
+
+            // Set the MCR
+            MCRBit0Button.Tag = 0;
+            MCRBit1Button.Tag = 0;
+            MCRBit2Button.Tag = 0;
+            MCRBit3Button.Tag = 0;
+            MCRBit4Button.Tag = 0;
+            MCRBit5Button.Tag = 0;
+            MCRBit6Button.Tag = 0;
+            MCRBit7Button.Tag = 0;
         }
 
         public void RefreshMemoryView()
@@ -163,6 +184,32 @@ namespace FoenixIDE.UI
                 this.PreviousButton_Click(sender, e);
             }
 
+        }
+
+        private void MCRBitButton_Click(object sender, EventArgs e)
+        {
+            // toggle the button tag 0 or 1
+            Button btn = ((Button)sender);
+            if ((int)btn.Tag == 0)
+            {
+                btn.Tag = 1;
+                btn.BackColor = Color.DarkGray;
+            }
+            else
+            {
+                btn.Tag = 0;
+                btn.BackColor = Control.DefaultBackColor;
+            }
+            // Save the value of all buttons to the Master Control Memory Location
+            int value = ((int)MCRBit0Button.Tag);
+            value |= ((int)MCRBit1Button.Tag) << 1;
+            value |= ((int)MCRBit2Button.Tag) << 2;
+            value |= ((int)MCRBit3Button.Tag) << 3;
+            value |= ((int)MCRBit4Button.Tag) << 4;
+            value |= ((int)MCRBit5Button.Tag) << 5;
+            value |= ((int)MCRBit6Button.Tag) << 6;
+            value |= ((int)MCRBit7Button.Tag) << 7;
+            Memory.WriteByte(0xAF_0000, (byte)value);
         }
     }
 }

@@ -529,6 +529,11 @@ namespace FoenixIDE.Processor
                 case OpcodeList.BVS_ProgramCounterRelative:
                     takeBranch = cpu.Flags.oVerflow;
                     break;
+                case OpcodeList.BRL_ProgramCounterRelativeLong:
+                    takeBranch = false;  // we are actually always taking this branch, but the offset is a word
+                    int offset = MakeSignedWord((UInt16)signature);
+                    cpu.PC.Value += offset;
+                    break;
                 default:
                     throw new NotImplementedException("ExecuteBranch() opcode not implemented: " + instruction.ToString("X2"));
             }

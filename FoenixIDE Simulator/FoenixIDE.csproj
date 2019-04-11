@@ -139,6 +139,12 @@
     </Compile>
     <Compile Include="RingBuffer.cs" />
     <Compile Include="SystemLog.cs" />
+    <Compile Include="UI\BitmapLoader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\BitmapLoader.Designer.cs">
+      <DependentUpon>BitmapLoader.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\UploaderWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -178,6 +184,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\RegisterDisplay.resx">
       <DependentUpon>RegisterDisplay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\BitmapLoader.resx">
+      <DependentUpon>BitmapLoader.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\UploaderWindow.resx">
       <DependentUpon>UploaderWindow.cs</DependentUpon>

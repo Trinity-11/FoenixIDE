@@ -100,6 +100,17 @@ namespace FoenixIDE.UI
             }
         }
 
+        /*
+         * Loading image into memory requires the user to specify what kind of image (tile, bitmap, sprite).
+         * What address location in video RAM.
+         */
+        private void loadImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BitmapLoader loader = new BitmapLoader();
+            loader.Memory = kernel.CPU.Memory;
+            loader.ShowDialog();
+        }
+
         private void BootTimer_Tick(object sender, EventArgs e)
         {
             BootTimer.Enabled = false;
@@ -222,6 +233,11 @@ namespace FoenixIDE.UI
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
         }
     }
 }

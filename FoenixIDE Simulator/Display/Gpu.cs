@@ -17,7 +17,6 @@ namespace FoenixIDE.Display
     {
         public event KeyPressEventHandler KeyPressed;
 
-        public const int VRAM_SIZE = 0x40_0000;
         private const int REGISTER_BLOCK_SIZE = 256;
         const int MAX_TEXT_COLS = 128;
         const int MAX_TEXT_LINES = 64;
@@ -388,97 +387,41 @@ namespace FoenixIDE.Display
                 return;
             }
 
-            if (ColumnsVisible < 1 || ColumnsVisible > 128)
+            // Text Mode
+            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
+            if ((MCRegister & 0x1) == 0x1)
             {
-                g.DrawString("ColumnsVisible invalid:" + ColumnsVisible.ToString(), this.Font, TextBrush, 0, 0);
-                return;
+                DrawBitmapText(g);
             }
-            if (LinesVisible < 1)
+            // Overlay Mode
+            if ((MCRegister & 0x2) == 0x1)
             {
-                g.DrawString("LinesVisible invalid:" + LinesVisible.ToString(), this.Font, TextBrush, 0, 0);
-                return;
-            }
 
-            //DrawVectorText(e.Graphics);
-            DrawBitmapText(e.Graphics);
+            }
+            // Graphics Mode
+            if ((MCRegister & 0x4) == 0x4)
+            {
+
+            }
+            // Bitmap Mode
+            if ((MCRegister & 0x8) == 0x8)
+            {
+                DrawBitmap(g);
+            }
         }
-
-        /*
-        private void DrawVectorText(Graphics g)
-        {
-            float x;
-            float y;
-
-            if (TextFont == null)
-            {
-                TextFont = GetBestFont();
-            }
-            SizeF charSize = MeasureFont(TextFont, g);
-            float charWidth = charSize.Width / MEASURE_STRING.Length;
-            float charHeight = charSize.Height;
-            float RightCol = charWidth * ColumnsVisible;
-            float BottomRow = charWidth * LinesVisible;
-
-            float ScaleX = this.ClientRectangle.Width / RightCol;
-            float ScaleY = this.ClientRectangle.Height / BottomRow;
-            g.ResetTransform();
-            g.ScaleTransform(ScaleX, ScaleY);
-
-            if (VRAM == null)
-                return;
-
-            int col = 0, row = 0;
-            for (int i = 0; i < BufferSize; i++)
-            {
-                if (col < ColumnsVisible)
-                {
-                    x = col * charWidth;
-                    y = row * charHeight;
-
-                    char c = (char)IO.ReadByte(i);
-                    g.DrawString(c.ToString(),
-                        this.Font,
-                        TextBrush,
-                        x, y,
-                        StringFormat.GenericTypographic);
-                }
-
-                col++;
-                if (col >= COLS_PER_LINE)
-                {
-                    col = 0;
-                    row++;
-                }
-            }
-
-            //if (CursorState && CursorEnabled)
-            //{
-            //    x = X * charWidth;
-            //    y = Y * charHeight;
-            //    g.FillRectangle(CursorBrush, x, y, charWidth, charHeight);
-            //    g.DrawString(CharacterData[GetCharPos(Y, X)].ToString(),
-            //        TextFont,
-            //        InvertedBrush,
-            //        x, y,
-            //        StringFormat.GenericTypographic);
-            //}
-        }
-        */
 
         int lastWidth = 0;
         private void DrawBitmapText(Graphics controlGraphics)
         {
-            
-            if (VRAM == null)
+
+            if (ColumnsVisible < 1 || ColumnsVisible > 128)
             {
-                controlGraphics.Clear(Color.Blue);
-                controlGraphics.DrawString("VRAM not initialized", this.Font, TextBrush, 0, 0);
+                controlGraphics.DrawString("ColumnsVisible invalid:" + ColumnsVisible.ToString(), this.Font, TextBrush, 0, 0);
                 return;
             }
-            if (CharacterSetSlots.Count == 0)
+            if (LinesVisible < 1)
             {
-                controlGraphics.Clear(Color.Blue);
-                controlGraphics.DrawString("Character ROM not initialized", this.Font, TextBrush, 0, 0);
+                controlGraphics.DrawString("LinesVisible invalid:" + LinesVisible.ToString(), this.Font, TextBrush, 0, 0);
                 return;
             }
 
@@ -575,6 +518,49 @@ namespace FoenixIDE.Display
             controlGraphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
+        private void DrawBitmap(Graphics controlGraphics)
+        {
+            // Bitmap Controller is located at $AF:0140
+            int reg = IO.ReadByte(0xAF_0140 - 0xAF_0000);
+            if ((reg & 0x01) == 00)
+            {
+                return;
+            }
+            int LUT = (reg & 0x14) >> 1;  // 8 possible LUTs
+
+            int bitmapAddress = IO.ReadLong(0xAF_0141 - 0xAF_0000);
+            int width = IO.ReadWord(0xAF_0144 - 0xAF_0000);
+            int height = IO.ReadWord(0xAF_0146 - 0xAF_0000);
+
+            frameBuffer = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
+            // Read the color lookup tables
+            int lutAddress = LUT * 1024 + 0xAF_2000 - 0xAF_0000;
+            ColorPalette pal = frameBuffer.Palette;
+            for (int c = 0; c < 256; c++)
+            {
+                // Foreground
+                byte blue = IO.ReadByte(lutAddress++);
+                byte green = IO.ReadByte(lutAddress++);
+                byte red = IO.ReadByte(lutAddress++);
+                lutAddress++;
+                pal.Entries[c] = Color.FromArgb(red, green, blue);
+            }
+            frameBuffer.Palette = pal;
+
+            int col = 0, line = 0;
+            BitmapData bitmapData = frameBuffer.LockBits(new Rectangle(0,0,640, 480), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+            IntPtr p = bitmapData.Scan0;
+            for (line = 0; line < height; line++)
+            {
+                for (col = 0; col < width; col++)
+                {
+                    System.Runtime.InteropServices.Marshal.WriteByte(p, line * bitmapData.Width + col, VRAM.ReadByte(bitmapAddress++));
+                }
+            }
+            frameBuffer.UnlockBits(bitmapData);
+
+            controlGraphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
+        }
         private SizeF MeasureFont(Font font, Graphics g)
         {
             return g.MeasureString(MEASURE_STRING, font, int.MaxValue, StringFormat.GenericTypographic);

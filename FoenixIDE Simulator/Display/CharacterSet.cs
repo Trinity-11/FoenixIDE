@@ -118,7 +118,6 @@ namespace FoenixIDE.Display
                 for (int y = 0; y < charHeight; y++)
                 {
                     System.Runtime.InteropServices.Marshal.WriteByte(p, y * bitmapData.Stride, Read(charCode, y));
-                    
                 }
                 bmp.UnlockBits(bitmapData);
             }
