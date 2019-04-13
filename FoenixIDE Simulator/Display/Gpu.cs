@@ -57,8 +57,6 @@ namespace FoenixIDE.Display
 
         public List<CharacterSet> CharacterSetSlots = new List<CharacterSet>();
 
-        private Bitmap frameBuffer = new Bitmap(640, 200, PixelFormat.Format32bppArgb);
-
         /// <summary>
         /// number of frames to wait to refresh the screen.
         /// One frame = 1/60 second.
@@ -68,7 +66,8 @@ namespace FoenixIDE.Display
 
         public ColorCodes CurrentColor = ColorCodes.White;
 
-        Font TextFont = SystemFonts.DefaultFont;
+        // To provide a better contrast when writing on top of bitmaps
+        Brush BackgroundTextBrush = new SolidBrush(Color.Black);
         Brush TextBrush = new SolidBrush(Color.LightBlue);
         Brush BorderBrush = new SolidBrush(Color.LightBlue);
         Brush InvertedBrush = new SolidBrush(Color.Blue);
@@ -232,7 +231,6 @@ namespace FoenixIDE.Display
 
         void Gpu_Load(object sender, EventArgs e)
         {
-            //TextFont = GetBestFont();
 
             this.SetScreenSize(25, 80);
             this.Paint += new PaintEventHandler(Gpu_Paint);
@@ -376,6 +374,11 @@ namespace FoenixIDE.Display
         {
             Graphics g = e.Graphics;
             g.Clear(BackColor);
+            //g.CompositingQuality = global::System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+            //g.InterpolationMode = global::System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+
+            Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
+
             if (VRAM == null)
             {
                 g.DrawString("VRAM Not initialized", this.Font, TextBrush, 0, 0);
@@ -389,12 +392,33 @@ namespace FoenixIDE.Display
 
             // Text Mode
             byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
+            // Bitmap Mode
+            if ((MCRegister & 0x8) == 0x8)
+            {
+                DrawBitmap(frameBuffer);
+            }
             if ((MCRegister & 0x1) == 0x1)
             {
-                DrawBitmapText(g);
+                int top = 0;
+                if (ColumnsVisible < 1 || ColumnsVisible > 128)
+                {
+                    Graphics graphics = Graphics.FromImage(frameBuffer);
+                    DrawTextWithBackground("ColumnsVisible invalid:" + ColumnsVisible.ToString(), graphics, Color.Black, 0, top);
+                    top += 12;
+                }
+                if (LinesVisible < 1)
+                {
+                    Graphics graphics = Graphics.FromImage(frameBuffer);
+                    DrawTextWithBackground("LinesVisible invalid:" + LinesVisible.ToString(), graphics, Color.Black, 0, top);
+                    top += 12;
+                }
+                if (top == 0)
+                {
+                    DrawBitmapText(frameBuffer);
+                }
             }
             // Overlay Mode
-            if ((MCRegister & 0x2) == 0x1)
+            if ((MCRegister & 0x2) == 0x2)
             {
 
             }
@@ -403,40 +427,36 @@ namespace FoenixIDE.Display
             {
 
             }
-            // Bitmap Mode
-            if ((MCRegister & 0x8) == 0x8)
-            {
-                DrawBitmap(g);
-            }
+            g.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
+
         }
 
-        int lastWidth = 0;
-        private void DrawBitmapText(Graphics controlGraphics)
+        /*
+         * Display the text with a colored background. This should make the text more visible against bitmaps.
+         */
+        private void DrawTextWithBackground(String text, Graphics g, Color backgroundColor, int x, int y)
         {
-
-            if (ColumnsVisible < 1 || ColumnsVisible > 128)
-            {
-                controlGraphics.DrawString("ColumnsVisible invalid:" + ColumnsVisible.ToString(), this.Font, TextBrush, 0, 0);
-                return;
-            }
-            if (LinesVisible < 1)
-            {
-                controlGraphics.DrawString("LinesVisible invalid:" + LinesVisible.ToString(), this.Font, TextBrush, 0, 0);
-                return;
-            }
-
+            g.DrawString(text, this.Font, BackgroundTextBrush, x, y);
+            g.DrawString(text, this.Font, BackgroundTextBrush, x + 2, y);
+            g.DrawString(text, this.Font, BackgroundTextBrush, x, y + 2);
+            g.DrawString(text, this.Font, BackgroundTextBrush, x + 2, y + 2);
+            g.DrawString(text, this.Font, TextBrush, x + 1, y + 1);
+        }
+        int lastWidth = 0;
+        private void DrawBitmapText(Bitmap bitmap)
+        {
             if (lastWidth != ColumnsVisible
                 && ColumnsVisible > 0
                 && LinesVisible > 0)
             {
-                frameBuffer = new Bitmap(8 * ColumnsVisible, 8 * LinesVisible, PixelFormat.Format32bppArgb);
                 lastWidth = ColumnsVisible;
             }
+            bool overlayBitSet = (IO.ReadByte(0) & 0x02) == 0x02;
 
-            Graphics g = Graphics.FromImage(frameBuffer);
             float x;
             float y;
 
+            Graphics g = Graphics.FromImage(bitmap);
             // Read the color lookup tables
             Color[] fgColorLUT = new Color[16];
             Color[] bgColorLUT = new Color[16];
@@ -459,16 +479,16 @@ namespace FoenixIDE.Display
                 bgColorLUT[c] = Color.FromArgb(red, green, blue);
             }
 
-            float charWidth = 8;
-            float charHeight = 8;
-
-            g.CompositingQuality = global::System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-            g.InterpolationMode = global::System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            int charWidth = 8;
+            int charHeight = 8;
 
             int col = 0, line = 0;
 
             int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
+            int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
             int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
+            int lineOffset = (60 - LinesVisible) / 2 * charHeight;
+            
             for (line = 0; line < LinesVisible; line++)
             {
                 int textAddr = lineStart;
@@ -484,20 +504,26 @@ namespace FoenixIDE.Display
                     byte bgColor = (byte)(color & 0x0F);
 
                     Bitmap bmp = CharacterSetSlots[0].Bitmaps[character];
+                        
                     ColorPalette pal = bmp.Palette;
-                    if (bgColor != 0)
+                    if (!overlayBitSet && (bgColor != 0))
                     {
                         pal.Entries[0] = bgColorLUT[bgColor];
+                    }
+                    else
+                    {
+                        pal.Entries[0] = Color.Transparent;
                     }
                     if (fgColor != 0)
                     {
                         pal.Entries[1] = fgColorLUT[fgColor];
                     }
-                    
                     bmp.Palette = pal;
 
-                    RectangleF rect = new RectangleF((int)x, (int)y, bmp.Width, bmp.Height);
+                    RectangleF rect = new RectangleF((int)x + colOffset, (int)y + lineOffset, bmp.Width, bmp.Height);
+                    
                     g.DrawImage(bmp, rect);
+                    
                 }
                 lineStart += COLS_PER_LINE;
                 colorStart += COLS_PER_LINE;
@@ -507,18 +533,16 @@ namespace FoenixIDE.Display
             {
                 x = X * charWidth;
                 y = Y * charHeight;
-                g.FillRectangle(CursorBrush, x, y, charWidth, charHeight);
+                g.FillRectangle(CursorBrush, x + colOffset, y + lineOffset, charWidth, charHeight);
                 //g.DrawString(CharacterData[GetCharPos(Y, X)].ToString(),
                 //    TextFont,
                 //    InvertedBrush,
                 //    x, y,
                 //    StringFormat.GenericTypographic);
             }
-
-            controlGraphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
-        private void DrawBitmap(Graphics controlGraphics)
+        private void DrawBitmap(Bitmap bitmap)
         {
             // Bitmap Controller is located at $AF:0140
             int reg = IO.ReadByte(0xAF_0140 - 0xAF_0000);
@@ -526,16 +550,17 @@ namespace FoenixIDE.Display
             {
                 return;
             }
-            int LUT = (reg & 0x14) >> 1;  // 8 possible LUTs
+            int LUT = (reg & 14) >> 1;  // 8 possible LUTs
 
             int bitmapAddress = IO.ReadLong(0xAF_0141 - 0xAF_0000);
             int width = IO.ReadWord(0xAF_0144 - 0xAF_0000);
             int height = IO.ReadWord(0xAF_0146 - 0xAF_0000);
 
-            frameBuffer = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
+            //Bitmap frameBuffer = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
             // Read the color lookup tables
             int lutAddress = LUT * 1024 + 0xAF_2000 - 0xAF_0000;
-            ColorPalette pal = frameBuffer.Palette;
+            //ColorPalette pal = frameBuffer.Palette;
+            int[] lut = new int[256];
             for (int c = 0; c < 256; c++)
             {
                 // Foreground
@@ -543,24 +568,26 @@ namespace FoenixIDE.Display
                 byte green = IO.ReadByte(lutAddress++);
                 byte red = IO.ReadByte(lutAddress++);
                 lutAddress++;
-                pal.Entries[c] = Color.FromArgb(red, green, blue);
+                lut[c] = (255 << 24) + (red << 16) + (green << 8) + blue;
+                //pal.Entries[c] = Color.FromArgb(red, green, blue);
             }
-            frameBuffer.Palette = pal;
+            //frameBuffer.Palette = pal;
 
             int col = 0, line = 0;
-            BitmapData bitmapData = frameBuffer.LockBits(new Rectangle(0,0,640, 480), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0,0,640, 480), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             for (line = 0; line < height; line++)
             {
                 for (col = 0; col < width; col++)
                 {
-                    System.Runtime.InteropServices.Marshal.WriteByte(p, line * bitmapData.Width + col, VRAM.ReadByte(bitmapAddress++));
+                    int value = (int) lut[VRAM.ReadByte(bitmapAddress++)];
+                    System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
+                    //System.Runtime.InteropServices.Marshal.WriteByte(p, line * bitmapData.Width + col, ));
                 }
             }
-            frameBuffer.UnlockBits(bitmapData);
-
-            controlGraphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
+            bitmap.UnlockBits(bitmapData);
         }
+
         private SizeF MeasureFont(Font font, Graphics g)
         {
             return g.MeasureString(MEASURE_STRING, font, int.MaxValue, StringFormat.GenericTypographic);

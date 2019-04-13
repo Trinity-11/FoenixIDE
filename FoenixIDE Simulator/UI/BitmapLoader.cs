@@ -24,6 +24,7 @@ namespace FoenixIDE.UI
         int strideX = 0;
         int strideY = 0;
         Bitmap bitmap = null;
+        byte controlByte = 0;
 
         public BitmapLoader()
         {
@@ -179,7 +180,8 @@ namespace FoenixIDE.UI
             StoreButton.Enabled = false;
 
             // TODO: determine what to do with the control register
-            Memory.WriteByte(controlRegisterAddress, 0x01); // enable
+            controlByte = (byte)((LUTCombo.SelectedIndex << 1) + 1);
+            Memory.WriteByte(controlRegisterAddress, controlByte); // enable
 
             // Store the address in the pointer address - little endian - 24 bits
             string strAddress = LoadAddressTextBox.Text.Replace(":", "");

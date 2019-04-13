@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace FoenixIDE.UI
 {
@@ -49,6 +50,9 @@ namespace FoenixIDE.UI
             MCRBit5Button.Tag = 0;
             MCRBit6Button.Tag = 0;
             MCRBit7Button.Tag = 0;
+
+            // Set the Address to Bank $00
+            AddressCombo.SelectedIndex = 0;
         }
 
         public void RefreshMemoryView()
@@ -141,7 +145,6 @@ namespace FoenixIDE.UI
             {
                 GotoAddress(desiredStart);
             }
-            
         }
 
         private void PreviousButton_Click(object sender, EventArgs e)
@@ -151,27 +154,26 @@ namespace FoenixIDE.UI
             {
                 GotoAddress(desiredStart);
             }
-            
         }
 
-        private void Page00_Click(object sender, EventArgs e)
+        private void AddressCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            GotoAddress(0);
-        }
-
-        private void Page18Button_Click(object sender, EventArgs e)
-        {
-            GotoAddress(0x18_0000);
-        }
-
-        private void Page19_Click(object sender, EventArgs e)
-        {
-            GotoAddress(0x19_0000);
-        }
-
-        private void IOButton_Click(object sender, EventArgs e)
-        {
-            GotoAddress(0xAF_0000);
+            String value = (String)AddressCombo.SelectedItem;
+            int startAddress = 0;
+            if (value.StartsWith("Bank"))
+            {
+                // Read two characters and pad with '0000' to get a 24 bit address
+                int start = value.IndexOf('$');
+                startAddress = Convert.ToInt32(value.Substring(start + 1, 2) + "0000", 16);
+            }
+            else
+            {
+                // Read all 6 characters, but omit the ':'
+                int start = value.IndexOf('$');
+                startAddress = Convert.ToInt32(value.Replace(":","").Substring(start + 1, 6), 16);
+            }
+            GotoAddress(startAddress);
+            MemoryText.Focus();
         }
 
         private void MemoryWindow_KeyDown(object sender, KeyEventArgs e)
@@ -186,6 +188,10 @@ namespace FoenixIDE.UI
 
         }
 
+        /*
+         * Change the Master Control Register (MCR).
+         * This allows for displaying text, overlay on top of graphics.
+         */
         private void MCRBitButton_Click(object sender, EventArgs e)
         {
             // toggle the button tag 0 or 1
@@ -210,6 +216,115 @@ namespace FoenixIDE.UI
             value |= ((int)MCRBit6Button.Tag) << 6;
             value |= ((int)MCRBit7Button.Tag) << 7;
             Memory.WriteByte(0xAF_0000, (byte)value);
+        }
+
+        /*
+         * Export all memory content to an XML file.
+         */
+        private void ExportButton_Click(object sender, EventArgs e)
+        {
+            // Pick the file to create
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Title = "Save Memory to Foenix File";
+            dialog.CheckPathExists = true;
+            dialog.Filter = "Foenix IDE File (.fnx) | *.fnx";
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                XmlWriter xmlWriter = XmlWriter.Create(dialog.FileName);
+                xmlWriter.WriteStartDocument();
+                xmlWriter.WriteRaw("\r");
+                xmlWriter.WriteComment("Export of FoenixIDE for C256.  All values are in hexadecimal form");
+                xmlWriter.WriteRaw("\r");
+                xmlWriter.WriteStartElement("pages");
+                bool compact = CompactCheckbox.Checked;
+                if (compact)
+                {
+                    xmlWriter.WriteAttributeString("format", "compact");
+                }
+                else
+                {
+                    xmlWriter.WriteAttributeString("format", "full");
+                }
+                
+                xmlWriter.WriteRaw("\r");
+                
+                // We don't need to scan $FFFF pages, only scan the ones we know are gettings used
+                // Scan each of the banks and pages and save to an XML file
+                // If a page is blank, don't export it.
+                for (int i = 0; i < 0x200000; i = i+256 )
+                {
+                    if (PageChecksum(i) != 0)
+                    {
+                        WriteData(i, xmlWriter, compact);
+                    }
+                }
+                
+                for (int i = 0xAF_0000; i < 0xF0_0000; i = i + 256)
+                {
+                    if (PageChecksum(i) != 0)
+                    {
+                        WriteData(i, xmlWriter, compact);
+                    }
+                }
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndDocument();
+                xmlWriter.Close();
+            }
+        }
+
+        private void WriteData(int startAddress, XmlWriter writer, bool compact)
+        {
+            writer.WriteStartElement("page");
+            writer.WriteAttributeString("start-address", "$" + startAddress.ToString("X6"));
+            writer.WriteAttributeString("bank", "$" + startAddress.ToString("X6").Substring(0,2));
+            writer.WriteRaw("\r");
+
+            // Write 8 bytes per data line
+            for (int i = 0; i < 256; i = i + 8)
+            {
+                WritePhrase(startAddress + i, writer, compact);
+            }
+            writer.WriteEndElement();
+            writer.WriteRaw("\r");
+        }
+
+        // Only write a phrase if the bytes are non-zero
+        private void WritePhrase(int startAddress, XmlWriter writer, bool compact)
+        {
+            if (PhraseChecksum(startAddress) == 0 && !compact || PhraseChecksum(startAddress) != 0)
+            {
+                writer.WriteStartElement("data");
+                writer.WriteAttributeString("address", "$" + (startAddress).ToString("X6"));
+                for (int i = 0; i < 8; i++)
+                {
+                    writer.WriteString(Memory.ReadByte(startAddress + i).ToString("X2") + " ");
+                }
+                writer.WriteEndElement();
+                writer.WriteRaw("\r");
+            }
+        }
+
+        // Sum 256 bytes
+        private int PageChecksum(int startAddress)
+        {
+            int sum = 0;
+            for (int i = 0; i < 255; i++)
+            {
+                sum += Memory.ReadByte(startAddress + i);
+            }
+            return sum;
+        }
+
+        // Sum 8 bytes
+        private int PhraseChecksum(int startAddress)
+        {
+            int sum = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                sum += Memory.ReadByte(startAddress + i);
+            }
+            return sum;
         }
     }
 }
