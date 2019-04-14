@@ -21,6 +21,13 @@ namespace FoenixIDE.Display
         const int MAX_TEXT_COLS = 128;
         const int MAX_TEXT_LINES = 64;
         const int SCREEN_PAGE_SIZE = 128 * 64;
+        const int IO_BASE_ADDR = 0xAF_0000;
+        const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0100;
+        const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0140;
+        const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
+        const int GRP_LUT_BASE_ADDR = 0xAF_2000;
+
+        int[][] LUT = new int[4][];
 
         private int length = 128 * 64 * 2; //Text mode uses 16K, 1 page for text, the other for colors.
 
@@ -256,6 +263,10 @@ namespace FoenixIDE.Display
                 ParentForm.Height = htarget + topmargin;
                 ParentForm.Width = (int)Math.Ceiling(htarget * 1.6) + sidemargin;
             }
+            for (int i = 0; i < 4;i++)
+            {
+                LUT[i] = new int[256];
+            }
         }
 
         public void LoadCharacterData()
@@ -373,7 +384,8 @@ namespace FoenixIDE.Display
         void Gpu_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            g.Clear(BackColor);
+            int backgroundColor = IO.ReadLong(8);
+            g.Clear(Color.FromArgb(backgroundColor));
             //g.CompositingQuality = global::System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
             //g.InterpolationMode = global::System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
 
@@ -397,10 +409,21 @@ namespace FoenixIDE.Display
             {
                 DrawBitmap(frameBuffer);
             }
-            if ((MCRegister & 0x10) == 0x10)
+            // Load Graphical LUTs
+            loadLUT();
+
+            for (int layer = 4; layer > 0; --layer)
             {
-                DrawTiles(frameBuffer, 0);
+                if ((MCRegister & 0x10) == 0x10)
+                {
+                    DrawTiles(frameBuffer, layer - 1);
+                }
+                if ((MCRegister & 0x20) == 0x20)
+                {
+                    DrawSprites(frameBuffer, layer - 1);
+                }
             }
+            
             if ((MCRegister & 0x1) == 0x1)
             {
                 int top = 0;
@@ -431,12 +454,26 @@ namespace FoenixIDE.Display
             {
 
             }
-            
-
             g.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
 
         }
 
+        private void loadLUT()
+        {
+            // Read the color lookup tables
+            int lutAddress = GRP_LUT_BASE_ADDR - IO_BASE_ADDR;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int c = 0; c < 256; c++)
+                {
+                    byte blue = IO.ReadByte(lutAddress++);
+                    byte green = IO.ReadByte(lutAddress++);
+                    byte red = IO.ReadByte(lutAddress++);
+                    lutAddress++;
+                    LUT[i][c] = (255 << 24) + (red << 16) + (green << 8) + blue;
+                }
+            }
+        }
         /*
          * Display the text with a colored background. This should make the text more visible against bitmaps.
          */
@@ -448,6 +485,7 @@ namespace FoenixIDE.Display
             g.DrawString(text, this.Font, BackgroundTextBrush, x + 2, y + 2);
             g.DrawString(text, this.Font, TextBrush, x + 1, y + 1);
         }
+
         int lastWidth = 0;
         private void DrawBitmapText(Bitmap bitmap)
         {
@@ -551,30 +589,16 @@ namespace FoenixIDE.Display
         private void DrawBitmap(Bitmap bitmap)
         {
             // Bitmap Controller is located at $AF:0140
-            int reg = IO.ReadByte(0xAF_0140 - 0xAF_0000);
+            int reg = IO.ReadByte(BITMAP_CONTROL_REGISTER_ADDR - IO_BASE_ADDR);
             if ((reg & 0x01) == 00)
             {
                 return;
             }
-            int LUT = (reg & 14) >> 1;  // 8 possible LUTs
+            int lutIndex = (reg & 14) >> 1;  // 8 possible LUTs
 
-            int bitmapAddress = IO.ReadLong(0xAF_0141 - 0xAF_0000);
-            int width = IO.ReadWord(0xAF_0144 - 0xAF_0000);
-            int height = IO.ReadWord(0xAF_0146 - 0xAF_0000);
-
-            // Read the color lookup tables
-            int lutAddress = LUT * 1024 + 0xAF_2000 - 0xAF_0000;
-
-            int[] lut = new int[256];
-            for (int c = 0; c < 256; c++)
-            {
-                byte blue = IO.ReadByte(lutAddress++);
-                byte green = IO.ReadByte(lutAddress++);
-                byte red = IO.ReadByte(lutAddress++);
-                lutAddress++;
-                lut[c] = (255 << 24) + (red << 16) + (green << 8) + blue;
-            }
-
+            int bitmapAddress = IO.ReadLong(0xAF_0141 - IO_BASE_ADDR);
+            int width = IO.ReadWord(0xAF_0144 - IO_BASE_ADDR);
+            int height = IO.ReadWord(0xAF_0146 - IO_BASE_ADDR);
 
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0,0,640, 480), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
@@ -582,7 +606,7 @@ namespace FoenixIDE.Display
             {
                 for (int col = 0; col < width; col++)
                 {
-                    int value = (int) lut[VRAM.ReadByte(bitmapAddress++)];
+                    int value = (int) LUT[lutIndex][VRAM.ReadByte(bitmapAddress++)];
                     System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
                 }
             }
@@ -592,32 +616,19 @@ namespace FoenixIDE.Display
         private void DrawTiles(Bitmap bitmap, int layer)
         {
             // There are four possible tilesets to choose from
-            int addrTileset = 0xAF_0100 + layer * 8;
-            int reg = IO.ReadByte(addrTileset - 0xAF_0000);
+            int addrTileset = TILE_CONTROL_REGISTER_ADDR + layer * 8;
+            int reg = IO.ReadByte(addrTileset - IO_BASE_ADDR);
             // if the set is not enabled, we're done.
             if ((reg & 0x01) == 00)
             {
                 return;
             }
-            int LUT = (reg & 14) >> 1;  // 8 possible LUTs
+            int lutIndex = (reg & 14) >> 1;  // 8 possible LUTs
             bool striding = (reg & 0x80) == 0x80;
 
-            int tilesetAddress = IO.ReadLong(addrTileset + 1 - 0xAF_0000);
-            int strideX = IO.ReadWord(addrTileset + 4 - 0xAF_0000);
-            int strideY = IO.ReadWord(addrTileset + 6 - 0xAF_0000);
-
-            // Read the color lookup tables
-            int lutAddress = LUT * 1024 + 0xAF_2000 - 0xAF_0000;
-
-            int[] lut = new int[256];
-            for (int c = 0; c < 256; c++)
-            {
-                byte blue = IO.ReadByte(lutAddress++);
-                byte green = IO.ReadByte(lutAddress++);
-                byte red = IO.ReadByte(lutAddress++);
-                lutAddress++;
-                lut[c] = (255 << 24) + (red << 16) + (green << 8) + blue;
-            }
+            int tilesetAddress = IO.ReadLong(addrTileset + 1 - IO_BASE_ADDR);
+            int strideX = IO.ReadWord(addrTileset + 4 - IO_BASE_ADDR);
+            int strideY = IO.ReadWord(addrTileset + 6 - IO_BASE_ADDR);
 
             // Now read the tilemap
             int tilemapAddress = 0xAF5000 + 0x800 * layer;
@@ -628,8 +639,7 @@ namespace FoenixIDE.Display
             {
                 for (int tileCol = 0; tileCol < 40; tileCol++)
                 {
-                    int tile = IO.ReadByte(tilemapAddress + tileCol + tileRow * 64 - 0xAF_0000);
-
+                    int tile = IO.ReadByte(tilemapAddress + tileCol + tileRow * 64 - IO_BASE_ADDR);
                     
                     // Tiles are 16 x 16
                     for (int line = 0; line < 16; line++)
@@ -637,14 +647,60 @@ namespace FoenixIDE.Display
                         for (int col = 0; col < 16; col++)
                         {
                             // Lookup the pixel in the tileset
-                            int value = (int)lut[VRAM.ReadByte(tilesetAddress + ((tile /16 ) * 256 * 16 + (tile % 16) * 16) + col + line * strideX)];
-                            System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16*640) * 4, value);
+                            int pixelIndex = VRAM.ReadByte(tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + col + line * strideX);
+                            if (pixelIndex != 0)
+                            {
+                                int value = (int)LUT[lutIndex][pixelIndex];
+                                System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
+                            }
                         }
                     }
                 }
             }
             bitmap.UnlockBits(bitmapData);
         }
+
+        private void DrawSprites(Bitmap bitmap, int layer)
+        {
+            // There are 32 possible sprites to choose from.
+            for (int s = 0; s < 32; s++)
+            {
+                int addrSprite = SPRITE_CONTROL_REGISTER_ADDR + s * 8;
+                int reg = IO.ReadByte(addrSprite - IO_BASE_ADDR);
+                // if the set is not enabled, we're done.
+                int spriteLayer = (reg & 0x70) >> 4;
+                if ((reg & 1) == 1 && layer == spriteLayer)
+                {
+                    int lutIndex = (reg & 14) >> 1;  // 8 possible LUTs
+                    bool striding = (reg & 0x80) == 0x80;
+
+                    int spriteAddress = IO.ReadLong(addrSprite + 1 - IO_BASE_ADDR);
+                    int posX = IO.ReadWord(addrSprite + 4 - IO_BASE_ADDR);
+                    int posY = IO.ReadWord(addrSprite + 6 - IO_BASE_ADDR);
+
+                    BitmapData bitmapData = bitmap.LockBits(new Rectangle(posX, posY, 32, 32), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    IntPtr p = bitmapData.Scan0;
+
+                    // Sprites are 32 x 32
+                    for (int line = 0; line < 32; line++)
+                    {
+                        for (int col = 0; col < 32; col++)
+                        {
+                            // Lookup the pixel in the tileset
+                            int pixelIndex = VRAM.ReadByte(spriteAddress++);
+                            if (pixelIndex != 0)
+                            {
+                                int value = (int)LUT[lutIndex][pixelIndex];
+                                System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
+                            }
+                        }
+                    }
+
+                    bitmap.UnlockBits(bitmapData);
+                }
+            }
+        }
+
         private SizeF MeasureFont(Font font, Graphics g)
         {
             return g.MeasureString(MEASURE_STRING, font, int.MaxValue, StringFormat.GenericTypographic);
