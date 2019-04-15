@@ -21,8 +21,8 @@ namespace FoenixIDE.Processor
         private OpcodeList opcodes = null;
         private Operations operations = null;
 
-        public DateTime StartTime = DateTime.MinValue;
-        public DateTime StopTime = DateTime.MinValue;
+        //public DateTime StartTime = DateTime.MinValue;
+        //public DateTime StopTime = DateTime.MinValue;
 
         /// <summary>
         /// Currently executing opcode 
@@ -153,7 +153,7 @@ namespace FoenixIDE.Processor
         {
             CPUThread = new Thread(new ThreadStart(this.RunLoop));
 
-            StartTime = DateTime.Now;
+            //StartTime = DateTime.Now;
             clockCyles = 0;
             CPUThread.Start();
         }
@@ -176,10 +176,6 @@ namespace FoenixIDE.Processor
         /// </summary>
         public void Halt()
         {
-            StopTime = DateTime.Now;
-            global::System.Diagnostics.Debug.WriteLine("Elapsed time: " +
-                (this.StopTime - this.StartTime).TotalMilliseconds.ToString() + "ms" +
-                ", Cycles: " + this.CycleCounter.ToString());
             if (CPUThread != null && CPUThread.ThreadState == ThreadState.Running)
             {
                 Thread tmp = CPUThread;

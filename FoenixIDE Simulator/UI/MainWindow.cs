@@ -152,24 +152,29 @@ namespace FoenixIDE.UI
             this.Close();
         }
 
-        double cps;
         private void timer1_Tick(object sender, EventArgs e)
         {
             kernel.CPU.ExecuteCycles(CyclesPerTick);
-
-            TimeSpan s = kernel.CPU.CycleTime;
-            int c = kernel.CPU.CycleCounter;
-
-            cps = c / s.TotalSeconds;
         }
 
+        int previousCounter = 0;
+        int previousFrame = 0;
+        DateTime previousTime = DateTime.Now;
         private void performanceTimer_Tick(object sender, EventArgs e)
         {
-            TimeSpan s = DateTime.Now - kernel.CPU.StartTime;
-            int c = kernel.CPU.CycleCounter;
-            cps = c / s.TotalSeconds;
+            DateTime currentTime = DateTime.Now;
+            TimeSpan s = currentTime - previousTime;
+            int currentCounter = kernel.CPU.CycleCounter;
+            int currentFrame = gpu.paintCycle;
+            double cps = (currentCounter - previousCounter) / s.TotalSeconds;
+            double fps = (currentFrame - previousFrame) / s.TotalSeconds;
 
-            timerStatus.Text = cps.ToString("N0") + " CPS";
+            previousCounter = currentCounter;
+            previousTime = currentTime;
+            previousFrame = currentFrame;
+            cpsPerf.Text = "CPS: " + cps.ToString("N0");
+            fpsPerf.Text = "FPS: " + fps.ToString("N0");
+
         }
 
         private void gpu_VisibleChanged(object sender, EventArgs e)
@@ -233,11 +238,6 @@ namespace FoenixIDE.UI
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }
-        }
-
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
         }
     }
 }

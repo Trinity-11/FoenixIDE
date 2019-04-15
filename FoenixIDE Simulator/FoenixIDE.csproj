@@ -58,6 +58,7 @@
     <Compile Include="DeviceEnum.cs" />
     <Compile Include="KeyboardMap.cs" />
     <Compile Include="MemoryBuffer.cs" />
+    <Compile Include="MemoryLocations\MathCoproMemoryRAM.cs" />
     <Compile Include="MemoryLocations\MemoryMap_IO.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Blocks.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Other.cs" />

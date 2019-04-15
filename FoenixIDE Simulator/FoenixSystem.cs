@@ -44,6 +44,7 @@ namespace FoenixIDE
                 IO = new MemoryRAM(MemoryMap.IO_START, MemoryMap.IO_SIZE),   // 64K IO space
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
+                MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_END) // 48 bytes
             };
             this.CPU = new CPU(Memory);
             this.CPU.SimulatorCommand += CPU_SimulatorCommand;
@@ -491,5 +492,6 @@ namespace FoenixIDE
             defaultKernel = value;
         }
 
+        
     }
 }

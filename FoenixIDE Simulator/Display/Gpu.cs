@@ -34,6 +34,7 @@ namespace FoenixIDE.Display
         public MemoryRAM VRAM = null;
         public MemoryRAM RAM = null;
         public MemoryRAM IO = null;
+        public int paintCycle = 0;
 
         public int StartAddress
         {
@@ -383,13 +384,8 @@ namespace FoenixIDE.Display
         /// <param name="e"></param>
         void Gpu_Paint(object sender, PaintEventArgs e)
         {
+            paintCycle++;
             Graphics g = e.Graphics;
-            int backgroundColor = IO.ReadLong(8);
-            g.Clear(Color.FromArgb(backgroundColor));
-            //g.CompositingQuality = global::System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-            //g.InterpolationMode = global::System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-
-            Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
 
             if (VRAM == null)
             {
@@ -401,6 +397,9 @@ namespace FoenixIDE.Display
                 g.DrawString("CodeRAM Not initialized", this.Font, TextBrush, 0, 0);
                 return;
             }
+            Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
+            int backgroundColor = IO.ReadLong(8);
+            g.Clear(Color.FromArgb(backgroundColor));
 
             // Text Mode
             byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000

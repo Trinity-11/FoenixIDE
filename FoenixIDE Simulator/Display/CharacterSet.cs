@@ -86,13 +86,6 @@ namespace FoenixIDE.Display
                 SystemLog.WriteLine(SystemLog.SeverityCodes.Recoverable, "Error in CharacteSet.Load\r\n" + ex.Message + "Filename:" + Filename);
             }
 
-            GenerateBitmaps();
-
-        }
-
-        SolidBrush brush = new SolidBrush(Color.White);
-        private void GenerateBitmaps()
-        {
             Bitmaps = new Bitmap[256];
             switch (CharSize)
             {

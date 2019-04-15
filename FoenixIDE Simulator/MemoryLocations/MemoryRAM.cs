@@ -11,7 +11,6 @@ namespace FoenixIDE
 {
     public class MemoryRAM : IMappable
     {
-        // allocate 16MB of memory
         protected byte[] data = null;
         private int startAddress;
         private int length;
@@ -75,11 +74,6 @@ namespace FoenixIDE
         public virtual void WriteByte(int Address, byte Value)
         {
             data[Address] = Value;
-            if (Value != 0 && (Address == MemoryMap.COLS_VISIBLE || Address == MemoryMap.LINES_VISIBLE))
-            {
-                // Refresh the display
-                SystemLog.WriteLine(SystemLog.SeverityCodes.Minor, "Refresh Display");
-            }
         }
 
         public void WriteWord(int Address, int Value)

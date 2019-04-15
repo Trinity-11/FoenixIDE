@@ -30,6 +30,9 @@ namespace FoenixIDE.MemoryLocations
         public const int FLASH_END = 0xFFFFFF; // End of 1MB FLASH 
         public const int FLASH_SIZE = 0x100000; // 1MB between the two FLASHES
 
+        public const int MATH_START = 0x00_0100;
+        public const int MATH_END = 0x00_012F;
+
         #endregion
     }
 }

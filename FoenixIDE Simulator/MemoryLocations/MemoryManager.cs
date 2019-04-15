@@ -16,13 +16,14 @@ namespace FoenixIDE
     /// </summary>
     public class MemoryManager : FoenixIDE.Common.IMappable
     {
-        public const int MinAddress = 0x000000;
-        public const int MaxAddress = 0xffffff;
+        public const int MinAddress = 0x00_0000;
+        public const int MaxAddress = 0xff_ffff;
 
         public MemoryRAM RAM = null;
         public MemoryRAM FLASH = null;
         public MemoryRAM VIDEO = null;
         public MemoryRAM IO = null;
+        public MathCoproMemoryRAM MATH = null;
 
         public bool VectorPull = false;
 
@@ -40,7 +41,7 @@ namespace FoenixIDE
         {
             get
             {
-                return 0x1000000;
+                return 0x100_0000;
             }
         }
 
@@ -48,7 +49,7 @@ namespace FoenixIDE
         {
             get
             {
-                return 0xFFFFFF;
+                return 0xFF_FFFF;
             }
         }
 
@@ -61,7 +62,14 @@ namespace FoenixIDE
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
         {
-            if (Address >= MemoryMap.RAM_START && Address <= MemoryMap.RAM_END)
+            if (Address >= MemoryMap.MATH_START && Address <= MemoryMap.MATH_END)
+            {
+                Device = MATH;
+                DeviceAddress = Address - MATH.StartAddress;
+                return;
+            }
+            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.MATH_START) ||
+                (Address > MemoryMap.MATH_END && Address <= MemoryMap.RAM_END))
             {
                 Device = RAM;
                 DeviceAddress = Address - RAM.StartAddress;
@@ -88,6 +96,7 @@ namespace FoenixIDE
                 DeviceAddress = Address - FLASH.StartAddress;
                 return;
             }
+
 
             // oops, we didn't map this to anything. 
             Device = null;
