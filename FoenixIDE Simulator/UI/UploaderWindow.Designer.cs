@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UploaderWindow));
             this.ConnectButton = new System.Windows.Forms.Button();
             this.COMPortComboBox = new System.Windows.Forms.ComboBox();
             this.BrowseFileButton = new System.Windows.Forms.Button();
@@ -177,6 +178,7 @@
             this.Controls.Add(this.COMPortComboBox);
             this.Controls.Add(this.ConnectButton);
             this.Controls.Add(this.DollarSignLabel);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "UploaderWindow";

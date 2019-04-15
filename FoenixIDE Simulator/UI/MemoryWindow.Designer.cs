@@ -31,6 +31,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MemoryWindow));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.CompactCheckbox = new System.Windows.Forms.CheckBox();
+            this.ExportButton = new System.Windows.Forms.Button();
+            this.AddressCombo = new System.Windows.Forms.ComboBox();
             this.PreviousButton = new System.Windows.Forms.Button();
             this.NextButton = new System.Windows.Forms.Button();
             this.ViewButton = new System.Windows.Forms.Button();
@@ -49,9 +52,6 @@
             this.MCRBit6Button = new System.Windows.Forms.Button();
             this.MCRBit7Button = new System.Windows.Forms.Button();
             this.MasterControlLabel = new System.Windows.Forms.Label();
-            this.AddressCombo = new System.Windows.Forms.ComboBox();
-            this.ExportButton = new System.Windows.Forms.Button();
-            this.CompactCheckbox = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -70,18 +70,61 @@
             this.panel1.Controls.Add(this.StartAddressText);
             this.panel1.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(757, 31);
+            this.panel1.Size = new System.Drawing.Size(1041, 46);
             this.panel1.TabIndex = 0;
+            // 
+            // CompactCheckbox
+            // 
+            this.CompactCheckbox.AutoSize = true;
+            this.CompactCheckbox.Checked = true;
+            this.CompactCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CompactCheckbox.Location = new System.Drawing.Point(909, 8);
+            this.CompactCheckbox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CompactCheckbox.Name = "CompactCheckbox";
+            this.CompactCheckbox.Size = new System.Drawing.Size(117, 29);
+            this.CompactCheckbox.TabIndex = 12;
+            this.CompactCheckbox.Text = "Compact";
+            this.CompactCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // ExportButton
+            // 
+            this.ExportButton.Location = new System.Drawing.Point(810, 0);
+            this.ExportButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ExportButton.Name = "ExportButton";
+            this.ExportButton.Size = new System.Drawing.Size(96, 44);
+            this.ExportButton.TabIndex = 11;
+            this.ExportButton.Text = "Export";
+            this.ExportButton.UseVisualStyleBackColor = true;
+            this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
+            // 
+            // AddressCombo
+            // 
+            this.AddressCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.AddressCombo.FormattingEnabled = true;
+            this.AddressCombo.Items.AddRange(new object[] {
+            "Bank $00",
+            "Bank $18",
+            "Bank $19",
+            "Bank $AF (Vicky)",
+            "Bank $B0 (Video)",
+            "Address $AF:0100 (Bitmap and Tile Registers)",
+            "Address $AF:E000 (Beatrix)"});
+            this.AddressCombo.Location = new System.Drawing.Point(389, 4);
+            this.AddressCombo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.AddressCombo.Name = "AddressCombo";
+            this.AddressCombo.Size = new System.Drawing.Size(418, 32);
+            this.AddressCombo.TabIndex = 10;
+            this.AddressCombo.SelectedIndexChanged += new System.EventHandler(this.AddressCombo_SelectedIndexChanged);
             // 
             // PreviousButton
             // 
             this.PreviousButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PreviousButton.Location = new System.Drawing.Point(248, 0);
-            this.PreviousButton.Margin = new System.Windows.Forms.Padding(4);
+            this.PreviousButton.Location = new System.Drawing.Point(341, 0);
+            this.PreviousButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.PreviousButton.Name = "PreviousButton";
-            this.PreviousButton.Size = new System.Drawing.Size(33, 29);
+            this.PreviousButton.Size = new System.Drawing.Size(45, 44);
             this.PreviousButton.TabIndex = 4;
             this.PreviousButton.Text = "←";
             this.PreviousButton.UseVisualStyleBackColor = true;
@@ -90,10 +133,10 @@
             // NextButton
             // 
             this.NextButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NextButton.Location = new System.Drawing.Point(213, 0);
-            this.NextButton.Margin = new System.Windows.Forms.Padding(4);
+            this.NextButton.Location = new System.Drawing.Point(293, 0);
+            this.NextButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.NextButton.Name = "NextButton";
-            this.NextButton.Size = new System.Drawing.Size(35, 29);
+            this.NextButton.Size = new System.Drawing.Size(48, 44);
             this.NextButton.TabIndex = 3;
             this.NextButton.Text = "→";
             this.NextButton.UseVisualStyleBackColor = true;
@@ -101,10 +144,10 @@
             // 
             // ViewButton
             // 
-            this.ViewButton.Location = new System.Drawing.Point(143, 0);
-            this.ViewButton.Margin = new System.Windows.Forms.Padding(4);
+            this.ViewButton.Location = new System.Drawing.Point(197, 0);
+            this.ViewButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.ViewButton.Name = "ViewButton";
-            this.ViewButton.Size = new System.Drawing.Size(70, 29);
+            this.ViewButton.Size = new System.Drawing.Size(96, 44);
             this.ViewButton.TabIndex = 2;
             this.ViewButton.Text = "View";
             this.ViewButton.UseVisualStyleBackColor = true;
@@ -113,10 +156,10 @@
             // EndAddressText
             // 
             this.EndAddressText.Font = new System.Drawing.Font("Consolas", 10F);
-            this.EndAddressText.Location = new System.Drawing.Point(72, 0);
-            this.EndAddressText.Margin = new System.Windows.Forms.Padding(4);
+            this.EndAddressText.Location = new System.Drawing.Point(99, 0);
+            this.EndAddressText.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.EndAddressText.Name = "EndAddressText";
-            this.EndAddressText.Size = new System.Drawing.Size(70, 27);
+            this.EndAddressText.Size = new System.Drawing.Size(95, 35);
             this.EndAddressText.TabIndex = 1;
             this.EndAddressText.Text = "0000FF";
             this.EndAddressText.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -127,9 +170,9 @@
             this.StartAddressText.Dock = System.Windows.Forms.DockStyle.Left;
             this.StartAddressText.Font = new System.Drawing.Font("Consolas", 10F);
             this.StartAddressText.Location = new System.Drawing.Point(0, 0);
-            this.StartAddressText.Margin = new System.Windows.Forms.Padding(4);
+            this.StartAddressText.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.StartAddressText.Name = "StartAddressText";
-            this.StartAddressText.Size = new System.Drawing.Size(70, 27);
+            this.StartAddressText.Size = new System.Drawing.Size(95, 35);
             this.StartAddressText.TabIndex = 0;
             this.StartAddressText.Text = "000000";
             this.StartAddressText.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -140,12 +183,12 @@
             this.MemoryText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.MemoryText.Font = new System.Drawing.Font("Consolas", 10F);
-            this.MemoryText.Location = new System.Drawing.Point(0, 28);
-            this.MemoryText.Margin = new System.Windows.Forms.Padding(4);
+            this.MemoryText.Location = new System.Drawing.Point(0, 42);
+            this.MemoryText.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.MemoryText.Multiline = true;
             this.MemoryText.Name = "MemoryText";
             this.MemoryText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.MemoryText.Size = new System.Drawing.Size(759, 426);
+            this.MemoryText.Size = new System.Drawing.Size(1042, 637);
             this.MemoryText.TabIndex = 0;
             this.MemoryText.Text = resources.GetString("MemoryText.Text");
             // 
@@ -172,16 +215,18 @@
             this.panel2.Controls.Add(this.MCRBit6Button);
             this.panel2.Controls.Add(this.MCRBit7Button);
             this.panel2.Controls.Add(this.MasterControlLabel);
-            this.panel2.Location = new System.Drawing.Point(0, 461);
+            this.panel2.Location = new System.Drawing.Point(0, 692);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(762, 37);
+            this.panel2.Size = new System.Drawing.Size(1048, 56);
             this.panel2.TabIndex = 1;
             // 
             // MCRBit0Button
             // 
-            this.MCRBit0Button.Location = new System.Drawing.Point(452, 3);
+            this.MCRBit0Button.Location = new System.Drawing.Point(622, 4);
+            this.MCRBit0Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit0Button.Name = "MCRBit0Button";
-            this.MCRBit0Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit0Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit0Button.TabIndex = 8;
             this.MCRBit0Button.Tag = "0";
             this.MCRBit0Button.Text = "T";
@@ -190,9 +235,10 @@
             // 
             // MCRBit1Button
             // 
-            this.MCRBit1Button.Location = new System.Drawing.Point(416, 3);
+            this.MCRBit1Button.Location = new System.Drawing.Point(572, 4);
+            this.MCRBit1Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit1Button.Name = "MCRBit1Button";
-            this.MCRBit1Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit1Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit1Button.TabIndex = 7;
             this.MCRBit1Button.Tag = "0";
             this.MCRBit1Button.Text = "O";
@@ -201,9 +247,10 @@
             // 
             // MCRBit2Button
             // 
-            this.MCRBit2Button.Location = new System.Drawing.Point(380, 3);
+            this.MCRBit2Button.Location = new System.Drawing.Point(522, 4);
+            this.MCRBit2Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit2Button.Name = "MCRBit2Button";
-            this.MCRBit2Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit2Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit2Button.TabIndex = 6;
             this.MCRBit2Button.Tag = "0";
             this.MCRBit2Button.Text = "G";
@@ -212,9 +259,10 @@
             // 
             // MCRBit3Button
             // 
-            this.MCRBit3Button.Location = new System.Drawing.Point(344, 3);
+            this.MCRBit3Button.Location = new System.Drawing.Point(473, 4);
+            this.MCRBit3Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit3Button.Name = "MCRBit3Button";
-            this.MCRBit3Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit3Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit3Button.TabIndex = 5;
             this.MCRBit3Button.Tag = "0";
             this.MCRBit3Button.Text = "B";
@@ -223,9 +271,10 @@
             // 
             // MCRBit4Button
             // 
-            this.MCRBit4Button.Location = new System.Drawing.Point(301, 3);
+            this.MCRBit4Button.Location = new System.Drawing.Point(414, 4);
+            this.MCRBit4Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit4Button.Name = "MCRBit4Button";
-            this.MCRBit4Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit4Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit4Button.TabIndex = 4;
             this.MCRBit4Button.Tag = "0";
             this.MCRBit4Button.Text = "T";
@@ -234,9 +283,10 @@
             // 
             // MCRBit5Button
             // 
-            this.MCRBit5Button.Location = new System.Drawing.Point(265, 3);
+            this.MCRBit5Button.Location = new System.Drawing.Point(364, 4);
+            this.MCRBit5Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit5Button.Name = "MCRBit5Button";
-            this.MCRBit5Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit5Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit5Button.TabIndex = 3;
             this.MCRBit5Button.Tag = "0";
             this.MCRBit5Button.Text = "S";
@@ -245,9 +295,10 @@
             // 
             // MCRBit6Button
             // 
-            this.MCRBit6Button.Location = new System.Drawing.Point(229, 3);
+            this.MCRBit6Button.Location = new System.Drawing.Point(315, 4);
+            this.MCRBit6Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit6Button.Name = "MCRBit6Button";
-            this.MCRBit6Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit6Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit6Button.TabIndex = 2;
             this.MCRBit6Button.Tag = "0";
             this.MCRBit6Button.Text = "G";
@@ -257,9 +308,10 @@
             // MCRBit7Button
             // 
             this.MCRBit7Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.MCRBit7Button.Location = new System.Drawing.Point(193, 3);
+            this.MCRBit7Button.Location = new System.Drawing.Point(265, 4);
+            this.MCRBit7Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MCRBit7Button.Name = "MCRBit7Button";
-            this.MCRBit7Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit7Button.Size = new System.Drawing.Size(48, 45);
             this.MCRBit7Button.TabIndex = 1;
             this.MCRBit7Button.Tag = "0";
             this.MCRBit7Button.Text = "D";
@@ -270,65 +322,26 @@
             // 
             this.MasterControlLabel.AutoSize = true;
             this.MasterControlLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MasterControlLabel.Location = new System.Drawing.Point(12, 11);
+            this.MasterControlLabel.Location = new System.Drawing.Point(16, 16);
+            this.MasterControlLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.MasterControlLabel.Name = "MasterControlLabel";
-            this.MasterControlLabel.Size = new System.Drawing.Size(156, 18);
+            this.MasterControlLabel.Size = new System.Drawing.Size(216, 25);
             this.MasterControlLabel.TabIndex = 0;
             this.MasterControlLabel.Text = "Master Control Reg";
-            // 
-            // AddressCombo
-            // 
-            this.AddressCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.AddressCombo.FormattingEnabled = true;
-            this.AddressCombo.Items.AddRange(new object[] {
-            "Bank $00",
-            "Bank $18",
-            "Bank $19",
-            "Bank $AF (Vicky)",
-            "Bank $B0 (Video)",
-            "Address $AF:0100 (Bitmap and Tile Registers)",
-            "Address $AF:E000 (Beatrix)"});
-            this.AddressCombo.Location = new System.Drawing.Point(283, 3);
-            this.AddressCombo.Name = "AddressCombo";
-            this.AddressCombo.Size = new System.Drawing.Size(305, 24);
-            this.AddressCombo.TabIndex = 10;
-            this.AddressCombo.SelectedIndexChanged += new System.EventHandler(this.AddressCombo_SelectedIndexChanged);
-            // 
-            // ExportButton
-            // 
-            this.ExportButton.Location = new System.Drawing.Point(589, 0);
-            this.ExportButton.Margin = new System.Windows.Forms.Padding(4);
-            this.ExportButton.Name = "ExportButton";
-            this.ExportButton.Size = new System.Drawing.Size(70, 29);
-            this.ExportButton.TabIndex = 11;
-            this.ExportButton.Text = "Export";
-            this.ExportButton.UseVisualStyleBackColor = true;
-            this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
-            // 
-            // CompactCheckbox
-            // 
-            this.CompactCheckbox.AutoSize = true;
-            this.CompactCheckbox.Checked = true;
-            this.CompactCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CompactCheckbox.Location = new System.Drawing.Point(661, 5);
-            this.CompactCheckbox.Name = "CompactCheckbox";
-            this.CompactCheckbox.Size = new System.Drawing.Size(85, 21);
-            this.CompactCheckbox.TabIndex = 12;
-            this.CompactCheckbox.Text = "Compact";
-            this.CompactCheckbox.UseVisualStyleBackColor = true;
             // 
             // MemoryWindow
             // 
             this.AcceptButton = this.ViewButton;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(762, 498);
+            this.ClientSize = new System.Drawing.Size(1048, 747);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.MemoryText);
             this.Controls.Add(this.panel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.Margin = new System.Windows.Forms.Padding(4);
-            this.MinimumSize = new System.Drawing.Size(780, 463);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.MinimumSize = new System.Drawing.Size(1064, 662);
             this.Name = "MemoryWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "MemoryWindow";

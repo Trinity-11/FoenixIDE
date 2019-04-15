@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CPUWindow));
             this.messageText = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.stepsInput = new System.Windows.Forms.TextBox();
@@ -311,6 +312,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.lastLine);
             this.Controls.Add(this.stackText);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(1280, 0);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "CPUWindow";
