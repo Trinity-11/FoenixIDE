@@ -709,7 +709,7 @@ namespace FoenixIDE.Display
         {
             if (RefreshTimer-- > 0)
             {
-                if (Form.ActiveForm == this.ParentForm)
+                if (this.Visible)
                     Refresh();
                 return;
             }
@@ -761,11 +761,6 @@ namespace FoenixIDE.Display
         public byte ReadGPURegister(int Address)
         {
             return 0;
-        }
-
-        public void WriteGPURegister(int Address, byte Data)
-        {
-
         }
 
         public void WriteByte(int Address, byte Data)

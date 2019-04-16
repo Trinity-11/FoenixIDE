@@ -46,9 +46,10 @@
             // ConnectButton
             // 
             this.ConnectButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ConnectButton.Location = new System.Drawing.Point(23, 27);
+            this.ConnectButton.Location = new System.Drawing.Point(17, 18);
+            this.ConnectButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.ConnectButton.Name = "ConnectButton";
-            this.ConnectButton.Size = new System.Drawing.Size(205, 44);
+            this.ConnectButton.Size = new System.Drawing.Size(149, 29);
             this.ConnectButton.TabIndex = 0;
             this.ConnectButton.Text = "Connect";
             this.ConnectButton.UseVisualStyleBackColor = true;
@@ -57,17 +58,19 @@
             // COMPortComboBox
             // 
             this.COMPortComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.COMPortComboBox.Location = new System.Drawing.Point(245, 34);
+            this.COMPortComboBox.Location = new System.Drawing.Point(178, 23);
+            this.COMPortComboBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.COMPortComboBox.Name = "COMPortComboBox";
-            this.COMPortComboBox.Size = new System.Drawing.Size(199, 32);
+            this.COMPortComboBox.Size = new System.Drawing.Size(146, 24);
             this.COMPortComboBox.TabIndex = 1;
             // 
             // BrowseFileButton
             // 
             this.BrowseFileButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BrowseFileButton.Location = new System.Drawing.Point(23, 86);
+            this.BrowseFileButton.Location = new System.Drawing.Point(17, 57);
+            this.BrowseFileButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.BrowseFileButton.Name = "BrowseFileButton";
-            this.BrowseFileButton.Size = new System.Drawing.Size(205, 44);
+            this.BrowseFileButton.Size = new System.Drawing.Size(149, 29);
             this.BrowseFileButton.TabIndex = 2;
             this.BrowseFileButton.Text = "Browse File";
             this.BrowseFileButton.UseVisualStyleBackColor = true;
@@ -75,28 +78,31 @@
             // 
             // FileNameTextBox
             // 
-            this.FileNameTextBox.Location = new System.Drawing.Point(245, 93);
+            this.FileNameTextBox.Location = new System.Drawing.Point(178, 62);
+            this.FileNameTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.FileNameTextBox.Name = "FileNameTextBox";
             this.FileNameTextBox.ReadOnly = true;
-            this.FileNameTextBox.Size = new System.Drawing.Size(594, 29);
+            this.FileNameTextBox.Size = new System.Drawing.Size(433, 22);
             this.FileNameTextBox.TabIndex = 3;
             // 
             // FileSizeLabel
             // 
             this.FileSizeLabel.AutoSize = true;
             this.FileSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FileSizeLabel.Location = new System.Drawing.Point(23, 147);
+            this.FileSizeLabel.Location = new System.Drawing.Point(17, 98);
+            this.FileSizeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeLabel.Name = "FileSizeLabel";
-            this.FileSizeLabel.Size = new System.Drawing.Size(103, 25);
+            this.FileSizeLabel.Size = new System.Drawing.Size(75, 17);
             this.FileSizeLabel.TabIndex = 4;
             this.FileSizeLabel.Text = "File Size:";
             // 
             // FileSizeResultLabel
             // 
             this.FileSizeResultLabel.AutoSize = true;
-            this.FileSizeResultLabel.Location = new System.Drawing.Point(243, 147);
+            this.FileSizeResultLabel.Location = new System.Drawing.Point(177, 98);
+            this.FileSizeResultLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeResultLabel.Name = "FileSizeResultLabel";
-            this.FileSizeResultLabel.Size = new System.Drawing.Size(95, 25);
+            this.FileSizeResultLabel.Size = new System.Drawing.Size(68, 17);
             this.FileSizeResultLabel.TabIndex = 5;
             this.FileSizeResultLabel.Text = "$00:0000";
             // 
@@ -104,9 +110,10 @@
             // 
             this.LoadAddressLabel.AutoSize = true;
             this.LoadAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LoadAddressLabel.Location = new System.Drawing.Point(23, 186);
+            this.LoadAddressLabel.Location = new System.Drawing.Point(17, 124);
+            this.LoadAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.LoadAddressLabel.Name = "LoadAddressLabel";
-            this.LoadAddressLabel.Size = new System.Drawing.Size(153, 25);
+            this.LoadAddressLabel.Size = new System.Drawing.Size(113, 17);
             this.LoadAddressLabel.TabIndex = 6;
             this.LoadAddressLabel.Text = "Load Address:";
             // 
@@ -114,9 +121,10 @@
             // 
             this.SendBinaryButton.Enabled = false;
             this.SendBinaryButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SendBinaryButton.Location = new System.Drawing.Point(23, 230);
+            this.SendBinaryButton.Location = new System.Drawing.Point(17, 153);
+            this.SendBinaryButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.SendBinaryButton.Name = "SendBinaryButton";
-            this.SendBinaryButton.Size = new System.Drawing.Size(205, 44);
+            this.SendBinaryButton.Size = new System.Drawing.Size(149, 29);
             this.SendBinaryButton.TabIndex = 7;
             this.SendBinaryButton.Text = "Send Binary";
             this.SendBinaryButton.UseVisualStyleBackColor = true;
@@ -125,9 +133,10 @@
             // LoadAddressTextBox
             // 
             this.LoadAddressTextBox.Enabled = false;
-            this.LoadAddressTextBox.Location = new System.Drawing.Point(261, 183);
+            this.LoadAddressTextBox.Location = new System.Drawing.Point(190, 122);
+            this.LoadAddressTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.LoadAddressTextBox.Name = "LoadAddressTextBox";
-            this.LoadAddressTextBox.Size = new System.Drawing.Size(126, 29);
+            this.LoadAddressTextBox.Size = new System.Drawing.Size(93, 22);
             this.LoadAddressTextBox.TabIndex = 8;
             this.LoadAddressTextBox.Text = "00:0000";
             this.LoadAddressTextBox.TextChanged += new System.EventHandler(this.LoadAddressTextBox_TextChanged);
@@ -135,26 +144,29 @@
             // DollarSignLabel
             // 
             this.DollarSignLabel.AutoSize = true;
-            this.DollarSignLabel.Location = new System.Drawing.Point(240, 186);
+            this.DollarSignLabel.Location = new System.Drawing.Point(175, 124);
+            this.DollarSignLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DollarSignLabel.Name = "DollarSignLabel";
-            this.DollarSignLabel.Size = new System.Drawing.Size(23, 25);
+            this.DollarSignLabel.Size = new System.Drawing.Size(16, 17);
             this.DollarSignLabel.TabIndex = 9;
             this.DollarSignLabel.Text = "$";
             // 
             // UploadProgressBar
             // 
-            this.UploadProgressBar.Location = new System.Drawing.Point(23, 294);
+            this.UploadProgressBar.Location = new System.Drawing.Point(17, 196);
+            this.UploadProgressBar.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.UploadProgressBar.Name = "UploadProgressBar";
-            this.UploadProgressBar.Size = new System.Drawing.Size(816, 39);
+            this.UploadProgressBar.Size = new System.Drawing.Size(593, 26);
             this.UploadProgressBar.TabIndex = 10;
             this.UploadProgressBar.Visible = false;
             // 
             // DisconnectButton
             // 
             this.DisconnectButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DisconnectButton.Location = new System.Drawing.Point(23, 27);
+            this.DisconnectButton.Location = new System.Drawing.Point(17, 18);
+            this.DisconnectButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.DisconnectButton.Name = "DisconnectButton";
-            this.DisconnectButton.Size = new System.Drawing.Size(205, 44);
+            this.DisconnectButton.Size = new System.Drawing.Size(149, 29);
             this.DisconnectButton.TabIndex = 11;
             this.DisconnectButton.Text = "Disconnect";
             this.DisconnectButton.UseVisualStyleBackColor = true;
@@ -163,9 +175,10 @@
             // 
             // UploaderWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(872, 357);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(634, 238);
             this.Controls.Add(this.DisconnectButton);
             this.Controls.Add(this.UploadProgressBar);
             this.Controls.Add(this.LoadAddressTextBox);
@@ -178,10 +191,14 @@
             this.Controls.Add(this.COMPortComboBox);
             this.Controls.Add(this.ConnectButton);
             this.Controls.Add(this.DollarSignLabel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "UploaderWindow";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Uploader Window";
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -68,10 +68,10 @@ namespace FoenixIDE.UI
             this.lastKeyPressed,
             this.cpsPerf,
             this.fpsPerf});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 1532);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 520);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 26, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(2171, 43);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(682, 33);
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -79,13 +79,13 @@ namespace FoenixIDE.UI
             // ModeText
             // 
             this.ModeText.Name = "ModeText";
-            this.ModeText.Size = new System.Drawing.Size(112, 38);
+            this.ModeText.Size = new System.Drawing.Size(81, 28);
             this.ModeText.Text = "Immediate";
             // 
             // lastKeyPressed
             // 
             this.lastKeyPressed.Name = "lastKeyPressed";
-            this.lastKeyPressed.Size = new System.Drawing.Size(46, 38);
+            this.lastKeyPressed.Size = new System.Drawing.Size(33, 28);
             this.lastKeyPressed.Text = "$00";
             // 
             // cpsPerf
@@ -97,7 +97,7 @@ namespace FoenixIDE.UI
             this.cpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cpsPerf.Name = "cpsPerf";
             this.cpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.cpsPerf.Size = new System.Drawing.Size(83, 38);
+            this.cpsPerf.Size = new System.Drawing.Size(60, 28);
             this.cpsPerf.Text = "CPS: 0";
             // 
             // fpsPerf
@@ -109,7 +109,7 @@ namespace FoenixIDE.UI
             this.fpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fpsPerf.Name = "fpsPerf";
             this.fpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.fpsPerf.Size = new System.Drawing.Size(81, 38);
+            this.fpsPerf.Size = new System.Drawing.Size(59, 28);
             this.fpsPerf.Text = "FPS: 0";
             // 
             // menuStrip1
@@ -121,8 +121,8 @@ namespace FoenixIDE.UI
             this.resetToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(11, 4, 0, 4);
-            this.menuStrip1.Size = new System.Drawing.Size(2171, 42);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 3, 0, 3);
+            this.menuStrip1.Size = new System.Drawing.Size(682, 30);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -133,27 +133,27 @@ namespace FoenixIDE.UI
             this.loadImageToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(56, 34);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(44, 24);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // menuOpen
             // 
             this.menuOpen.Name = "menuOpen";
-            this.menuOpen.Size = new System.Drawing.Size(213, 34);
+            this.menuOpen.Size = new System.Drawing.Size(163, 26);
             this.menuOpen.Text = "&Open";
             this.menuOpen.Click += new System.EventHandler(this.menuOpen_Click);
             // 
             // loadImageToolStripMenuItem
             // 
             this.loadImageToolStripMenuItem.Name = "loadImageToolStripMenuItem";
-            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(213, 34);
+            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
             this.loadImageToolStripMenuItem.Text = "&Load Image";
             this.loadImageToolStripMenuItem.Click += new System.EventHandler(this.loadImageToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(213, 34);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -164,27 +164,27 @@ namespace FoenixIDE.UI
             this.memoryToolStripMenuItem,
             this.uploaderToolStripMenuItem});
             this.windowsToolStripMenuItem.Name = "windowsToolStripMenuItem";
-            this.windowsToolStripMenuItem.Size = new System.Drawing.Size(110, 34);
+            this.windowsToolStripMenuItem.Size = new System.Drawing.Size(82, 24);
             this.windowsToolStripMenuItem.Text = "&Windows";
             // 
             // cPUToolStripMenuItem
             // 
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(188, 34);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(146, 26);
             this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.cPUToolStripMenuItem_Click);
             // 
             // memoryToolStripMenuItem
             // 
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(188, 34);
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(146, 26);
             this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.memoryToolStripMenuItem_Click);
             // 
             // uploaderToolStripMenuItem
             // 
             this.uploaderToolStripMenuItem.Name = "uploaderToolStripMenuItem";
-            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(188, 34);
+            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(146, 26);
             this.uploaderToolStripMenuItem.Text = "&Uploader";
             this.uploaderToolStripMenuItem.Click += new System.EventHandler(this.uploaderToolStripMenuItem_Click);
             // 
@@ -196,20 +196,20 @@ namespace FoenixIDE.UI
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
             this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.R)));
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(75, 34);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(57, 24);
             this.resetToolStripMenuItem.Text = "&Reset";
             // 
             // resetToolStripMenuItem1
             // 
             this.resetToolStripMenuItem1.Name = "resetToolStripMenuItem1";
-            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(218, 34);
+            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(167, 26);
             this.resetToolStripMenuItem1.Text = "Start/&Restart";
             this.resetToolStripMenuItem1.Click += new System.EventHandler(this.resetToolStripMenuItem1_Click);
             // 
             // debugToolStripMenuItem
             // 
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
-            this.debugToolStripMenuItem.Size = new System.Drawing.Size(218, 34);
+            this.debugToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
             this.debugToolStripMenuItem.Text = "Start/&Debug";
             this.debugToolStripMenuItem.Click += new System.EventHandler(this.debugToolStripMenuItem_Click);
             // 
@@ -228,40 +228,40 @@ namespace FoenixIDE.UI
             // 
             this.panel1.BackColor = System.Drawing.Color.LightBlue;
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 72);
-            this.panel1.Margin = new System.Windows.Forms.Padding(6);
+            this.panel1.Location = new System.Drawing.Point(0, 50);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(29, 1460);
+            this.panel1.Size = new System.Drawing.Size(21, 470);
             this.panel1.TabIndex = 3;
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(2142, 72);
-            this.panel2.Margin = new System.Windows.Forms.Padding(6);
+            this.panel2.Location = new System.Drawing.Point(661, 50);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(29, 1460);
+            this.panel2.Size = new System.Drawing.Size(21, 470);
             this.panel2.TabIndex = 4;
             // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.LightBlue;
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(29, 1502);
-            this.panel3.Margin = new System.Windows.Forms.Padding(6);
+            this.panel3.Location = new System.Drawing.Point(21, 500);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(2113, 30);
+            this.panel3.Size = new System.Drawing.Size(640, 20);
             this.panel3.TabIndex = 5;
             // 
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.LightBlue;
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel4.Location = new System.Drawing.Point(0, 42);
-            this.panel4.Margin = new System.Windows.Forms.Padding(6);
+            this.panel4.Location = new System.Drawing.Point(0, 30);
+            this.panel4.Margin = new System.Windows.Forms.Padding(4);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(2171, 30);
+            this.panel4.Size = new System.Drawing.Size(682, 20);
             this.panel4.TabIndex = 6;
             // 
             // gpu
@@ -274,11 +274,11 @@ namespace FoenixIDE.UI
             this.gpu.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gpu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.gpu.LinesVisible = 0;
-            this.gpu.Location = new System.Drawing.Point(29, 72);
-            this.gpu.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
-            this.gpu.MinimumSize = new System.Drawing.Size(639, 480);
+            this.gpu.Location = new System.Drawing.Point(21, 50);
+            this.gpu.Margin = new System.Windows.Forms.Padding(5);
+            this.gpu.MinimumSize = new System.Drawing.Size(465, 320);
             this.gpu.Name = "gpu";
-            this.gpu.Size = new System.Drawing.Size(2113, 1430);
+            this.gpu.Size = new System.Drawing.Size(640, 450);
             this.gpu.TabIndex = 0;
             this.gpu.X = 0;
             this.gpu.Y = 0;
@@ -286,9 +286,9 @@ namespace FoenixIDE.UI
             // 
             // MainWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2171, 1575);
+            this.ClientSize = new System.Drawing.Size(682, 553);
             this.Controls.Add(this.gpu);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);
@@ -300,8 +300,8 @@ namespace FoenixIDE.UI
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(300, 300);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(6);
-            this.MinimumSize = new System.Drawing.Size(710, 637);
+            this.Margin = new System.Windows.Forms.Padding(4);
+            this.MinimumSize = new System.Drawing.Size(700, 600);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Foenix IDE";

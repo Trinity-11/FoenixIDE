@@ -16,14 +16,8 @@ namespace FoenixIDE.UI
         private const int MNEMONIC_COLUMN = 22;
         private const int REGISTER_COLUMN = 34;
         private int StepCounter = 0;
-        string[] listing;
-        Processor.Breakpoints breakpoints = new Processor.Breakpoints();
 
-        public CPUWindow()
-        {
-            InitializeComponent();
-            Instance = this;
-        }
+        Processor.Breakpoints breakpoints = new Processor.Breakpoints();
 
         public static CPUWindow Instance = null;
         private Processor.CPU _cpu = null;
@@ -31,6 +25,23 @@ namespace FoenixIDE.UI
 
         List<string> PrintQueue = new List<string>();
         static StringBuilder lineBuffer = new StringBuilder();
+
+        const int MAX_LINES = 25;
+        const int TRIM_LINES = 1;
+
+        public CPUWindow()
+        {
+            InitializeComponent();
+            Instance = this;
+        }
+
+        private void CPUWindow_Load(object sender, EventArgs e)
+        {
+            PrintTab(REGISTER_COLUMN);
+            HeaderTextbox.Text = GetHeaderText();
+            ClearTrace();
+            RefreshStatus();
+        }
 
         public CPU CPU
         {
@@ -83,6 +94,13 @@ namespace FoenixIDE.UI
                 lineBuffer.Append(" ");
         }
 
+        private void RunButton_Click(object sender, EventArgs e)
+        {
+            RefreshStatus();
+            CPU.DebugPause = false;
+            timer1.Enabled = true;
+        }
+
         private void PauseButton_Click(object sender, EventArgs e)
         {
             CPU.DebugPause = true;
@@ -101,7 +119,7 @@ namespace FoenixIDE.UI
             while (!Kernel.CPU.DebugPause && steps-- > 0)
             {
                 ExecuteStep();
-                Application.DoEvents();
+                //Application.DoEvents();
             }
             RefreshStatus();
             Kernel.CPU.DebugPause = true;
@@ -110,8 +128,10 @@ namespace FoenixIDE.UI
         private void RefreshStatus()
         {
             this.Text = "Debug: " + StepCounter.ToString();
-            UpdateStackDisplay();
+            
             Kernel.gpu.Refresh();
+
+            UpdateStackDisplay();
 
             string[] lines = new string[messageText.Lines.Length + PrintQueue.Count];
             messageText.Lines.CopyTo(lines, 0);
@@ -132,48 +152,12 @@ namespace FoenixIDE.UI
             messageText.SelectionStart = messageText.TextLength;
             messageText.ScrollToCaret();
 
-            //if (PrintQueue.Count > 5)
-            //{
-            //    string[] lines = new string[messageText.Lines.Length + PrintQueue.Count];
-            //    if (messageText.Lines.Length > 0)
-            //        Array.Copy(messageText.Lines, lines, messageText.Lines.Length);
-            //    PrintQueue.CopyTo(lines, messageText.Lines.Length);
-            //    messageText.Lines = lines;
-
-            //    messageText.AppendText(" ");
-            //}
-            //else
-            //{
-            //    for (int i = 0; i < PrintQueue.Count; i++)
-            //    {
-            //        if (messageText.Lines.Length > 127)
-            //        {
-            //            //skip one line
-            //            messageText.Lines = messageText.Lines.Skip(1).ToArray();
-            //        }
-            //        messageText.AppendText("\r\n");
-            //        messageText.AppendText(PrintQueue[i]);
-            //    }
-            //}
             PrintQueue.Clear();
             PrintNextInstruction();
         }
 
         private void PrintNextInstruction()
         {
-            //if (listing != null || listing.Length > 0)
-            //{
-            //    string pc = "." + CPU.GetLongPC().ToString("x6");
-            //    foreach (string line in listing)
-            //    {
-            //        if (line.StartsWith(pc))
-            //        {
-            //            lastLine.Text = line;
-            //            return;
-            //        }
-            //    }
-            //}
-
             OpCode oc = CPU.PreFetch();
             int start = CPU.GetLongPC();
             PrintPC(start);
@@ -203,8 +187,6 @@ namespace FoenixIDE.UI
             return s.ToString();
         }
 
-        const int MAX_LINES = 25;
-        const int TRIM_LINES = 1;
         private void PrintPC(int pc1)
         {
             Print("." + pc1.ToString("X6") + "  ");
@@ -271,19 +253,6 @@ namespace FoenixIDE.UI
             }
         }
 
-        const int COUNTER_STEPS = 1000;
-        private void RunButton_Click(object sender, EventArgs e)
-        {
-            RefreshStatus();
-            //int counter = COUNTER_STEPS;
-            CPU.DebugPause = false;
-            timer1.Enabled = true;
-        }
-
-        private void locationInput_TextChanged(object sender, EventArgs e)
-        {
-        }
-
         private void stepsInput_Enter(object sender, EventArgs e)
         {
             TextBox tb = sender as TextBox;
@@ -322,17 +291,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void CPUWindow_Load(object sender, EventArgs e)
-        {
-            //if (messageText.Lines.Length == 0)
-            //    PrintLine(GetHeaderText());
-            PrintTab(REGISTER_COLUMN);
-            HeaderTextbox.Text = GetHeaderText();
-            //PrintLine(Kernel.Monitor.GetRegisterText());
-            ClearTrace();
-            RefreshStatus();
-        }
-
+        // Don't try to display the CPU information too often
         private void timer1_Tick(object sender, EventArgs e)
         {
             DateTime t = DateTime.Now.AddMilliseconds(timer1.Interval / 2);
@@ -373,11 +332,6 @@ namespace FoenixIDE.UI
             RefreshBreakpoints();
         }
 
-        private void MemoryButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void JumpButton_Click(object sender, EventArgs e)
         {
             int pc = breakpoints.GetIntFromHex(locationInput.Text);
@@ -397,7 +351,13 @@ namespace FoenixIDE.UI
             messageText.Clear();
             CPU.Stack.Reset();
             stackText.Clear();
-            //this.listing = global::System.IO.File.ReadAllLines(@"ROMs\kernel.lst");
+        }
+
+        private void locationInput_Validated(object sender, EventArgs e)
+        {
+            int jumpAddress = Convert.ToInt32(this.locationInput.Text.Replace(":",""), 16);
+            String address = jumpAddress.ToString("X6");
+            locationInput.Text = address.Substring(0, 2) + ":" + address.Substring(2);
         }
     }
 }

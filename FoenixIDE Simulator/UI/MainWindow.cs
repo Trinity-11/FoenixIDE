@@ -92,6 +92,9 @@ namespace FoenixIDE.UI
             if (uploaderWindow == null || uploaderWindow.IsDisposed)
             {
                 uploaderWindow = new UploaderWindow();
+                int left = this.Left + (this.Width - uploaderWindow.Width) / 2;
+                int top =  this.Top + (this.Height - uploaderWindow.Height) / 2;
+                uploaderWindow.Location = new Point(left, top);
                 uploaderWindow.Show();
             }
             else
@@ -107,8 +110,9 @@ namespace FoenixIDE.UI
         private void loadImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BitmapLoader loader = new BitmapLoader();
+            loader.StartPosition = FormStartPosition.CenterParent;
             loader.Memory = kernel.CPU.Memory;
-            loader.ShowDialog();
+            loader.ShowDialog(this);
         }
 
         private void BootTimer_Tick(object sender, EventArgs e)
