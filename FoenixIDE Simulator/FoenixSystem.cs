@@ -111,9 +111,9 @@ namespace FoenixIDE
         {
             Y = 0;
             PrintTab(60);
-            PrintLine("(c)2018 Tom Wilson");
+            PrintLine("(c) C256 Foenix");
             PrintTab(60);
-            PrintLine("wilsontp@gmail.com");
+            PrintLine("wilsontp@gmail and others");
         }
 
         private void TickTimer_Elapsed(object sender, global::System.Timers.ElapsedEventArgs e)

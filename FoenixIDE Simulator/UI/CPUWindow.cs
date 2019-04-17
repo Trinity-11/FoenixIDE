@@ -98,20 +98,20 @@ namespace FoenixIDE.UI
         {
             RefreshStatus();
             CPU.DebugPause = false;
-            timer1.Enabled = true;
+            UpdateTraceTimer.Enabled = true;
         }
 
         private void PauseButton_Click(object sender, EventArgs e)
         {
             CPU.DebugPause = true;
-            timer1.Enabled = false;
+            UpdateTraceTimer.Enabled = false;
             RefreshStatus();
         }
 
         private void StepButton_Click(object sender, EventArgs e)
         {
             CPU.DebugPause = true;
-            timer1.Enabled = false;
+            UpdateTraceTimer.Enabled = false;
 
             int steps = 1;
             int.TryParse(stepsInput.Text, out steps);
@@ -280,7 +280,7 @@ namespace FoenixIDE.UI
                 if (breakpoints.ContainsKey(pc))
                 {
                     CPU.DebugPause = true;
-                    timer1.Enabled = false;
+                    UpdateTraceTimer.Enabled = false;
                     BPCombo.Text = breakpoints.GetHex(pc);
                 }
             }
@@ -292,9 +292,9 @@ namespace FoenixIDE.UI
         }
 
         // Don't try to display the CPU information too often
-        private void timer1_Tick(object sender, EventArgs e)
+        private void UpdateTrackeTick(object sender, EventArgs e)
         {
-            DateTime t = DateTime.Now.AddMilliseconds(timer1.Interval / 2);
+            DateTime t = DateTime.Now.AddMilliseconds(UpdateTraceTimer.Interval / 2);
             while (DateTime.Now < t)
             {
                 if (CPU.DebugPause || CPU.Waiting)
@@ -316,9 +316,12 @@ namespace FoenixIDE.UI
 
         private void AddBPButton_Click(object sender, EventArgs e)
         {
-            breakpoints.Add(BPCombo.Text);
-            BPCombo.Text = breakpoints.Format(BPCombo.Text);
-            RefreshBreakpoints();
+            if (BPCombo.Text.Trim() != "")
+            {
+                breakpoints.Add(BPCombo.Text);
+                BPCombo.Text = breakpoints.Format(BPCombo.Text);
+                RefreshBreakpoints();
+            }
         }
 
         private void DeleteBPButton_Click(object sender, EventArgs e)

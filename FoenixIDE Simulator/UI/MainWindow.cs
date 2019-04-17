@@ -146,11 +146,6 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void BasicWindow_KeyUp(object sender, KeyEventArgs e)
-        {
-
-        }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -201,14 +196,20 @@ namespace FoenixIDE.UI
             ShowUploaderWindow();
         }
 
-        private void resetToolStripMenuItem1_Click(object sender, EventArgs e)
+        /**
+         * Restart the CPU
+         */
+        private void restartMenuItemClick(object sender, EventArgs e)
         {
             debugWindow.ClearTrace();
             kernel.CPU.DebugPause = false;
             kernel.Reset();
             kernel.Run();
         }
-
+        
+        /** 
+         * Reset the system and go to step mode.
+         */
         private void debugToolStripMenuItem_Click(object sender, EventArgs e)
         {
             debugWindow.ClearTrace();
@@ -227,7 +228,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void menuOpen_Click(object sender, EventArgs e)
+        private void menuOpenHexFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Hex Filed|*.hex";
@@ -237,6 +238,22 @@ namespace FoenixIDE.UI
                 debugWindow.Close();
                 memoryWindow.Close();
                 kernel = new FoenixSystem(this.gpu);
+                kernel.setKernel(dialog.FileName);
+                kernel.Reset();
+                ShowDebugWindow();
+                ShowMemoryWindow();
+            }
+        }
+
+        private void openHexFileWoZeroingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Hex Filed|*.hex";
+            dialog.CheckFileExists = true;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                debugWindow.Close();
+                memoryWindow.Close();
                 kernel.setKernel(dialog.FileName);
                 kernel.Reset();
                 ShowDebugWindow();

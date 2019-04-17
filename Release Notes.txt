@@ -1,0 +1,8 @@
+Release 1.0.0.1
+---------------
+* Fixed a bug that cause the IDE to crash when adding a breakpoint with no text.
+* Memory Window is now aware of the mouse pointer position and display the address and value under the pointer.
+* Allow modification of memory window address.
+* Uploader window only allows 6MBaud uploads.
+* Added Load Hex File w/o Zeroing.  This way a Hex file can be loading without affecting existing memory.
+

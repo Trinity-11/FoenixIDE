@@ -40,8 +40,8 @@
             this.EndAddressText = new System.Windows.Forms.TextBox();
             this.StartAddressText = new System.Windows.Forms.TextBox();
             this.MemoryText = new System.Windows.Forms.TextBox();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.UpdateDisplayTimer = new System.Windows.Forms.Timer(this.components);
+            this.MemoryWindowTooltips = new System.Windows.Forms.ToolTip(this.components);
             this.panel2 = new System.Windows.Forms.Panel();
             this.MCRBit0Button = new System.Windows.Forms.Button();
             this.MCRBit1Button = new System.Windows.Forms.Button();
@@ -52,6 +52,7 @@
             this.MCRBit6Button = new System.Windows.Forms.Button();
             this.MCRBit7Button = new System.Windows.Forms.Button();
             this.MasterControlLabel = new System.Windows.Forms.Label();
+            this.PositionLabel = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -178,32 +179,37 @@
             // 
             // MemoryText
             // 
+            this.MemoryText.AllowDrop = true;
             this.MemoryText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.MemoryText.Cursor = System.Windows.Forms.Cursors.Hand;
             this.MemoryText.Font = new System.Drawing.Font("Consolas", 10F);
             this.MemoryText.Location = new System.Drawing.Point(0, 28);
             this.MemoryText.Margin = new System.Windows.Forms.Padding(4);
             this.MemoryText.Multiline = true;
             this.MemoryText.Name = "MemoryText";
-            this.MemoryText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.MemoryText.ReadOnly = true;
             this.MemoryText.Size = new System.Drawing.Size(759, 350);
             this.MemoryText.TabIndex = 0;
             this.MemoryText.Text = resources.GetString("MemoryText.Text");
+            this.MemoryText.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MemoryText_MouseClick);
+            this.MemoryText.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MemoryText_MouseMove);
             // 
-            // timer1
+            // UpdateDisplayTimer
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.UpdateDisplayTimer.Enabled = true;
+            this.UpdateDisplayTimer.Interval = 1000;
+            this.UpdateDisplayTimer.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // toolTip1
+            // MemoryWindowTooltips
             // 
-            this.toolTip1.ShowAlways = true;
+            this.MemoryWindowTooltips.ShowAlways = true;
             // 
             // panel2
             // 
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Controls.Add(this.PositionLabel);
             this.panel2.Controls.Add(this.MCRBit0Button);
             this.panel2.Controls.Add(this.MCRBit1Button);
             this.panel2.Controls.Add(this.MCRBit2Button);
@@ -317,6 +323,15 @@
             this.MasterControlLabel.TabIndex = 0;
             this.MasterControlLabel.Text = "Master Control Reg";
             // 
+            // PositionLabel
+            // 
+            this.PositionLabel.AutoSize = true;
+            this.PositionLabel.Location = new System.Drawing.Point(545, 10);
+            this.PositionLabel.Name = "PositionLabel";
+            this.PositionLabel.Size = new System.Drawing.Size(46, 17);
+            this.PositionLabel.TabIndex = 9;
+            this.PositionLabel.Text = "label1";
+            // 
             // MemoryWindow
             // 
             this.AcceptButton = this.ViewButton;
@@ -351,10 +366,10 @@
         private global::System.Windows.Forms.TextBox StartAddressText;
         private global::System.Windows.Forms.TextBox MemoryText;
         private global::System.Windows.Forms.Panel panel1;
-        private global::System.Windows.Forms.Timer timer1;
+        private global::System.Windows.Forms.Timer UpdateDisplayTimer;
         private System.Windows.Forms.Button NextButton;
         private System.Windows.Forms.Button PreviousButton;
-        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ToolTip MemoryWindowTooltips;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button MCRBit0Button;
         private System.Windows.Forms.Button MCRBit1Button;
@@ -368,5 +383,6 @@
         private System.Windows.Forms.ComboBox AddressCombo;
         private System.Windows.Forms.Button ExportButton;
         private System.Windows.Forms.CheckBox CompactCheckbox;
+        private System.Windows.Forms.Label PositionLabel;
     }
 }

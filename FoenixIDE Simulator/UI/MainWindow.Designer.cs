@@ -39,7 +39,7 @@ namespace FoenixIDE.UI
             this.fpsPerf = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOpenHexFile = new System.Windows.Forms.ToolStripMenuItem();
             this.loadImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,7 +47,7 @@ namespace FoenixIDE.UI
             this.memoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.RestartMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.executeTimer = new System.Windows.Forms.Timer(this.components);
             this.performanceTimer = new System.Windows.Forms.Timer(this.components);
@@ -55,6 +55,7 @@ namespace FoenixIDE.UI
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.openHexFileWoZeroingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gpu = new FoenixIDE.Display.Gpu();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -129,31 +130,32 @@ namespace FoenixIDE.UI
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuOpen,
+            this.menuOpenHexFile,
+            this.openHexFileWoZeroingToolStripMenuItem,
             this.loadImageToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(44, 24);
             this.fileToolStripMenuItem.Text = "&File";
             // 
-            // menuOpen
+            // menuOpenHexFile
             // 
-            this.menuOpen.Name = "menuOpen";
-            this.menuOpen.Size = new System.Drawing.Size(163, 26);
-            this.menuOpen.Text = "&Open";
-            this.menuOpen.Click += new System.EventHandler(this.menuOpen_Click);
+            this.menuOpenHexFile.Name = "menuOpenHexFile";
+            this.menuOpenHexFile.Size = new System.Drawing.Size(263, 26);
+            this.menuOpenHexFile.Text = "&Open Hex File";
+            this.menuOpenHexFile.Click += new System.EventHandler(this.menuOpenHexFile_Click);
             // 
             // loadImageToolStripMenuItem
             // 
             this.loadImageToolStripMenuItem.Name = "loadImageToolStripMenuItem";
-            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
+            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
             this.loadImageToolStripMenuItem.Text = "&Load Image";
             this.loadImageToolStripMenuItem.Click += new System.EventHandler(this.loadImageToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -191,7 +193,7 @@ namespace FoenixIDE.UI
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.resetToolStripMenuItem1,
+            this.RestartMenuItem,
             this.debugToolStripMenuItem});
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
             this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
@@ -199,18 +201,18 @@ namespace FoenixIDE.UI
             this.resetToolStripMenuItem.Size = new System.Drawing.Size(57, 24);
             this.resetToolStripMenuItem.Text = "&Reset";
             // 
-            // resetToolStripMenuItem1
+            // RestartMenuItem
             // 
-            this.resetToolStripMenuItem1.Name = "resetToolStripMenuItem1";
-            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(167, 26);
-            this.resetToolStripMenuItem1.Text = "Start/&Restart";
-            this.resetToolStripMenuItem1.Click += new System.EventHandler(this.resetToolStripMenuItem1_Click);
+            this.RestartMenuItem.Name = "RestartMenuItem";
+            this.RestartMenuItem.Size = new System.Drawing.Size(130, 26);
+            this.RestartMenuItem.Text = "&Restart";
+            this.RestartMenuItem.Click += new System.EventHandler(this.restartMenuItemClick);
             // 
             // debugToolStripMenuItem
             // 
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
-            this.debugToolStripMenuItem.Size = new System.Drawing.Size(167, 26);
-            this.debugToolStripMenuItem.Text = "Start/&Debug";
+            this.debugToolStripMenuItem.Size = new System.Drawing.Size(130, 26);
+            this.debugToolStripMenuItem.Text = "&Debug";
             this.debugToolStripMenuItem.Click += new System.EventHandler(this.debugToolStripMenuItem_Click);
             // 
             // executeTimer
@@ -264,6 +266,13 @@ namespace FoenixIDE.UI
             this.panel4.Size = new System.Drawing.Size(682, 20);
             this.panel4.TabIndex = 6;
             // 
+            // openHexFileWoZeroingToolStripMenuItem
+            // 
+            this.openHexFileWoZeroingToolStripMenuItem.Name = "openHexFileWoZeroingToolStripMenuItem";
+            this.openHexFileWoZeroingToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
+            this.openHexFileWoZeroingToolStripMenuItem.Text = "Open Hex File w/o &Zeroing";
+            this.openHexFileWoZeroingToolStripMenuItem.Click += new System.EventHandler(this.openHexFileWoZeroingToolStripMenuItem_Click);
+            // 
             // gpu
             // 
             this.gpu.BackColor = System.Drawing.Color.Blue;
@@ -309,7 +318,6 @@ namespace FoenixIDE.UI
             this.Load += new System.EventHandler(this.BasicWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyDown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.BasicWindow_KeyPress);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyUp);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -339,12 +347,13 @@ namespace FoenixIDE.UI
         private global::System.Windows.Forms.Panel panel3;
         private global::System.Windows.Forms.Panel panel4;
         private global::System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
-        private global::System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem1;
+        private global::System.Windows.Forms.ToolStripMenuItem RestartMenuItem;
         private global::System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem menuOpen;
+        private System.Windows.Forms.ToolStripMenuItem menuOpenHexFile;
         private System.Windows.Forms.ToolStripMenuItem uploaderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel fpsPerf;
+        private System.Windows.Forms.ToolStripMenuItem openHexFileWoZeroingToolStripMenuItem;
     }
 }
 

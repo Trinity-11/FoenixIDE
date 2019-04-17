@@ -28,18 +28,19 @@ namespace FoenixIDE.UI
 
         private void MemoryWindow_Load(object sender, EventArgs e)
         {
-            toolTip1.SetToolTip(NextButton, "Next Page");
-            toolTip1.SetToolTip(PreviousButton, "Previous Page");
+            MemoryWindowTooltips.SetToolTip(NextButton, "Next Page");
+            MemoryWindowTooltips.SetToolTip(PreviousButton, "Previous Page");
 
             // MCR Tooltips
-            toolTip1.SetToolTip(MCRBit7Button, "Disable Video");
-            toolTip1.SetToolTip(MCRBit6Button, "Enable Gamma");
-            toolTip1.SetToolTip(MCRBit5Button, "Enable Sprites");
-            toolTip1.SetToolTip(MCRBit4Button, "Enable Tilemap");
-            toolTip1.SetToolTip(MCRBit3Button, "Enable Bitmap");
-            toolTip1.SetToolTip(MCRBit2Button, "Enable Graphics Mode");
-            toolTip1.SetToolTip(MCRBit1Button, "Enable Text Overlay");
-            toolTip1.SetToolTip(MCRBit0Button, "Enable Text");
+            MemoryWindowTooltips.SetToolTip(MCRBit7Button, "Disable Video");
+            MemoryWindowTooltips.SetToolTip(MCRBit6Button, "Enable Gamma");
+            MemoryWindowTooltips.SetToolTip(MCRBit5Button, "Enable Sprites");
+            MemoryWindowTooltips.SetToolTip(MCRBit4Button, "Enable Tilemap");
+            MemoryWindowTooltips.SetToolTip(MCRBit3Button, "Enable Bitmap");
+            MemoryWindowTooltips.SetToolTip(MCRBit2Button, "Enable Graphics Mode");
+            MemoryWindowTooltips.SetToolTip(MCRBit1Button, "Enable Text Overlay");
+            MemoryWindowTooltips.SetToolTip(MCRBit0Button, "Enable Text");
+            MemoryWindowTooltips.SetToolTip(ExportButton, "Export Memory to Foenix File");
 
             // Set the MCR
             MCRBit0Button.Tag = 0;
@@ -92,7 +93,7 @@ namespace FoenixIDE.UI
         private void timer1_Tick(object sender, EventArgs e)
         {
             RefreshMemoryView();
-            timer1.Enabled = false;
+            UpdateDisplayTimer.Enabled = false;
         }
 
         private void ViewButton_Click(object sender, EventArgs e)
@@ -170,7 +171,7 @@ namespace FoenixIDE.UI
             {
                 // Read all 6 characters, but omit the ':'
                 int start = value.IndexOf('$');
-                startAddress = Convert.ToInt32(value.Replace(":","").Substring(start + 1, 6), 16);
+                startAddress = Convert.ToInt32(value.Replace(":", "").Substring(start + 1, 6), 16);
             }
             GotoAddress(startAddress);
             MemoryText.Focus();
@@ -246,20 +247,20 @@ namespace FoenixIDE.UI
                 {
                     xmlWriter.WriteAttributeString("format", "full");
                 }
-                
+
                 xmlWriter.WriteRaw("\r");
-                
+
                 // We don't need to scan $FFFF pages, only scan the ones we know are gettings used
                 // Scan each of the banks and pages and save to an XML file
                 // If a page is blank, don't export it.
-                for (int i = 0; i < 0x200000; i = i+256 )
+                for (int i = 0; i < 0x200000; i = i + 256)
                 {
                     if (PageChecksum(i) != 0)
                     {
                         WriteData(i, xmlWriter, compact);
                     }
                 }
-                
+
                 for (int i = 0xAF_0000; i < 0xF0_0000; i = i + 256)
                 {
                     if (PageChecksum(i) != 0)
@@ -277,7 +278,7 @@ namespace FoenixIDE.UI
         {
             writer.WriteStartElement("page");
             writer.WriteAttributeString("start-address", "$" + startAddress.ToString("X6"));
-            writer.WriteAttributeString("bank", "$" + startAddress.ToString("X6").Substring(0,2));
+            writer.WriteAttributeString("bank", "$" + startAddress.ToString("X6").Substring(0, 2));
             writer.WriteRaw("\r");
 
             // Write 8 bytes per data line
@@ -325,6 +326,73 @@ namespace FoenixIDE.UI
                 sum += Memory.ReadByte(startAddress + i);
             }
             return sum;
+        }
+
+        // Retrieve the memory location of the mouse location
+        private Point getAddressPosition(Point mouse)
+        {
+            int line = mouse.Y / 15;
+            int col = -1;
+            int colWidth = 21;
+            int addr = -1;
+            int value = 0;
+            if (mouse.X > 54 && mouse.X < 230)
+            {
+                col = 1 + (mouse.X - 66) / colWidth;
+            }
+            if (mouse.X > 241 && mouse.X < 400)
+            {
+                col = 10 + (mouse.X - 242) / colWidth;
+            }
+            if (line < 16 && col != -1)
+            {
+                String[] lineText = MemoryText.Lines[line].Split(' ');
+                String text = lineText[col + 1];
+                String address = lineText[0].Substring(1);
+                addr = Convert.ToInt32(address, 16) + ((col < 10) ? (col - 1) : (col - 2));
+                value = Convert.ToByte(text, 16);
+            }
+            return new Point(addr, value);
+        }
+
+        // Offer the user to modify the address value
+        private void MemoryText_MouseClick(object sender, MouseEventArgs e)
+        {
+            Point mem = getAddressPosition(e.Location);
+            if (mem.X != -1)
+            {
+                String rawAddress = mem.X.ToString("X6");
+                String address = "$" + rawAddress.Substring(0, 2) + ":" + rawAddress.Substring(2);
+                int left = this.Left + (this.Width - 443) /2;
+                int top = this.Top + (this.Height - 190) /2;
+                String result = Microsoft.VisualBasic.Interaction.InputBox("Enter New Hex Value for address " + address, "Modify Memory Location", mem.Y.ToString("X2"), left, top);
+                if (result != "")
+                {
+                    // The result may be a hexadecimal value
+                    byte intResult = Convert.ToByte(result, 16);
+                    // Check that the value was changed
+                    if (intResult != mem.Y)
+                    {
+                        Memory.WriteByte(mem.X, intResult);
+                        RefreshMemoryView();
+                    }
+                }
+                
+            }
+        }
+
+        private void MemoryText_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point mem = getAddressPosition(e.Location);
+            if (mem.X != -1)
+            {
+                String address = mem.X.ToString("X6");
+                PositionLabel.Text = "Adress: $" + address.Substring(0, 2) + ":" + address.Substring(2) + ", Value: " + mem.Y.ToString("X2"); // + ", X: " + e.X + ", Y: " + e.Y + ", Col: " + col + ", Line: " + line;
+            }
+            else
+            {
+                PositionLabel.Text = "";
+            }
         }
     }
 }

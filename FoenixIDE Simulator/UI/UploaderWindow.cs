@@ -66,10 +66,6 @@ namespace FoenixIDE.UI
             try
             {
                 serial.PortName = COMPortComboBox.Items[COMPortComboBox.SelectedIndex].ToString();
-                if (serial.PortName.StartsWith("COM"))
-                {
-                    serial.BaudRate = 115200;
-                }
                 serial.Open();
                 // Enable all the button if the serial Port turns out to be the good one.
                 BrowseFileButton.Enabled = true;

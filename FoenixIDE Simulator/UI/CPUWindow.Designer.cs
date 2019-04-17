@@ -47,7 +47,7 @@
             this.lastLine = new System.Windows.Forms.TextBox();
             this.stackText = new System.Windows.Forms.TextBox();
             this.HeaderTextbox = new System.Windows.Forms.TextBox();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.UpdateTraceTimer = new System.Windows.Forms.Timer(this.components);
             this.panel2 = new System.Windows.Forms.Panel();
             this.ClearTraceButton = new System.Windows.Forms.Button();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
@@ -260,10 +260,10 @@
             this.HeaderTextbox.Size = new System.Drawing.Size(823, 24);
             this.HeaderTextbox.TabIndex = 1;
             // 
-            // timer1
+            // UpdateTraceTimer
             // 
-            this.timer1.Interval = 200;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.UpdateTraceTimer.Interval = 200;
+            this.UpdateTraceTimer.Tick += new System.EventHandler(this.UpdateTrackeTick);
             // 
             // panel2
             // 
@@ -345,7 +345,7 @@
         private global::System.Windows.Forms.Label stepsLabel;
         private global::System.Windows.Forms.TextBox stepsInput;
         private global::System.Windows.Forms.TextBox HeaderTextbox;
-        private global::System.Windows.Forms.Timer timer1;
+        private global::System.Windows.Forms.Timer UpdateTraceTimer;
         private global::System.Windows.Forms.Label BPLabel;
         private global::System.Windows.Forms.ComboBox BPCombo;
         private global::System.Windows.Forms.Button AddBPButton;
