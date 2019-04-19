@@ -328,8 +328,9 @@ namespace FoenixIDE.UI
             return sum;
         }
 
+        Point mem = new Point(-1,-1);
         // Retrieve the memory location of the mouse location
-        private Point getAddressPosition(Point mouse)
+        private void GetAddressPosition(Point mouse)
         {
             int line = mouse.Y / 15;
             int col = -1;
@@ -351,14 +352,23 @@ namespace FoenixIDE.UI
                 String address = lineText[0].Substring(1);
                 addr = Convert.ToInt32(address, 16) + ((col < 10) ? (col - 1) : (col - 2));
                 value = Convert.ToByte(text, 16);
+                
+                HighlightPanel.Left = col<10 ? col * colWidth + 44 : col * colWidth + 30;
+                HighlightPanel.Top = MemoryText.Top + line * 15 + 2;
+                HighlightPanel.Text = text;
+                HighlightPanel.Visible = true;
             }
-            return new Point(addr, value);
+            else
+            {
+                HighlightPanel.Visible = false;
+            }
+            mem.X = addr;
+            mem.Y = value;
         }
 
         // Offer the user to modify the address value
         private void MemoryText_MouseClick(object sender, MouseEventArgs e)
         {
-            Point mem = getAddressPosition(e.Location);
             if (mem.X != -1)
             {
                 String rawAddress = mem.X.ToString("X6");
@@ -377,17 +387,19 @@ namespace FoenixIDE.UI
                         RefreshMemoryView();
                     }
                 }
-                
             }
         }
 
+        
         private void MemoryText_MouseMove(object sender, MouseEventArgs e)
         {
-            Point mem = getAddressPosition(e.Location);
+            GetAddressPosition(e.Location);
             if (mem.X != -1)
             {
+                String val = mem.Y.ToString("X2");
+                
                 String address = mem.X.ToString("X6");
-                PositionLabel.Text = "Adress: $" + address.Substring(0, 2) + ":" + address.Substring(2) + ", Value: " + mem.Y.ToString("X2"); // + ", X: " + e.X + ", Y: " + e.Y + ", Col: " + col + ", Line: " + line;
+                PositionLabel.Text = "Adress: $" + address.Substring(0, 2) + ":" + address.Substring(2) + ", Value: " + val; // + ", X: " + e.X + ", Y: " + e.Y + ", Col: " + col + ", Line: " + line;
             }
             else
             {

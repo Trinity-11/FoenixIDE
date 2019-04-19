@@ -278,68 +278,6 @@ namespace FoenixIDE.Display
             //LoadCharacterSet("PETSCII_TEXT", @"Resources\PETSCII.901225-01.bin", 4096, CharacterSet.CharTypeCodes.PETSCII_TEXT, CharacterSet.SizeCodes.Size8x8);
         }
 
-        private Font GetBestFont()
-        {
-            Font useFont = null;
-            float rowHeight = this.ClientRectangle.Height / (float)LinesVisible;
-            if (rowHeight < 8)
-                rowHeight = 8;
-
-            var fonts = new[]
-            {
-                "C64 Pro Mono",
-                "Consolas",
-                //"Classic Console",
-                //"Glass TTY VT220",
-                "Lucida Console",
-            };
-
-#if DEBUGx
-            InstalledFontCollection installedFontCollection = new InstalledFontCollection();
-
-            // Get the array of FontFamily objects.
-            var fontFamilies = installedFontCollection.Families;
-
-            // The loop below creates a large string that is a comma-separated
-            // list of all font family names.
-
-            int count = fontFamilies.Length;
-            for (int j = 0; j < count; ++j)
-            {
-                System.Diagnostics.Debug.WriteLine("Font: " + fontFamilies[j].Name);
-            }
-#endif
-
-            foreach (var f in fonts)
-            {
-                using (Font fontTester = new Font(
-                        f,
-                        rowHeight,
-                        FontStyle.Regular,
-                        GraphicsUnit.Pixel))
-                {
-                    if (fontTester.Name == f)
-                    {
-                        useFont = new Font(f, rowHeight, FontStyle.Regular, GraphicsUnit.Pixel);
-                        break;
-                    }
-                    else
-                    {
-                    }
-                }
-            }
-            if (useFont == null)
-                useFont = new Font(this.Font, FontStyle.Regular);
-
-            Graphics g = this.CreateGraphics();
-            SizeF fs = MeasureFont(useFont, g);
-            float ratio = rowHeight / fs.Height;
-            float newSize = rowHeight * ratio;
-            useFont = new Font(useFont.FontFamily, newSize, FontStyle.Regular, GraphicsUnit.Pixel);
-
-            return useFont;
-        }
-
         public void ResetDrawTimer()
         {
             RefreshTimer = 0;
@@ -454,7 +392,7 @@ namespace FoenixIDE.Display
 
             }
             g.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
-
+            frameBuffer.Dispose();
         }
 
         private void loadLUT()
@@ -722,11 +660,6 @@ namespace FoenixIDE.Display
         void FrameBufferControl_VisibleChanged(object sender, EventArgs e)
         {
             timer.Enabled = this.Visible;
-        }
-
-        private void FrameBuffer_SizeChanged(object sender, global::System.EventArgs e)
-        {
-            //TextFont = GetBestFont();
         }
 
         private void FrameBuffer_KeyPress(object sender, KeyPressEventArgs e)

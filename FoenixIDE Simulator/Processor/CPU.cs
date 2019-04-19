@@ -122,8 +122,7 @@ namespace FoenixIDE.Processor
         public void ExecuteCycles(int Cycles)
         {
             ResetCounter(Cycles);
-            while (clockCyles < nextCycleCheck 
-                && !DebugPause)
+            while (clockCyles < nextCycleCheck && !DebugPause)
             {
                 ExecuteNext();
             }
