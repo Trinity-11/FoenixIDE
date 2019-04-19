@@ -41,8 +41,6 @@ namespace FoenixIDE.Display
         public CharTypeCodes CharType = CharTypeCodes.ASCII_PET;
         public SizeCodes CharSize = SizeCodes.Unknown;
 
-        public Bitmap[] Bitmaps;
-
         public int StartAddress;
         public int Length;
         public MemoryRAM CharacterData;
@@ -84,35 +82,6 @@ namespace FoenixIDE.Display
             catch (Exception ex)
             {
                 SystemLog.WriteLine(SystemLog.SeverityCodes.Recoverable, "Error in CharacteSet.Load\r\n" + ex.Message + "Filename:" + Filename);
-            }
-
-            Bitmaps = new Bitmap[256];
-            switch (CharSize)
-            {
-                case SizeCodes.Unknown:
-                    break;
-                case SizeCodes.Size8x8:
-                    charHeight = 8;
-                    break;
-                case SizeCodes.Size8x16:
-                    charHeight = 16;
-                    break;
-                default:
-                    break;
-            }
-
-            for (int charCode = 0; charCode < 256; charCode++)
-            {
-                Bitmap bmp = new Bitmap(charWidth, charHeight, PixelFormat.Format1bppIndexed);
-                Bitmaps[charCode] = bmp;
-
-                BitmapData bitmapData = bmp.LockBits(new Rectangle(0, 0, charWidth, charHeight), ImageLockMode.WriteOnly, PixelFormat.Format1bppIndexed);
-                IntPtr p = bitmapData.Scan0;
-                for (int y = 0; y < charHeight; y++)
-                {
-                    System.Runtime.InteropServices.Marshal.WriteByte(p, y * bitmapData.Stride, Read(charCode, y));
-                }
-                bmp.UnlockBits(bitmapData);
             }
         }
     }

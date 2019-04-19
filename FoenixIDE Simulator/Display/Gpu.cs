@@ -27,7 +27,7 @@ namespace FoenixIDE.Display
         const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
         const int GRP_LUT_BASE_ADDR = 0xAF_2000;
 
-        int[][] LUT = new int[4][];
+        int[][] graphicsLUT = new int[4][];
 
         private int length = 128 * 64 * 2; //Text mode uses 16K, 1 page for text, the other for colors.
 
@@ -63,7 +63,7 @@ namespace FoenixIDE.Display
         //private int colorMatrixStart = 6096;
         //private int attributeStart = 8096;
 
-        public List<CharacterSet> CharacterSetSlots = new List<CharacterSet>();
+        //public List<CharacterSet> CharacterSetSlots = new List<CharacterSet>();
 
         /// <summary>
         /// number of frames to wait to refresh the screen.
@@ -266,18 +266,11 @@ namespace FoenixIDE.Display
             }
             for (int i = 0; i < 4;i++)
             {
-                LUT[i] = new int[256];
+                graphicsLUT[i] = new int[256];
             }
         }
 
-        public void LoadCharacterData()
-        {
-            LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
-            //LoadCharacterSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
-            //LoadCharacterSet("PETSCII_GRAPHICS", @"Resources\PETSCII.901225-01.bin", 0, CharacterSet.CharTypeCodes.PETSCII_GRAPHICS, CharacterSet.SizeCodes.Size8x8);
-            //LoadCharacterSet("PETSCII_TEXT", @"Resources\PETSCII.901225-01.bin", 4096, CharacterSet.CharTypeCodes.PETSCII_TEXT, CharacterSet.SizeCodes.Size8x8);
-        }
-
+        
         public void ResetDrawTimer()
         {
             RefreshTimer = 0;
@@ -335,12 +328,19 @@ namespace FoenixIDE.Display
                 g.DrawString("CodeRAM Not initialized", this.Font, TextBrush, 0, 0);
                 return;
             }
+
+            // Default background color to border color
+            int backgroundColor = (int)((UInt32)IO.ReadLong(5) | 0xFF000000);
             Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
-            int backgroundColor = IO.ReadLong(8);
+
+            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
+            // Graphics Mode - I don't know what this is for... we already have bit for tiles, sprints and bitmaps.
+            if ((MCRegister & 0x4) == 0x4)
+            {
+                backgroundColor = (int)((UInt32)IO.ReadLong(8) | 0xFF000000);
+            }
             g.Clear(Color.FromArgb(backgroundColor));
 
-            // Text Mode
-            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
             // Bitmap Mode
             if ((MCRegister & 0x8) == 0x8)
             {
@@ -386,11 +386,7 @@ namespace FoenixIDE.Display
             {
 
             }
-            // Graphics Mode - I don't know what this is for... we already have bit for tiles, sprints and bitmaps.
-            if ((MCRegister & 0x4) == 0x4)
-            {
-
-            }
+            
             g.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
             frameBuffer.Dispose();
         }
@@ -407,7 +403,7 @@ namespace FoenixIDE.Display
                     byte green = IO.ReadByte(lutAddress++);
                     byte red = IO.ReadByte(lutAddress++);
                     lutAddress++;
-                    LUT[i][c] = (255 << 24) + (red << 16) + (green << 8) + blue;
+                    graphicsLUT[i][c] = (255 << 24) + (red << 16) + (green << 8) + blue;
                 }
             }
         }
@@ -438,27 +434,10 @@ namespace FoenixIDE.Display
             float y;
 
             Graphics g = Graphics.FromImage(bitmap);
+            
             // Read the color lookup tables
-            Color[] fgColorLUT = new Color[16];
-            Color[] bgColorLUT = new Color[16];
             int fgLUT = MemoryLocations.MemoryMap.FG_CHAR_LUT_PTR - IO.StartAddress;
             int bgLUT = MemoryLocations.MemoryMap.BG_CHAR_LUT_PTR - IO.StartAddress;
-            for (int c = 0; c < 16; c++)
-            {
-                // Foreground
-                byte blue = IO.ReadByte(fgLUT++);
-                byte green = IO.ReadByte(fgLUT++);
-                byte red = IO.ReadByte(fgLUT++);
-                fgLUT++;
-                fgColorLUT[c] = Color.FromArgb(red, green, blue);
-
-                // Background
-                blue = IO.ReadByte(bgLUT++);
-                green = IO.ReadByte(bgLUT++);
-                red = IO.ReadByte(bgLUT++);
-                bgLUT++;
-                bgColorLUT[c] = Color.FromArgb(red, green, blue);
-            }
 
             int charWidth = 8;
             int charHeight = 8;
@@ -469,6 +448,7 @@ namespace FoenixIDE.Display
             int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
             int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
             int lineOffset = (60 - LinesVisible) / 2 * charHeight;
+            int fontBaseAddress = MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START - IO.StartAddress;
             
             for (line = 0; line < LinesVisible; line++)
             {
@@ -478,33 +458,93 @@ namespace FoenixIDE.Display
                 {
                     x = col * charWidth;
                     y = line * charHeight;
-                    byte character = IO.ReadByte(textAddr++);
 
+                    // Each character will have foreground and background colors
+                    byte character = IO.ReadByte(textAddr++);
                     byte color = IO.ReadByte(colorAddr++);
                     byte fgColor = (byte)((color & 0xF0) >> 4);
                     byte bgColor = (byte)(color & 0x0F);
+                    int fgValue = (int)((UInt32)IO.ReadLong(fgLUT + fgColor * 4) | 0xFF000000);
+                    int bgValue = (int)((UInt32)IO.ReadLong(bgLUT + bgColor * 4) | 0xFF000000);
 
-                    Bitmap bmp = CharacterSetSlots[0].Bitmaps[character];
-                        
-                    ColorPalette pal = bmp.Palette;
-                    if (!overlayBitSet && (bgColor != 0))
+                    Rectangle rect = new Rectangle((int)x + colOffset, (int)y + lineOffset, 8, 8);
+                    BitmapData bitmapData = bitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    
+                    IntPtr p = bitmapData.Scan0;
+                    int stride = bitmapData.Stride;
+                    // Each character is defined by 8 bytes
+                    for (int i = 0; i < 8; i++)
                     {
-                        pal.Entries[0] = bgColorLUT[bgColor];
-                    }
-                    else
-                    {
-                        pal.Entries[0] = Color.Transparent;
-                    }
-                    if (fgColor != 0)
-                    {
-                        pal.Entries[1] = fgColorLUT[fgColor];
-                    }
-                    bmp.Palette = pal;
+                        byte value = IO.ReadByte(fontBaseAddress + character * 8 + i);
+                        if ((value & 0x80) == 0x80)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride, bgValue);
+                        }
+                        if ((value & 0x40) == 0x40)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 4, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 4, bgValue);
+                        }
+                        if ((value & 0x20) == 0x20)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 8, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 8, bgValue);
+                        }
+                        if ((value & 0x10) == 0x10)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 12, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 12, bgValue);
+                        }
 
-                    RectangleF rect = new RectangleF((int)x + colOffset, (int)y + lineOffset, bmp.Width, bmp.Height);
-                    
-                    g.DrawImage(bmp, rect);
-                    
+                        // Low nibble
+                        if ((value & 0x8) == 0x8)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 16, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 16, bgValue);
+                        }
+                        if ((value & 0x4) == 0x4)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 20, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 20, bgValue);
+                        }
+                        if ((value & 0x2) == 0x2)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 24, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 24, bgValue);
+                        }
+                        if ((value & 0x1) == 0x1)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 28, fgValue);
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, i * stride + 28, bgValue);
+                        }
+
+                    }
+                    bitmap.UnlockBits(bitmapData);
                 }
                 lineStart += COLS_PER_LINE;
                 colorStart += COLS_PER_LINE;
@@ -543,7 +583,7 @@ namespace FoenixIDE.Display
             {
                 for (int col = 0; col < width; col++)
                 {
-                    int value = (int) LUT[lutIndex][VRAM.ReadByte(bitmapAddress++)];
+                    int value = (int)graphicsLUT[lutIndex][VRAM.ReadByte(bitmapAddress++)];
                     System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
                 }
             }
@@ -587,7 +627,7 @@ namespace FoenixIDE.Display
                             int pixelIndex = VRAM.ReadByte(tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + col + line * strideX);
                             if (pixelIndex != 0)
                             {
-                                int value = (int)LUT[lutIndex][pixelIndex];
+                                int value = (int)graphicsLUT[lutIndex][pixelIndex];
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
                             }
                         }
@@ -627,7 +667,7 @@ namespace FoenixIDE.Display
                             int pixelIndex = VRAM.ReadByte(spriteAddress++);
                             if (pixelIndex != 0)
                             {
-                                int value = (int)LUT[lutIndex][pixelIndex];
+                                int value = (int)graphicsLUT[lutIndex][pixelIndex];
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
                             }
                         }
@@ -716,15 +756,11 @@ namespace FoenixIDE.Display
         /// </summary>
         /// <param name="Address"></param>
         /// <param name="Filename"></param>
-        public CharacterSet LoadFontSet(string Name, string Filename, int Offset, CharacterSet.CharTypeCodes CharType, CharacterSet.SizeCodes CharSize)
+        public void LoadFontSet(string Name, string Filename, int Offset, CharacterSet.CharTypeCodes CharType, CharacterSet.SizeCodes CharSize)
         {
             CharacterSet cs = new CharacterSet();
             // Load the data from the file into the  IO buffer - starting at address $AF8000
-            cs.Load(Filename, Offset, IO, MemoryLocations.MemoryMap.FONT_MEMORY_BANK_START & 0xffff, CharSize);
-            
-            CharacterSetSlots.Add(cs);
-            cs.CharType = CharType;
-            return cs;
+            cs.Load(Filename, Offset, IO, MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START & 0xffff, CharSize);
         }
 
         protected override bool IsInputKey(Keys keyData)

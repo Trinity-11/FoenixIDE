@@ -52,7 +52,7 @@ namespace FoenixIDE
             gpu.VRAM = Memory.VIDEO;
             gpu.RAM = Memory.RAM;
             gpu.IO = Memory.IO;
-            gpu.LoadCharacterData();
+            gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
             KeyboardBuffer = new MemoryBuffer(
                 Memory.RAM,
