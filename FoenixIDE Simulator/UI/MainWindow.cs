@@ -201,10 +201,11 @@ namespace FoenixIDE.UI
          */
         private void restartMenuItemClick(object sender, EventArgs e)
         {
+            debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
-            kernel.CPU.DebugPause = false;
             kernel.Reset();
             kernel.Run();
+            debugWindow.RunButton_Click(null, null);
         }
         
         /** 
@@ -212,8 +213,8 @@ namespace FoenixIDE.UI
          */
         private void debugToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            debugWindow.ClearTrace();
             kernel.CPU.DebugPause = true;
+            debugWindow.ClearTrace();
             kernel.Reset();
         }
 

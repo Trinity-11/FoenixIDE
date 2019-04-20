@@ -122,6 +122,7 @@ namespace FoenixIDE.UI
                     BitmapTypesCombo.SelectedItem = "Bitmap";
                     break;
                 case 16:
+                case 256:
                     BitmapTypesCombo.SelectedItem = "Tile Layer 0";
                     break;
                 case 32:
@@ -164,6 +165,8 @@ namespace FoenixIDE.UI
                     pointerAddress = 0XAF_0101 + offsetTL; // 3 bytes
                     strideXAddress = 0xAF_0104 + offsetTL; // 2 bytes
                     strideYAddress = 0xAF_0106 + offsetTL; // 2 bytes
+                    strideX = bitmap.Width;
+                    strideY = bitmap.Height;
                     break;
                 default: // sprites 0..31
                     int offsetSP = ((BitmapTypesCombo.SelectedIndex - 5) * 8);
@@ -171,6 +174,8 @@ namespace FoenixIDE.UI
                     pointerAddress = 0XAF_0201; // 3 bytes
                     strideXAddress = 0xAF_0204; // 2 bytes --> X Position
                     strideYAddress = 0xAF_0206; // 2 bytes --> Y Position
+                    strideX = bitmap.Width;
+                    strideY = bitmap.Height;
                     break;
             }
         }
@@ -213,16 +218,16 @@ namespace FoenixIDE.UI
             int fileLength = BitConverter.ToInt32(data, 2);
 
             int numberOfColors = BitConverter.ToInt32(data, 46);
+            int lutOffset = 0xAF_2000 + LUTCombo.SelectedIndex * 1024;
             if (numberOfColors == 0)
             {
                 // we need to create a LUT - each LUT only accepts 256 entries - 0 is black
-
+                TransformBitmap(data, startOffset, Int32.Parse(PixelDepthValueLabel.Text), lutOffset, writeVideoAddress, bitmap.Width, bitmap.Height);
             }
             else
             {
-                int lutOffset = 0xAF_2000 + LUTCombo.SelectedIndex * 1024; 
                 for (int offset = 54; offset < 1024 + 54; offset = offset + 4)
-                { 
+                {
                     int color = BitConverter.ToInt32(data, offset);
                     Memory.WriteByte(lutOffset, lowByte(color));
                     Memory.WriteByte(lutOffset + 1, midByte(color));
@@ -230,12 +235,12 @@ namespace FoenixIDE.UI
                     Memory.WriteByte(lutOffset + 3, 0xFF); // Alpha
                     lutOffset = lutOffset + 4;
                 }
-            }
-            for (int line = 0; line < bitmap.Height; line++)
-            {
-                for (int i = 0; i < bitmap.Width; i++)
+                for (int line = 0; line < bitmap.Height; line++)
                 {
-                    Memory.WriteByte(writeVideoAddress + (bitmap.Height-line)*bitmap.Width + i, data[startOffset + line*bitmap.Width + i]);
+                    for (int i = 0; i < bitmap.Width; i++)
+                    {
+                        Memory.WriteByte(writeVideoAddress + (bitmap.Height - line + 1) * bitmap.Width + i, data[startOffset + line * bitmap.Width + i]);
+                    }
                 }
             }
             MessageBox.Show("Transfer successful!", "Bitmap Storage", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -254,6 +259,62 @@ namespace FoenixIDE.UI
         private byte lowByte(int value)
         {
             return ((byte)(value & 0xFF));
+        }
+
+        /*
+         * Convert a bitmap with no palette to a bytes with a color lookup table.
+         */
+        private void TransformBitmap(byte[] data, int startOffset, int pixelDepth, int lutPointer, int videoPointer, int width, int height)
+        {
+            List<int> lut = new List<int>(256);
+            // Always add black and white
+            lut.Add(0);
+            lut.Add(0xFFFFFF);
+            // Read every pixel into a color table
+            int bytes = 1;
+            switch (pixelDepth)
+            {
+                case 16:
+                    bytes = 2;
+                    break;
+                case 24:
+                    bytes = 3;
+                    break;
+            }
+            // Now read the bitmap
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int pointer = startOffset + ((height - y - 1) * width + x) * bytes;
+                    int rgb = -1;
+                    switch (pixelDepth)
+                    {
+                        case 16:
+                            rgb = (data[pointer] & 0x1F) + ((((data[pointer] & 0xE0) >> 5) + (data[pointer + 1] & 0x3) << 3) << 8) + ((data[pointer + 1] & 0x7C) << 14);
+                            break;
+                        case 24:
+                            rgb = data[pointer] + (data[pointer + 1] << 8) + (data[pointer + 2] << 16);
+                            break;
+                    }
+                    if (rgb != -1)
+                    {
+                        int index = lut.IndexOf(rgb);
+                        byte value = (byte)index;
+                        if (index == -1 && lut.Count < 256)
+                        {
+                            lut.Add(rgb);
+                            value = (byte)(lut.Count - 1);
+                            // Write the value to the LUT
+                            Memory.WriteByte(value * 4 + lutPointer, data[pointer]);
+                            Memory.WriteByte(value * 4 + 1 + lutPointer, data[pointer + 1]);
+                            Memory.WriteByte(value * 4 + 2 + lutPointer, data[pointer + 2]);
+                            Memory.WriteByte(value * 4 + 3 + lutPointer, 0xFF);
+                        }
+                        Memory.WriteByte(videoPointer++, value);
+                    }
+                }
+            }
         }
     }
 }

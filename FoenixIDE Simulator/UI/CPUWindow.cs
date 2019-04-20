@@ -94,14 +94,14 @@ namespace FoenixIDE.UI
                 lineBuffer.Append(" ");
         }
 
-        private void RunButton_Click(object sender, EventArgs e)
+        public void RunButton_Click(object sender, EventArgs e)
         {
             RefreshStatus();
             CPU.DebugPause = false;
             UpdateTraceTimer.Enabled = true;
         }
 
-        private void PauseButton_Click(object sender, EventArgs e)
+        public void PauseButton_Click(object sender, EventArgs e)
         {
             CPU.DebugPause = true;
             UpdateTraceTimer.Enabled = false;

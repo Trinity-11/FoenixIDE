@@ -1,4 +1,14 @@
-Release 1.0.0.1
+Release 0.2.0.3
+---------------
+Changed file extension of Foenix IDE export files to .FNXML.
+Added tileset loading.  The feature expected a bitmap of 256 x 256.
+Added importing of 24 bpp images.  Only 256 colors are allowed.
+
+Release 0.2.0.2
+---------------
+??
+
+Release 0.2.0.1
 ---------------
 * Fixed a bug that cause the IDE to crash when adding a breakpoint with no text.
 * Memory Window is now aware of the mouse pointer position and display the address and value under the pointer.

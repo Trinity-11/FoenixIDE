@@ -228,7 +228,7 @@ namespace FoenixIDE.UI
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Title = "Save Memory to Foenix File";
             dialog.CheckPathExists = true;
-            dialog.Filter = "Foenix IDE File (.fnx) | *.fnx";
+            dialog.Filter = "Foenix IDE File (.fnxml) | *.fnxml";
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -384,6 +384,7 @@ namespace FoenixIDE.UI
                     if (intResult != mem.Y)
                     {
                         Memory.WriteByte(mem.X, intResult);
+                        HighlightPanel.Text = intResult.ToString("X2");
                         RefreshMemoryView();
                     }
                 }

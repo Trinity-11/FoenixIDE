@@ -32,16 +32,15 @@ namespace FoenixIDE.Processor
 
         public string GetHex(int value)
         {
-            return "$" + value.ToString("X6");
+            String val = value.ToString("X6");
+            return "$" + val.Substring(0,2) + ":"+ val.Substring(2);
         }
 
         public int GetIntFromHex(string Hex)
         {
             try
             {
-                if (Hex.StartsWith("$") && Hex.Length > 1)
-                    Hex = Hex.Substring(1);
-                int ret = Convert.ToInt32(Hex, 16);
+                int ret = Convert.ToInt32(Hex.Replace("$","").Replace(":", ""), 16);
                 return ret;
             }
             catch (FormatException)
@@ -55,7 +54,7 @@ namespace FoenixIDE.Processor
             try
             {
                 int Addr = GetIntFromHex(HexAddress);
-                this.Add(Addr, "$" + Addr.ToString("X6"));
+                this.Add(Addr, GetHex(Addr));
             }
             catch (Exception ex)
             {
