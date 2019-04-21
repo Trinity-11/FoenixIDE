@@ -33,6 +33,8 @@ namespace FoenixIDE.MemoryLocations
         public const int MATH_START = 0x00_0100;
         public const int MATH_END = 0x00_012F;
 
+        public const int CODEC_WR_CTRL = 0xAF_E822; // codec write address
+
         #endregion
     }
 }

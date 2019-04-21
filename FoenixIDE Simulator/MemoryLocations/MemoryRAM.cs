@@ -15,6 +15,8 @@ namespace FoenixIDE
         private int startAddress;
         private int length;
         private int endAddress;
+        public delegate void PostWriteFn();
+        PostWriteFn postWrite = null;
 
         public int StartAddress
         {
@@ -48,6 +50,15 @@ namespace FoenixIDE
             data = new byte[Length];
         }
 
+        public MemoryRAM(int StartAddress, int Length, PostWriteFn fn)
+        {
+            this.startAddress = StartAddress;
+            this.length = Length;
+            this.endAddress = StartAddress + Length - 1;
+            data = new byte[Length];
+            postWrite = fn;
+        }
+
         public virtual byte ReadByte(int Address)
         {
             return data[Address];
@@ -74,6 +85,7 @@ namespace FoenixIDE
         public virtual void WriteByte(int Address, byte Value)
         {
             data[Address] = Value;
+            postWrite?.Invoke();
         }
 
         public void WriteWord(int Address, int Value)

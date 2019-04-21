@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE
 {
-    public delegate void PostWriteFn();
     /**
      * This class will automatically call other methods immediately after writes
      */

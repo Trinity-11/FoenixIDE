@@ -36,6 +36,13 @@ namespace FoenixIDE
         public Thread CPUThread = null;
         private String defaultKernel = @"ROMs\kernel.hex";
 
+        // When the codec write address is written, wait a  little bit, then write a zero to signify that we're finished
+        private async void CodecWait5SecondsAndWrite00()
+        {
+            await Task.Delay(2000);
+            Memory.WriteByte(MemoryMap.CODEC_WR_CTRL, 0);
+        }
+
         public FoenixSystem(Gpu gpu)
         {
             Memory = new MemoryManager
@@ -44,7 +51,8 @@ namespace FoenixIDE
                 IO = new MemoryRAM(MemoryMap.IO_START, MemoryMap.IO_SIZE),   // 64K IO space
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
-                MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_END) // 48 bytes
+                MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_END), // 48 bytes
+                CODEC = new MemoryRAM(MemoryMap.CODEC_WR_CTRL, MemoryMap.CODEC_WR_CTRL, CodecWait5SecondsAndWrite00)  // 1 byte
             };
             this.CPU = new CPU(Memory);
             this.CPU.SimulatorCommand += CPU_SimulatorCommand;

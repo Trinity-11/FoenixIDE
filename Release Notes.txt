@@ -1,3 +1,8 @@
+Release 0.2.0.4
+---------------
+Added a timed event whenever the CODEC Write address ($AF:E822) is written to, to reset the value to 0.
+Modified the Memory Window to allow direct entry of values, instead of using an InputBox.
+
 Release 0.2.0.3
 ---------------
 Changed file extension of Foenix IDE export files to .FNXML.
@@ -6,7 +11,10 @@ Added importing of 24 bpp images.  Only 256 colors are allowed.
 
 Release 0.2.0.2
 ---------------
-??
+Added loading of font from live memory during display cycle, instead of using hard-coded font files.
+Fixed memory leak which was caused by not disposing of the displayed bitmap.
+Use border color when in text mode.
+Added highlight box to memory window.
 
 Release 0.2.0.1
 ---------------

@@ -24,6 +24,7 @@ namespace FoenixIDE
         public MemoryRAM VIDEO = null;
         public MemoryRAM IO = null;
         public MathCoproMemoryRAM MATH = null;
+        public MemoryRAM CODEC = null;
 
         public bool VectorPull = false;
 
@@ -62,6 +63,12 @@ namespace FoenixIDE
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
         {
+            if (Address >= MemoryMap.CODEC_WR_CTRL && Address <= MemoryMap.CODEC_WR_CTRL)
+            {
+                Device = CODEC;
+                DeviceAddress = Address - CODEC.StartAddress;
+                return;
+            }
             if (Address >= MemoryMap.MATH_START && Address <= MemoryMap.MATH_END)
             {
                 Device = MATH;

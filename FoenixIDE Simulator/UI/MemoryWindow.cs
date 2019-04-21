@@ -61,33 +61,43 @@ namespace FoenixIDE.UI
             StringBuilder s = new StringBuilder();
             if (Memory == null)
                 return;
-            MemoryText.Clear();
+            //MemoryText.Clear();
+            // Display 16 bytes per line
             for (int i = StartAddress; i <= EndAddress; i += 0x10)
             {
                 s.Append(">");
                 s.Append(i.ToString("X6"));
                 s.Append("  ");
-                for (int j = 0; j < 16; j++)
-                {
-                    s.Append(Memory.ReadByte(i + j).ToString("X2"));
-                    s.Append(" ");
-                    if (j == 7 || j == 15)
-                        s.Append(" ");
-                }
-
+                StringBuilder text = new StringBuilder();
                 for (int j = 0; j < 16; j++)
                 {
                     int c = Memory.ReadByte(i + j);
+                    s.Append(c.ToString("X2"));
+                    s.Append(" ");
+
+                    // Character data
                     if (c < 32 || c > 127)
-                        s.Append(".");
+                        text.Append(".");
                     else
-                        s.Append((char)c);
+                        text.Append((char)c);
+
+                    // Group 8 bytes together
                     if (j == 7 || j == 15)
+                    {
                         s.Append(" ");
+                        text.Append(" ");
+                    }
+                    
                 }
-                s.AppendLine();
+                s.Append(text);
+                if (i < 256)
+                {
+                    s.AppendLine();
+                }
+                
             }
-            MemoryText.AppendText(s.ToString());
+            MemoryText.Text = s.ToString();
+            //MemoryText.AppendText(s.ToString());
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -167,7 +177,7 @@ namespace FoenixIDE.UI
                 int start = value.IndexOf('$');
                 startAddress = Convert.ToInt32(value.Substring(start + 1, 2) + "0000", 16);
             }
-            else
+            else if (value.StartsWith("Address"))
             {
                 // Read all 6 characters, but omit the ':'
                 int start = value.IndexOf('$');
@@ -328,6 +338,22 @@ namespace FoenixIDE.UI
             return sum;
         }
 
+        private void MemoryText_MouseMove(object sender, MouseEventArgs e)
+        {
+            GetAddressPosition(e.Location);
+            if (mem.X != -1)
+            {
+                String val = mem.Y.ToString("X2");
+
+                String address = mem.X.ToString("X6");
+                PositionLabel.Text = "Adress: $" + address.Substring(0, 2) + ":" + address.Substring(2) + ", Value: " + val; // + ", X: " + e.X + ", Y: " + e.Y + ", Col: " + col + ", Line: " + line;
+            }
+            else
+            {
+                PositionLabel.Text = "";
+            }
+        }
+
         Point mem = new Point(-1,-1);
         // Retrieve the memory location of the mouse location
         private void GetAddressPosition(Point mouse)
@@ -337,25 +363,26 @@ namespace FoenixIDE.UI
             int colWidth = 21;
             int addr = -1;
             int value = 0;
+            int offset = 0;
             if (mouse.X > 54 && mouse.X < 230)
             {
                 col = 1 + (mouse.X - 66) / colWidth;
+                offset = col - 1;
             }
             if (mouse.X > 241 && mouse.X < 400)
             {
                 col = 10 + (mouse.X - 242) / colWidth;
+                offset = col - 2;
             }
             if (line < 16 && col != -1)
             {
-                String[] lineText = MemoryText.Lines[line].Split(' ');
-                String text = lineText[col + 1];
-                String address = lineText[0].Substring(1);
-                addr = Convert.ToInt32(address, 16) + ((col < 10) ? (col - 1) : (col - 2));
-                value = Convert.ToByte(text, 16);
+                // Determine the address
+                addr = Convert.ToInt32(StartAddressText.Text, 16) + line * 16 + offset;
+                value = Memory.ReadByte(addr);
                 
-                HighlightPanel.Left = col<10 ? col * colWidth + 44 : col * colWidth + 30;
-                HighlightPanel.Top = MemoryText.Top + line * 15 + 2;
-                HighlightPanel.Text = text;
+                HighlightPanel.Left = col<10 ? col * colWidth + 47 : col * colWidth + 34;
+                HighlightPanel.Top = MemoryText.Top + line * 15 + 3;
+                HighlightPanel.Text = value.ToString("X2");
                 HighlightPanel.Visible = true;
             }
             else
@@ -366,46 +393,35 @@ namespace FoenixIDE.UI
             mem.Y = value;
         }
 
-        // Offer the user to modify the address value
-        private void MemoryText_MouseClick(object sender, MouseEventArgs e)
+        private void HighlightPanel_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+        }
+
+        private void HighlightPanel_KeyUp(object sender, KeyEventArgs e)
         {
             if (mem.X != -1)
             {
                 String rawAddress = mem.X.ToString("X6");
                 String address = "$" + rawAddress.Substring(0, 2) + ":" + rawAddress.Substring(2);
-                int left = this.Left + (this.Width - 443) /2;
-                int top = this.Top + (this.Height - 190) /2;
-                String result = Microsoft.VisualBasic.Interaction.InputBox("Enter New Hex Value for address " + address, "Modify Memory Location", mem.Y.ToString("X2"), left, top);
-                if (result != "")
+                if (HighlightPanel.Text != "")
                 {
                     // The result may be a hexadecimal value
-                    byte intResult = Convert.ToByte(result, 16);
+                    byte intResult = Convert.ToByte(HighlightPanel.Text, 16);
                     // Check that the value was changed
                     if (intResult != mem.Y)
                     {
                         Memory.WriteByte(mem.X, intResult);
-                        HighlightPanel.Text = intResult.ToString("X2");
+                        //HighlightPanel.Text = intResult.ToString("X2");
                         RefreshMemoryView();
                     }
                 }
             }
         }
 
-        
-        private void MemoryText_MouseMove(object sender, MouseEventArgs e)
+        private void MemoryText_MouseLeave(object sender, EventArgs e)
         {
-            GetAddressPosition(e.Location);
-            if (mem.X != -1)
-            {
-                String val = mem.Y.ToString("X2");
-                
-                String address = mem.X.ToString("X6");
-                PositionLabel.Text = "Adress: $" + address.Substring(0, 2) + ":" + address.Substring(2) + ", Value: " + val; // + ", X: " + e.X + ", Y: " + e.Y + ", Col: " + col + ", Line: " + line;
-            }
-            else
-            {
-                PositionLabel.Text = "";
-            }
+            HighlightPanel.Visible = false;
         }
     }
 }

@@ -101,8 +101,7 @@ namespace FoenixIDE.Processor
                 case SimulatorCommands.WaitForInterrupt:
                     break;
                 case SimulatorCommands.RefreshDisplay:
-                    if (SimulatorCommand != null)
-                        SimulatorCommand(EventID);
+                    SimulatorCommand?.Invoke(EventID);
                     break;
                 default:
                     break;

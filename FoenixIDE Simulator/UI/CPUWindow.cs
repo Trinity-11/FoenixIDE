@@ -113,8 +113,7 @@ namespace FoenixIDE.UI
             CPU.DebugPause = true;
             UpdateTraceTimer.Enabled = false;
 
-            int steps = 1;
-            int.TryParse(stepsInput.Text, out steps);
+            int.TryParse(stepsInput.Text, out int steps);
             Kernel.CPU.DebugPause = false;
             while (!Kernel.CPU.DebugPause && steps-- > 0)
             {

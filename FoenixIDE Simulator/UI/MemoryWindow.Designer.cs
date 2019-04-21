@@ -53,7 +53,7 @@
             this.MCRBit6Button = new System.Windows.Forms.Button();
             this.MCRBit7Button = new System.Windows.Forms.Button();
             this.MasterControlLabel = new System.Windows.Forms.Label();
-            this.HighlightPanel = new System.Windows.Forms.Label();
+            this.HighlightPanel = new System.Windows.Forms.TextBox();
             this.HeaderPanel.SuspendLayout();
             this.FooterPanel.SuspendLayout();
             this.SuspendLayout();
@@ -72,7 +72,7 @@
             this.HeaderPanel.Controls.Add(this.StartAddressText);
             this.HeaderPanel.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
-            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(757, 31);
             this.HeaderPanel.TabIndex = 0;
@@ -92,7 +92,7 @@
             // ExportButton
             // 
             this.ExportButton.Location = new System.Drawing.Point(592, 0);
-            this.ExportButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ExportButton.Margin = new System.Windows.Forms.Padding(4);
             this.ExportButton.Name = "ExportButton";
             this.ExportButton.Size = new System.Drawing.Size(70, 29);
             this.ExportButton.TabIndex = 11;
@@ -111,7 +111,10 @@
             "Bank $AF (Vicky)",
             "Bank $B0 (Video)",
             "Address $AF:0100 (Bitmap and Tile Registers)",
-            "Address $AF:E000 (Beatrix)"});
+            "Address $AF:5000 (Tilemap 0)",
+            "Address $AF:8000 (Font Memory Bank 0)",
+            "Address $AF:E000 (Beatrix)",
+            "Unspecified Page"});
             this.AddressCombo.Location = new System.Drawing.Point(286, 3);
             this.AddressCombo.Name = "AddressCombo";
             this.AddressCombo.Size = new System.Drawing.Size(305, 24);
@@ -122,7 +125,7 @@
             // 
             this.PreviousButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PreviousButton.Location = new System.Drawing.Point(251, 0);
-            this.PreviousButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PreviousButton.Margin = new System.Windows.Forms.Padding(4);
             this.PreviousButton.Name = "PreviousButton";
             this.PreviousButton.Size = new System.Drawing.Size(33, 29);
             this.PreviousButton.TabIndex = 4;
@@ -134,7 +137,7 @@
             // 
             this.NextButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.NextButton.Location = new System.Drawing.Point(216, 0);
-            this.NextButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.NextButton.Margin = new System.Windows.Forms.Padding(4);
             this.NextButton.Name = "NextButton";
             this.NextButton.Size = new System.Drawing.Size(35, 29);
             this.NextButton.TabIndex = 3;
@@ -145,7 +148,7 @@
             // ViewButton
             // 
             this.ViewButton.Location = new System.Drawing.Point(145, 0);
-            this.ViewButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ViewButton.Margin = new System.Windows.Forms.Padding(4);
             this.ViewButton.Name = "ViewButton";
             this.ViewButton.Size = new System.Drawing.Size(70, 29);
             this.ViewButton.TabIndex = 2;
@@ -157,7 +160,7 @@
             // 
             this.EndAddressText.Font = new System.Drawing.Font("Consolas", 10F);
             this.EndAddressText.Location = new System.Drawing.Point(73, 0);
-            this.EndAddressText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.EndAddressText.Margin = new System.Windows.Forms.Padding(4);
             this.EndAddressText.Name = "EndAddressText";
             this.EndAddressText.Size = new System.Drawing.Size(70, 27);
             this.EndAddressText.TabIndex = 1;
@@ -170,7 +173,7 @@
             this.StartAddressText.Dock = System.Windows.Forms.DockStyle.Left;
             this.StartAddressText.Font = new System.Drawing.Font("Consolas", 10F);
             this.StartAddressText.Location = new System.Drawing.Point(0, 0);
-            this.StartAddressText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.StartAddressText.Margin = new System.Windows.Forms.Padding(4);
             this.StartAddressText.Name = "StartAddressText";
             this.StartAddressText.Size = new System.Drawing.Size(70, 27);
             this.StartAddressText.TabIndex = 0;
@@ -180,19 +183,20 @@
             // 
             // MemoryText
             // 
-            this.MemoryText.AllowDrop = true;
             this.MemoryText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.MemoryText.Cursor = System.Windows.Forms.Cursors.Hand;
             this.MemoryText.Font = new System.Drawing.Font("Consolas", 10F);
             this.MemoryText.Location = new System.Drawing.Point(0, 28);
-            this.MemoryText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MemoryText.Margin = new System.Windows.Forms.Padding(4);
             this.MemoryText.Multiline = true;
             this.MemoryText.Name = "MemoryText";
             this.MemoryText.ReadOnly = true;
             this.MemoryText.Size = new System.Drawing.Size(759, 350);
             this.MemoryText.TabIndex = 0;
+            this.MemoryText.TabStop = false;
             this.MemoryText.Text = resources.GetString("MemoryText.Text");
+            this.MemoryText.WordWrap = false;
             this.MemoryText.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MemoryText_MouseMove);
             // 
             // UpdateDisplayTimer
@@ -236,30 +240,33 @@
             // MCRBit0Button
             // 
             this.MCRBit0Button.Location = new System.Drawing.Point(452, 3);
+            this.MCRBit0Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit0Button.Name = "MCRBit0Button";
-            this.MCRBit0Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit0Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit0Button.TabIndex = 8;
             this.MCRBit0Button.Tag = "0";
-            this.MCRBit0Button.Text = "T";
+            this.MCRBit0Button.Text = "Tx";
             this.MCRBit0Button.UseVisualStyleBackColor = true;
             this.MCRBit0Button.Click += new System.EventHandler(this.MCRBitButton_Click);
             // 
             // MCRBit1Button
             // 
             this.MCRBit1Button.Location = new System.Drawing.Point(416, 3);
+            this.MCRBit1Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit1Button.Name = "MCRBit1Button";
-            this.MCRBit1Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit1Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit1Button.TabIndex = 7;
             this.MCRBit1Button.Tag = "0";
-            this.MCRBit1Button.Text = "O";
+            this.MCRBit1Button.Text = "Ov";
             this.MCRBit1Button.UseVisualStyleBackColor = true;
             this.MCRBit1Button.Click += new System.EventHandler(this.MCRBitButton_Click);
             // 
             // MCRBit2Button
             // 
             this.MCRBit2Button.Location = new System.Drawing.Point(380, 3);
+            this.MCRBit2Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit2Button.Name = "MCRBit2Button";
-            this.MCRBit2Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit2Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit2Button.TabIndex = 6;
             this.MCRBit2Button.Tag = "0";
             this.MCRBit2Button.Text = "G";
@@ -269,8 +276,9 @@
             // MCRBit3Button
             // 
             this.MCRBit3Button.Location = new System.Drawing.Point(344, 3);
+            this.MCRBit3Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit3Button.Name = "MCRBit3Button";
-            this.MCRBit3Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit3Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit3Button.TabIndex = 5;
             this.MCRBit3Button.Tag = "0";
             this.MCRBit3Button.Text = "B";
@@ -280,19 +288,21 @@
             // MCRBit4Button
             // 
             this.MCRBit4Button.Location = new System.Drawing.Point(301, 3);
+            this.MCRBit4Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit4Button.Name = "MCRBit4Button";
-            this.MCRBit4Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit4Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit4Button.TabIndex = 4;
             this.MCRBit4Button.Tag = "0";
-            this.MCRBit4Button.Text = "T";
+            this.MCRBit4Button.Text = "Ti";
             this.MCRBit4Button.UseVisualStyleBackColor = true;
             this.MCRBit4Button.Click += new System.EventHandler(this.MCRBitButton_Click);
             // 
             // MCRBit5Button
             // 
             this.MCRBit5Button.Location = new System.Drawing.Point(265, 3);
+            this.MCRBit5Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit5Button.Name = "MCRBit5Button";
-            this.MCRBit5Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit5Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit5Button.TabIndex = 3;
             this.MCRBit5Button.Tag = "0";
             this.MCRBit5Button.Text = "S";
@@ -302,11 +312,12 @@
             // MCRBit6Button
             // 
             this.MCRBit6Button.Location = new System.Drawing.Point(229, 3);
+            this.MCRBit6Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit6Button.Name = "MCRBit6Button";
-            this.MCRBit6Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit6Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit6Button.TabIndex = 2;
             this.MCRBit6Button.Tag = "0";
-            this.MCRBit6Button.Text = "G";
+            this.MCRBit6Button.Text = "Ga";
             this.MCRBit6Button.UseVisualStyleBackColor = true;
             this.MCRBit6Button.Click += new System.EventHandler(this.MCRBitButton_Click);
             // 
@@ -314,8 +325,9 @@
             // 
             this.MCRBit7Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.MCRBit7Button.Location = new System.Drawing.Point(193, 3);
+            this.MCRBit7Button.Margin = new System.Windows.Forms.Padding(2);
             this.MCRBit7Button.Name = "MCRBit7Button";
-            this.MCRBit7Button.Size = new System.Drawing.Size(35, 30);
+            this.MCRBit7Button.Size = new System.Drawing.Size(35, 32);
             this.MCRBit7Button.TabIndex = 1;
             this.MCRBit7Button.Tag = "0";
             this.MCRBit7Button.Text = "D";
@@ -335,20 +347,20 @@
             // HighlightPanel
             // 
             this.HighlightPanel.BackColor = System.Drawing.Color.Red;
-            this.HighlightPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.HighlightPanel.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.HighlightPanel.CausesValidation = false;
-            this.HighlightPanel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.HighlightPanel.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.HighlightPanel.Font = new System.Drawing.Font("Consolas", 10F);
-            this.HighlightPanel.Location = new System.Drawing.Point(172, 331);
+            this.HighlightPanel.Location = new System.Drawing.Point(387, 331);
             this.HighlightPanel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.HighlightPanel.MaxLength = 2;
             this.HighlightPanel.Name = "HighlightPanel";
-            this.HighlightPanel.Size = new System.Drawing.Size(28, 20);
-            this.HighlightPanel.TabIndex = 3;
-            this.HighlightPanel.Text = "FF";
-            this.HighlightPanel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.HighlightPanel.Size = new System.Drawing.Size(27, 20);
+            this.HighlightPanel.TabIndex = 4;
+            this.HighlightPanel.TabStop = false;
+            this.HighlightPanel.Text = "00";
             this.HighlightPanel.Visible = false;
-            this.HighlightPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MemoryText_MouseClick);
+            this.HighlightPanel.WordWrap = false;
+            this.HighlightPanel.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HighlightPanel_KeyUp);
             // 
             // MemoryWindow
             // 
@@ -363,7 +375,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MinimumSize = new System.Drawing.Size(779, 460);
             this.Name = "MemoryWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -403,6 +415,6 @@
         private System.Windows.Forms.Button ExportButton;
         private System.Windows.Forms.CheckBox CompactCheckbox;
         private System.Windows.Forms.Label PositionLabel;
-        private System.Windows.Forms.Label HighlightPanel;
+        private System.Windows.Forms.TextBox HighlightPanel;
     }
 }

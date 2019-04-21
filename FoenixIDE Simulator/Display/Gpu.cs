@@ -27,7 +27,7 @@ namespace FoenixIDE.Display
         const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
         const int GRP_LUT_BASE_ADDR = 0xAF_2000;
 
-        int[][] graphicsLUT = new int[4][];
+        int[][] graphicsLUT = new int[8][];
 
         private int length = 128 * 64 * 2; //Text mode uses 16K, 1 page for text, the other for colors.
 
@@ -86,16 +86,6 @@ namespace FoenixIDE.Display
         Timer timer = new Timer();
         bool CursorEnabled = true;
         bool CursorState = true;
-
-        /// <summary>
-        /// Screen character data. Data is addressed as Data[i].
-        /// </summary>
-        //public char[] CharacterData = null;
-
-        /// <summary>
-        /// Screen color data. Upper nibble is background color. Lower nibble is foreground color. 
-        /// </summary>
-        //public ColorCodes[] ColorData = null;
 
         private int GetCharPos(int row, int col)
         {
@@ -239,8 +229,7 @@ namespace FoenixIDE.Display
 
         void Gpu_Load(object sender, EventArgs e)
         {
-
-            this.SetScreenSize(25, 80);
+            this.SetScreenSize(80, 40);
             this.Paint += new PaintEventHandler(Gpu_Paint);
             timer.Tick += new EventHandler(timer_Tick);
             timer.Interval = 1000 / 60;
@@ -713,7 +702,7 @@ namespace FoenixIDE.Display
             return 0;
         }
 
-        public virtual void SetScreenSize(int Lines, int Columns)
+        public virtual void SetScreenSize(int Columns, int Lines)
         {
             this.ColumnsVisible = Columns;
             this.LinesVisible = Lines;
