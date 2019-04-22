@@ -150,7 +150,6 @@ namespace CharSet
             int bitHeight = 2;
             int charWidth = bitWidth * 8 + 4;
             int charHeight = bitHeight * BytesPerCharacter + 4;
-            int col = 0;
             int[] cols = { StartX, StartX + 32, StartX + 28 };
             int[] rows = { StartY, StartY + 24, StartY + 28 };
 

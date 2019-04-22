@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nu64
+namespace FoenixIDE.Common
 {
     public interface IMappable
     {
@@ -17,5 +17,8 @@ namespace Nu64
         /// <returns></returns>
         void WriteByte(int Address, byte Data);
         byte ReadByte(int Address);
+        int StartAddress { get; }
+        int Length { get; }
+        int EndAddress { get; }
     }
 }

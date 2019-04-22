@@ -90,14 +90,13 @@ namespace FoenixIDE.UI
                     
                 }
                 s.Append(text);
-                if (i < 256)
+                if ((i - StartAddress) < 256)
                 {
                     s.AppendLine();
                 }
                 
             }
             MemoryText.Text = s.ToString();
-            //MemoryText.AppendText(s.ToString());
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -130,7 +129,7 @@ namespace FoenixIDE.UI
         {
             try
             {
-                this.StartAddress = Convert.ToInt32(this.StartAddressText.Text, 16);
+                this.EndAddress = Convert.ToInt32(this.EndAddressText.Text, 16);
             }
             catch (global::System.FormatException ex)
             {
@@ -145,6 +144,8 @@ namespace FoenixIDE.UI
 
             this.StartAddressText.Text = StartAddress.ToString("X6");
             this.EndAddressText.Text = EndAddress.ToString("X6");
+            HighlightPanel.Visible = false;
+            PositionLabel.Text = "";
             RefreshMemoryView();
         }
 
@@ -183,8 +184,12 @@ namespace FoenixIDE.UI
                 int start = value.IndexOf('$');
                 startAddress = Convert.ToInt32(value.Replace(":", "").Substring(start + 1, 6), 16);
             }
+            else
+            {
+                return;
+            }
             GotoAddress(startAddress);
-            MemoryText.Focus();
+            ViewButton.Focus();
         }
 
         private void MemoryWindow_KeyDown(object sender, KeyEventArgs e)
@@ -196,7 +201,6 @@ namespace FoenixIDE.UI
             {
                 this.PreviousButton_Click(sender, e);
             }
-
         }
 
         /*
@@ -229,6 +233,32 @@ namespace FoenixIDE.UI
             Memory.WriteByte(0xAF_0000, (byte)value);
         }
 
+        public void UpdateMCRButtons()
+        {
+            byte value = Memory.ReadByte(0xAF_0000);
+            SetMCRButton(MCRBit7Button, (value & 0x80) == 0x80);
+            SetMCRButton(MCRBit6Button, (value & 0x40) == 0x40);
+            SetMCRButton(MCRBit5Button, (value & 0x20) == 0x20);
+            SetMCRButton(MCRBit4Button, (value & 0x10) == 0x10);
+            SetMCRButton(MCRBit3Button, (value & 0x08) == 0x08);
+            SetMCRButton(MCRBit2Button, (value & 0x04) == 0x04);
+            SetMCRButton(MCRBit1Button, (value & 0x02) == 0x02);
+            SetMCRButton(MCRBit0Button, (value & 0x01) == 0x01);
+        }
+
+        private void SetMCRButton(Button btn, bool value)
+        {
+            if (value)
+            {
+                btn.Tag = 1;
+                btn.BackColor = Color.DarkGray;
+            }
+            else
+            {
+                btn.Tag = 0;
+                btn.BackColor = Control.DefaultBackColor;
+            }
+        }
         /*
          * Export all memory content to an XML file.
          */
@@ -242,100 +272,9 @@ namespace FoenixIDE.UI
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                XmlWriter xmlWriter = XmlWriter.Create(dialog.FileName);
-                xmlWriter.WriteStartDocument();
-                xmlWriter.WriteRaw("\r");
-                xmlWriter.WriteComment("Export of FoenixIDE for C256.  All values are in hexadecimal form");
-                xmlWriter.WriteRaw("\r");
-                xmlWriter.WriteStartElement("pages");
-                bool compact = CompactCheckbox.Checked;
-                if (compact)
-                {
-                    xmlWriter.WriteAttributeString("format", "compact");
-                }
-                else
-                {
-                    xmlWriter.WriteAttributeString("format", "full");
-                }
-
-                xmlWriter.WriteRaw("\r");
-
-                // We don't need to scan $FFFF pages, only scan the ones we know are gettings used
-                // Scan each of the banks and pages and save to an XML file
-                // If a page is blank, don't export it.
-                for (int i = 0; i < 0x200000; i = i + 256)
-                {
-                    if (PageChecksum(i) != 0)
-                    {
-                        WriteData(i, xmlWriter, compact);
-                    }
-                }
-
-                for (int i = 0xAF_0000; i < 0xF0_0000; i = i + 256)
-                {
-                    if (PageChecksum(i) != 0)
-                    {
-                        WriteData(i, xmlWriter, compact);
-                    }
-                }
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteEndDocument();
-                xmlWriter.Close();
+                FoenixmlFile fnxml = new FoenixmlFile(Memory);
+                fnxml.Write(dialog.FileName, CompactCheckbox.Checked);
             }
-        }
-
-        private void WriteData(int startAddress, XmlWriter writer, bool compact)
-        {
-            writer.WriteStartElement("page");
-            writer.WriteAttributeString("start-address", "$" + startAddress.ToString("X6"));
-            writer.WriteAttributeString("bank", "$" + startAddress.ToString("X6").Substring(0, 2));
-            writer.WriteRaw("\r");
-
-            // Write 8 bytes per data line
-            for (int i = 0; i < 256; i = i + 8)
-            {
-                WritePhrase(startAddress + i, writer, compact);
-            }
-            writer.WriteEndElement();
-            writer.WriteRaw("\r");
-        }
-
-        // Only write a phrase if the bytes are non-zero
-        private void WritePhrase(int startAddress, XmlWriter writer, bool compact)
-        {
-            if (PhraseChecksum(startAddress) == 0 && !compact || PhraseChecksum(startAddress) != 0)
-            {
-                writer.WriteStartElement("data");
-                writer.WriteAttributeString("address", "$" + (startAddress).ToString("X6"));
-                for (int i = 0; i < 8; i++)
-                {
-                    writer.WriteString(Memory.ReadByte(startAddress + i).ToString("X2") + " ");
-                }
-                writer.WriteEndElement();
-                writer.WriteRaw("\r");
-            }
-        }
-
-        // Sum 256 bytes
-        private int PageChecksum(int startAddress)
-        {
-            int sum = 0;
-            for (int i = 0; i < 255; i++)
-            {
-                sum += Memory.ReadByte(startAddress + i);
-            }
-            return sum;
-        }
-
-        // Sum 8 bytes
-        private int PhraseChecksum(int startAddress)
-        {
-            int sum = 0;
-            for (int i = 0; i < 8; i++)
-            {
-                sum += Memory.ReadByte(startAddress + i);
-            }
-            return sum;
         }
 
         private void MemoryText_MouseMove(object sender, MouseEventArgs e)
@@ -391,11 +330,6 @@ namespace FoenixIDE.UI
             }
             mem.X = addr;
             mem.Y = value;
-        }
-
-        private void HighlightPanel_KeyPress(object sender, KeyPressEventArgs e)
-        {
-
         }
 
         private void HighlightPanel_KeyUp(object sender, KeyEventArgs e)

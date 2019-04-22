@@ -170,7 +170,6 @@ namespace CharSet
             int bitHeight = 2;
             CharacterWidth = bitWidth * 8 + 4;
             CharacterHeight = bitHeight * BytesPerCharacter + 4;
-            int col = 0;
 
             Col1X = StartX + 28;
             int lastCol = Col1X + CharacterWidth * Columns;

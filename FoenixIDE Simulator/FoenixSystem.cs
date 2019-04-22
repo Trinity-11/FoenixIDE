@@ -36,13 +36,6 @@ namespace FoenixIDE
         public Thread CPUThread = null;
         private String defaultKernel = @"ROMs\kernel.hex";
 
-        // When the codec write address is written, wait a  little bit, then write a zero to signify that we're finished
-        private async void CodecWait5SecondsAndWrite00()
-        {
-            await Task.Delay(2000);
-            Memory.WriteByte(MemoryMap.CODEC_WR_CTRL, 0);
-        }
-
         public FoenixSystem(Gpu gpu)
         {
             Memory = new MemoryManager
@@ -78,6 +71,13 @@ namespace FoenixIDE
             this.Monitor = new Monitor.Monitor(this);
         }
 
+        // When the codec write address is written to, wait 200ms then write a zero to signify that we're finished
+        private async void CodecWait5SecondsAndWrite00()
+        {
+            await Task.Delay(200);
+            Memory.WriteByte(MemoryMap.CODEC_WR_CTRL, 0);
+        }
+
         private void CPU_SimulatorCommand(int EventID)
         {
             switch (EventID)
@@ -98,7 +98,15 @@ namespace FoenixIDE
             gpu.Refresh();
 
             this.ReadyHandler = Monitor;
-            defaultKernel = HexFile.Load(Memory, defaultKernel);
+            if (defaultKernel.EndsWith(".fnxml", true, null))
+            {
+                FoenixmlFile fnxml = new FoenixmlFile(Memory);
+                fnxml.Load(defaultKernel);
+            }
+            else
+            {
+                defaultKernel = HexFile.Load(Memory, defaultKernel);
+            }
 
             // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
             if (Memory.ReadLong(0xFFE0) == 0 && Memory.ReadLong(0x18_FFE0) != 0)
@@ -106,10 +114,7 @@ namespace FoenixIDE
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
             }
             CPU.Reset();
-
-            //CPUTest test= new CPUTest(this);
-            //test.BeginTest(0xf81000);
-
+            
             this.TickTimer.Interval = 1000 / 60;
             this.TickTimer.Elapsed += TickTimer_Elapsed;
             this.TickTimer.Enabled = true;
@@ -499,7 +504,5 @@ namespace FoenixIDE
         {
             defaultKernel = value;
         }
-
-        
     }
 }

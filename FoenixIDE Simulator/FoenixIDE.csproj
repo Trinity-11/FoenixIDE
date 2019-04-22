@@ -15,6 +15,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -27,7 +28,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -75,6 +75,9 @@
     <Compile Include="Basic\Immediate.cs" />
     <Compile Include="Basic\Parser.cs" />
     <Compile Include="DeviceEnum.cs" />
+    <Compile Include="FileFormat\FoenixmlFile.cs" />
+    <Compile Include="FileFormat\HexFile.cs" />
+    <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="KeyboardMap.cs" />
     <Compile Include="MemoryBuffer.cs" />
     <Compile Include="MemoryLocations\MathCoproMemoryRAM.cs" />
@@ -234,12 +237,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\PET-ASCII.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FoenixIDE.Common\FoenixIDE.Common.csproj">
-      <Project>{ec7b8dcd-41a5-458c-a0c9-23a8fdfe948b}</Project>
-      <Name>FoenixIDE.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

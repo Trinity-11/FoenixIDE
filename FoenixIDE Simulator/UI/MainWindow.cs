@@ -80,6 +80,7 @@ namespace FoenixIDE.UI
                 memoryWindow.Left = debugWindow.Left;
                 memoryWindow.Top = debugWindow.Top + debugWindow.Height;
                 memoryWindow.Show();
+                memoryWindow.UpdateMCRButtons();
             }
             else
             {
@@ -204,6 +205,7 @@ namespace FoenixIDE.UI
             debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
             kernel.Reset();
+            memoryWindow.UpdateMCRButtons();
             kernel.Run();
             debugWindow.RunButton_Click(null, null);
         }
@@ -216,6 +218,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
             kernel.Reset();
+            memoryWindow.UpdateMCRButtons();
         }
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
@@ -229,7 +232,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void menuOpenHexFile_Click(object sender, EventArgs e)
+        private void loadHexFile(bool ResetMemory)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Hex Filed|*.hex";
@@ -238,23 +241,39 @@ namespace FoenixIDE.UI
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu);
+                if (ResetMemory)
+                {
+                    kernel = new FoenixSystem(this.gpu);
+                }
                 kernel.setKernel(dialog.FileName);
                 kernel.Reset();
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }
         }
+        private void menuOpenHexFile_Click(object sender, EventArgs e)
+        {
+            loadHexFile(true);
+        }
 
         private void openHexFileWoZeroingToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            loadHexFile(false);
+        }
+
+        /*
+         * Read a Foenix XML file
+         */
+        private void loadFNXMLFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Hex Filed|*.hex";
+            dialog.Filter = "Foenix XML File|*.fnxml";
             dialog.CheckFileExists = true;
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 debugWindow.Close();
                 memoryWindow.Close();
+                kernel = new FoenixSystem(this.gpu);
                 kernel.setKernel(dialog.FileName);
                 kernel.Reset();
                 ShowDebugWindow();

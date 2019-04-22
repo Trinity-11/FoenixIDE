@@ -161,6 +161,7 @@
             this.EndAddressText.Font = new System.Drawing.Font("Consolas", 10F);
             this.EndAddressText.Location = new System.Drawing.Point(73, 0);
             this.EndAddressText.Margin = new System.Windows.Forms.Padding(4);
+            this.EndAddressText.MaxLength = 6;
             this.EndAddressText.Name = "EndAddressText";
             this.EndAddressText.Size = new System.Drawing.Size(70, 27);
             this.EndAddressText.TabIndex = 1;
@@ -174,6 +175,7 @@
             this.StartAddressText.Font = new System.Drawing.Font("Consolas", 10F);
             this.StartAddressText.Location = new System.Drawing.Point(0, 0);
             this.StartAddressText.Margin = new System.Windows.Forms.Padding(4);
+            this.StartAddressText.MaxLength = 6;
             this.StartAddressText.Name = "StartAddressText";
             this.StartAddressText.Size = new System.Drawing.Size(70, 27);
             this.StartAddressText.TabIndex = 0;
@@ -189,6 +191,7 @@
             this.MemoryText.Font = new System.Drawing.Font("Consolas", 10F);
             this.MemoryText.Location = new System.Drawing.Point(0, 28);
             this.MemoryText.Margin = new System.Windows.Forms.Padding(4);
+            this.MemoryText.MaxLength = 4096;
             this.MemoryText.Multiline = true;
             this.MemoryText.Name = "MemoryText";
             this.MemoryText.ReadOnly = true;
