@@ -59,5 +59,15 @@ namespace FoenixIDE.Simulator.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap foenix_96x96 {
+            get {
+                object obj = ResourceManager.GetObject("foenix-96x96", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

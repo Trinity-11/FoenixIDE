@@ -39,6 +39,7 @@ namespace FoenixIDE.UI
             this.fpsPerf = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadFNXMLFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOpenHexFile = new System.Windows.Forms.ToolStripMenuItem();
             this.openHexFileWoZeroingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,7 +59,8 @@ namespace FoenixIDE.UI
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.gpu = new FoenixIDE.Display.Gpu();
-            this.loadFNXMLFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -122,7 +124,8 @@ namespace FoenixIDE.UI
             this.fileToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.windowsToolStripMenuItem,
-            this.resetToolStripMenuItem});
+            this.resetToolStripMenuItem,
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(8, 3, 0, 3);
@@ -140,6 +143,13 @@ namespace FoenixIDE.UI
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(44, 24);
             this.fileToolStripMenuItem.Text = "&File";
+            // 
+            // loadFNXMLFileToolStripMenuItem
+            // 
+            this.loadFNXMLFileToolStripMenuItem.Name = "loadFNXMLFileToolStripMenuItem";
+            this.loadFNXMLFileToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
+            this.loadFNXMLFileToolStripMenuItem.Text = "&Load FNXML File";
+            this.loadFNXMLFileToolStripMenuItem.Click += new System.EventHandler(this.loadFNXMLFileToolStripMenuItem_Click);
             // 
             // menuOpenHexFile
             // 
@@ -174,14 +184,14 @@ namespace FoenixIDE.UI
             // loadImageToolStripMenuItem
             // 
             this.loadImageToolStripMenuItem.Name = "loadImageToolStripMenuItem";
-            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
             this.loadImageToolStripMenuItem.Text = "&Load Image";
             this.loadImageToolStripMenuItem.Click += new System.EventHandler(this.loadImageToolStripMenuItem_Click);
             // 
             // uploaderToolStripMenuItem
             // 
             this.uploaderToolStripMenuItem.Name = "uploaderToolStripMenuItem";
-            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
             this.uploaderToolStripMenuItem.Text = "&Uploader";
             this.uploaderToolStripMenuItem.Click += new System.EventHandler(this.uploaderToolStripMenuItem_Click);
             // 
@@ -197,14 +207,14 @@ namespace FoenixIDE.UI
             // cPUToolStripMenuItem
             // 
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(139, 26);
             this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.cPUToolStripMenuItem_Click);
             // 
             // memoryToolStripMenuItem
             // 
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(139, 26);
             this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.memoryToolStripMenuItem_Click);
             // 
@@ -248,7 +258,7 @@ namespace FoenixIDE.UI
             this.panel1.BackColor = System.Drawing.Color.LightBlue;
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 50);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(21, 470);
             this.panel1.TabIndex = 3;
@@ -258,7 +268,7 @@ namespace FoenixIDE.UI
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel2.Location = new System.Drawing.Point(661, 50);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(21, 470);
             this.panel2.TabIndex = 4;
@@ -268,7 +278,7 @@ namespace FoenixIDE.UI
             this.panel3.BackColor = System.Drawing.Color.LightBlue;
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel3.Location = new System.Drawing.Point(21, 500);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(640, 20);
             this.panel3.TabIndex = 5;
@@ -278,7 +288,7 @@ namespace FoenixIDE.UI
             this.panel4.BackColor = System.Drawing.Color.LightBlue;
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(0, 30);
-            this.panel4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel4.Margin = new System.Windows.Forms.Padding(4);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(682, 20);
             this.panel4.TabIndex = 6;
@@ -294,7 +304,7 @@ namespace FoenixIDE.UI
             this.gpu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.gpu.LinesVisible = 0;
             this.gpu.Location = new System.Drawing.Point(21, 50);
-            this.gpu.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.gpu.Margin = new System.Windows.Forms.Padding(5);
             this.gpu.MinimumSize = new System.Drawing.Size(465, 320);
             this.gpu.Name = "gpu";
             this.gpu.Size = new System.Drawing.Size(640, 450);
@@ -303,12 +313,20 @@ namespace FoenixIDE.UI
             this.gpu.Y = 0;
             this.gpu.VisibleChanged += new System.EventHandler(this.gpu_VisibleChanged);
             // 
-            // loadFNXMLFileToolStripMenuItem
+            // helpToolStripMenuItem
             // 
-            this.loadFNXMLFileToolStripMenuItem.Name = "loadFNXMLFileToolStripMenuItem";
-            this.loadFNXMLFileToolStripMenuItem.Size = new System.Drawing.Size(263, 26);
-            this.loadFNXMLFileToolStripMenuItem.Text = "&Load FNXML File";
-            this.loadFNXMLFileToolStripMenuItem.Click += new System.EventHandler(this.loadFNXMLFileToolStripMenuItem_Click);
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(53, 24);
+            this.helpToolStripMenuItem.Text = "&Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
+            this.aboutToolStripMenuItem.Text = "&About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -326,7 +344,7 @@ namespace FoenixIDE.UI
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(300, 300);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MinimumSize = new System.Drawing.Size(699, 594);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -373,6 +391,8 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem uploaderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadFNXMLFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
     }
 }
 

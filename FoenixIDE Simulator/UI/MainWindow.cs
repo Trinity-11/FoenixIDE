@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoenixIDE.Simulator.UI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -279,6 +280,12 @@ namespace FoenixIDE.UI
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutFrom about = new AboutFrom();
+            about.ShowDialog();
         }
     }
 }

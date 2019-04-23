@@ -1,3 +1,9 @@
+Release 0.2.0.5
+---------------
+Added validation of the Load Hex file.  This prevents loading "bin" files.
+Added the About form, which reads the version from the Assembly file.
+Modified the Uploader Window to allow uploading of memory directly to the machine.
+
 Release 0.2.0.4
 ---------------
 Added a timed event whenever the CODEC Write address ($AF:E822) is written to, to reset the value to 0.

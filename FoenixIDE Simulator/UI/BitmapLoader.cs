@@ -95,7 +95,7 @@ namespace FoenixIDE.UI
         {
             OpenFileDialog openFileDlg = new OpenFileDialog();
             openFileDlg.DefaultExt = ".bin";
-            openFileDlg.Filter = "Bitmap Files (.bmp)|*.bmp";
+            openFileDlg.Filter = "Bitmap Files|*.bmp";
 
             // Set initial directory    
             //openFileDlg.InitialDirectory = @"C:\Temp\";

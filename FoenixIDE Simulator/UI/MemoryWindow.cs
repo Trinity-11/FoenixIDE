@@ -231,6 +231,10 @@ namespace FoenixIDE.UI
             value |= ((int)MCRBit6Button.Tag) << 6;
             value |= ((int)MCRBit7Button.Tag) << 7;
             Memory.WriteByte(0xAF_0000, (byte)value);
+            if (StartAddressText.Text.StartsWith("AF", false, null))
+            {
+                RefreshMemoryView();
+            }
         }
 
         public void UpdateMCRButtons()
@@ -268,7 +272,7 @@ namespace FoenixIDE.UI
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Title = "Save Memory to Foenix File";
             dialog.CheckPathExists = true;
-            dialog.Filter = "Foenix IDE File (.fnxml) | *.fnxml";
+            dialog.Filter = "Foenix IDE File| *.fnxml";
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {

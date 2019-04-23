@@ -17,8 +17,6 @@ namespace FoenixIDE.UI
         public static byte[] FileBuffer = new byte[1024 * 1024 * 2];   // Located between $00:0000 to $1F:FFFF
         public static int Size_Of_File = -1;
 
-        //        public static byte[] FoenixFlash0Buffer = new byte[512 * 1024];     // Located between $F8:0000 to $FF:FFFF
-        //        public static byte[] FoenixFlash1Buffer = new byte[512 * 1024];     // Located between $F0:0000 to $F7:FFFF
         public static byte[] TxSerialBuffer = new byte[1 + 1 + 3 + 2 + 8192 + 1];
         public static byte TxLRC = 0;
         public static byte RxLRC = 0;
@@ -99,7 +97,7 @@ namespace FoenixIDE.UI
         {
             OpenFileDialog openFileDlg = new OpenFileDialog();
             openFileDlg.DefaultExt = ".bin";
-            openFileDlg.Filter = "Binary documents (.bin)|*.bin";
+            openFileDlg.Filter = "Binary documents|*.bin";
 
             // Set initial directory    
             //openFileDlg.InitialDirectory = @"C:\Temp\";
@@ -192,15 +190,16 @@ namespace FoenixIDE.UI
             DisconnectButton.Enabled = true;
         }
 
-        private void LoadAddressTextBox_TextChanged(object sender, EventArgs e)
+        private void AddressTextBox_TextChanged(object sender, EventArgs e)
         {
-            string item = LoadAddressTextBox.Text.Replace(":","");
-            int n = 0;
-            if (!int.TryParse(item, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out n) &&
-              item != String.Empty)
+            TextBox tb = (TextBox)sender;
+            string item = tb.Text.Replace(":", "");
+            if (item.Length > 0)
             {
-                LoadAddressTextBox.Text = item.Remove(item.Length - 1, 1);
-                LoadAddressTextBox.SelectionStart = LoadAddressTextBox.Text.Length;
+
+                int n = Convert.ToInt32(item, 16);
+                String value = n.ToString("X6");
+                tb.Text = value.Substring(0, 2) + ":" + value.Substring(2);
             }
         }
 
@@ -255,21 +254,6 @@ namespace FoenixIDE.UI
             TxSerialBuffer[7] = 0xD4;
             SendMessage(8, 0);
         }
-
-
-        public void ReadPacket_Test()
-        {
-            TxSerialBuffer[0] = 0x55;   // Header
-            TxSerialBuffer[1] = 0x00;   // ExitFNXinDebugMode
-            TxSerialBuffer[2] = 0x01;
-            TxSerialBuffer[3] = 0x00;
-            TxSerialBuffer[4] = 0x00;
-            TxSerialBuffer[5] = 0x10;
-            TxSerialBuffer[6] = 0x00;
-            TxSerialBuffer[7] = 0x44;
-            SendMessage(8, 0x1000);
-        }
-
 
         public void SendMessage(int TxSize, int RxSize)
         {
@@ -331,6 +315,49 @@ namespace FoenixIDE.UI
                     RxLRC = (byte)(RxLRC ^ RxSerialBuffer[i]);
             }
             RxLRC = (byte)(RxLRC ^ LRC);
+        }
+
+        private void SendFileRadio_CheckedChanged(object sender, EventArgs e)
+        {
+            FileNameTextBox.Enabled = SendFileRadio.Checked;
+            BrowseFileButton.Enabled = SendFileRadio.Checked;
+            BlockSizeTextBox.Enabled = BlockSendRadio.Checked;
+            BlockAddressTextBox.Enabled = BlockSendRadio.Checked;
+        }
+
+        // TODO: implement a dialog to read from the device
+        private void readFromDevice()
+        {
+            GetFnxInDebugMode();
+            // Fetch 256 Data out of 00:0F00 
+            TxSerialBuffer[0] = 0x55;   // Header
+            TxSerialBuffer[1] = 0x00;   // ExitFNXinDebugMode
+            TxSerialBuffer[2] = 0x00;
+            TxSerialBuffer[3] = 0x0F;
+            TxSerialBuffer[4] = 0x00;
+            TxSerialBuffer[5] = 0x01;
+            TxSerialBuffer[6] = 0x00;
+            TxSerialBuffer[7] = 0x6C;
+            SendMessage(8, 0x0100);
+            Console.WriteLine("{0:X4}", 0xF00);
+            for (int i = 0; i < 256; i++)
+            {
+                Console.WriteLine("{0:x}", RxSerialBuffer[i]);
+            }
+            ExitFnxDebugMode();
+        }
+
+        public void ReadPacket_Test()
+        {
+            TxSerialBuffer[0] = 0x55;   // Header
+            TxSerialBuffer[1] = 0x00;   // ExitFNXinDebugMode
+            TxSerialBuffer[2] = 0x01;
+            TxSerialBuffer[3] = 0x00;
+            TxSerialBuffer[4] = 0x00;
+            TxSerialBuffer[5] = 0x10;
+            TxSerialBuffer[6] = 0x00;
+            TxSerialBuffer[7] = 0x44;
+            SendMessage(8, 0x1000);
         }
     }
 }
