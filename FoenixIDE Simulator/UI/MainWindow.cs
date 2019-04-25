@@ -97,6 +97,7 @@ namespace FoenixIDE.UI
                 int left = this.Left + (this.Width - uploaderWindow.Width) / 2;
                 int top =  this.Top + (this.Height - uploaderWindow.Height) / 2;
                 uploaderWindow.Location = new Point(left, top);
+                uploaderWindow.Memory = kernel.CPU.Memory;
                 uploaderWindow.Show();
             }
             else

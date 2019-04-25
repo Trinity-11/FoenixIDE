@@ -148,6 +148,7 @@
             this.LoadAddressTextBox.TabIndex = 8;
             this.LoadAddressTextBox.Text = "00:0000";
             this.LoadAddressTextBox.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.LoadAddressTextBox.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
             // DollarSignLabel
             // 
@@ -215,6 +216,7 @@
             this.BlockAddressTextBox.TabIndex = 15;
             this.BlockAddressTextBox.Text = "00:0000";
             this.BlockAddressTextBox.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.BlockAddressTextBox.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
             // BlockAddressLabel
             // 
@@ -247,6 +249,7 @@
             this.BlockSizeTextBox.TabIndex = 18;
             this.BlockSizeTextBox.Text = "00:0000";
             this.BlockSizeTextBox.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.BlockSizeTextBox.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
             // label3
             // 
