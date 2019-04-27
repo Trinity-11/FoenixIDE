@@ -153,9 +153,6 @@ namespace FoenixIDE.UI
             SendBinaryButton.Enabled = false;
             UploadProgressBar.Visible = true;
             DisconnectButton.Enabled = false;
-            int i, j = 0;
-            int Loop = 0;
-            int percentage = 0;
 
             int uploadSize = getUploadSize();
             UploadProgressBar.Maximum = uploadSize;
@@ -165,7 +162,7 @@ namespace FoenixIDE.UI
             Console.WriteLine("Starting Address: " + FnxAddressPtr);
             Console.WriteLine("Size of File: " + uploadSize);
 
-            byte[] DataBuffer = new byte[1024 * 1024 * 2];  // Maximum 2 MB, example from $0 to $1F:FFFF.
+            byte[] DataBuffer = new byte[uploadSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
             if (SendFileRadio.Checked)
             {
                 // Read the bytes and put them in the buffer
@@ -190,21 +187,19 @@ namespace FoenixIDE.UI
                     // Now's let's transfer the code
                     if (uploadSize <= 2048)
                     {
-                        i = 0;
                         // DataBuffer = The buffer where the loaded Binary File resides
                         // FnxAddressPtr = Pointer where to put the Data in the Fnx
                         // i = Pointer Inside the data buffer
                         // Size_Of_File = Size of the Payload we want to transfer which ought to be smaller than 8192
-                        PreparePacket2Write(DataBuffer, FnxAddressPtr, i, uploadSize);
+                        PreparePacket2Write(DataBuffer, FnxAddressPtr, 0, uploadSize);
                         UploadProgressBar.Value = uploadSize;
                     }
                     else
                     {
                         int BufferSize = 2048;
-                        Loop = uploadSize / BufferSize;
-                        percentage = 80 / Loop;
+                        int Loop = uploadSize / BufferSize;
 
-                        for (j = 0; j < Loop; j++)
+                        for (int j = 0; j < Loop; j++)
                         {
                             PreparePacket2Write(DataBuffer, FnxAddressPtr, j * BufferSize, BufferSize);
                             FnxAddressPtr = FnxAddressPtr + BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
