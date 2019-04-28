@@ -45,8 +45,16 @@ namespace FoenixIDE
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
                 MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_END), // 48 bytes
-                CODEC = new MemoryRAM(MemoryMap.CODEC_WR_CTRL, MemoryMap.CODEC_WR_CTRL, CodecWait5SecondsAndWrite00)  // 1 byte
+                CODEC = new MemoryRAM(MemoryMap.CODEC_WR_CTRL, MemoryMap.CODEC_WR_CTRL),  // 1 byte
+                KEYBOARD = new MemoryRAM(MemoryMap.KBD_DATA_BUF, 5),
+                SDCARD = new MemoryRAM(MemoryMap.SDCARD_DATA, 2)
             };
+            // Wire the postWrite functions.
+            Memory.CODEC.postWrite = Memory.CODEC.OnCodecWait5SecondsAndWrite00;
+            Memory.KEYBOARD.postWrite = Memory.KEYBOARD.OnKeyboardStatusCodeChange;
+            Memory.SDCARD.postWrite = Memory.SDCARD.OnSDCARDCommand;
+
+
             this.CPU = new CPU(Memory);
             this.CPU.SimulatorCommand += CPU_SimulatorCommand;
             this.gpu = gpu;
@@ -71,13 +79,6 @@ namespace FoenixIDE
             this.Monitor = new Monitor.Monitor(this);
         }
 
-        // When the codec write address is written to, wait 200ms then write a zero to signify that we're finished
-        private async void CodecWait5SecondsAndWrite00()
-        {
-            await Task.Delay(200);
-            Memory.WriteByte(MemoryMap.CODEC_WR_CTRL, 0);
-        }
-
         private void CPU_SimulatorCommand(int EventID)
         {
             switch (EventID)
@@ -96,6 +97,10 @@ namespace FoenixIDE
 
             Cls();
             gpu.Refresh();
+            // Clear out Vicky's memory
+            Memory.IO.zero();
+            gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+
 
             this.ReadyHandler = Monitor;
             if (defaultKernel.EndsWith(".fnxml", true, null))

@@ -25,6 +25,8 @@ namespace FoenixIDE
         public MemoryRAM IO = null;
         public MathCoproMemoryRAM MATH = null;
         public MemoryRAM CODEC = null;
+        public MemoryRAM KEYBOARD = null;
+        public MemoryRAM SDCARD = null;
 
         public bool VectorPull = false;
 
@@ -83,6 +85,18 @@ namespace FoenixIDE
                 return;
             }
 
+            if (Address >= MemoryMap.KBD_DATA_BUF && Address <= MemoryMap.KBD_STATUS_PORT)
+            {
+                Device = KEYBOARD;
+                DeviceAddress = Address - MemoryMap.KBD_DATA_BUF;
+                return;
+            }
+            if (Address >= MemoryMap.SDCARD_DATA && Address <= MemoryMap.SDCARD_CMD)
+            {
+                Device = SDCARD;
+                DeviceAddress = Address - MemoryMap.SDCARD_DATA;
+                return;
+            }
             if(Address >= MemoryMap.IO_START && Address <= MemoryMap.IO_END)
             {
                 Device = IO;

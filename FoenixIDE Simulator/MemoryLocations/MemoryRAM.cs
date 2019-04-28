@@ -15,8 +15,8 @@ namespace FoenixIDE
         private int startAddress;
         private int length;
         private int endAddress;
-        public delegate void PostWriteFn();
-        PostWriteFn postWrite = null;
+        public delegate void PostWriteFn(int address);
+        public PostWriteFn postWrite = null;
 
         public int StartAddress
         {
@@ -50,15 +50,10 @@ namespace FoenixIDE
             data = new byte[Length];
         }
 
-        public MemoryRAM(int StartAddress, int Length, PostWriteFn fn)
+        public void zero()
         {
-            this.startAddress = StartAddress;
-            this.length = Length;
-            this.endAddress = StartAddress + Length - 1;
-            data = new byte[Length];
-            postWrite = fn;
+            Array.Clear(data, 0, Length);
         }
-
         public virtual byte ReadByte(int Address)
         {
             return data[Address];
@@ -85,7 +80,7 @@ namespace FoenixIDE
         public virtual void WriteByte(int Address, byte Value)
         {
             data[Address] = Value;
-            postWrite?.Invoke();
+            postWrite?.Invoke(Address);
         }
 
         public void WriteWord(int Address, int Value)
@@ -104,6 +99,55 @@ namespace FoenixIDE
             for(int i=0; i<Length; ++i)
             {
                 Destination.data[DestAddress + i] = data[SourceAddress + i];
+            }
+        }
+
+        // When the codec write address is written to, wait 200ms then write a zero to signify that we're finished
+        public async void OnCodecWait5SecondsAndWrite00(int address)
+        {
+            await Task.Delay(200);
+            data[0] = 0;
+        }
+
+        // This is used to simulate the Keyboard Register
+        public void OnKeyboardStatusCodeChange(int address)
+        {
+            // In order to avoid an infinite loop, we write to the device directly
+            switch (address)
+            {
+                case 0:
+                    byte command = data[0];
+                    switch (command)
+                    {
+                        case 0xEE: // echo command
+                            data[4] = 1;
+                            break;
+                    }
+                    break;
+                case 4:
+                    byte reg = data[4];
+                    switch (reg)
+                    {
+                        case 0xAA:
+                            data[0] = 0x55;
+                            data[4] = 1;
+                            break;
+                        case 0xAB:
+                            data[0] = 0;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        public void OnSDCARDCommand(int address)
+        {
+            byte command = data[1];
+            switch (command)
+            {
+                case 0x15:
+                    data[0] = 0x51;
+                    break;
             }
         }
     }

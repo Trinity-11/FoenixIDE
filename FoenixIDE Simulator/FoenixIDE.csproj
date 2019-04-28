@@ -136,7 +136,7 @@
     <Compile Include="UI\MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="MemoryLocations\IODevice.cs" />
+    <Compile Include="Deprecated\IODevice.cs" />
     <Compile Include="FoenixSystem.cs" />
     <Compile Include="MemoryLocations\MemoryRAM.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Page00.cs" />

@@ -18,6 +18,13 @@ namespace FoenixIDE.MemoryLocations
 
 
         public const int IO_START = 0xAF0000; // Beginning of I/O Space
+
+        public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
+        public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
+        public const int SDCARD_DATA = 0xAF_E808;
+        public const int SDCARD_CMD = 0xAF_E809;
+        public const int CODEC_WR_CTRL = 0xAF_E822; // codec write address
+
         public const int IO_END = 0xAFFFFF; // End of I/O Space
         public const int IO_SIZE = 0x00FFFF; // 64KB
 
@@ -32,8 +39,6 @@ namespace FoenixIDE.MemoryLocations
 
         public const int MATH_START = 0x00_0100;
         public const int MATH_END = 0x00_012F;
-
-        public const int CODEC_WR_CTRL = 0xAF_E822; // codec write address
 
         #endregion
     }
