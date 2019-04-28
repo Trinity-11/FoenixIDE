@@ -147,6 +147,10 @@ namespace FoenixIDE.UI
             HighlightPanel.Visible = false;
             PositionLabel.Text = "";
             RefreshMemoryView();
+            if (StartAddressText.Text.StartsWith("AF00"))
+            {
+                UpdateMCRButtons();
+            }
         }
 
         private void NextButton_Click(object sender, EventArgs e)

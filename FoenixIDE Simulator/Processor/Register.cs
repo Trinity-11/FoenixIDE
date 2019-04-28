@@ -297,7 +297,7 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         public override int GetLongAddress(int address)
         {
-            return this.Value + (address & 0Xff);
+            return (this.Value) + (address & 0Xff);
         }
 
     }

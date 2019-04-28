@@ -310,27 +310,34 @@ namespace FoenixIDE.Display
         {
             paintCycle++;
 
+            if (IO == null)
+            {
+                e.Graphics.DrawString("IO Memory Not Initialized", this.Font, TextBrush, 0, 0);
+                return;
+            }
+            if (VRAM == null)
+            {
+                e.Graphics.DrawString("VRAM Not Initialized", this.Font, TextBrush, 0, 0);
+                return;
+            }
+            if (RAM == null)
+            {
+                e.Graphics.DrawString("CodeRAM Not Initialized", this.Font, TextBrush, 0, 0);
+                return;
+            }
+            // Don't forget to dispose the framebuffer.
+            Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
+            Graphics g = Graphics.FromImage(frameBuffer);
+
             // Determine if we display a border
             int border_register = IO.ReadByte(4);
             bool displayBorder = (border_register & 1) == 1;
 
             // Default background color to border color
             int borderColor = (int)((UInt32)(IO.ReadLong(5) | 0xFF000000));
-            
-            Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
-            Graphics g = Graphics.FromImage(frameBuffer);
             g.Clear(Color.FromArgb(borderColor));
 
-            if (VRAM == null)
-            {
-                g.DrawString("VRAM Not initialized", this.Font, TextBrush, 0, 0);
-                return;
-            }
-            if (RAM == null)
-            {
-                g.DrawString("CodeRAM Not initialized", this.Font, TextBrush, 0, 0);
-                return;
-            }
+            
 
             byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
             // Graphics Mode - I don't know what this is for... we already have bit for tiles, sprints and bitmaps.
@@ -612,6 +619,7 @@ namespace FoenixIDE.Display
             {
                 return;
             }
+            LinesVisible = 52;
             int lutIndex = (reg & 14) >> 1;  // 8 possible LUTs
             bool striding = (reg & 0x80) == 0x80;
 
@@ -625,7 +633,7 @@ namespace FoenixIDE.Display
             IntPtr p = bitmapData.Scan0;
 
             int colOffset = bkgrnd ? (80 - ColumnsVisible) / 2 * charWidth / tileSize: 0;
-            int lineOffset = bkgrnd ? (64 - LinesVisible) / 2 * charHeight / tileSize : 0;
+            int lineOffset = bkgrnd ? (60 - LinesVisible) / 2 * charHeight / tileSize : 0;
 
             for (int tileRow = lineOffset; tileRow < (30 - lineOffset); tileRow++)
             {
@@ -654,6 +662,7 @@ namespace FoenixIDE.Display
 
         private void DrawSprites(Bitmap bitmap, int layer, bool bkgrnd)
         {
+            LinesVisible = 52;
             int colOffset = bkgrnd ? (80 - ColumnsVisible) / 2 * charWidth / spriteSize : 0;
             int lineOffset = bkgrnd ? (60 - LinesVisible) / 2 * charHeight / spriteSize : 0;
 

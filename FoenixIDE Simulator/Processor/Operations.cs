@@ -499,6 +499,18 @@ namespace FoenixIDE.Processor
                     cpu.PullInto(cpu.Flags);
                     cpu.SyncFlags();
                     break;
+                case OpcodeList.PEA_StackAbsolute:
+                    // push operand to the stack
+                    cpu.Push(signature, 2);
+                    break;
+                case OpcodeList.PEI_StackDirectPageIndirect:
+                    // Read the word at direct page address specified by operand - in Bank 0
+                    int addr = cpu.DirectPage.GetLongAddress(signature & 0xFF) & 0xFFFF;
+                    cpu.Push(cpu.Memory.ReadWord(addr), 2);
+                    break;
+                case OpcodeList.PER_StackProgramCounterRelativeLong:
+
+                    break;
                 default:
                     throw new NotImplementedException("ExecuteStack() opcode not implemented: " + instruction.ToString("X2"));
             }

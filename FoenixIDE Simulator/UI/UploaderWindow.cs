@@ -210,7 +210,10 @@ namespace FoenixIDE.UI
                     }
 
                     // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                    PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
+                    if (DataBuffer.Length > 0xFFFF)
+                    {
+                        PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
+                    }
 
                     // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
                     ExitFnxDebugMode();
