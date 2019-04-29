@@ -58,12 +58,14 @@ namespace FoenixIDE.UI
         {
             if (debugWindow == null || debugWindow.IsDisposed)
             {
-                debugWindow = new UI.CPUWindow();
-                debugWindow.CPU = kernel.CPU;
                 kernel.CPU.DebugPause = true;
-                debugWindow.Kernel = kernel;
+                debugWindow = new UI.CPUWindow
+                {
+                    CPU = kernel.CPU,
+                    Top = Screen.PrimaryScreen.WorkingArea.Top,
+                    Kernel = kernel
+                };
                 debugWindow.Left = Screen.PrimaryScreen.WorkingArea.Width - debugWindow.Width;
-                debugWindow.Top = Screen.PrimaryScreen.WorkingArea.Top;
                 debugWindow.Show();
             } 
             else
@@ -76,10 +78,12 @@ namespace FoenixIDE.UI
         {
             if (memoryWindow == null || memoryWindow.IsDisposed)
             {
-                memoryWindow = new MemoryWindow();
-                memoryWindow.Memory = kernel.CPU.Memory;
-                memoryWindow.Left = debugWindow.Left;
-                memoryWindow.Top = debugWindow.Top + debugWindow.Height;
+                memoryWindow = new MemoryWindow
+                {
+                    Memory = kernel.CPU.Memory,
+                    Left = debugWindow.Left,
+                    Top = debugWindow.Top + debugWindow.Height
+                };
                 memoryWindow.Show();
             }
             else
@@ -110,11 +114,13 @@ namespace FoenixIDE.UI
          * Loading image into memory requires the user to specify what kind of image (tile, bitmap, sprite).
          * What address location in video RAM.
          */
-        private void loadImageToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LoadImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BitmapLoader loader = new BitmapLoader();
-            loader.StartPosition = FormStartPosition.CenterParent;
-            loader.Memory = kernel.CPU.Memory;
+            BitmapLoader loader = new BitmapLoader
+            {
+                StartPosition = FormStartPosition.CenterParent,
+                Memory = kernel.CPU.Memory
+            };
             loader.ShowDialog(this);
         }
 
@@ -149,12 +155,12 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             kernel.CPU.ExecuteCycles(CyclesPerTick);
         }
@@ -162,7 +168,7 @@ namespace FoenixIDE.UI
         int previousCounter = 0;
         int previousFrame = 0;
         DateTime previousTime = DateTime.Now;
-        private void performanceTimer_Tick(object sender, EventArgs e)
+        private void PerformanceTimer_Tick(object sender, EventArgs e)
         {
             DateTime currentTime = DateTime.Now;
             TimeSpan s = currentTime - previousTime;
@@ -179,22 +185,22 @@ namespace FoenixIDE.UI
 
         }
 
-        private void gpu_VisibleChanged(object sender, EventArgs e)
+        private void GPU_VisibleChanged(object sender, EventArgs e)
         {
             BootTimer.Enabled = gpu.Visible;
         }
 
-        private void cPUToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowDebugWindow();
         }
 
-        private void memoryToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MemoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowMemoryWindow();
         }
 
-        private void uploaderToolStripMenuItem_Click(object sender, EventArgs e)
+        private void UploaderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowUploaderWindow();
         }
@@ -202,7 +208,7 @@ namespace FoenixIDE.UI
         /**
          * Restart the CPU
          */
-        private void restartMenuItemClick(object sender, EventArgs e)
+        private void RestartMenuItemClick(object sender, EventArgs e)
         {
             debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
@@ -215,7 +221,7 @@ namespace FoenixIDE.UI
         /** 
          * Reset the system and go to step mode.
          */
-        private void debugToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DebugToolStripMenuItem_Click(object sender, EventArgs e)
         {
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
@@ -234,11 +240,13 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void loadHexFile(bool ResetMemory)
+        private void LoadHexFile(bool ResetMemory)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Hex Filed|*.hex";
-            dialog.CheckFileExists = true;
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Hex Filed|*.hex",
+                CheckFileExists = true
+            };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 debugWindow.Close();
@@ -247,43 +255,45 @@ namespace FoenixIDE.UI
                 {
                     kernel = new FoenixSystem(this.gpu);
                 }
-                kernel.setKernel(dialog.FileName);
+                kernel.SetKernel(dialog.FileName);
                 kernel.Reset();
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }
         }
-        private void menuOpenHexFile_Click(object sender, EventArgs e)
+        private void MenuOpenHexFile_Click(object sender, EventArgs e)
         {
-            loadHexFile(true);
+            LoadHexFile(true);
         }
 
-        private void openHexFileWoZeroingToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenHexFileWoZeroingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadHexFile(false);
+            LoadHexFile(false);
         }
 
         /*
          * Read a Foenix XML file
          */
-        private void loadFNXMLFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LoadFNXMLFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Foenix XML File|*.fnxml";
-            dialog.CheckFileExists = true;
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Foenix XML File|*.fnxml",
+                CheckFileExists = true
+            };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 debugWindow.Close();
                 memoryWindow.Close();
                 kernel = new FoenixSystem(this.gpu);
-                kernel.setKernel(dialog.FileName);
+                kernel.SetKernel(dialog.FileName);
                 kernel.Reset();
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutFrom about = new AboutFrom();
             about.ShowDialog();

@@ -235,7 +235,7 @@ namespace FoenixIDE.Display
         {
             this.SetScreenSize(80, 40);
             this.Paint += new PaintEventHandler(Gpu_Paint);
-            timer.Tick += new EventHandler(timer_Tick);
+            timer.Tick += new EventHandler(Timer_Tick);
             timer.Interval = 1000 / 60;
             this.VisibleChanged += new EventHandler(FrameBufferControl_VisibleChanged);
             this.DoubleBuffered = true;
@@ -356,7 +356,7 @@ namespace FoenixIDE.Display
                 DrawBitmap(frameBuffer, displayBorder);
             }
             // Load Graphical LUTs
-            loadLUT();
+            LoadLUT();
 
             for (int layer = 4; layer > 0; --layer)
             {
@@ -409,7 +409,7 @@ namespace FoenixIDE.Display
             frameBuffer.Dispose();
         }
 
-        private void loadLUT()
+        private void LoadLUT()
         {
             // Read the color lookup tables
             int lutAddress = GRP_LUT_BASE_ADDR - IO_BASE_ADDR;
@@ -710,7 +710,7 @@ namespace FoenixIDE.Display
             return g.MeasureString(MEASURE_STRING, font, int.MaxValue, StringFormat.GenericTypographic);
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        void Timer_Tick(object sender, EventArgs e)
         {
             if (RefreshTimer-- > 0)
             {

@@ -53,7 +53,20 @@ namespace FoenixIDE.UI
             MCRBit7Button.Tag = 0;
 
             // Set the Address to Bank $00
-            AddressCombo.SelectedIndex = 0;
+            if (Memory is MemoryRAM)
+            {
+                AddressCombo.Items.Clear();
+                AddressCombo.Items.Add("Custom Memory " + Memory.StartAddress.ToString("X6"));
+                AddressCombo.Enabled = false;
+                HighlightPanel.ReadOnly = true;
+                FooterPanel.Visible = false;
+            }
+            else
+            {
+                AddressCombo.SelectedIndex = 0;
+                HighlightPanel.ReadOnly = true;
+                HighlightPanel.ReadOnly = false;
+            }
         }
 
         public void RefreshMemoryView()
@@ -66,7 +79,15 @@ namespace FoenixIDE.UI
             for (int i = StartAddress; i <= EndAddress; i += 0x10)
             {
                 s.Append(">");
-                s.Append(i.ToString("X6"));
+                if (Memory is MemoryRAM)
+                {
+                    s.Append((i + Memory.StartAddress).ToString("X6"));
+                }
+                else
+                {
+                    s.Append(i.ToString("X6"));
+                }
+                
                 s.Append("  ");
                 StringBuilder text = new StringBuilder();
                 for (int j = 0; j < 16; j++)
@@ -99,7 +120,7 @@ namespace FoenixIDE.UI
             MemoryText.Text = s.ToString();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             RefreshMemoryView();
             UpdateDisplayTimer.Enabled = false;
@@ -115,9 +136,18 @@ namespace FoenixIDE.UI
             try
             {
                 int len = this.EndAddress - this.StartAddress;
-                this.StartAddress = Convert.ToInt32(this.StartAddressText.Text, 16);
-                this.EndAddress = this.StartAddress + len;
-                this.EndAddressText.Text = this.EndAddress.ToString("X6");
+                if (Memory is MemoryRAM)
+                {
+                    this.StartAddress = Convert.ToInt32(this.StartAddressText.Text, 16) - Memory.StartAddress;
+                    this.EndAddress = this.StartAddress + len;
+                    this.EndAddressText.Text = (this.EndAddress + Memory.StartAddress).ToString("X6");
+                }
+                else
+                {
+                    this.StartAddress = Convert.ToInt32(this.StartAddressText.Text, 16);
+                    this.EndAddress = this.StartAddress + len;
+                    this.EndAddressText.Text = this.EndAddress.ToString("X6");
+                }
             }
             catch (global::System.FormatException ex)
             {
@@ -137,13 +167,31 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void GotoAddress(int StartAddress)
+        public void GotoAddress(int requestedAddress)
         {
-            this.StartAddress = StartAddress;
-            this.EndAddress = StartAddress + 255;
+            if (Memory is MemoryRAM)
+            {
+                int newAddress = requestedAddress - Memory.StartAddress;
+                if (newAddress >= 0 && newAddress < Memory.Length)
+                {
+                    StartAddress = newAddress;
+                    EndAddress = newAddress + 255;
+                    if (EndAddress > Memory.Length)
+                    {
+                        EndAddress = Memory.Length;
+                    }
+                    this.StartAddressText.Text = (StartAddress + Memory.StartAddress).ToString("X6");
+                    this.EndAddressText.Text = (EndAddress + Memory.StartAddress).ToString("X6");
+                }
+            }
+            else
+            {
+                this.StartAddress = requestedAddress;
+                this.EndAddress = requestedAddress + 255;
+                this.StartAddressText.Text = requestedAddress.ToString("X6");
+                this.EndAddressText.Text = EndAddress.ToString("X6");
+            }
 
-            this.StartAddressText.Text = StartAddress.ToString("X6");
-            this.EndAddressText.Text = EndAddress.ToString("X6");
             HighlightPanel.Visible = false;
             PositionLabel.Text = "";
             RefreshMemoryView();
@@ -273,10 +321,12 @@ namespace FoenixIDE.UI
         private void ExportButton_Click(object sender, EventArgs e)
         {
             // Pick the file to create
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Title = "Save Memory to Foenix File";
-            dialog.CheckPathExists = true;
-            dialog.Filter = "Foenix IDE File| *.fnxml";
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Title = "Save Memory to Foenix File",
+                CheckPathExists = true,
+                Filter = "Foenix IDE File| *.fnxml"
+            };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -325,7 +375,14 @@ namespace FoenixIDE.UI
             {
                 // Determine the address
                 addr = Convert.ToInt32(StartAddressText.Text, 16) + line * 16 + offset;
-                value = Memory.ReadByte(addr);
+                if (Memory is MemoryRAM)
+                {
+                    value = Memory.ReadByte(addr - Memory.StartAddress);
+                }
+                else
+                {
+                    value = Memory.ReadByte(addr);
+                }
                 
                 HighlightPanel.Left = col<10 ? col * colWidth + 47 : col * colWidth + 34;
                 HighlightPanel.Top = MemoryText.Top + line * 15 + 3;

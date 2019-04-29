@@ -871,7 +871,7 @@ namespace FoenixIDE.Processor
                 // WDM is a 2-byte NOP and an easter egg. William D Mensch designed the 6502 and 65816.
                 // We will use this to give the simulator commands
                 case OpcodeList.WDM_Implied:
-                    onSimulatorCommand(signature);
+                    OnSimulatorCommand(signature);
                     break;
                 case OpcodeList.NOP_Implied:
                     break;
@@ -883,7 +883,7 @@ namespace FoenixIDE.Processor
             }
         }
 
-        private void onSimulatorCommand(int signature)
+        private void OnSimulatorCommand(int signature)
         {
             if (SimulatorCommand == null)
                 return;

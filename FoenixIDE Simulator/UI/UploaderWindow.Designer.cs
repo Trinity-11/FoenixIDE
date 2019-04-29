@@ -35,20 +35,27 @@
             this.FileNameTextBox = new System.Windows.Forms.TextBox();
             this.FileSizeLabel = new System.Windows.Forms.Label();
             this.FileSizeResultLabel = new System.Windows.Forms.Label();
-            this.LoadAddressLabel = new System.Windows.Forms.Label();
+            this.DestinationAddressLabel = new System.Windows.Forms.Label();
             this.SendBinaryButton = new System.Windows.Forms.Button();
-            this.LoadAddressTextBox = new System.Windows.Forms.TextBox();
+            this.C256DestAddress = new System.Windows.Forms.TextBox();
             this.DollarSignLabel = new System.Windows.Forms.Label();
             this.UploadProgressBar = new System.Windows.Forms.ProgressBar();
             this.DisconnectButton = new System.Windows.Forms.Button();
             this.SendFileRadio = new System.Windows.Forms.RadioButton();
             this.BlockSendRadio = new System.Windows.Forms.RadioButton();
-            this.BlockAddressTextBox = new System.Windows.Forms.TextBox();
-            this.BlockAddressLabel = new System.Windows.Forms.Label();
+            this.EmuSrcAddress = new System.Windows.Forms.TextBox();
+            this.EmuSourceAddressLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.BlockSizeTextBox = new System.Windows.Forms.TextBox();
+            this.EmuSrcSize = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.FetchRadio = new System.Windows.Forms.RadioButton();
+            this.C256SrcSize = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.C256SrcAddress = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // ConnectButton
@@ -97,7 +104,7 @@
             // 
             this.FileSizeLabel.AutoSize = true;
             this.FileSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FileSizeLabel.Location = new System.Drawing.Point(151, 82);
+            this.FileSizeLabel.Location = new System.Drawing.Point(475, 82);
             this.FileSizeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeLabel.Name = "FileSizeLabel";
             this.FileSizeLabel.Size = new System.Drawing.Size(75, 17);
@@ -107,29 +114,29 @@
             // FileSizeResultLabel
             // 
             this.FileSizeResultLabel.AutoSize = true;
-            this.FileSizeResultLabel.Location = new System.Drawing.Point(311, 82);
+            this.FileSizeResultLabel.Location = new System.Drawing.Point(554, 82);
             this.FileSizeResultLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeResultLabel.Name = "FileSizeResultLabel";
             this.FileSizeResultLabel.Size = new System.Drawing.Size(68, 17);
             this.FileSizeResultLabel.TabIndex = 5;
             this.FileSizeResultLabel.Text = "$00:0000";
             // 
-            // LoadAddressLabel
+            // DestinationAddressLabel
             // 
-            this.LoadAddressLabel.AutoSize = true;
-            this.LoadAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LoadAddressLabel.Location = new System.Drawing.Point(15, 154);
-            this.LoadAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.LoadAddressLabel.Name = "LoadAddressLabel";
-            this.LoadAddressLabel.Size = new System.Drawing.Size(159, 17);
-            this.LoadAddressLabel.TabIndex = 6;
-            this.LoadAddressLabel.Text = "Destination Address:";
+            this.DestinationAddressLabel.AutoSize = true;
+            this.DestinationAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DestinationAddressLabel.Location = new System.Drawing.Point(195, 130);
+            this.DestinationAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.DestinationAddressLabel.Name = "DestinationAddressLabel";
+            this.DestinationAddressLabel.Size = new System.Drawing.Size(157, 17);
+            this.DestinationAddressLabel.TabIndex = 6;
+            this.DestinationAddressLabel.Text = "C256 Dest. Address:";
             // 
             // SendBinaryButton
             // 
             this.SendBinaryButton.Enabled = false;
             this.SendBinaryButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SendBinaryButton.Location = new System.Drawing.Point(474, 152);
+            this.SendBinaryButton.Location = new System.Drawing.Point(474, 18);
             this.SendBinaryButton.Margin = new System.Windows.Forms.Padding(2);
             this.SendBinaryButton.Name = "SendBinaryButton";
             this.SendBinaryButton.Size = new System.Drawing.Size(149, 29);
@@ -138,22 +145,22 @@
             this.SendBinaryButton.UseVisualStyleBackColor = true;
             this.SendBinaryButton.Click += new System.EventHandler(this.SendBinaryButton_Click);
             // 
-            // LoadAddressTextBox
+            // C256DestAddress
             // 
-            this.LoadAddressTextBox.Enabled = false;
-            this.LoadAddressTextBox.Location = new System.Drawing.Point(193, 152);
-            this.LoadAddressTextBox.Margin = new System.Windows.Forms.Padding(2);
-            this.LoadAddressTextBox.Name = "LoadAddressTextBox";
-            this.LoadAddressTextBox.Size = new System.Drawing.Size(93, 22);
-            this.LoadAddressTextBox.TabIndex = 8;
-            this.LoadAddressTextBox.Text = "00:0000";
-            this.LoadAddressTextBox.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
-            this.LoadAddressTextBox.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
+            this.C256DestAddress.Enabled = false;
+            this.C256DestAddress.Location = new System.Drawing.Point(363, 129);
+            this.C256DestAddress.Margin = new System.Windows.Forms.Padding(2);
+            this.C256DestAddress.Name = "C256DestAddress";
+            this.C256DestAddress.Size = new System.Drawing.Size(93, 22);
+            this.C256DestAddress.TabIndex = 8;
+            this.C256DestAddress.Text = "00:0000";
+            this.C256DestAddress.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.C256DestAddress.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
             // DollarSignLabel
             // 
             this.DollarSignLabel.AutoSize = true;
-            this.DollarSignLabel.Location = new System.Drawing.Point(178, 154);
+            this.DollarSignLabel.Location = new System.Drawing.Point(347, 131);
             this.DollarSignLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DollarSignLabel.Name = "DollarSignLabel";
             this.DollarSignLabel.Size = new System.Drawing.Size(16, 17);
@@ -162,7 +169,7 @@
             // 
             // UploadProgressBar
             // 
-            this.UploadProgressBar.Location = new System.Drawing.Point(11, 196);
+            this.UploadProgressBar.Location = new System.Drawing.Point(11, 209);
             this.UploadProgressBar.Margin = new System.Windows.Forms.Padding(2);
             this.UploadProgressBar.Name = "UploadProgressBar";
             this.UploadProgressBar.Size = new System.Drawing.Size(612, 26);
@@ -198,7 +205,7 @@
             // BlockSendRadio
             // 
             this.BlockSendRadio.AutoSize = true;
-            this.BlockSendRadio.Location = new System.Drawing.Point(20, 116);
+            this.BlockSendRadio.Location = new System.Drawing.Point(20, 101);
             this.BlockSendRadio.Name = "BlockSendRadio";
             this.BlockSendRadio.Size = new System.Drawing.Size(154, 21);
             this.BlockSendRadio.TabIndex = 13;
@@ -206,56 +213,56 @@
             this.BlockSendRadio.UseVisualStyleBackColor = true;
             this.BlockSendRadio.CheckedChanged += new System.EventHandler(this.SendFileRadio_CheckedChanged);
             // 
-            // BlockAddressTextBox
+            // EmuSrcAddress
             // 
-            this.BlockAddressTextBox.Enabled = false;
-            this.BlockAddressTextBox.Location = new System.Drawing.Point(335, 117);
-            this.BlockAddressTextBox.Margin = new System.Windows.Forms.Padding(2);
-            this.BlockAddressTextBox.Name = "BlockAddressTextBox";
-            this.BlockAddressTextBox.Size = new System.Drawing.Size(93, 22);
-            this.BlockAddressTextBox.TabIndex = 15;
-            this.BlockAddressTextBox.Text = "00:0000";
-            this.BlockAddressTextBox.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
-            this.BlockAddressTextBox.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
+            this.EmuSrcAddress.Enabled = false;
+            this.EmuSrcAddress.Location = new System.Drawing.Point(363, 100);
+            this.EmuSrcAddress.Margin = new System.Windows.Forms.Padding(2);
+            this.EmuSrcAddress.Name = "EmuSrcAddress";
+            this.EmuSrcAddress.Size = new System.Drawing.Size(93, 22);
+            this.EmuSrcAddress.TabIndex = 15;
+            this.EmuSrcAddress.Text = "00:0000";
+            this.EmuSrcAddress.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.EmuSrcAddress.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
-            // BlockAddressLabel
+            // EmuSourceAddressLabel
             // 
-            this.BlockAddressLabel.AutoSize = true;
-            this.BlockAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BlockAddressLabel.Location = new System.Drawing.Point(197, 119);
-            this.BlockAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.BlockAddressLabel.Name = "BlockAddressLabel";
-            this.BlockAddressLabel.Size = new System.Drawing.Size(116, 17);
-            this.BlockAddressLabel.TabIndex = 14;
-            this.BlockAddressLabel.Text = "Block Address:";
+            this.EmuSourceAddressLabel.AutoSize = true;
+            this.EmuSourceAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.EmuSourceAddressLabel.Location = new System.Drawing.Point(215, 102);
+            this.EmuSourceAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.EmuSourceAddressLabel.Name = "EmuSourceAddressLabel";
+            this.EmuSourceAddressLabel.Size = new System.Drawing.Size(137, 17);
+            this.EmuSourceAddressLabel.TabIndex = 14;
+            this.EmuSourceAddressLabel.Text = "Emu Src Address:";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(318, 119);
+            this.label2.Location = new System.Drawing.Point(346, 102);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(16, 17);
             this.label2.TabIndex = 16;
             this.label2.Text = "$";
             // 
-            // BlockSizeTextBox
+            // EmuSrcSize
             // 
-            this.BlockSizeTextBox.Enabled = false;
-            this.BlockSizeTextBox.Location = new System.Drawing.Point(530, 117);
-            this.BlockSizeTextBox.Margin = new System.Windows.Forms.Padding(2);
-            this.BlockSizeTextBox.Name = "BlockSizeTextBox";
-            this.BlockSizeTextBox.Size = new System.Drawing.Size(93, 22);
-            this.BlockSizeTextBox.TabIndex = 18;
-            this.BlockSizeTextBox.Text = "00:0000";
-            this.BlockSizeTextBox.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
-            this.BlockSizeTextBox.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
+            this.EmuSrcSize.Enabled = false;
+            this.EmuSrcSize.Location = new System.Drawing.Point(525, 101);
+            this.EmuSrcSize.Margin = new System.Windows.Forms.Padding(2);
+            this.EmuSrcSize.Name = "EmuSrcSize";
+            this.EmuSrcSize.Size = new System.Drawing.Size(93, 22);
+            this.EmuSrcSize.TabIndex = 18;
+            this.EmuSrcSize.Text = "00:0000";
+            this.EmuSrcSize.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.EmuSrcSize.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(467, 118);
+            this.label3.Location = new System.Drawing.Point(462, 102);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(44, 17);
@@ -265,39 +272,121 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(515, 119);
+            this.label4.Location = new System.Drawing.Point(510, 103);
             this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(16, 17);
             this.label4.TabIndex = 19;
             this.label4.Text = "$";
             // 
+            // FetchRadio
+            // 
+            this.FetchRadio.AutoSize = true;
+            this.FetchRadio.Location = new System.Drawing.Point(20, 172);
+            this.FetchRadio.Name = "FetchRadio";
+            this.FetchRadio.Size = new System.Drawing.Size(156, 21);
+            this.FetchRadio.TabIndex = 20;
+            this.FetchRadio.Text = "Fetch Memory Block";
+            this.FetchRadio.UseVisualStyleBackColor = true;
+            this.FetchRadio.CheckedChanged += new System.EventHandler(this.SendFileRadio_CheckedChanged);
+            // 
+            // C256SrcSize
+            // 
+            this.C256SrcSize.Enabled = false;
+            this.C256SrcSize.Location = new System.Drawing.Point(525, 172);
+            this.C256SrcSize.Margin = new System.Windows.Forms.Padding(2);
+            this.C256SrcSize.Name = "C256SrcSize";
+            this.C256SrcSize.Size = new System.Drawing.Size(93, 22);
+            this.C256SrcSize.TabIndex = 25;
+            this.C256SrcSize.Text = "00:0000";
+            this.C256SrcSize.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(462, 174);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(44, 17);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "Size:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(510, 175);
+            this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(16, 17);
+            this.label5.TabIndex = 26;
+            this.label5.Text = "$";
+            // 
+            // C256SrcAddress
+            // 
+            this.C256SrcAddress.Enabled = false;
+            this.C256SrcAddress.Location = new System.Drawing.Point(363, 172);
+            this.C256SrcAddress.Margin = new System.Windows.Forms.Padding(2);
+            this.C256SrcAddress.Name = "C256SrcAddress";
+            this.C256SrcAddress.Size = new System.Drawing.Size(93, 22);
+            this.C256SrcAddress.TabIndex = 22;
+            this.C256SrcAddress.Text = "00:0000";
+            this.C256SrcAddress.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(207, 174);
+            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(143, 17);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "C256 Src Address:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(346, 174);
+            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(16, 17);
+            this.label7.TabIndex = 23;
+            this.label7.Text = "$";
+            // 
             // UploaderWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(634, 238);
-            this.Controls.Add(this.BlockSizeTextBox);
+            this.ClientSize = new System.Drawing.Size(630, 246);
+            this.Controls.Add(this.C256DestAddress);
+            this.Controls.Add(this.C256SrcAddress);
+            this.Controls.Add(this.EmuSrcAddress);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.DollarSignLabel);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.C256SrcSize);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.FetchRadio);
+            this.Controls.Add(this.EmuSrcSize);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.BlockAddressTextBox);
-            this.Controls.Add(this.BlockAddressLabel);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.EmuSourceAddressLabel);
             this.Controls.Add(this.BlockSendRadio);
             this.Controls.Add(this.SendFileRadio);
             this.Controls.Add(this.DisconnectButton);
             this.Controls.Add(this.UploadProgressBar);
-            this.Controls.Add(this.LoadAddressTextBox);
             this.Controls.Add(this.SendBinaryButton);
-            this.Controls.Add(this.LoadAddressLabel);
+            this.Controls.Add(this.DestinationAddressLabel);
             this.Controls.Add(this.FileSizeResultLabel);
             this.Controls.Add(this.FileSizeLabel);
             this.Controls.Add(this.FileNameTextBox);
             this.Controls.Add(this.BrowseFileButton);
             this.Controls.Add(this.COMPortComboBox);
             this.Controls.Add(this.ConnectButton);
-            this.Controls.Add(this.DollarSignLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -320,19 +409,26 @@
         private System.Windows.Forms.TextBox FileNameTextBox;
         private System.Windows.Forms.Label FileSizeLabel;
         private System.Windows.Forms.Label FileSizeResultLabel;
-        private System.Windows.Forms.Label LoadAddressLabel;
+        private System.Windows.Forms.Label DestinationAddressLabel;
         private System.Windows.Forms.Button SendBinaryButton;
-        private System.Windows.Forms.TextBox LoadAddressTextBox;
+        private System.Windows.Forms.TextBox C256DestAddress;
         private System.Windows.Forms.Label DollarSignLabel;
         private System.Windows.Forms.ProgressBar UploadProgressBar;
         private System.Windows.Forms.Button DisconnectButton;
         private System.Windows.Forms.RadioButton SendFileRadio;
         private System.Windows.Forms.RadioButton BlockSendRadio;
-        private System.Windows.Forms.TextBox BlockAddressTextBox;
-        private System.Windows.Forms.Label BlockAddressLabel;
+        private System.Windows.Forms.TextBox EmuSrcAddress;
+        private System.Windows.Forms.Label EmuSourceAddressLabel;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox BlockSizeTextBox;
+        private System.Windows.Forms.TextBox EmuSrcSize;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.RadioButton FetchRadio;
+        private System.Windows.Forms.TextBox C256SrcSize;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox C256SrcAddress;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
     }
 }

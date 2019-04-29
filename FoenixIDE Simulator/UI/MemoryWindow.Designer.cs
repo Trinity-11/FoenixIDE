@@ -43,7 +43,6 @@
             this.UpdateDisplayTimer = new System.Windows.Forms.Timer(this.components);
             this.MemoryWindowTooltips = new System.Windows.Forms.ToolTip(this.components);
             this.FooterPanel = new System.Windows.Forms.Panel();
-            this.PositionLabel = new System.Windows.Forms.Label();
             this.MCRBit0Button = new System.Windows.Forms.Button();
             this.MCRBit1Button = new System.Windows.Forms.Button();
             this.MCRBit2Button = new System.Windows.Forms.Button();
@@ -54,6 +53,7 @@
             this.MCRBit7Button = new System.Windows.Forms.Button();
             this.MasterControlLabel = new System.Windows.Forms.Label();
             this.HighlightPanel = new System.Windows.Forms.TextBox();
+            this.PositionLabel = new System.Windows.Forms.Label();
             this.HeaderPanel.SuspendLayout();
             this.FooterPanel.SuspendLayout();
             this.SuspendLayout();
@@ -206,7 +206,7 @@
             // 
             this.UpdateDisplayTimer.Enabled = true;
             this.UpdateDisplayTimer.Interval = 1000;
-            this.UpdateDisplayTimer.Tick += new System.EventHandler(this.timer1_Tick);
+            this.UpdateDisplayTimer.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // MemoryWindowTooltips
             // 
@@ -216,7 +216,6 @@
             // 
             this.FooterPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.FooterPanel.Controls.Add(this.PositionLabel);
             this.FooterPanel.Controls.Add(this.MCRBit0Button);
             this.FooterPanel.Controls.Add(this.MCRBit1Button);
             this.FooterPanel.Controls.Add(this.MCRBit2Button);
@@ -228,17 +227,8 @@
             this.FooterPanel.Controls.Add(this.MasterControlLabel);
             this.FooterPanel.Location = new System.Drawing.Point(0, 382);
             this.FooterPanel.Name = "FooterPanel";
-            this.FooterPanel.Size = new System.Drawing.Size(762, 37);
+            this.FooterPanel.Size = new System.Drawing.Size(515, 37);
             this.FooterPanel.TabIndex = 1;
-            // 
-            // PositionLabel
-            // 
-            this.PositionLabel.AutoSize = true;
-            this.PositionLabel.Location = new System.Drawing.Point(545, 10);
-            this.PositionLabel.Name = "PositionLabel";
-            this.PositionLabel.Size = new System.Drawing.Size(46, 17);
-            this.PositionLabel.TabIndex = 9;
-            this.PositionLabel.Text = "label1";
             // 
             // MCRBit0Button
             // 
@@ -365,12 +355,25 @@
             this.HighlightPanel.WordWrap = false;
             this.HighlightPanel.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HighlightPanel_KeyUp);
             // 
+            // PositionLabel
+            // 
+            this.PositionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.PositionLabel.AutoSize = true;
+            this.PositionLabel.Location = new System.Drawing.Point(548, 393);
+            this.PositionLabel.Name = "PositionLabel";
+            this.PositionLabel.Size = new System.Drawing.Size(97, 17);
+            this.PositionLabel.TabIndex = 10;
+            this.PositionLabel.Text = "Position Label";
+            this.PositionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // MemoryWindow
             // 
             this.AcceptButton = this.ViewButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(762, 418);
+            this.Controls.Add(this.PositionLabel);
             this.Controls.Add(this.HighlightPanel);
             this.Controls.Add(this.FooterPanel);
             this.Controls.Add(this.MemoryText);
@@ -379,10 +382,11 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(779, 460);
             this.Name = "MemoryWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "MemoryWindow";
+            this.Text = "Emulator Memory";
             this.Load += new System.EventHandler(this.MemoryWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MemoryWindow_KeyDown);
             this.HeaderPanel.ResumeLayout(false);
@@ -414,10 +418,10 @@
         private System.Windows.Forms.Button MCRBit6Button;
         private System.Windows.Forms.Button MCRBit7Button;
         private System.Windows.Forms.Label MasterControlLabel;
-        private System.Windows.Forms.ComboBox AddressCombo;
         private System.Windows.Forms.Button ExportButton;
         private System.Windows.Forms.CheckBox CompactCheckbox;
-        private System.Windows.Forms.Label PositionLabel;
         private System.Windows.Forms.TextBox HighlightPanel;
+        private System.Windows.Forms.ComboBox AddressCombo;
+        private System.Windows.Forms.Label PositionLabel;
     }
 }

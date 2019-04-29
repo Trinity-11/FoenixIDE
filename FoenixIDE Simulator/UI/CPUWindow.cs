@@ -252,10 +252,9 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void stepsInput_Enter(object sender, EventArgs e)
+        private void StepsInput_Enter(object sender, EventArgs e)
         {
-            TextBox tb = sender as TextBox;
-            if (tb == null)
+            if (!(sender is TextBox tb))
                 return;
 
             tb.SelectAll();
@@ -355,7 +354,7 @@ namespace FoenixIDE.UI
             stackText.Clear();
         }
 
-        private void locationInput_Validated(object sender, EventArgs e)
+        private void LocationInput_Validated(object sender, EventArgs e)
         {
             int jumpAddress = Convert.ToInt32(this.locationInput.Text.Replace(":",""), 16);
             String address = jumpAddress.ToString("X6");

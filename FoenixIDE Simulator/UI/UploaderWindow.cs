@@ -15,10 +15,8 @@ namespace FoenixIDE.UI
 {
     public partial class UploaderWindow : Form
     {
-        public static byte[] TxSerialBuffer = new byte[1 + 1 + 3 + 2 + 8192 + 1];
         public static byte TxLRC = 0;
         public static byte RxLRC = 0;
-        public static byte[] RxSerialBuffer = new byte[1 + 2 + 8192 + 1];
         public static byte Stat0 = 0;
         public static byte Stat1 = 0;
         public static byte LRC = 0;
@@ -58,18 +56,23 @@ namespace FoenixIDE.UI
             COMPortComboBox.SelectedItem = COMPortComboBox.Items[0];
         }
 
-        private int getUploadSize()
+        private int GetTransmissionSize()
         {
-            int uploadSize = -1;
+            int transmissionSize = -1;
             if (SendFileRadio.Checked)
             {
-                uploadSize = Convert.ToInt32(FileSizeResultLabel.Text.Replace("$", "").Replace(":", ""), 16);
+                GetFileLength(FileNameTextBox.Text);
+                transmissionSize = Convert.ToInt32(FileSizeResultLabel.Text.Replace("$", "").Replace(":", ""), 16);
+            }
+            else if (BlockSendRadio.Checked)
+            {
+                transmissionSize = Convert.ToInt32(EmuSrcSize.Text.Replace("$", "").Replace(":", ""), 16);
             }
             else
             {
-                uploadSize = Convert.ToInt32(BlockSizeTextBox.Text.Replace("$", "").Replace(":", ""), 16);
+                transmissionSize = Convert.ToInt32(C256SrcSize.Text.Replace("$", "").Replace(":", ""), 16);
             }
-            return uploadSize;
+            return transmissionSize;
         }
 
         private void ConnectButton_Click(object sender, EventArgs e)
@@ -79,10 +82,10 @@ namespace FoenixIDE.UI
                 serial.PortName = COMPortComboBox.Items[COMPortComboBox.SelectedIndex].ToString();
                 serial.Open();
                 // Enable all the button if the serial Port turns out to be the good one.
-                BrowseFileButton.Enabled = true;
-                LoadAddressTextBox.Enabled = true;
+                BrowseFileButton.Enabled = SendFileRadio.Checked;
+                C256DestAddress.Enabled = true;
 
-                SendBinaryButton.Enabled = getUploadSize() > 0;
+                SendBinaryButton.Enabled = GetTransmissionSize() > 0;
                 COMPortComboBox.Enabled = false;
                 ConnectButton.Visible = false;
                 DisconnectButton.Visible = true;
@@ -104,14 +107,30 @@ namespace FoenixIDE.UI
             SendBinaryButton.Enabled = false;
         }
 
+        private long GetFileLength(String filename)
+        {
+            long flen = 0;
+            // Display the file length in hex
+            if (filename != null && filename.Length > 0)
+            {
+                FileInfo f = new FileInfo(filename);
+                flen = f.Length;
+                String hexSize = flen.ToString("X6");
+                FileSizeResultLabel.Text = "$" + hexSize.Substring(0, 2) + ":" + hexSize.Substring(2);
+            }
+            return flen;
+        }
+
         /*
          * Let the user select a file from the file system and display it in a text box.
          */
         private void BrowseFileButton_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDlg = new OpenFileDialog();
-            openFileDlg.DefaultExt = ".bin";
-            openFileDlg.Filter = "Binary documents|*.bin";
+            OpenFileDialog openFileDlg = new OpenFileDialog
+            {
+                DefaultExt = ".bin",
+                Filter = "Binary documents|*.bin"
+            };
 
             // Set initial directory    
             //openFileDlg.InitialDirectory = @"C:\Temp\";
@@ -119,16 +138,14 @@ namespace FoenixIDE.UI
             // Load content of file in a TextBlock
             if (openFileDlg.ShowDialog() == DialogResult.OK)
             {
-                // Display the file length in hex
-                FileInfo f = new FileInfo(openFileDlg.FileName);
-                String hexSize = f.Length.ToString("X6");
-                FileSizeResultLabel.Text = "$" + hexSize.Substring(0, 2) + ":" + hexSize.Substring(2);
+                // Display the file length
+                long flen = GetFileLength(openFileDlg.FileName);
 
                 // Display the file name
                 FileNameTextBox.Text = openFileDlg.FileName;
 
-                LoadAddressTextBox.Enabled = true;
-                SendBinaryButton.Enabled = (f.Length != -1);
+                C256DestAddress.Enabled = true;
+                SendBinaryButton.Enabled = (flen != -1) && !ConnectButton.Visible;
             }
         }
 
@@ -139,45 +156,74 @@ namespace FoenixIDE.UI
         {
             FileNameTextBox.Enabled = SendFileRadio.Checked;
             BrowseFileButton.Enabled = SendFileRadio.Checked;
-            BlockSizeTextBox.Enabled = BlockSendRadio.Checked;
-            BlockAddressTextBox.Enabled = BlockSendRadio.Checked;
 
-            int uploadSize = getUploadSize();
-            LoadAddressTextBox.Enabled = (uploadSize > 0 || BlockSendRadio.Checked);
-            SendBinaryButton.Enabled = (uploadSize > 0);
+            int transmissionSize = GetTransmissionSize();
+            EmuSrcSize.Enabled = BlockSendRadio.Checked;
+            EmuSrcAddress.Enabled = BlockSendRadio.Checked;
+            C256DestAddress.Enabled = (transmissionSize > 0 || BlockSendRadio.Checked);
+
+            C256SrcSize.Enabled = FetchRadio.Checked;
+            C256SrcAddress.Enabled = FetchRadio.Checked;
+
+            SendBinaryButton.Enabled = (transmissionSize > 0) && !ConnectButton.Visible;
+            SendBinaryButton.Text = FetchRadio.Checked ? "Fetch from C256" : "Send Binary";
         }
 
 
         private void SendBinaryButton_Click(object sender, EventArgs e)
         {
             SendBinaryButton.Enabled = false;
-            UploadProgressBar.Visible = true;
             DisconnectButton.Enabled = false;
 
-            int uploadSize = getUploadSize();
-            UploadProgressBar.Maximum = uploadSize;
+            int transmissionSize = GetTransmissionSize();
+            UploadProgressBar.Maximum = transmissionSize;
             UploadProgressBar.Value = 0;
+            UploadProgressBar.Visible = true;
 
-            int FnxAddressPtr = int.Parse(LoadAddressTextBox.Text.Replace(":", ""), System.Globalization.NumberStyles.AllowHexSpecifier);
+            int FnxAddressPtr = int.Parse(C256DestAddress.Text.Replace(":", ""), System.Globalization.NumberStyles.AllowHexSpecifier);
             Console.WriteLine("Starting Address: " + FnxAddressPtr);
-            Console.WriteLine("Size of File: " + uploadSize);
+            Console.WriteLine("Size of File: " + transmissionSize);
 
-            byte[] DataBuffer = new byte[uploadSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
+            byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
             if (SendFileRadio.Checked)
             {
                 // Read the bytes and put them in the buffer
                 DataBuffer = System.IO.File.ReadAllBytes(FileNameTextBox.Text);
+                SendData(DataBuffer, FnxAddressPtr, transmissionSize);
             }
-            else
+            else if (BlockSendRadio.Checked)
             {
-                int blockAddress = Convert.ToInt32(BlockAddressTextBox.Text.Replace(":",""), 16);
+                int blockAddress = Convert.ToInt32(EmuSrcAddress.Text.Replace(":",""), 16);
                 // Read the data directly from emulator memory
                 int offset = 0;
-                for (int start = blockAddress; start < blockAddress + uploadSize; start++)
+                for (int start = blockAddress; start < blockAddress + transmissionSize; start++)
                 {
                     DataBuffer[offset++] = Memory.ReadByte(start);
                 }
+                SendData(DataBuffer, FnxAddressPtr, transmissionSize);
             }
+            else
+            {
+                int blockAddress = Convert.ToInt32(C256SrcAddress.Text.Replace(":", ""), 16);
+                FetchData(DataBuffer, blockAddress, transmissionSize);
+                MemoryRAM mem = new MemoryRAM(blockAddress, transmissionSize);
+                mem.Load(DataBuffer, 0, 0, transmissionSize);
+                MemoryWindow tempMem = new MemoryWindow
+                {
+                    Memory = mem,
+                    Text = "C256 Memory"
+                };
+                tempMem.GotoAddress(blockAddress);
+                tempMem.Show();
+            }
+            
+            UploadProgressBar.Visible = false;
+            SendBinaryButton.Enabled = true;
+            DisconnectButton.Enabled = true;
+        }
+
+        private void SendData(byte[] buffer, int startAddress, int size)
+        {
             try
             {
                 if (serial.IsOpen)
@@ -185,34 +231,34 @@ namespace FoenixIDE.UI
                     // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
                     GetFnxInDebugMode();
                     // Now's let's transfer the code
-                    if (uploadSize <= 2048)
+                    if (size <= 2048)
                     {
                         // DataBuffer = The buffer where the loaded Binary File resides
                         // FnxAddressPtr = Pointer where to put the Data in the Fnx
                         // i = Pointer Inside the data buffer
                         // Size_Of_File = Size of the Payload we want to transfer which ought to be smaller than 8192
-                        PreparePacket2Write(DataBuffer, FnxAddressPtr, 0, uploadSize);
-                        UploadProgressBar.Value = uploadSize;
+                        PreparePacket2Write(buffer, startAddress, 0, size);
+                        UploadProgressBar.Value = size;
                     }
                     else
                     {
                         int BufferSize = 2048;
-                        int Loop = uploadSize / BufferSize;
+                        int Loop = size / BufferSize;
 
                         for (int j = 0; j < Loop; j++)
                         {
-                            PreparePacket2Write(DataBuffer, FnxAddressPtr, j * BufferSize, BufferSize);
-                            FnxAddressPtr = FnxAddressPtr + BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
+                            PreparePacket2Write(buffer, startAddress, j * BufferSize, BufferSize);
+                            startAddress = startAddress + BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
                             UploadProgressBar.Value = (j + 1) * BufferSize;
                         }
-                        BufferSize = (uploadSize % BufferSize);
-                        PreparePacket2Write(DataBuffer, FnxAddressPtr, uploadSize - BufferSize, BufferSize);
+                        BufferSize = (size % BufferSize);
+                        PreparePacket2Write(buffer, startAddress, size - BufferSize, BufferSize);
                     }
 
                     // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                    if (DataBuffer.Length > 0xFFFF)
+                    if (buffer.Length > 0xFFFF)
                     {
-                        PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
+                        PreparePacket2Write(buffer, 0x00FF00, 0x00FF00, 256);
                     }
 
                     // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
@@ -226,15 +272,78 @@ namespace FoenixIDE.UI
             {
                 MessageBox.Show(ex.Message, "Send Binary Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            UploadProgressBar.Visible = false;
-            SendBinaryButton.Enabled = true;
-            DisconnectButton.Enabled = true;
+        }
+        private void FetchData(byte[] buffer, int startAddress, int size)
+        {
+            try
+            {
+                if (serial.IsOpen)
+                {
+                    GetFnxInDebugMode();
+                    byte[] commandBuffer = new byte[8];
+                    commandBuffer[0] = 0x55;   // Header
+                    commandBuffer[1] = 0x00;   // Command READ Memory
+                    commandBuffer[2] = (byte)(startAddress >> 16 ); // Address Hi
+                    commandBuffer[3] = (byte)(startAddress >> 8); // Address Med
+                    commandBuffer[4] = (byte)(startAddress & 0xFF); //Address Lo
+                    commandBuffer[5] = (byte)(size >> 8); //Size HI
+                    commandBuffer[6] = (byte)(size & 0xFF); //Size LO
+                    commandBuffer[7] = 0x5A;
+                    SendMessage(commandBuffer, buffer);
+
+                    ExitFnxDebugMode();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Fetch Data Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void AddressTextBox_TextChanged(object sender, EventArgs e)
         {
-            int uploadSize = getUploadSize();
-            SendBinaryButton.Enabled = uploadSize > 0;
+            int uploadSize = GetTransmissionSize();
+            SendBinaryButton.Enabled = uploadSize > 0 && !ConnectButton.Visible;
+        }
+
+        private void BlockAddressTextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = (TextBox)sender;
+            string item = tb.Text.Replace(":", "");
+            if (item.Length > 0)
+            {
+                int n = Convert.ToInt32(item, 16);
+                String value = n.ToString("X6");
+                tb.Text = value.Substring(0, 2) + ":" + value.Substring(2);
+            }
+        }
+
+        public void GetFnxInDebugMode()
+        {
+            byte[] commandBuffer = new byte[8];
+            commandBuffer[0] = 0x55;   // Header
+            commandBuffer[1] = 0x80;   // GetFNXinDebugMode
+            commandBuffer[2] = 0x00;
+            commandBuffer[3] = 0x00;
+            commandBuffer[4] = 0x00;
+            commandBuffer[5] = 0x00;
+            commandBuffer[6] = 0x00;
+            commandBuffer[7] = 0xD5;
+            SendMessage(commandBuffer, null);
+        }
+
+        public void ExitFnxDebugMode()
+        {
+            byte[] commandBuffer = new byte[8];
+            commandBuffer[0] = 0x55;   // Header
+            commandBuffer[1] = 0x81;   // ExitFNXinDebugMode
+            commandBuffer[2] = 0x00;
+            commandBuffer[3] = 0x00;
+            commandBuffer[4] = 0x00;
+            commandBuffer[5] = 0x00;
+            commandBuffer[6] = 0x00;
+            commandBuffer[7] = 0xD4;
+            SendMessage(commandBuffer, null);
         }
 
         /*
@@ -245,59 +354,35 @@ namespace FoenixIDE.UI
          */
         public void PreparePacket2Write(byte[] buffer, int FNXMemPointer, int FilePointer, int Size)
         {
+            // Maximum transmission size is 8192
             if (Size > 8192)
                 Size = 8192;
 
-            TxSerialBuffer[0] = 0x55;   // Header
-            TxSerialBuffer[1] = 0x01;   // Write 2 Memory
-            TxSerialBuffer[2] = (byte)((FNXMemPointer >> 16) & 0xFF); // (H)24Bit Addy - Where to Store the Data
-            TxSerialBuffer[3] = (byte)((FNXMemPointer >> 8) & 0xFF);  // (M)24Bit Addy - Where to Store the Data
-            TxSerialBuffer[4] = (byte)(FNXMemPointer & 0xFF);         // (L)24Bit Addy - Where to Store the Data
-            TxSerialBuffer[5] = (byte)((Size >> 8) & 0xFF);           // (H)16Bit Size - How many bytes to Store (Max 8Kbytes 4 Now)
-            TxSerialBuffer[6] = (byte)(Size & 0xFF);                  // (L)16Bit Size - How many bytes to Store (Max 8Kbytes 4 Now)
-            Array.Copy(buffer, FilePointer, TxSerialBuffer, 7, Size);
+            byte[] commandBuffer = new byte[8 + Size];
+            commandBuffer[0] = 0x55;   // Header
+            commandBuffer[1] = 0x01;   // Write 2 Memory
+            commandBuffer[2] = (byte)((FNXMemPointer >> 16) & 0xFF); // (H)24Bit Addy - Where to Store the Data
+            commandBuffer[3] = (byte)((FNXMemPointer >> 8) & 0xFF);  // (M)24Bit Addy - Where to Store the Data
+            commandBuffer[4] = (byte)(FNXMemPointer & 0xFF);         // (L)24Bit Addy - Where to Store the Data
+            commandBuffer[5] = (byte)((Size >> 8) & 0xFF);           // (H)16Bit Size - How many bytes to Store (Max 8Kbytes 4 Now)
+            commandBuffer[6] = (byte)(Size & 0xFF);                  // (L)16Bit Size - How many bytes to Store (Max 8Kbytes 4 Now)
+            Array.Copy(buffer, FilePointer, commandBuffer, 7, Size);
 
-            TxProcessLRC((Size + 7));
-            //TxSerialBuffer[Size + 7] = TxLRC;
+            TxProcessLRC(commandBuffer);
+            Console.WriteLine("Transmit Data LRC:" + TxLRC);
+            //commandBuffer[Size + 7] = TxLRC;
 
-            SendMessage(Size + 8, 0);   // Tx the requested Payload Size (Plus Header and LRC), No Payload to be received aside of the Status.
+            SendMessage(commandBuffer, null);   // Tx the requested Payload Size (Plus Header and LRC), No Payload to be received aside of the Status.
         }
 
-        public void GetFnxInDebugMode()
-        {
-            TxSerialBuffer[0] = 0x55;   // Header
-            TxSerialBuffer[1] = 0x80;   // GetFNXinDebugMode
-            TxSerialBuffer[2] = 0x00;
-            TxSerialBuffer[3] = 0x00;
-            TxSerialBuffer[4] = 0x00;
-            TxSerialBuffer[5] = 0x00;
-            TxSerialBuffer[6] = 0x00;
-            TxSerialBuffer[7] = 0xD5;
-            SendMessage(8, 0);
-        }
-
-        public void ExitFnxDebugMode()
-        {
-            TxSerialBuffer[0] = 0x55;   // Header
-            TxSerialBuffer[1] = 0x81;   // ExitFNXinDebugMode
-            TxSerialBuffer[2] = 0x00;
-            TxSerialBuffer[3] = 0x00;
-            TxSerialBuffer[4] = 0x00;
-            TxSerialBuffer[5] = 0x00;
-            TxSerialBuffer[6] = 0x00;
-            TxSerialBuffer[7] = 0xD4;
-            SendMessage(8, 0);
-        }
-
-        public void SendMessage(int TxSize, int RxSize)
+        public void SendMessage(byte[] command, byte[] data)
         {
             //            int dwStartTime = System.Environment.TickCount;
             int i;
             byte byte_buffer;
 
-            serial.Write(TxSerialBuffer, 0, TxSize);
+            serial.Write(command, 0, command.Length);
 
-            Array.Clear(RxSerialBuffer, 0, RxSerialBuffer.Length);
             Stat0 = 0;
             Stat1 = 0;
             LRC = 0;
@@ -313,89 +398,42 @@ namespace FoenixIDE.UI
             {
                 Stat0 = (byte)serial.ReadByte();
                 Stat1 = (byte)serial.ReadByte();
-                if (RxSize != 0)
+                if (data != null)
                 {
-                    for (i = 0; i < RxSize; i++)
+                    for (i = 0; i < data.Length; i++)
                     {
-                        RxSerialBuffer[i] = (byte)serial.ReadByte();
+                        data[i] = (byte)serial.ReadByte();
                     }
                 }
                 LRC = (byte)serial.ReadByte();
             }
 
-            RxProcessLRC(RxSize);
+            RxProcessLRC(data);
             Console.WriteLine("Recieve Data LRC:" + RxLRC);
         }
 
-
-
-        public void TxProcessLRC(int Size)
+        public int TxProcessLRC(byte[] buffer)
         {
             int i;
             TxLRC = 0;
-            for (i = 0; i < Size; i++)
-                TxLRC = (byte)(TxLRC ^ TxSerialBuffer[i]);
+            for (i = 0; i < buffer.Length; i++)
+                TxLRC = (byte)(TxLRC ^ buffer[i]);
+            return TxLRC;
         }
 
-        public void RxProcessLRC(int Size)
+        public int RxProcessLRC(byte[] data)
         {
             int i;
             RxLRC = 0xAA;
             RxLRC = (byte)(RxLRC ^ Stat0);
             RxLRC = (byte)(RxLRC ^ Stat1);
-            if (Size != 0)
+            if (data != null)
             {
-                for (i = 0; i < Size; i++)
-                    RxLRC = (byte)(RxLRC ^ RxSerialBuffer[i]);
+                for (i = 0; i < data.Length; i++)
+                    RxLRC = (byte)(RxLRC ^ data[i]);
             }
             RxLRC = (byte)(RxLRC ^ LRC);
-        }
-
-        // TODO: implement a dialog to read from the device
-        private void readFromDevice()
-        {
-            GetFnxInDebugMode();
-            // Fetch 256 Data out of 00:0F00 
-            TxSerialBuffer[0] = 0x55;   // Header
-            TxSerialBuffer[1] = 0x00;   // ExitFNXinDebugMode
-            TxSerialBuffer[2] = 0x00;
-            TxSerialBuffer[3] = 0x0F;
-            TxSerialBuffer[4] = 0x00;
-            TxSerialBuffer[5] = 0x01;
-            TxSerialBuffer[6] = 0x00;
-            TxSerialBuffer[7] = 0x6C;
-            SendMessage(8, 0x0100);
-            Console.WriteLine("{0:X4}", 0xF00);
-            for (int i = 0; i < 256; i++)
-            {
-                Console.WriteLine("{0:x}", RxSerialBuffer[i]);
-            }
-            ExitFnxDebugMode();
-        }
-
-        public void ReadPacket_Test()
-        {
-            TxSerialBuffer[0] = 0x55;   // Header
-            TxSerialBuffer[1] = 0x00;   // ExitFNXinDebugMode
-            TxSerialBuffer[2] = 0x01;
-            TxSerialBuffer[3] = 0x00;
-            TxSerialBuffer[4] = 0x00;
-            TxSerialBuffer[5] = 0x10;
-            TxSerialBuffer[6] = 0x00;
-            TxSerialBuffer[7] = 0x44;
-            SendMessage(8, 0x1000);
-        }
-
-        private void BlockAddressTextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox tb = (TextBox)sender;
-            string item = tb.Text.Replace(":", "");
-            if (item.Length > 0)
-            {
-                int n = Convert.ToInt32(item, 16);
-                String value = n.ToString("X6");
-                tb.Text = value.Substring(0, 2) + ":" + value.Substring(2);
-            }
+            return RxLRC;
         }
     }
 }

@@ -98,7 +98,7 @@ namespace FoenixIDE
             Cls();
             gpu.Refresh();
             // Clear out Vicky's memory
-            Memory.IO.zero();
+            Memory.IO.Zero();
             gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
 
@@ -505,7 +505,7 @@ namespace FoenixIDE
             PrintLine("  \xf9\xf9\xf9\xf9\xf9\xf9");
         }
 
-        public void setKernel(String value)
+        public void SetKernel(String value)
         {
             defaultKernel = value;
         }

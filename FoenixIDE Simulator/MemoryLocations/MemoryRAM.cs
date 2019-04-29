@@ -12,9 +12,9 @@ namespace FoenixIDE
     public class MemoryRAM : IMappable
     {
         protected byte[] data = null;
-        private int startAddress;
-        private int length;
-        private int endAddress;
+        private readonly int startAddress;
+        private readonly int length;
+        private readonly int endAddress;
         public delegate void PostWriteFn(int address);
         public PostWriteFn postWrite = null;
 
@@ -50,7 +50,7 @@ namespace FoenixIDE
             data = new byte[Length];
         }
 
-        public void zero()
+        public void Zero()
         {
             Array.Clear(data, 0, Length);
         }

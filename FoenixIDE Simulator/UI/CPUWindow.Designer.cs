@@ -97,7 +97,7 @@
             this.stepsInput.Size = new System.Drawing.Size(84, 27);
             this.stepsInput.TabIndex = 3;
             this.stepsInput.Text = "1";
-            this.stepsInput.Enter += new System.EventHandler(this.stepsInput_Enter);
+            this.stepsInput.Enter += new System.EventHandler(this.StepsInput_Enter);
             // 
             // BPLabel
             // 
@@ -213,7 +213,7 @@
             this.locationInput.Size = new System.Drawing.Size(84, 27);
             this.locationInput.TabIndex = 10;
             this.locationInput.Text = "00:0000";
-            this.locationInput.Validated += new System.EventHandler(this.locationInput_Validated);
+            this.locationInput.Validated += new System.EventHandler(this.LocationInput_Validated);
             // 
             // JumpButton
             // 
@@ -315,6 +315,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(1280, 0);
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1046, 728);
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
