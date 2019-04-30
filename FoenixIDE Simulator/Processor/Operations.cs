@@ -509,7 +509,8 @@ namespace FoenixIDE.Processor
                     cpu.Push(cpu.Memory.ReadWord(addr), 2);
                     break;
                 case OpcodeList.PER_StackProgramCounterRelativeLong:
-
+                    int effRelAddr = cpu.PC.Value + signature & 0xFFFF;
+                    cpu.Push(effRelAddr, 2);
                     break;
                 default:
                     throw new NotImplementedException("ExecuteStack() opcode not implemented: " + instruction.ToString("X2"));
@@ -892,11 +893,10 @@ namespace FoenixIDE.Processor
 
         /// <summary>
         /// Block moves.
-        /// <para>C = bytes to move -1 (so if we're moving 20 bytes, C=19</para>
+        /// <para>C = bytes to move +1 (so if we're moving 20 bytes, C=19</para>
         /// <para>X=16-bit source address</para>
         /// <para>Y=16-bit destination address</para>
         /// <para>Operand bytes are the source and destination banks.</para>
-        /// <para>After the move, the destination bank is stored in the DBR.</para>
         /// <para>In the assembled code, order is dest,source. In source code, specify source,dest.</para>
         /// </summary>
         /// <param name="instruction"></param>
@@ -904,22 +904,26 @@ namespace FoenixIDE.Processor
         /// <param name="signature"></param>
         public void ExecuteBlockMove(byte instruction, AddressModes addressMode, int signature)
         {
-            int sourceBank = (signature << 16) & 0xff0000;
-            int destBank = (signature << 8) & 0xff0000;
+            int sourceBank = (signature << 8) & 0xff0000;
+            int destBank = (signature << 16) & 0xff0000;
 
-            int sourceAddr = sourceBank + cpu.X.Value;
-            int destAddr = destBank + cpu.Y.Value;
+            
             int bytesToMove = cpu.A.Value + 1;
 
-            int dir = (instruction == OpcodeList.MVP_BlockMove) ? 1 : -1;
+            // For MVN, X and Y are incremented
+            // For MVP, X and Y are decremented
+            int dir = (instruction == OpcodeList.MVP_BlockMove) ? -1 : 1;
 
-            for (int i = 0; i < bytesToMove; i++)
+            while (cpu.A.Value != 0xFFFF)
             {
-                cpu.Memory[destAddr+i] = cpu.Memory[sourceAddr+i];
+                // The addresses must remain in the correct bank, so the addresses will wrap
+                int sourceAddr = sourceBank + cpu.X.Value;
+                int destAddr = destBank + cpu.Y.Value;
+                cpu.Memory[destAddr] = cpu.Memory[sourceAddr];
                 cpu.X.Value += dir;
                 cpu.Y.Value += dir;
+                cpu.A.Value--;
             }
-            cpu.A.Value = 0xffff;
         }
 
         public void ExecuteADC(byte instruction, AddressModes addressMode, int signature)
