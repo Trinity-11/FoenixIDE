@@ -1,26 +1,51 @@
+Release 0.2.0.9
+---------------
+* Added Long fetch from the C256 unit.
+* Fixed the memory window to only allow typing in the Start Address.
+* Fixed the incorrect PC that gets pushed into the stack when BRK is called.
+* Added the implementation to RTI.
+
+Release 0.2.0.8
+---------------
+* Fixed the MVN and MVP opcodes.
+* Added the PER opcode.
+
+Release 0.2.0.7
+---------------
+* Added Fetch from C256
+
+Release 0.2.0.6
+---------------
+* Added the FoenixIDE.exe in the bin\Debug folder.
+* Readded MainWindow.cs - the file was deleted by error.
+* Added opcode for PEA and PEI.
+* Fixed the GPU to draw the border properly.
+* Added SDCARD handling, such that it will initialize.
+* Added KEYBOARD handling, such that it will initialize.
+
 Release 0.2.0.5
 ---------------
-Added validation of the Load Hex file.  This prevents loading "bin" files.
-Added the About form, which reads the version from the Assembly file.
-Modified the Uploader Window to allow uploading of memory directly to the machine.
+* Added validation of the Load Hex file.  This prevents loading "bin" files.
+* Added the About form, which reads the version from the Assembly file.
+* Modified the Uploader Window to allow uploading of memory directly to the machine.
 
 Release 0.2.0.4
 ---------------
-Added a timed event whenever the CODEC Write address ($AF:E822) is written to, to reset the value to 0.
-Modified the Memory Window to allow direct entry of values, instead of using an InputBox.
+* Added a timed event whenever the CODEC Write address ($AF:E822) is written to, to reset the value to 0.
+* Modified the Memory Window to allow direct entry of values, instead of using an InputBox.
 
 Release 0.2.0.3
 ---------------
-Changed file extension of Foenix IDE export files to .FNXML.
-Added tileset loading.  The feature expected a bitmap of 256 x 256.
-Added importing of 24 bpp images.  Only 256 colors are allowed.
+* Changed file extension of Foenix IDE export files to .FNXML.
+* Added tileset loading.  The feature expected a bitmap of 256 x 256.
+* Added importing of 24 bpp images.  Only 256 colors are allowed.
 
 Release 0.2.0.2
 ---------------
-Added loading of font from live memory during display cycle, instead of using hard-coded font files.
-Fixed memory leak which was caused by not disposing of the displayed bitmap.
-Use border color when in text mode.
-Added highlight box to memory window.
+* Added loading of font from live memory during display cycle, instead of using hard-coded font files.
+* Fixed memory leak which was caused by not disposing of the displayed bitmap.
+* Use border color when in text mode.
+* Added highlight box to memory window.
 
 Release 0.2.0.1
 ---------------
