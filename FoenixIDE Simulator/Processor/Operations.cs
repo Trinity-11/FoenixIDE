@@ -826,6 +826,16 @@ namespace FoenixIDE.Processor
                 case OpcodeList.RTS_StackImplied:
                     cpu.JumpShort(cpu.Pull(2));
                     return;
+                case OpcodeList.RTI_StackImplied:
+                    cpu.Flags.SetFlags(cpu.Pull(1));
+                    int address = cpu.Pull(2);
+                    if (!cpu.Flags.Emulation)
+                    {
+                        cpu.DataBank.Value = cpu.Pull(1);
+                        address += (cpu.DataBank.Value << 16);
+                    }
+                    cpu.JumpLong(address);
+                    return;
                 case OpcodeList.RTL_StackImplied:
                     addr = cpu.Pull(3);
                     cpu.JumpLong(addr);

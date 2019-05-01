@@ -334,7 +334,7 @@ namespace FoenixIDE.Processor
             Add(new OpCode(0x3D, "AND", 3, AddressModes.AbsoluteIndexedWithX, new OpCode.ExecuteDelegate(operations.ExecuteAND)));
             Add(new OpCode(0x3E, "ROL", 3, AddressModes.AbsoluteIndexedWithX, new OpCode.ExecuteDelegate(operations.ExecuteShift)));
             Add(new OpCode(0x3F, "AND", 4, AddressModes.AbsoluteLongIndexedWithX, new OpCode.ExecuteDelegate(operations.ExecuteAND)));
-            Add(new OpCode(0x40, "RTI", 1, AddressModes.StackImplied, new OpCode.ExecuteDelegate(operations.ExecuteInterrupt)));
+            Add(new OpCode(0x40, "RTI", 1, AddressModes.StackImplied, new OpCode.ExecuteDelegate(operations.ExecuteJumpReturn)));
             Add(new OpCode(0x41, "EOR", 2, AddressModes.DirectPageIndexedIndirectWithX, new OpCode.ExecuteDelegate(operations.ExecuteEOR)));
             Add(new OpCode(0x42, "WDM", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc)));
             Add(new OpCode(0x43, "EOR", 2, AddressModes.StackRelative, new OpCode.ExecuteDelegate(operations.ExecuteEOR)));

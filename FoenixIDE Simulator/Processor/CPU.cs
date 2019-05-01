@@ -419,11 +419,12 @@ namespace FoenixIDE.Processor
 
             if (!Flags.Emulation)
                 Push(ProgramBank);
-            Push(PC, 2);
+            Push(PC);
+            
             Push(Flags);
 
             int addr = 0;
-            int eaddr = 0;
+            int emuAddr = 0;
             Flags.Irqdisable = true;
             Flags.Decimal = false;
 
@@ -431,26 +432,26 @@ namespace FoenixIDE.Processor
             {
                 case InteruptTypes.BRK:
                     addr = MemoryMap.VECTOR_BRK;
-                    eaddr = MemoryMap.VECTOR_EBRK;
+                    emuAddr = MemoryMap.VECTOR_EBRK;
                     break;
                 case InteruptTypes.ABORT:
-                    eaddr = MemoryMap.VECTOR_EABORT;
+                    emuAddr = MemoryMap.VECTOR_EABORT;
                     addr = MemoryMap.VECTOR_ABORT;
                     break;
                 case InteruptTypes.IRQ:
-                    eaddr = MemoryMap.VECTOR_EIRQ;
+                    emuAddr = MemoryMap.VECTOR_EIRQ;
                     addr = MemoryMap.VECTOR_IRQ;
                     break;
                 case InteruptTypes.NMI:
-                    eaddr = MemoryMap.VECTOR_ENMI;
+                    emuAddr = MemoryMap.VECTOR_ENMI;
                     addr = MemoryMap.VECTOR_NMI;
                     break;
                 case InteruptTypes.RESET:
-                    eaddr = MemoryMap.VECTOR_ERESET;
+                    emuAddr = MemoryMap.VECTOR_ERESET;
                     addr = MemoryMap.VECTOR_RESET;
                     break;
                 case InteruptTypes.COP:
-                    eaddr = MemoryMap.VECTOR_ECOP;
+                    emuAddr = MemoryMap.VECTOR_ECOP;
                     addr = MemoryMap.VECTOR_COP;
                     break;
                 default:
@@ -458,7 +459,7 @@ namespace FoenixIDE.Processor
             }
 
             if (Flags.Emulation)
-                JumpVector(eaddr);
+                JumpVector(emuAddr);
             else
                 JumpVector(addr);
         }
