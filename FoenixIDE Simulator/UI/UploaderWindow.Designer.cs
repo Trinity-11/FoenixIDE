@@ -173,6 +173,7 @@
             this.UploadProgressBar.Margin = new System.Windows.Forms.Padding(2);
             this.UploadProgressBar.Name = "UploadProgressBar";
             this.UploadProgressBar.Size = new System.Drawing.Size(612, 26);
+            this.UploadProgressBar.Step = 1;
             this.UploadProgressBar.TabIndex = 10;
             this.UploadProgressBar.Visible = false;
             // 
@@ -396,6 +397,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Uploader Window";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.UploaderWindow_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 

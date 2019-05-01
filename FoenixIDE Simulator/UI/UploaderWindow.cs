@@ -107,6 +107,11 @@ namespace FoenixIDE.UI
             SendBinaryButton.Enabled = false;
         }
 
+        private void UploaderWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            DisconnectButton_Click(null, null);
+        }
+
         private long GetFileLength(String filename)
         {
             long flen = 0;
@@ -205,16 +210,19 @@ namespace FoenixIDE.UI
             else
             {
                 int blockAddress = Convert.ToInt32(C256SrcAddress.Text.Replace(":", ""), 16);
-                FetchData(DataBuffer, blockAddress, transmissionSize);
-                MemoryRAM mem = new MemoryRAM(blockAddress, transmissionSize);
-                mem.Load(DataBuffer, 0, 0, transmissionSize);
-                MemoryWindow tempMem = new MemoryWindow
+                if (FetchData(DataBuffer, blockAddress, transmissionSize))
                 {
-                    Memory = mem,
-                    Text = "C256 Memory"
-                };
-                tempMem.GotoAddress(blockAddress);
-                tempMem.Show();
+                    MemoryRAM mem = new MemoryRAM(blockAddress, transmissionSize);
+                    mem.Load(DataBuffer, 0, 0, transmissionSize);
+                    MemoryWindow tempMem = new MemoryWindow
+                    {
+                        Memory = mem,
+                        Text = "C256 Memory from " + blockAddress.ToString("X6") + 
+                            " to " + (blockAddress + transmissionSize -1).ToString("X6")
+                    };
+                    tempMem.GotoAddress(blockAddress);
+                    tempMem.Show();
+                }
             }
             
             UploadProgressBar.Visible = false;
@@ -238,7 +246,7 @@ namespace FoenixIDE.UI
                         // i = Pointer Inside the data buffer
                         // Size_Of_File = Size of the Payload we want to transfer which ought to be smaller than 8192
                         PreparePacket2Write(buffer, startAddress, 0, size);
-                        UploadProgressBar.Value = size;
+                        UploadProgressBar.Increment(size);
                     }
                     else
                     {
@@ -249,14 +257,18 @@ namespace FoenixIDE.UI
                         {
                             PreparePacket2Write(buffer, startAddress, j * BufferSize, BufferSize);
                             startAddress = startAddress + BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
-                            UploadProgressBar.Value = (j + 1) * BufferSize;
+                            UploadProgressBar.Increment(BufferSize);
                         }
                         BufferSize = (size % BufferSize);
-                        PreparePacket2Write(buffer, startAddress, size - BufferSize, BufferSize);
+                        if (BufferSize > 0)
+                        {
+                            PreparePacket2Write(buffer, startAddress, size - BufferSize, BufferSize);
+                            UploadProgressBar.Increment(BufferSize);
+                        }
                     }
 
                     // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                    if (buffer.Length > 0xFFFF)
+                    if (startAddress < 0xFF00 && (startAddress + buffer.Length) > 0xFFFF)
                     {
                         PreparePacket2Write(buffer, 0x00FF00, 0x00FF00, 256);
                     }
@@ -273,31 +285,49 @@ namespace FoenixIDE.UI
                 MessageBox.Show(ex.Message, "Send Binary Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void FetchData(byte[] buffer, int startAddress, int size)
+
+        private bool FetchData(byte[] buffer, int startAddress, int size)
         {
+            bool success = false;
             try
             {
                 if (serial.IsOpen)
                 {
                     GetFnxInDebugMode();
-                    byte[] commandBuffer = new byte[8];
-                    commandBuffer[0] = 0x55;   // Header
-                    commandBuffer[1] = 0x00;   // Command READ Memory
-                    commandBuffer[2] = (byte)(startAddress >> 16 ); // Address Hi
-                    commandBuffer[3] = (byte)(startAddress >> 8); // Address Med
-                    commandBuffer[4] = (byte)(startAddress & 0xFF); //Address Lo
-                    commandBuffer[5] = (byte)(size >> 8); //Size HI
-                    commandBuffer[6] = (byte)(size & 0xFF); //Size LO
-                    commandBuffer[7] = 0x5A;
-                    SendMessage(commandBuffer, buffer);
+                    if (size < 2048)
+                    {
+                        PreparePacket2Read(buffer, startAddress, 0, size);
+                        UploadProgressBar.Increment(size);
+                    }
+                    else
+                    {
+                        int BufferSize = 2048;
+                        int Loop = size / BufferSize;
+
+                        for (int j = 0; j < Loop; j++)
+                        {
+                            PreparePacket2Read(buffer, startAddress, j * BufferSize, BufferSize);
+                            startAddress += BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
+                            UploadProgressBar.Increment(BufferSize);
+                        }
+                        BufferSize = (size % BufferSize);
+                        if (BufferSize > 0)
+                        {
+                            PreparePacket2Read(buffer, startAddress, size - BufferSize, BufferSize);
+                            UploadProgressBar.Increment(BufferSize);
+                        }
+                    }
+                    
 
                     ExitFnxDebugMode();
+                    success = true;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Fetch Data Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            return success;
         }
 
         private void AddressTextBox_TextChanged(object sender, EventArgs e)
@@ -373,6 +403,26 @@ namespace FoenixIDE.UI
             //commandBuffer[Size + 7] = TxLRC;
 
             SendMessage(commandBuffer, null);   // Tx the requested Payload Size (Plus Header and LRC), No Payload to be received aside of the Status.
+        }
+
+        public void PreparePacket2Read(byte[] receiveBuffer, int address, int offset, int size)
+        {
+            if (size > 0)
+            {
+                byte[] commandBuffer = new byte[8];
+                commandBuffer[0] = 0x55;   // Header
+                commandBuffer[1] = 0x00;   // Command READ Memory
+                commandBuffer[2] = (byte)(address >> 16); // Address Hi
+                commandBuffer[3] = (byte)(address >> 8); // Address Med
+                commandBuffer[4] = (byte)(address & 0xFF); //Address Lo
+                commandBuffer[5] = (byte)(size >> 8); //Size HI
+                commandBuffer[6] = (byte)(size & 0xFF); //Size LO
+                commandBuffer[7] = 0x5A;
+
+                byte[] partialBuffer = new byte[size];
+                SendMessage(commandBuffer, partialBuffer);
+                Array.Copy(partialBuffer, 0, receiveBuffer, offset, size);
+            }
         }
 
         public void SendMessage(byte[] command, byte[] data)

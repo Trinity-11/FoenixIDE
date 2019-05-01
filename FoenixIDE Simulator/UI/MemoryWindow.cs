@@ -19,6 +19,7 @@ namespace FoenixIDE.UI
         public IMappable Memory = null;
         public int StartAddress = 0;
         public int EndAddress = 0xFF;
+        const int PageSize = 0xFF;
 
         public MemoryWindow()
         {
@@ -135,31 +136,8 @@ namespace FoenixIDE.UI
         {
             try
             {
-                int len = this.EndAddress - this.StartAddress;
-                if (Memory is MemoryRAM)
-                {
-                    this.StartAddress = Convert.ToInt32(this.StartAddressText.Text, 16) - Memory.StartAddress;
-                    this.EndAddress = this.StartAddress + len;
-                    this.EndAddressText.Text = (this.EndAddress + Memory.StartAddress).ToString("X6");
-                }
-                else
-                {
-                    this.StartAddress = Convert.ToInt32(this.StartAddressText.Text, 16);
-                    this.EndAddress = this.StartAddress + len;
-                    this.EndAddressText.Text = this.EndAddress.ToString("X6");
-                }
-            }
-            catch (global::System.FormatException ex)
-            {
-                global::System.Diagnostics.Debug.WriteLine(ex.Message);
-            }
-        }
-
-        private void EndAddressText_Validated(object sender, EventArgs e)
-        {
-            try
-            {
-                this.EndAddress = Convert.ToInt32(this.EndAddressText.Text, 16);
+                int requestedAddress = Convert.ToInt32(this.StartAddressText.Text, 16) & 0xFFFF00;
+                GotoAddress(requestedAddress);
             }
             catch (global::System.FormatException ex)
             {
@@ -172,22 +150,22 @@ namespace FoenixIDE.UI
             if (Memory is MemoryRAM)
             {
                 int newAddress = requestedAddress - Memory.StartAddress;
-                if (newAddress >= 0 && newAddress < Memory.Length)
+                if (newAddress >= 0 && (newAddress + PageSize) < Memory.Length)
                 {
                     StartAddress = newAddress;
-                    EndAddress = newAddress + 255;
+                    EndAddress = newAddress + PageSize;
                     if (EndAddress > Memory.Length)
                     {
                         EndAddress = Memory.Length;
                     }
-                    this.StartAddressText.Text = (StartAddress + Memory.StartAddress).ToString("X6");
-                    this.EndAddressText.Text = (EndAddress + Memory.StartAddress).ToString("X6");
                 }
+                this.StartAddressText.Text = (StartAddress + Memory.StartAddress).ToString("X6");
+                this.EndAddressText.Text = (EndAddress + Memory.StartAddress).ToString("X6");
             }
             else
             {
                 this.StartAddress = requestedAddress;
-                this.EndAddress = requestedAddress + 255;
+                this.EndAddress = requestedAddress + PageSize;
                 this.StartAddressText.Text = requestedAddress.ToString("X6");
                 this.EndAddressText.Text = EndAddress.ToString("X6");
             }

@@ -163,11 +163,12 @@
             this.EndAddressText.Margin = new System.Windows.Forms.Padding(4);
             this.EndAddressText.MaxLength = 6;
             this.EndAddressText.Name = "EndAddressText";
+            this.EndAddressText.ReadOnly = true;
             this.EndAddressText.Size = new System.Drawing.Size(70, 27);
             this.EndAddressText.TabIndex = 1;
+            this.EndAddressText.TabStop = false;
             this.EndAddressText.Text = "0000FF";
             this.EndAddressText.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.EndAddressText.Validated += new System.EventHandler(this.EndAddressText_Validated);
             // 
             // StartAddressText
             // 
