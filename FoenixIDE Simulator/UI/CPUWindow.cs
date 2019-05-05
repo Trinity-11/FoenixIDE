@@ -196,7 +196,9 @@ namespace FoenixIDE.UI
             {
                 int row = position.Y / ROW_HEIGHT;
                 DebugLine line = queue.ToArray()[row];
-                BPCombo.Text = line.PC.ToString("X6");
+                line.isBreakpoint = false;
+                string value = line.PC.ToString("X6");
+                BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                 DeleteBPButton_Click(null, null);
             }
         }
