@@ -149,7 +149,7 @@ namespace FoenixIDE
 
             if (OutputDevice == DeviceEnum.DebugWindow)
             {
-                UI.CPUWindow.PrintChar(c);
+               ////  UI.CPUWindow.PrintChar(c);
             }
         }
 
@@ -222,7 +222,7 @@ namespace FoenixIDE
             }
             else if (OutputDevice == DeviceEnum.DebugWindow)
             {
-                UI.CPUWindow.PrintTab(Col);
+               ////  UI.CPUWindow.PrintTab(Col);
             }
         }
 

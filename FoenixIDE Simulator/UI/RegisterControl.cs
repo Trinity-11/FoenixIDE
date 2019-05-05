@@ -64,7 +64,7 @@ namespace FoenixIDE.UI
 
         public void UpdateValue()
         {
-            if(Bank != null && Register != null)
+            if (Bank != null && Register != null)
             {
                 this.Value = Bank.Value.ToString("X2") + this._register.Value.ToString("X4");
             }

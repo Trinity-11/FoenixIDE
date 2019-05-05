@@ -252,23 +252,23 @@ namespace FoenixIDE.UI
                     {
                         int BufferSize = 2048;
                         int Loop = size / BufferSize;
-
+                        int offset = startAddress;
                         for (int j = 0; j < Loop; j++)
                         {
-                            PreparePacket2Write(buffer, startAddress, j * BufferSize, BufferSize);
-                            startAddress = startAddress + BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
+                            PreparePacket2Write(buffer, offset, j * BufferSize, BufferSize);
+                            offset = offset + BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
                             UploadProgressBar.Increment(BufferSize);
                         }
                         BufferSize = (size % BufferSize);
                         if (BufferSize > 0)
                         {
-                            PreparePacket2Write(buffer, startAddress, size - BufferSize, BufferSize);
+                            PreparePacket2Write(buffer, offset, size - BufferSize, BufferSize);
                             UploadProgressBar.Increment(BufferSize);
                         }
                     }
 
                     // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                    if (startAddress < 0xFF00 && (startAddress + buffer.Length) > 0xFFFF)
+                    if (startAddress < 0xFF00 && (startAddress + buffer.Length) > 0xFFFF || (startAddress == 0x18_0000 && buffer.Length > 0xFFFF))
                     {
                         PreparePacket2Write(buffer, 0x00FF00, 0x00FF00, 256);
                     }

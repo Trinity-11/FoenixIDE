@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Processor;
@@ -13,21 +15,23 @@ namespace FoenixIDE.UI
 {
     public partial class CPUWindow : Form
     {
-        private const int MNEMONIC_COLUMN = 22;
-        private const int REGISTER_COLUMN = 34;
         private int StepCounter = 0;
 
         Processor.Breakpoints breakpoints = new Processor.Breakpoints();
 
         public static CPUWindow Instance = null;
-        private Processor.CPU _cpu = null;
-        private FoenixSystem _kernel = null;
+        private FoenixSystem kernel = null;
 
-        List<string> PrintQueue = new List<string>();
-        static StringBuilder lineBuffer = new StringBuilder();
+        Queue<DebugLine> queue = null;
+        private Font debugFont = new Font("Consolas", 9f);
+        private Brush debugBrush = new SolidBrush(Color.Black);
+        private Brush yellowBrush = new SolidBrush(Color.Yellow);
+        private Brush lightBlueBrush = new SolidBrush(Color.LightBlue);
 
-        const int MAX_LINES = 25;
-        const int TRIM_LINES = 1;
+        const int ROW_HEIGHT = 13;
+
+        Thread t;
+        Point position = new Point();
 
         public CPUWindow()
         {
@@ -35,218 +39,242 @@ namespace FoenixIDE.UI
             Instance = this;
         }
 
+        public void SetKernel(FoenixSystem kernel)
+        {
+            this.kernel = kernel;
+            registerDisplay1.CPU = kernel.CPU;
+        }
+
+        private void ThreadProc()
+        {
+            while (!kernel.CPU.DebugPause && !kernel.CPU.Waiting)
+            {
+                ExecuteStep();
+            }
+        }
+
+        private class DebugLine
+        {
+            public bool isBreakpoint = false;
+            public readonly int PC;
+            readonly string Status;
+            readonly string Command;
+            readonly string OpCodes;
+            private readonly String pcString;
+
+            override public string ToString()
+            {
+
+                return string.Format("{0}  {1} {2}  {3}", pcString, Command, OpCodes, Status);
+            }
+            public DebugLine(int pc, byte[] command, string opcodes, string status)
+            {
+                PC = pc;
+                pcString = ">" + pc.ToString("X6");
+
+                StringBuilder c = new StringBuilder();
+                for (int i = 0; i < command.Length; i++)
+                {
+                    c.Append(command[i].ToString("X2")).Append(" ");
+                }
+                for (int i = command.Length; i < 4; i++)
+                {
+                    c.Append("   ");
+                }
+                Command = c.ToString();
+                OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
+                Status = status;
+            }
+        }
+        private List<string> lines = new List<string>();
+
         private void CPUWindow_Load(object sender, EventArgs e)
         {
-            PrintTab(REGISTER_COLUMN);
-            HeaderTextbox.Text = GetHeaderText();
+            queue = new Queue<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
+            HeaderTextbox.Text = " PC      INSTRUCTION                " + kernel.Monitor.GetRegisterHeader();
             ClearTrace();
             RefreshStatus();
+            Tooltip.SetToolTip(PlusButton, "Add Breakpoint");
+            Tooltip.SetToolTip(MinusButton, "Remove Breakpoint");
+            Tooltip.SetToolTip(InspectButton, "Browse Memory");
         }
 
-        public CPU CPU
+        private void DebugPanel_Paint(object sender, PaintEventArgs e)
         {
-            get
+            if (kernel.CPU.DebugPause)
             {
-                return this._cpu;
-            }
+                int queueLength = queue.Count;
+                int i = 0;
 
-            set
-            {
-                this._cpu = value;
-                registerDisplay1.CPU = value;
-            }
-        }
-
-        public FoenixSystem Kernel
-        {
-            get
-            {
-                return this._kernel;
-            }
-
-            set
-            {
-                this._kernel = value;
-            }
-        }
-
-
-        public static void PrintChar(char c)
-        {
-            if (c == '\r')
-            {
-                PrintLine(lineBuffer.ToString());
-                lineBuffer.Clear();
-            }
-            else if (c == '\n')
-            {
-                // do nothing
+                // Draw the position box
+                if (position.X > 0 && position.Y > 0)
+                {
+                    int row = position.Y / ROW_HEIGHT;
+                    int col = 12;
+                    e.Graphics.FillRectangle(lightBlueBrush, col, row * ROW_HEIGHT, 7 * 6, 14);
+                }
+                foreach (DebugLine line in queue)
+                {
+                    if (line.isBreakpoint)
+                    {
+                        e.Graphics.FillRectangle(yellowBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                    }
+                    e.Graphics.DrawString(line.ToString(), debugFont, debugBrush, 4, i * ROW_HEIGHT);
+                    i++;
+                }
             }
             else
             {
-                lineBuffer.Append(c);
+                e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
+                e.Graphics.DrawString("Running code real fast ... no time to write", debugFont, debugBrush, 4, DebugPanel.Height / 2);
             }
         }
 
-        public static void PrintTab(int x)
+        private void DebugPanel_MouseMove(object sender, MouseEventArgs e)
         {
-            while (lineBuffer.Length < x)
-                lineBuffer.Append(" ");
+            if (kernel.CPU.DebugPause)
+            {
+                
+                if (e.X > 12 && e.X < 120 && e.Y / ROW_HEIGHT < queue.Count)
+                {
+                    int top = e.Y / ROW_HEIGHT * ROW_HEIGHT;
+                    if ( (e.Y / ROW_HEIGHT != position.Y / ROW_HEIGHT || position.Y == -1) )
+                    {
+                        position.X = e.X;
+                        position.Y = e.Y;
+                        PlusButton.Top = DebugPanel.Top + top - 2;
+                        MinusButton.Top = DebugPanel.Top + top - 2;
+                        InspectButton.Top = DebugPanel.Top + top - 2;
+                        PlusButton.Left = 12 + 7 * 6 + 4;
+                        MinusButton.Left = PlusButton.Left + PlusButton.Width;
+                        InspectButton.Left = MinusButton.Left + MinusButton.Width;
+                        PlusButton.Visible = true;
+                        MinusButton.Visible = true;
+                        InspectButton.Visible = true;
+                    }
+                }
+                else
+                {
+                    position.X = -1;
+                    position.Y = -1;
+                    PlusButton.Visible = false;
+                    MinusButton.Visible = false;
+                    InspectButton.Visible = false;
+                }
+                DebugPanel.Refresh();
+            }
+        }
+
+        private void DebugPanel_Leave(object sender, EventArgs e)
+        {
+            position.X = -1;
+            position.Y = -1;
+            PlusButton.Visible = false;
+            MinusButton.Visible = false;
+            InspectButton.Visible = false;
+            DebugPanel.Refresh();
+        }
+
+        private void PlusButton_Click(object sender, EventArgs e)
+        {
+            if (position.X > 0 && position.Y > 0)
+            {
+                int row = position.Y / ROW_HEIGHT;
+                if (queue.Count > row)
+                {
+                    DebugLine line = queue.ToArray()[row];
+                    BPCombo.Text = line.PC.ToString("X6");
+                    AddBPButton_Click(null, null);
+                }
+            }
+        }
+
+
+        private void MinusButton_Click(object sender, EventArgs e)
+        {
+            if (position.X > 0 && position.Y > 0)
+            {
+                int row = position.Y / ROW_HEIGHT;
+                DebugLine line = queue.ToArray()[row];
+                BPCombo.Text = line.PC.ToString("X6");
+                DeleteBPButton_Click(null, null);
+            }
+        }
+
+
+        private void InspectButton_Click(object sender, EventArgs e)
+        {
+            if (position.X > 0 && position.Y > 0)
+            {
+                int row = position.Y / ROW_HEIGHT;
+                DebugLine line = queue.ToArray()[row];
+                MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
+                MemoryWindow.Instance.BringToFront();
+            }
         }
 
         public void RunButton_Click(object sender, EventArgs e)
         {
-            RefreshStatus();
-            CPU.DebugPause = false;
+            DebugPanel_Leave(sender, e);
+            kernel.CPU.DebugPause = false;
+            RunButton.Enabled = false;
+            t = new Thread(new ThreadStart(ThreadProc));
+            t.Start();
             UpdateTraceTimer.Enabled = true;
         }
 
         public void PauseButton_Click(object sender, EventArgs e)
         {
-            CPU.DebugPause = true;
+            DebugPanel_Leave(sender, e);
+            RunButton.Enabled = true;
+            kernel.CPU.DebugPause = true;
             UpdateTraceTimer.Enabled = false;
+            t?.Join();
             RefreshStatus();
         }
 
         private void StepButton_Click(object sender, EventArgs e)
         {
-            CPU.DebugPause = true;
+            DebugPanel_Leave(sender, e);
+            RunButton.Enabled = true;
+            kernel.CPU.DebugPause = true;
             UpdateTraceTimer.Enabled = false;
-
+            t?.Join();
             int.TryParse(stepsInput.Text, out int steps);
-            Kernel.CPU.DebugPause = false;
-            while (!Kernel.CPU.DebugPause && steps-- > 0)
+            while (steps-- > 0)
             {
                 ExecuteStep();
-                //Application.DoEvents();
             }
             RefreshStatus();
-            Kernel.CPU.DebugPause = true;
+            kernel.CPU.DebugPause = true;
         }
 
         private void RefreshStatus()
         {
             this.Text = "Debug: " + StepCounter.ToString();
-            
-            Kernel.gpu.Refresh();
-
-            UpdateStackDisplay();
-
-            string[] lines = new string[messageText.Lines.Length + PrintQueue.Count];
-            messageText.Lines.CopyTo(lines, 0);
-            PrintQueue.CopyTo(lines, messageText.Lines.Length);
-
-            int startIndex = 0;
-            int itemCount = lines.Length;
-            if (itemCount > 128)
-            {
-                startIndex = itemCount - 128;
-                string[] decimated = lines.Skip(startIndex).ToArray();
-                messageText.Lines = decimated;
-            }
-            else
-            {
-                messageText.Lines = lines;
-            }
-            messageText.SelectionStart = messageText.TextLength;
-            messageText.ScrollToCaret();
-
-            PrintQueue.Clear();
-            PrintNextInstruction();
-        }
-
-        private void PrintNextInstruction()
-        {
-            OpCode oc = CPU.PreFetch();
-            int start = CPU.GetLongPC();
-            PrintPC(start);
-
-            int end = start + oc.Length;
-            for (int i = start; i < end; i++)
-            {
-                Print(CPU.Memory[i].ToString("X2"));
-                Print(" ");
-            }
-
-            int s = CPU.ReadSignature(oc);
-            PrintTab(MNEMONIC_COLUMN);
-            Print(oc.ToString(s));
-            //PrintTab(REGISTER_COLUMN);
-            //Print(Kernel.Monitor.GetRegisterText());
-            Instance.lastLine.Text = lineBuffer.ToString();
-            lineBuffer.Clear();
-        }
-
-        string GetHeaderText()
-        {
-            StringBuilder s = new StringBuilder();
-            s.Append("PC    INSTRUCTION");
-            s.Append(new string(' ', REGISTER_COLUMN - s.Length));
-            s.Append(Kernel.Monitor.GetRegisterHeader());
-            return s.ToString();
-        }
-
-        private void PrintPC(int pc1)
-        {
-            Print("." + pc1.ToString("X6") + "  ");
-        }
-
-        public void PrintStatus(int lastPC, int newPC)
-        {
-            for (int i = lastPC; i < newPC; i++)
-            {
-                Print(CPU.Memory[i].ToString("X2"));
-                Print(" ");
-            }
-            PrintTab(MNEMONIC_COLUMN);
-            Print(CPU.Opcode.ToString(CPU.SignatureBytes));
-            PrintTab(REGISTER_COLUMN);
-            Print(Kernel.Monitor.GetRegisterText());
-            PrintLine();
-        }
-
-        public static void Print(string message)
-        {
-            lineBuffer.Append(message);
-        }
-
-        public static void PrintLine(string message)
-        {
-            lineBuffer.Append(message);
-            PrintLine();
-        }
-
-        public static void PrintClear()
-        {
-            lineBuffer.Clear();
-        }
-
-        public static void PrintLine()
-        {
-            Instance.PrintQueue.Add(lineBuffer.ToString());
-            PrintClear();
+            DebugPanel.Refresh();
         }
 
         public void UpdateStackDisplay()
         {
             stackText.Clear();
-            stackText.AppendText("Top: $" + CPU.Stack.TopOfStack.ToString("X4") + "\r\n");
-            stackText.AppendText("SP : $" + CPU.Stack.Value.ToString("X4") + "\r\n");
-            stackText.AppendText("N  : " + (CPU.Stack.TopOfStack - CPU.Stack.Value).ToString().PadLeft(4) + "\r\n");
+            stackText.AppendText("Top: $" + kernel.CPU.Stack.TopOfStack.ToString("X4") + "\r\n");
+            stackText.AppendText("SP : $" + kernel.CPU.Stack.Value.ToString("X4") + "\r\n");
+            stackText.AppendText("N  : " + (kernel.CPU.Stack.TopOfStack - kernel.CPU.Stack.Value).ToString().PadLeft(4) + "\r\n");
             stackText.AppendText("───────────\r\n");
 
             // Display all values on the stack
-            if (CPU.Stack.Value != CPU.Stack.TopOfStack)
+            if (kernel.CPU.Stack.Value != kernel.CPU.Stack.TopOfStack)
             {
-                int i = CPU.Stack.TopOfStack - CPU.Stack.Value;
+                int i = kernel.CPU.Stack.TopOfStack - kernel.CPU.Stack.Value;
                 if (i > 100)
                 {
                     i = 100;
                 }
                 while (i > 0)
                 {
-                    int address = CPU.Stack.Value + i;
-                    stackText.AppendText(address.ToString("X4") + " " + CPU.Memory[address].ToString("X2") + "\r\n");
+                    int address = kernel.CPU.Stack.Value + i;
+                    stackText.AppendText(address.ToString("X4") + " " + kernel.CPU.Memory[address].ToString("X2") + "\r\n");
                     i--;
                 }
             }
@@ -260,85 +288,95 @@ namespace FoenixIDE.UI
             tb.SelectAll();
         }
 
+        private delegate void breakpointSetter(int pc);
+        private void SetBreakpoint(int pc)
+        {
+            BPCombo.Text = breakpoints.GetHex(pc);
+            RefreshStatus();
+            RunButton.Enabled = true;
+        }
+        private delegate void nullParamMethod();
         public void ExecuteStep()
         {
-            try
+            StepCounter++;
+
+            int currentPC = kernel.CPU.GetLongPC();
+            kernel.CPU.ExecuteNext();
+            int cmdLength = kernel.CPU.OpcodeLength;
+            int nextPC = currentPC + cmdLength;
+
+                
+            int start = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
+            byte[] command = new byte[cmdLength];
+            for (int i = 0; i < cmdLength; i++)
             {
-                StepCounter++;
+                command[i] = kernel.CPU.Memory[currentPC + i];
+            }
+            string opcodes = kernel.CPU.Opcode.ToString(kernel.CPU.SignatureBytes);
+            string status = kernel.Monitor.GetRegisterText();
+            DebugLine line = new DebugLine(currentPC, command, opcodes, status);
+            queue.Enqueue(line);
+            if (queue.Count > (DebugPanel.Height/ROW_HEIGHT))
+            {
+                queue.Dequeue();
+            }
+            if (breakpoints.ContainsKey(currentPC))
+            {
+                kernel.CPU.DebugPause = true;
+                line.isBreakpoint = true;
+                UpdateTraceTimer.Enabled = false;
+                Invoke(new breakpointSetter(SetBreakpoint), new object[] { currentPC });
+            }
+        }
 
-                PrintClear();
-
-                int pc1 = CPU.GetLongPC();
-                PrintPC(pc1);
-                CPU.ExecuteNext();
-                int pc2 = pc1 + CPU.Opcode.Length;
-                PrintStatus(pc1, pc2);
-
-                int pc = CPU.GetLongPC();
-                if (breakpoints.ContainsKey(pc))
+        public void UpdateDebugLines(int newDebugLine, bool state)
+        {
+            foreach (DebugLine line in queue)
+            {
+                if (line.PC == newDebugLine)
                 {
-                    CPU.DebugPause = true;
-                    UpdateTraceTimer.Enabled = false;
-                    BPCombo.Text = breakpoints.GetHex(pc);
+                    line.isBreakpoint = state;
                 }
             }
-            catch (Exception ex)
-            {
-                Print(ex.Message);
-                CPU.Halt();
-            }
-        }
-
-        // Don't try to display the CPU information too often
-        private void UpdateTrackeTick(object sender, EventArgs e)
-        {
-            DateTime t = DateTime.Now.AddMilliseconds(UpdateTraceTimer.Interval / 2);
-            while (DateTime.Now < t)
-            {
-                if (CPU.DebugPause || CPU.Waiting)
-                    break;
-                ExecuteStep();
-            }
-            RefreshStatus();
-        }
-
-        private void RefreshBreakpoints()
-        {
-            BPCombo.Items.Clear();
-            foreach (string s in breakpoints.Values)
-            {
-                BPCombo.Items.Add(s);
-            }
-            BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
+            DebugPanel.Refresh();
         }
 
         private void AddBPButton_Click(object sender, EventArgs e)
         {
             if (BPCombo.Text.Trim() != "")
             {
-                breakpoints.Add(BPCombo.Text);
-                BPCombo.Text = breakpoints.Format(BPCombo.Text);
-                RefreshBreakpoints();
+                int newValue = breakpoints.Add(BPCombo.Text);
+                if (newValue > -1)
+                {
+                    BPCombo.Text = breakpoints.Format(BPCombo.Text);
+                    BPCombo.Items.Add(BPCombo.Text);
+                    UpdateDebugLines(newValue, true);
+                    BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
+                }
             }
         }
 
         private void DeleteBPButton_Click(object sender, EventArgs e)
         {
             if (BPCombo.Text != "")
+            {
                 breakpoints.Remove(BPCombo.Text);
+                BPCombo.Items.Remove(BPCombo.Text);
+                UpdateDebugLines(breakpoints.GetIntFromHex(BPCombo.Text), false);
+            }
             if (breakpoints.Count == 0)
                 BPCombo.Text = "";
             else
                 BPCombo.Text = breakpoints.Values[0];
-            RefreshBreakpoints();
+            BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
         }
 
         private void JumpButton_Click(object sender, EventArgs e)
         {
             int pc = breakpoints.GetIntFromHex(locationInput.Text);
-            CPU.SetLongPC(pc);
+            kernel.CPU.SetLongPC(pc);
             ClearTrace();
-            CPU.ExecuteNext();
+            kernel.CPU.ExecuteNext();
         }
 
         private void ClearTraceButton_Click(object sender, EventArgs e)
@@ -349,9 +387,11 @@ namespace FoenixIDE.UI
         public void ClearTrace()
         {
             StepCounter = 0;
-            messageText.Clear();
-            CPU.Stack.Reset();
+            queue.Clear();
+            //messageText.Clear();
+            kernel.CPU.Stack.Reset();
             stackText.Clear();
+            DebugPanel.Refresh();
         }
 
         private void LocationInput_Validated(object sender, EventArgs e)
@@ -359,6 +399,12 @@ namespace FoenixIDE.UI
             int jumpAddress = Convert.ToInt32(this.locationInput.Text.Replace(":",""), 16);
             String address = jumpAddress.ToString("X6");
             locationInput.Text = address.Substring(0, 2) + ":" + address.Substring(2);
+        }
+
+        // Don't try to display the CPU information too often
+        private void UpdateTraceTick(object sender, EventArgs e)
+        {
+            RefreshStatus();
         }
     }
 }

@@ -43,23 +43,25 @@ namespace FoenixIDE.Processor
                 int ret = Convert.ToInt32(Hex.Replace("$","").Replace(":", ""), 16);
                 return ret;
             }
-            catch (FormatException)
+            catch (Exception)
             {
                 return -1;
             }
         }
 
-        public void Add(string HexAddress)
+        public int Add(string HexAddress)
         {
             try
             {
                 int Addr = GetIntFromHex(HexAddress);
                 this.Add(Addr, GetHex(Addr));
+                return Addr;
             }
             catch (Exception ex)
             {
                 global::System.Diagnostics.Debug.WriteLine("Breakpoints.Add(" + HexAddress + ")");
                 global::System.Diagnostics.Debug.WriteLine("Message:  " + ex.Message);
+                return -1;
             }
         }
 

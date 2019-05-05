@@ -306,6 +306,7 @@ namespace FoenixIDE.Display
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
         void Gpu_Paint(object sender, PaintEventArgs e)
         {
             paintCycle++;
@@ -326,7 +327,6 @@ namespace FoenixIDE.Display
                 return;
             }
             // Don't forget to dispose the framebuffer.
-            Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(frameBuffer);
 
             // Determine if we display a border
@@ -395,18 +395,7 @@ namespace FoenixIDE.Display
             {
 
             }
-            //if (displayBorder)
-            //{
-            //    int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
-            //    int lineOffset = (60 - LinesVisible) / 2 * charHeight;
-            //    g.DrawImage(frameBuffer, colOffset, lineOffset, this.ClientRectangle.Width - colOffset, this.ClientRectangle.Height - lineOffset);
-            //}
-            //else
-            //{
-                e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
-            //}
-            
-            frameBuffer.Dispose();
+            e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
         private void LoadLUT()
@@ -651,7 +640,7 @@ namespace FoenixIDE.Display
                             if (pixelIndex != 0)
                             {
                                 int value = (int)graphicsLUT[lutIndex][pixelIndex];
-                                System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
+                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
                             }
                         }
                     }

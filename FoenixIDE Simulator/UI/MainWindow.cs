@@ -61,11 +61,10 @@ namespace FoenixIDE.UI
                 kernel.CPU.DebugPause = true;
                 debugWindow = new UI.CPUWindow
                 {
-                    CPU = kernel.CPU,
                     Top = Screen.PrimaryScreen.WorkingArea.Top,
-                    Kernel = kernel
                 };
                 debugWindow.Left = Screen.PrimaryScreen.WorkingArea.Width - debugWindow.Width;
+                debugWindow.SetKernel(kernel);
                 debugWindow.Show();
             } 
             else
@@ -74,7 +73,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        void ShowMemoryWindow()
+        private void ShowMemoryWindow()
         {
             if (memoryWindow == null || memoryWindow.IsDisposed)
             {
