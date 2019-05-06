@@ -29,7 +29,7 @@ namespace FoenixIDE.UI
 
         private void BasicWindow_KeyPress(object sender, KeyPressEventArgs e)
         {
-            //lastKeyPressed.Text = "$" + ((UInt16)e.KeyChar).ToString("X2");
+            lastKeyPressed.Text = "$" + ((UInt16)e.KeyChar).ToString("X2");
             kernel.KeyboardBuffer.Write(e.KeyChar, 2);
         }
 
@@ -156,12 +156,9 @@ namespace FoenixIDE.UI
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            debugWindow.Close();
+            memoryWindow.Close();
             this.Close();
-        }
-
-        private void Timer1_Tick(object sender, EventArgs e)
-        {
-            kernel.CPU.ExecuteCycles(CyclesPerTick);
         }
 
         int previousCounter = 0;
@@ -211,6 +208,7 @@ namespace FoenixIDE.UI
         {
             debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
+            previousCounter = 0;
             kernel.Reset();
             memoryWindow.UpdateMCRButtons();
             kernel.Run();
@@ -224,6 +222,7 @@ namespace FoenixIDE.UI
         {
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
+            previousCounter = 0;
             kernel.Reset();
             memoryWindow.UpdateMCRButtons();
         }

@@ -208,10 +208,10 @@ namespace FoenixIDE.UI
         {
             if (BPCombo.Text.Trim() != "")
             {
-                int newValue = breakpoints.Add(BPCombo.Text);
+                int newValue = breakpoints.Add(BPCombo.Text.Trim().Replace(">",""));
                 if (newValue > -1)
                 {
-                    BPCombo.Text = breakpoints.Format(BPCombo.Text);
+                    BPCombo.Text = breakpoints.Format(newValue.ToString("X"));
                     UpdateDebugLines(newValue, true);
                     BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
                 }
@@ -249,33 +249,35 @@ namespace FoenixIDE.UI
             DebugPanel_Leave(sender, e);
             kernel.CPU.DebugPause = false;
             RunButton.Enabled = false;
+            lastLine.Text = "";
             t = new Thread(new ThreadStart(ThreadProc));
-            t.Start();
             UpdateTraceTimer.Enabled = true;
+            t.Start();
         }
 
         public void PauseButton_Click(object sender, EventArgs e)
         {
             DebugPanel_Leave(sender, e);
-            RunButton.Enabled = true;
             kernel.CPU.DebugPause = true;
-            UpdateTraceTimer.Enabled = false;
             t?.Join();
+            RunButton.Enabled = true;
+            UpdateTraceTimer.Enabled = false;
             RefreshStatus();
         }
 
         private void StepButton_Click(object sender, EventArgs e)
         {
             DebugPanel_Leave(sender, e);
-            RunButton.Enabled = true;
             kernel.CPU.DebugPause = true;
-            UpdateTraceTimer.Enabled = false;
             t?.Join();
+            UpdateTraceTimer.Enabled = false;
+            RunButton.Enabled = true;
             int.TryParse(stepsInput.Text, out int steps);
             while (steps-- > 0)
             {
                 ExecuteStep();
             }
+
             RefreshStatus();
             kernel.CPU.DebugPause = true;
         }
@@ -359,8 +361,31 @@ namespace FoenixIDE.UI
                 UpdateTraceTimer.Enabled = false;
                 Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
             }
-        }
 
+            // Print the next instruction on lastLine
+            if (!UpdateTraceTimer.Enabled)
+            {
+                PrintNextInstruction(nextPC);
+            }
+        }
+        private void PrintNextInstruction(int pc)
+        {
+            OpCode oc = kernel.CPU.PreFetch();
+            int cmdLength = oc.Length;
+            byte[] command = new byte[cmdLength];
+            for (int i = 0; i < cmdLength; i++)
+            {
+                command[i] = kernel.CPU.Memory[pc + i];
+            }
+            string opcodes = oc.ToString(kernel.CPU.ReadSignature(oc));
+            string status = "";
+            DebugLine line = new DebugLine(pc, command, opcodes, status);
+            if (!lastLine.InvokeRequired)
+            {
+                lastLine.Text = line.ToString();
+            }
+            
+        }
         public void UpdateDebugLines(int newDebugLine, bool state)
         {
             BPCombo.BeginUpdate();
@@ -401,6 +426,7 @@ namespace FoenixIDE.UI
             kernel.CPU.Stack.Reset();
             stackText.Clear();
             DebugPanel.Refresh();
+            lastLine.Text = "";
         }
 
         private void LocationInput_Validated(object sender, EventArgs e)
@@ -414,6 +440,13 @@ namespace FoenixIDE.UI
         private void UpdateTraceTick(object sender, EventArgs e)
         {
             RefreshStatus();
+        }
+
+        private void CPUWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Kill the thread
+            kernel.CPU.DebugPause = true;
+            t?.Join();
         }
     }
 }

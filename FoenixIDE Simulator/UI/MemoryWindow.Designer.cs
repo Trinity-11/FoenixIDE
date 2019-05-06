@@ -72,7 +72,7 @@
             this.HeaderPanel.Controls.Add(this.StartAddressText);
             this.HeaderPanel.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
-            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(6);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(1041, 46);
             this.HeaderPanel.TabIndex = 0;
@@ -83,7 +83,7 @@
             this.CompactCheckbox.Checked = true;
             this.CompactCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CompactCheckbox.Location = new System.Drawing.Point(913, 8);
-            this.CompactCheckbox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CompactCheckbox.Margin = new System.Windows.Forms.Padding(4);
             this.CompactCheckbox.Name = "CompactCheckbox";
             this.CompactCheckbox.Size = new System.Drawing.Size(117, 29);
             this.CompactCheckbox.TabIndex = 12;
@@ -93,7 +93,7 @@
             // ExportButton
             // 
             this.ExportButton.Location = new System.Drawing.Point(814, 0);
-            this.ExportButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ExportButton.Margin = new System.Windows.Forms.Padding(6);
             this.ExportButton.Name = "ExportButton";
             this.ExportButton.Size = new System.Drawing.Size(96, 44);
             this.ExportButton.TabIndex = 11;
@@ -117,7 +117,7 @@
             "Address $AF:E000 (Beatrix)",
             "Unspecified Page"});
             this.AddressCombo.Location = new System.Drawing.Point(393, 4);
-            this.AddressCombo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.AddressCombo.Margin = new System.Windows.Forms.Padding(4);
             this.AddressCombo.Name = "AddressCombo";
             this.AddressCombo.Size = new System.Drawing.Size(418, 32);
             this.AddressCombo.TabIndex = 10;
@@ -127,7 +127,7 @@
             // 
             this.PreviousButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PreviousButton.Location = new System.Drawing.Point(345, 0);
-            this.PreviousButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.PreviousButton.Margin = new System.Windows.Forms.Padding(6);
             this.PreviousButton.Name = "PreviousButton";
             this.PreviousButton.Size = new System.Drawing.Size(45, 44);
             this.PreviousButton.TabIndex = 4;
@@ -139,7 +139,7 @@
             // 
             this.NextButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.NextButton.Location = new System.Drawing.Point(297, 0);
-            this.NextButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.NextButton.Margin = new System.Windows.Forms.Padding(6);
             this.NextButton.Name = "NextButton";
             this.NextButton.Size = new System.Drawing.Size(48, 44);
             this.NextButton.TabIndex = 3;
@@ -150,7 +150,7 @@
             // ViewButton
             // 
             this.ViewButton.Location = new System.Drawing.Point(199, 0);
-            this.ViewButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ViewButton.Margin = new System.Windows.Forms.Padding(6);
             this.ViewButton.Name = "ViewButton";
             this.ViewButton.Size = new System.Drawing.Size(96, 44);
             this.ViewButton.TabIndex = 2;
@@ -162,7 +162,7 @@
             // 
             this.EndAddressText.Font = new System.Drawing.Font("Consolas", 10F);
             this.EndAddressText.Location = new System.Drawing.Point(100, 0);
-            this.EndAddressText.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.EndAddressText.Margin = new System.Windows.Forms.Padding(6);
             this.EndAddressText.MaxLength = 6;
             this.EndAddressText.Name = "EndAddressText";
             this.EndAddressText.ReadOnly = true;
@@ -177,7 +177,7 @@
             this.StartAddressText.Dock = System.Windows.Forms.DockStyle.Left;
             this.StartAddressText.Font = new System.Drawing.Font("Consolas", 10F);
             this.StartAddressText.Location = new System.Drawing.Point(0, 0);
-            this.StartAddressText.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.StartAddressText.Margin = new System.Windows.Forms.Padding(6);
             this.StartAddressText.MaxLength = 6;
             this.StartAddressText.Name = "StartAddressText";
             this.StartAddressText.Size = new System.Drawing.Size(95, 35);
@@ -193,7 +193,7 @@
             this.MemoryText.Cursor = System.Windows.Forms.Cursors.Hand;
             this.MemoryText.Font = new System.Drawing.Font("Consolas", 10F);
             this.MemoryText.Location = new System.Drawing.Point(0, 42);
-            this.MemoryText.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.MemoryText.Margin = new System.Windows.Forms.Padding(6);
             this.MemoryText.MaxLength = 4096;
             this.MemoryText.Multiline = true;
             this.MemoryText.Name = "MemoryText";
@@ -229,7 +229,7 @@
             this.FooterPanel.Controls.Add(this.MCRBit7Button);
             this.FooterPanel.Controls.Add(this.MasterControlLabel);
             this.FooterPanel.Location = new System.Drawing.Point(0, 573);
-            this.FooterPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.FooterPanel.Margin = new System.Windows.Forms.Padding(4);
             this.FooterPanel.Name = "FooterPanel";
             this.FooterPanel.Size = new System.Drawing.Size(708, 56);
             this.FooterPanel.TabIndex = 1;
@@ -379,7 +379,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(1062, 658);
             this.Name = "MemoryWindow";

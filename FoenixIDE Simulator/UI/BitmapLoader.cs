@@ -85,7 +85,7 @@ namespace FoenixIDE.UI
 
         private String formatAddress(int address)
         {
-            String size = (address).ToString("X");
+            String size = (address).ToString("X6");
             return "$" + size.Substring(0, 2) + ":" + size.Substring(2);
         }
         /*

@@ -375,6 +375,7 @@
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "CPU Window";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CPUWindow_FormClosing);
             this.Load += new System.EventHandler(this.CPUWindow_Load);
             this.HeaderPanel.ResumeLayout(false);
             this.HeaderPanel.PerformLayout();
