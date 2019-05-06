@@ -126,7 +126,7 @@ namespace FoenixIDE.UI
             else
             {
                 e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
-                e.Graphics.DrawString("Running code real fast ... no time to write", debugFont, debugBrush, 4, DebugPanel.Height / 2);
+                e.Graphics.DrawString("Running code real fast ... no time to write!", debugFont, debugBrush, 4, DebugPanel.Height / 2);
             }
         }
 
@@ -183,7 +183,8 @@ namespace FoenixIDE.UI
                 if (queue.Count > row)
                 {
                     DebugLine line = queue.ToArray()[row];
-                    BPCombo.Text = line.PC.ToString("X6");
+                    string value = line.PC.ToString("X6");
+                    BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     AddBPButton_Click(null, null);
                 }
             }
@@ -203,6 +204,34 @@ namespace FoenixIDE.UI
             }
         }
 
+        private void AddBPButton_Click(object sender, EventArgs e)
+        {
+            if (BPCombo.Text.Trim() != "")
+            {
+                int newValue = breakpoints.Add(BPCombo.Text);
+                if (newValue > -1)
+                {
+                    BPCombo.Text = breakpoints.Format(BPCombo.Text);
+                    UpdateDebugLines(newValue, true);
+                    BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
+                }
+            }
+        }
+
+        private void DeleteBPButton_Click(object sender, EventArgs e)
+        {
+            if (BPCombo.Text != "")
+            {
+                breakpoints.Remove(BPCombo.Text);
+                UpdateDebugLines(breakpoints.GetIntFromHex(BPCombo.Text), false);
+                BPCombo.Items.Remove(BPCombo.Text);
+            }
+            if (breakpoints.Count == 0)
+                BPCombo.Text = "";
+            else
+                BPCombo.Text = breakpoints.Values[0];
+            BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
+        }
 
         private void InspectButton_Click(object sender, EventArgs e)
         {
@@ -255,6 +284,7 @@ namespace FoenixIDE.UI
         {
             this.Text = "Debug: " + StepCounter.ToString();
             DebugPanel.Refresh();
+            UpdateStackDisplay();
         }
 
         public void UpdateStackDisplay()
@@ -291,7 +321,7 @@ namespace FoenixIDE.UI
         }
 
         private delegate void breakpointSetter(int pc);
-        private void SetBreakpoint(int pc)
+        private void BreakpointReached(int pc)
         {
             BPCombo.Text = breakpoints.GetHex(pc);
             RefreshStatus();
@@ -327,12 +357,19 @@ namespace FoenixIDE.UI
                 kernel.CPU.DebugPause = true;
                 line.isBreakpoint = true;
                 UpdateTraceTimer.Enabled = false;
-                Invoke(new breakpointSetter(SetBreakpoint), new object[] { currentPC });
+                Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
             }
         }
 
         public void UpdateDebugLines(int newDebugLine, bool state)
         {
+            BPCombo.BeginUpdate();
+            BPCombo.Items.Clear();
+            foreach (KeyValuePair<int,string> bp in breakpoints)
+            {
+                BPCombo.Items.Add(bp.Value);
+            }
+            BPCombo.EndUpdate();
             foreach (DebugLine line in queue)
             {
                 if (line.PC == newDebugLine)
@@ -341,36 +378,6 @@ namespace FoenixIDE.UI
                 }
             }
             DebugPanel.Refresh();
-        }
-
-        private void AddBPButton_Click(object sender, EventArgs e)
-        {
-            if (BPCombo.Text.Trim() != "")
-            {
-                int newValue = breakpoints.Add(BPCombo.Text);
-                if (newValue > -1)
-                {
-                    BPCombo.Text = breakpoints.Format(BPCombo.Text);
-                    BPCombo.Items.Add(BPCombo.Text);
-                    UpdateDebugLines(newValue, true);
-                    BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
-                }
-            }
-        }
-
-        private void DeleteBPButton_Click(object sender, EventArgs e)
-        {
-            if (BPCombo.Text != "")
-            {
-                breakpoints.Remove(BPCombo.Text);
-                BPCombo.Items.Remove(BPCombo.Text);
-                UpdateDebugLines(breakpoints.GetIntFromHex(BPCombo.Text), false);
-            }
-            if (breakpoints.Count == 0)
-                BPCombo.Text = "";
-            else
-                BPCombo.Text = breakpoints.Values[0];
-            BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
         }
 
         private void JumpButton_Click(object sender, EventArgs e)
