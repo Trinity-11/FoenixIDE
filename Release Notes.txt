@@ -1,3 +1,11 @@
+Release 0.2.1.0
+---------------
+Made the CPU window multi-threaded and not timer based.  Performance is much improved.
+Fixed memory leak due to displaying too many line items in the CPU window.
+Added the +, - and "Mem" buttons to allow adding breakpoints and jumping to memory easily.
+Fixed a minor issue with the file size of the bitmap loader.
+CPU window is now double-buffered and allows drawing of breakpoints.
+
 Release 0.2.0.9
 ---------------
 * Added Long fetch from the C256 unit.
