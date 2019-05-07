@@ -346,7 +346,7 @@ namespace FoenixIDE.Display
             int backgroundColor = (int)((UInt32)IO.ReadLong(8) | 0xFF000000);
             Brush graphBackgroundBrush = new SolidBrush(Color.FromArgb(backgroundColor));
             int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
-            int rowOffset = (64 - LinesVisible) / 2 * charWidth;
+            int rowOffset = (60 - LinesVisible) / 2 * charWidth;
             g.FillRectangle(graphBackgroundBrush, colOffset, rowOffset, 640 - 2 * colOffset, 480 - 2 * rowOffset);
             
 

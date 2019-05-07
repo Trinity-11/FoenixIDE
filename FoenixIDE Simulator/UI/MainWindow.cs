@@ -296,6 +296,12 @@ namespace FoenixIDE.UI
             AboutFrom about = new AboutFrom();
             about.ShowDialog();
         }
+
+        private void tileEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TileEditor editor = new TileEditor();
+            editor.Show();
+        }
     }
 }
 

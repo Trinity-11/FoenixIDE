@@ -231,21 +231,12 @@ namespace FoenixIDE.Processor
 
         private int GetAbsoluteLong(int Address)
         {
-            if (cpu.A.Width == 1)
-            {
-                return cpu.Memory.ReadByte(Address);
-            }
-            else
-            {
-                return cpu.Memory.ReadWord(Address);
-            }
+            return (cpu.A.Width == 1) ? cpu.Memory.ReadByte(Address) : cpu.Memory.ReadWord(Address);
         }
 
         private int GetAbsoluteLongIndexed(int Address, Register Index)
         {
-            int addr = Address + Index.Value;
-            int val = cpu.Memory.ReadWord(Address + Index.Value);
-            return val;
+            return (cpu.A.Width == 1) ? cpu.Memory.ReadByte(Address + Index.Value) : cpu.Memory.ReadWord(Address + Index.Value);
         }
 
         /// <summary>

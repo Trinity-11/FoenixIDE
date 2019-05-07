@@ -115,11 +115,14 @@ namespace FoenixIDE.UI
                 }
                 foreach (DebugLine line in queue)
                 {
-                    if (line.isBreakpoint)
+                    if (line != null)
                     {
-                        e.Graphics.FillRectangle(yellowBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                        if (line.isBreakpoint)
+                        {
+                            e.Graphics.FillRectangle(yellowBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                        }
+                        e.Graphics.DrawString(line.ToString(), debugFont, debugBrush, 4, i * ROW_HEIGHT);
                     }
-                    e.Graphics.DrawString(line.ToString(), debugFont, debugBrush, 4, i * ROW_HEIGHT);
                     i++;
                 }
             }
@@ -337,8 +340,6 @@ namespace FoenixIDE.UI
             int currentPC = kernel.CPU.GetLongPC();
             kernel.CPU.ExecuteNext();
             int cmdLength = kernel.CPU.OpcodeLength;
-            int nextPC = currentPC + cmdLength;
-
                 
             int start = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
             byte[] command = new byte[cmdLength];
@@ -365,8 +366,13 @@ namespace FoenixIDE.UI
             // Print the next instruction on lastLine
             if (!UpdateTraceTimer.Enabled)
             {
-                PrintNextInstruction(nextPC);
+                PrintNextInstruction(kernel.CPU.GetLongPC());
             }
+        }
+        private delegate void lastLineDelegate(string line);
+        private void showLastLine(string line)
+        {
+            lastLine.Text = line;
         }
         private void PrintNextInstruction(int pc)
         {
@@ -383,6 +389,10 @@ namespace FoenixIDE.UI
             if (!lastLine.InvokeRequired)
             {
                 lastLine.Text = line.ToString();
+            }
+            else
+            {
+                lastLine.Invoke(new lastLineDelegate(showLastLine), new object[] { line.ToString() });
             }
             
         }
@@ -422,7 +432,6 @@ namespace FoenixIDE.UI
         {
             StepCounter = 0;
             queue.Clear();
-            //messageText.Clear();
             kernel.CPU.Stack.Reset();
             stackText.Clear();
             DebugPanel.Refresh();
@@ -442,7 +451,7 @@ namespace FoenixIDE.UI
             RefreshStatus();
         }
 
-        private void CPUWindow_FormClosing(object sender, FormClosingEventArgs e)
+        private void CPUWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             // Kill the thread
             kernel.CPU.DebugPause = true;
