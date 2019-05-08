@@ -20,7 +20,11 @@ namespace FoenixIDE.UI
         public UI.CPUWindow debugWindow;
         public MemoryWindow memoryWindow;
         public UploaderWindow uploaderWindow;
+        private TileEditor editor;
 
+        private byte previousGraphicMode;
+        private delegate void TileClickEvent(Point tile);
+        private TileClickEvent TileClicked;
 
         public MainWindow()
         {
@@ -257,6 +261,10 @@ namespace FoenixIDE.UI
                 kernel.Reset();
                 ShowDebugWindow();
                 ShowMemoryWindow();
+                if (editor != null && editor.Visible)
+                {
+                    editor.SetMemory(kernel.Memory);
+                }
             }
         }
         private void MenuOpenHexFile_Click(object sender, EventArgs e)
@@ -297,10 +305,67 @@ namespace FoenixIDE.UI
             about.ShowDialog();
         }
 
-        private void tileEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        // When the editor window is closed, exit the TileEditorMode
+        private void EditorWindowClosed(object sender, FormClosedEventArgs e)
         {
-            TileEditor editor = new TileEditor();
+            gpu.TileEditorMode = false;
+            // Restore the previous graphics mode
+            kernel.Memory.IO.WriteByte(0, previousGraphicMode);
+        }
+        
+        private void TileEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            editor = new TileEditor();
+            editor.SetMemory(kernel.Memory);
+            gpu.TileEditorMode = true;
+            gpu.ColumnsVisible = 72;
+            gpu.LinesVisible = 52;
+            // Set Vicky into Tile mode
+            previousGraphicMode = kernel.Memory.IO.ReadByte(0);
+            kernel.Memory.IO.WriteByte(0, 0x10);
+            // Enable borders
+            kernel.Memory.IO.WriteByte(4, 1);
             editor.Show();
+            editor.FormClosed += new FormClosedEventHandler(EditorWindowClosed);
+
+            // coordinate between the tile editor window and the GPU canvas
+            this.TileClicked += new TileClickEvent(editor.TileClicked_Click);
+    }
+
+        private void Gpu_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (gpu.TileEditorMode)
+            {
+                double ratioW = gpu.Width / 640d;
+                double ratioH = gpu.Height / 480d;
+                if ((e.X / ratioW > 32 && e.X / ratioW < 608) && (e.Y / ratioH > 32 && e.Y / ratioH < 448))
+                {
+                    this.Cursor = Cursors.Hand;
+                }
+                else
+                {
+                    this.Cursor = Cursors.No;
+                }
+            }
+            else
+            {
+                this.Cursor = Cursors.Default;
+            }
+        }
+
+        private void Gpu_MouseLeave(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Default;
+        }
+
+        private void Gpu_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
+            {
+                double ratioW = gpu.Width / 640d;
+                double ratioH = gpu.Height / 480d;
+                TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
+            }
         }
     }
 }

@@ -370,7 +370,7 @@ namespace FoenixIDE.UI
             }
         }
         private delegate void lastLineDelegate(string line);
-        private void showLastLine(string line)
+        private void ShowLastLine(string line)
         {
             lastLine.Text = line;
         }
@@ -392,7 +392,12 @@ namespace FoenixIDE.UI
             }
             else
             {
-                lastLine.Invoke(new lastLineDelegate(showLastLine), new object[] { line.ToString() });
+                try
+                {
+                    lastLine.Invoke(new lastLineDelegate(ShowLastLine), new object[] { line.ToString() });
+                }
+                finally
+                { }
             }
             
         }

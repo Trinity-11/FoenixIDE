@@ -31,7 +31,7 @@ namespace FoenixIDE.Display
         const int tileSize = 16;
         const int spriteSize = 32;
 
-        int[][] graphicsLUT = new int[8][];
+        int[][] graphicsLUT = null;
 
         private int length = 128 * 64 * 2; //Text mode uses 16K, 1 page for text, the other for colors.
 
@@ -39,6 +39,7 @@ namespace FoenixIDE.Display
         public MemoryRAM RAM = null;
         public MemoryRAM IO = null;
         public int paintCycle = 0;
+        private bool tileEditorMode = false;
 
         public int StartAddress
         {
@@ -61,6 +62,18 @@ namespace FoenixIDE.Display
             get
             {
                 return StartAddress + length - 1;
+            }
+        }
+
+        public bool TileEditorMode
+        {
+            get
+            {
+                return tileEditorMode;
+            }
+            set
+            {
+                tileEditorMode = value;
             }
         }
 
@@ -227,7 +240,6 @@ namespace FoenixIDE.Display
         public Gpu()
         {
             InitializeComponent();
-
             this.Load += new EventHandler(Gpu_Load);
         }
 
@@ -256,10 +268,6 @@ namespace FoenixIDE.Display
                 int sidemargin = ParentForm.Width - ClientRectangle.Width;
                 ParentForm.Height = htarget + topmargin;
                 ParentForm.Width = (int)Math.Ceiling(htarget * 1.6) + sidemargin;
-            }
-            for (int i = 0; i < 4;i++)
-            {
-                graphicsLUT[i] = new int[256];
             }
         }
 
@@ -326,7 +334,6 @@ namespace FoenixIDE.Display
                 e.Graphics.DrawString("CodeRAM Not Initialized", this.Font, TextBrush, 0, 0);
                 return;
             }
-            // Don't forget to dispose the framebuffer.
             Graphics g = Graphics.FromImage(frameBuffer);
 
             // Determine if we display a border
@@ -335,8 +342,16 @@ namespace FoenixIDE.Display
 
             // Default background color to border color
             int borderColor = (int)((UInt32)(IO.ReadLong(5) | 0xFF000000));
-            g.Clear(Color.FromArgb(borderColor));
-
+            if (tileEditorMode)
+            {
+                g.Clear(Color.LightGray);
+                DrawTextWithBackground("Tile Editing Mode",  g, Color.Black, 240, 10);
+                DrawTextWithBackground("Tile Editing Mode", g, Color.Black, 240, 455);
+            }
+            else
+            {
+                g.Clear(Color.FromArgb(borderColor));
+            }
             
 
             byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
@@ -356,7 +371,7 @@ namespace FoenixIDE.Display
                 DrawBitmap(frameBuffer, displayBorder);
             }
             // Load Graphical LUTs
-            LoadLUT();
+            graphicsLUT = LoadLUT(IO);
 
             for (int layer = 4; layer > 0; --layer)
             {
@@ -398,21 +413,24 @@ namespace FoenixIDE.Display
             e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
-        private void LoadLUT()
+        public static int[][] LoadLUT(MemoryRAM IO)
         {
             // Read the color lookup tables
             int lutAddress = GRP_LUT_BASE_ADDR - IO_BASE_ADDR;
+            int[][] result = new int[8][];
             for (int i = 0; i < 4; i++)
             {
+                result[i] = new int[256];
                 for (int c = 0; c < 256; c++)
                 {
                     byte blue = IO.ReadByte(lutAddress++);
                     byte green = IO.ReadByte(lutAddress++);
                     byte red = IO.ReadByte(lutAddress++);
                     lutAddress++;
-                    graphicsLUT[i][c] = (255 << 24) + (red << 16) + (green << 8) + blue;
+                    result[i][c] = (255 << 24) + (red << 16) + (green << 8) + blue;
                 }
             }
+            return result;
         }
         /*
          * Display the text with a colored background. This should make the text more visible against bitmaps.
@@ -640,7 +658,7 @@ namespace FoenixIDE.Display
                             if (pixelIndex != 0)
                             {
                                 int value = (int)graphicsLUT[lutIndex][pixelIndex];
-                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
+                                System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
                             }
                         }
                     }
