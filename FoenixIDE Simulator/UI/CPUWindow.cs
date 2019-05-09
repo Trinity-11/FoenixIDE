@@ -16,6 +16,7 @@ namespace FoenixIDE.UI
     public partial class CPUWindow : Form
     {
         private int StepCounter = 0;
+        private bool isStepOver = false;
 
         Processor.Breakpoints breakpoints = new Processor.Breakpoints();
 
@@ -58,13 +59,13 @@ namespace FoenixIDE.UI
             public bool isBreakpoint = false;
             public readonly int PC;
             readonly string Status;
-            readonly string Command;
-            readonly string OpCodes;
+            public readonly string Command;
+            public readonly string OpCodes;
             private readonly String pcString;
+            public int commandLength = 1;
 
             override public string ToString()
             {
-
                 return string.Format("{0}  {1} {2}  {3}", pcString, Command, OpCodes, Status);
             }
             public DebugLine(int pc, byte[] command, string opcodes, string status)
@@ -73,6 +74,7 @@ namespace FoenixIDE.UI
                 pcString = ">" + pc.ToString("X6");
 
                 StringBuilder c = new StringBuilder();
+                commandLength = command.Length;
                 for (int i = 0; i < command.Length; i++)
                 {
                     c.Append(command[i].ToString("X2")).Append(" ");
@@ -97,6 +99,7 @@ namespace FoenixIDE.UI
             Tooltip.SetToolTip(PlusButton, "Add Breakpoint");
             Tooltip.SetToolTip(MinusButton, "Remove Breakpoint");
             Tooltip.SetToolTip(InspectButton, "Browse Memory");
+            Tooltip.SetToolTip(StepOverButton, "Step Over");
         }
 
         private void DebugPanel_Paint(object sender, PaintEventArgs e)
@@ -137,23 +140,34 @@ namespace FoenixIDE.UI
         {
             if (kernel.CPU.DebugPause)
             {
-                
-                if (e.X > 12 && e.X < 120 && e.Y / ROW_HEIGHT < queue.Count)
+                if (e.X > 12 && e.X < 12 + 7 * 6 && e.Y / ROW_HEIGHT < queue.Count)
                 {
                     int top = e.Y / ROW_HEIGHT * ROW_HEIGHT;
                     if ( (e.Y / ROW_HEIGHT != position.Y / ROW_HEIGHT || position.Y == -1) )
                     {
                         position.X = e.X;
                         position.Y = e.Y;
+
                         PlusButton.Top = DebugPanel.Top + top - 2;
                         MinusButton.Top = DebugPanel.Top + top - 2;
                         InspectButton.Top = DebugPanel.Top + top - 2;
-                        PlusButton.Left = 12 + 7 * 6 + 4;
+                        StepOverButton.Top = DebugPanel.Top + top - 2;
+
+                        PlusButton.Left = 13;
                         MinusButton.Left = PlusButton.Left + PlusButton.Width;
                         InspectButton.Left = MinusButton.Left + MinusButton.Width;
+                        StepOverButton.Left = InspectButton.Left + InspectButton.Width;
+
                         PlusButton.Visible = true;
                         MinusButton.Visible = true;
                         InspectButton.Visible = true;
+                        int row = position.Y / ROW_HEIGHT;
+                        // Only show the Step Over button for Jump and Branch commands
+                        if (queue.Count > row)
+                        {
+                            DebugLine line = queue.ToArray()[row];
+                            StepOverButton.Visible = line.OpCodes.StartsWith("B") || line.OpCodes.StartsWith("J");
+                        }
                     }
                 }
                 else
@@ -163,6 +177,7 @@ namespace FoenixIDE.UI
                     PlusButton.Visible = false;
                     MinusButton.Visible = false;
                     InspectButton.Visible = false;
+                    StepOverButton.Visible = false;
                 }
                 DebugPanel.Refresh();
             }
@@ -175,6 +190,7 @@ namespace FoenixIDE.UI
             PlusButton.Visible = false;
             MinusButton.Visible = false;
             InspectButton.Visible = false;
+            StepOverButton.Visible = false;
             DebugPanel.Refresh();
         }
 
@@ -244,6 +260,26 @@ namespace FoenixIDE.UI
                 DebugLine line = queue.ToArray()[row];
                 MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
                 MemoryWindow.Instance.BringToFront();
+            }
+        }
+        private void StepOverButton_Click(object sender, EventArgs e)
+        {
+            if (position.X > 0 && position.Y > 0)
+            {
+                int row = position.Y / ROW_HEIGHT;
+                DebugLine line = queue.ToArray()[row];
+                // Set a breakpoint to the next address
+                int nextAddress = line.PC + line.commandLength;
+                int newValue = breakpoints.Add(nextAddress.ToString("X"));
+
+                if (newValue != -1)
+                {
+                    // Run the CPU until the breakpoint is reached
+                    RunButton_Click(null, null);
+
+                    // Ensure the breakpoint is removed
+                    isStepOver = true;
+                }
             }
         }
 
@@ -328,9 +364,19 @@ namespace FoenixIDE.UI
         private delegate void breakpointSetter(int pc);
         private void BreakpointReached(int pc)
         {
-            BPCombo.Text = breakpoints.GetHex(pc);
+            if (isStepOver)
+            {
+                isStepOver = false;
+                breakpoints.Remove(pc.ToString("X"));
+            }
+            else
+            {
+                BPCombo.Text = breakpoints.GetHex(pc);
+            }
+            
             RefreshStatus();
             RunButton.Enabled = true;
+            
         }
         private delegate void nullParamMethod();
         public void ExecuteStep()
@@ -360,6 +406,7 @@ namespace FoenixIDE.UI
                 kernel.CPU.DebugPause = true;
                 line.isBreakpoint = true;
                 UpdateTraceTimer.Enabled = false;
+
                 Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
             }
 

@@ -1,3 +1,8 @@
+Release 0.2.2.1
+---------------
+Added the "Step Over" button.
+Attempted to move the context buttons out of the way.
+
 Release 0.2.2.0
 ---------------
 Added the Tile Editor.  Load tiles using the Bitmap Loader or by running code in the emulator.

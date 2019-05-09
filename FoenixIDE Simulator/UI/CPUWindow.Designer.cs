@@ -54,6 +54,7 @@
             this.PlusButton = new System.Windows.Forms.Button();
             this.MinusButton = new System.Windows.Forms.Button();
             this.InspectButton = new System.Windows.Forms.Button();
+            this.StepOverButton = new System.Windows.Forms.Button();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
@@ -74,7 +75,7 @@
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
             this.HeaderPanel.Name = "HeaderPanel";
-            this.HeaderPanel.Size = new System.Drawing.Size(616, 24);
+            this.HeaderPanel.Size = new System.Drawing.Size(613, 24);
             this.HeaderPanel.TabIndex = 2;
             // 
             // stepsInput
@@ -91,7 +92,7 @@
             // BPLabel
             // 
             this.BPLabel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.BPLabel.Location = new System.Drawing.Point(351, 0);
+            this.BPLabel.Location = new System.Drawing.Point(348, 0);
             this.BPLabel.Name = "BPLabel";
             this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.BPLabel.Size = new System.Drawing.Size(96, 24);
@@ -103,7 +104,7 @@
             // 
             this.BPCombo.Dock = System.Windows.Forms.DockStyle.Right;
             this.BPCombo.FormattingEnabled = true;
-            this.BPCombo.Location = new System.Drawing.Point(447, 0);
+            this.BPCombo.Location = new System.Drawing.Point(444, 0);
             this.BPCombo.Name = "BPCombo";
             this.BPCombo.Size = new System.Drawing.Size(121, 21);
             this.BPCombo.TabIndex = 6;
@@ -111,7 +112,7 @@
             // AddBPButton
             // 
             this.AddBPButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.AddBPButton.Location = new System.Drawing.Point(568, 0);
+            this.AddBPButton.Location = new System.Drawing.Point(565, 0);
             this.AddBPButton.Name = "AddBPButton";
             this.AddBPButton.Size = new System.Drawing.Size(24, 24);
             this.AddBPButton.TabIndex = 7;
@@ -122,7 +123,7 @@
             // DeleteBPButton
             // 
             this.DeleteBPButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.DeleteBPButton.Location = new System.Drawing.Point(592, 0);
+            this.DeleteBPButton.Location = new System.Drawing.Point(589, 0);
             this.DeleteBPButton.Name = "DeleteBPButton";
             this.DeleteBPButton.Size = new System.Drawing.Size(24, 24);
             this.DeleteBPButton.TabIndex = 8;
@@ -209,9 +210,9 @@
             // 
             this.lastLine.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lastLine.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lastLine.Location = new System.Drawing.Point(0, 517);
+            this.lastLine.Location = new System.Drawing.Point(0, 505);
             this.lastLine.Name = "lastLine";
-            this.lastLine.Size = new System.Drawing.Size(616, 23);
+            this.lastLine.Size = new System.Drawing.Size(613, 23);
             this.lastLine.TabIndex = 4;
             this.lastLine.Text = "Click [Step] to execute an instruction";
             this.lastLine.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
@@ -220,10 +221,10 @@
             // 
             this.stackText.Dock = System.Windows.Forms.DockStyle.Right;
             this.stackText.Font = new System.Drawing.Font("Consolas", 10F);
-            this.stackText.Location = new System.Drawing.Point(616, 0);
+            this.stackText.Location = new System.Drawing.Point(613, 0);
             this.stackText.Multiline = true;
             this.stackText.Name = "stackText";
-            this.stackText.Size = new System.Drawing.Size(150, 540);
+            this.stackText.Size = new System.Drawing.Size(150, 528);
             this.stackText.TabIndex = 3;
             // 
             // HeaderTextbox
@@ -233,7 +234,7 @@
             this.HeaderTextbox.Location = new System.Drawing.Point(0, 101);
             this.HeaderTextbox.Multiline = true;
             this.HeaderTextbox.Name = "HeaderTextbox";
-            this.HeaderTextbox.Size = new System.Drawing.Size(616, 20);
+            this.HeaderTextbox.Size = new System.Drawing.Size(613, 20);
             this.HeaderTextbox.TabIndex = 1;
             this.HeaderTextbox.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 
@@ -250,7 +251,7 @@
             this.SecondPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.SecondPanel.Location = new System.Drawing.Point(0, 24);
             this.SecondPanel.Name = "SecondPanel";
-            this.SecondPanel.Size = new System.Drawing.Size(616, 24);
+            this.SecondPanel.Size = new System.Drawing.Size(613, 24);
             this.SecondPanel.TabIndex = 5;
             // 
             // ClearTraceButton
@@ -272,7 +273,7 @@
             this.DebugPanel.Location = new System.Drawing.Point(0, 124);
             this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
             this.DebugPanel.Name = "DebugPanel";
-            this.DebugPanel.Size = new System.Drawing.Size(613, 392);
+            this.DebugPanel.Size = new System.Drawing.Size(613, 376);
             this.DebugPanel.TabIndex = 6;
             this.DebugPanel.TabStop = false;
             this.DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DebugPanel_Paint);
@@ -282,7 +283,7 @@
             // 
             this.PlusButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.PlusButton.FlatAppearance.BorderSize = 0;
-            this.PlusButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.PlusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.PlusButton.Location = new System.Drawing.Point(99, 200);
             this.PlusButton.Margin = new System.Windows.Forms.Padding(2);
             this.PlusButton.Name = "PlusButton";
@@ -298,7 +299,7 @@
             // 
             this.MinusButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.MinusButton.FlatAppearance.BorderSize = 0;
-            this.MinusButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.MinusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.MinusButton.Location = new System.Drawing.Point(118, 200);
             this.MinusButton.Margin = new System.Windows.Forms.Padding(2);
             this.MinusButton.Name = "MinusButton";
@@ -314,9 +315,9 @@
             // 
             this.InspectButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.InspectButton.FlatAppearance.BorderSize = 0;
-            this.InspectButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.InspectButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.InspectButton.Location = new System.Drawing.Point(137, 200);
-            this.InspectButton.Margin = new System.Windows.Forms.Padding(2);
+            this.InspectButton.Margin = new System.Windows.Forms.Padding(1);
             this.InspectButton.Name = "InspectButton";
             this.InspectButton.Size = new System.Drawing.Size(38, 18);
             this.InspectButton.TabIndex = 9;
@@ -326,6 +327,23 @@
             this.InspectButton.Visible = false;
             this.InspectButton.Click += new System.EventHandler(this.InspectButton_Click);
             // 
+            // StepOverButton
+            // 
+            this.StepOverButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.StepOverButton.FlatAppearance.BorderSize = 0;
+            this.StepOverButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.StepOverButton.Font = new System.Drawing.Font("Arial Narrow", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.StepOverButton.Location = new System.Drawing.Point(176, 200);
+            this.StepOverButton.Margin = new System.Windows.Forms.Padding(1);
+            this.StepOverButton.Name = "StepOverButton";
+            this.StepOverButton.Size = new System.Drawing.Size(21, 18);
+            this.StepOverButton.TabIndex = 10;
+            this.StepOverButton.TabStop = false;
+            this.StepOverButton.Text = "►";
+            this.StepOverButton.UseVisualStyleBackColor = false;
+            this.StepOverButton.Visible = false;
+            this.StepOverButton.Click += new System.EventHandler(this.StepOverButton_Click);
+            // 
             // registerDisplay1
             // 
             this.registerDisplay1.CPU = null;
@@ -333,7 +351,7 @@
             this.registerDisplay1.Location = new System.Drawing.Point(0, 48);
             this.registerDisplay1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.registerDisplay1.Name = "registerDisplay1";
-            this.registerDisplay1.Size = new System.Drawing.Size(616, 53);
+            this.registerDisplay1.Size = new System.Drawing.Size(613, 53);
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 
@@ -341,7 +359,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(766, 540);
+            this.ClientSize = new System.Drawing.Size(763, 528);
+            this.Controls.Add(this.StepOverButton);
             this.Controls.Add(this.InspectButton);
             this.Controls.Add(this.MinusButton);
             this.Controls.Add(this.PlusButton);
@@ -356,7 +375,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(1280, 0);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(787, 592);
+            this.MaximumSize = new System.Drawing.Size(783, 581);
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "CPU Window";
@@ -399,5 +418,6 @@
         private System.Windows.Forms.Button PlusButton;
         private System.Windows.Forms.Button MinusButton;
         private System.Windows.Forms.Button InspectButton;
+        private System.Windows.Forms.Button StepOverButton;
     }
 }
