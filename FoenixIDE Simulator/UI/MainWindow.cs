@@ -20,10 +20,11 @@ namespace FoenixIDE.UI
         public UI.CPUWindow debugWindow;
         public MemoryWindow memoryWindow;
         public UploaderWindow uploaderWindow;
-        private TileEditor editor;
+        private TileEditor tileEditor;
 
         private byte previousGraphicMode;
         private delegate void TileClickEvent(Point tile);
+        public delegate void TileLoadedEvent(int layer);
         private TileClickEvent TileClicked;
 
         public MainWindow()
@@ -113,6 +114,10 @@ namespace FoenixIDE.UI
             }
         }
 
+        private void NewTileLoaded(int layer)
+        {
+            tileEditor.SelectLayer(layer);
+        }
         /*
          * Loading image into memory requires the user to specify what kind of image (tile, bitmap, sprite).
          * What address location in video RAM.
@@ -124,6 +129,7 @@ namespace FoenixIDE.UI
                 StartPosition = FormStartPosition.CenterParent,
                 Memory = kernel.CPU.Memory
             };
+            loader.OnTileLoaded += NewTileLoaded;
             loader.ShowDialog(this);
         }
 
@@ -261,9 +267,9 @@ namespace FoenixIDE.UI
                 kernel.Reset();
                 ShowDebugWindow();
                 ShowMemoryWindow();
-                if (editor != null && editor.Visible)
+                if (tileEditor != null && tileEditor.Visible)
                 {
-                    editor.SetMemory(kernel.Memory);
+                    tileEditor.SetMemory(kernel.Memory);
                 }
             }
         }
@@ -311,25 +317,34 @@ namespace FoenixIDE.UI
             gpu.TileEditorMode = false;
             // Restore the previous graphics mode
             kernel.Memory.IO.WriteByte(0, previousGraphicMode);
+            tileEditor.Dispose();
+            tileEditor = null;
         }
         
         private void TileEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            editor = new TileEditor();
-            editor.SetMemory(kernel.Memory);
-            gpu.TileEditorMode = true;
-            gpu.ColumnsVisible = 72;
-            gpu.LinesVisible = 52;
-            // Set Vicky into Tile mode
-            previousGraphicMode = kernel.Memory.IO.ReadByte(0);
-            kernel.Memory.IO.WriteByte(0, 0x10);
-            // Enable borders
-            kernel.Memory.IO.WriteByte(4, 1);
-            editor.Show();
-            editor.FormClosed += new FormClosedEventHandler(EditorWindowClosed);
+            if (tileEditor == null)
+            {
+                tileEditor = new TileEditor();
+                tileEditor.SetMemory(kernel.Memory);
+                gpu.TileEditorMode = true;
+                gpu.ColumnsVisible = 72;
+                gpu.LinesVisible = 52;
+                // Set Vicky into Tile mode
+                previousGraphicMode = kernel.Memory.IO.ReadByte(0);
+                kernel.Memory.IO.WriteByte(0, 0x10);
+                // Enable borders
+                kernel.Memory.IO.WriteByte(4, 1);
+                tileEditor.Show();
+                tileEditor.FormClosed += new FormClosedEventHandler(EditorWindowClosed);
 
-            // coordinate between the tile editor window and the GPU canvas
-            this.TileClicked += new TileClickEvent(editor.TileClicked_Click);
+                // coordinate between the tile editor window and the GPU canvas
+                this.TileClicked += new TileClickEvent(tileEditor.TileClicked_Click);
+            }
+            else
+            {
+                tileEditor.BringToFront();
+            }
     }
 
         private void Gpu_MouseMove(object sender, MouseEventArgs e)

@@ -24,7 +24,6 @@ namespace FoenixIDE.UI
         private FoenixSystem kernel = null;
 
         Queue<DebugLine> queue = null;
-        private Font debugFont = new Font("Consolas", 9f);
         private Brush debugBrush = new SolidBrush(Color.Black);
         private Brush yellowBrush = new SolidBrush(Color.Yellow);
         private Brush lightBlueBrush = new SolidBrush(Color.LightBlue);
@@ -93,7 +92,7 @@ namespace FoenixIDE.UI
         private void CPUWindow_Load(object sender, EventArgs e)
         {
             queue = new Queue<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
-            HeaderTextbox.Text = " PC      INSTRUCTION                " + kernel.Monitor.GetRegisterHeader();
+            HeaderTextbox.Text = " PC      OPCODES      INSTRUCTION     " + kernel.Monitor.GetRegisterHeader();
             ClearTrace();
             RefreshStatus();
             Tooltip.SetToolTip(PlusButton, "Add Breakpoint");
@@ -124,7 +123,7 @@ namespace FoenixIDE.UI
                         {
                             e.Graphics.FillRectangle(yellowBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                         }
-                        e.Graphics.DrawString(line.ToString(), debugFont, debugBrush, 4, i * ROW_HEIGHT);
+                        e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, i * ROW_HEIGHT);
                     }
                     i++;
                 }
@@ -132,7 +131,7 @@ namespace FoenixIDE.UI
             else
             {
                 e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
-                e.Graphics.DrawString("Running code real fast ... no time to write!", debugFont, debugBrush, 4, DebugPanel.Height / 2);
+                e.Graphics.DrawString("Running code real fast ... no time to write!", HeaderTextbox.Font, debugBrush, 8, DebugPanel.Height / 2);
             }
         }
 

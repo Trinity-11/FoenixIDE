@@ -1,3 +1,8 @@
+Release 0.2.2.2
+---------------
+Cleaned up the Tile Editor to be updated when images are loaded.
+Added more keyboard handling code.
+
 Release 0.2.2.1
 ---------------
 Added the "Step Over" button.

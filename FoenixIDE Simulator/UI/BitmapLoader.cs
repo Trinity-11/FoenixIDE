@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static FoenixIDE.UI.MainWindow;
 
 namespace FoenixIDE.UI
 {
@@ -25,6 +26,7 @@ namespace FoenixIDE.UI
         int strideY = 0;
         Bitmap bitmap = null;
         byte controlByte = 0;
+        public TileLoadedEvent OnTileLoaded;
 
         public BitmapLoader()
         {
@@ -242,6 +244,11 @@ namespace FoenixIDE.UI
                         Memory.WriteByte(writeVideoAddress + (bitmap.Height - line + 1) * bitmap.Width + i, data[startOffset + line * bitmap.Width + i]);
                     }
                 }
+            }
+            if (BitmapTypesCombo.SelectedIndex > 0 && BitmapTypesCombo.SelectedIndex < 5)
+            {
+                int layer = BitmapTypesCombo.SelectedIndex - 1;
+                OnTileLoaded?.Invoke(layer);
             }
             MessageBox.Show("Transfer successful!", "Bitmap Storage", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close();
