@@ -77,7 +77,7 @@ namespace FoenixIDE.UI
                 return;
             //MemoryText.Clear();
             // Display 16 bytes per line
-            for (int i = StartAddress; i <= EndAddress; i += 0x10)
+            for (int i = StartAddress; i < EndAddress; i += 0x10)
             {
                 s.Append(">");
                 if (Memory is MemoryRAM)
@@ -93,15 +93,25 @@ namespace FoenixIDE.UI
                 StringBuilder text = new StringBuilder();
                 for (int j = 0; j < 16; j++)
                 {
-                    int c = Memory.ReadByte(i + j);
-                    s.Append(c.ToString("X2"));
+                    if (i + j < Memory.Length)
+                    {
+                        int c = Memory.ReadByte(i + j);
+                        s.Append(c.ToString("X2"));
+
+                        // Character data
+                        if (c < 32 || c > 127)
+                            text.Append(".");
+                        else
+                            text.Append((char)c);
+                    }
+                    else
+                    {
+                        s.Append("--");
+                        text.Append("-");
+                    }
                     s.Append(" ");
 
-                    // Character data
-                    if (c < 32 || c > 127)
-                        text.Append(".");
-                    else
-                        text.Append((char)c);
+                    
 
                     // Group 8 bytes together
                     if (j == 7 || j == 15)
@@ -150,7 +160,7 @@ namespace FoenixIDE.UI
             if (Memory is MemoryRAM)
             {
                 int newAddress = requestedAddress - Memory.StartAddress;
-                if (newAddress >= 0 && (newAddress + PageSize) < Memory.Length)
+                if (newAddress >= 0 && (newAddress) < Memory.Length)
                 {
                     StartAddress = newAddress;
                     EndAddress = newAddress + PageSize;
@@ -173,7 +183,7 @@ namespace FoenixIDE.UI
             HighlightPanel.Visible = false;
             PositionLabel.Text = "";
             RefreshMemoryView();
-            if (StartAddressText.Text.StartsWith("AF00"))
+            if (!(Memory is MemoryRAM) && StartAddressText.Text.StartsWith("AF00"))
             {
                 UpdateMCRButtons();
             }
@@ -316,7 +326,7 @@ namespace FoenixIDE.UI
         private void MemoryText_MouseMove(object sender, MouseEventArgs e)
         {
             GetAddressPosition(e.Location);
-            if (mem.X != -1)
+            if (mem.X != -1 && mem.Y != -1)
             {
                 String val = mem.Y.ToString("X2");
 
@@ -355,17 +365,30 @@ namespace FoenixIDE.UI
                 addr = Convert.ToInt32(StartAddressText.Text, 16) + line * 16 + offset;
                 if (Memory is MemoryRAM)
                 {
-                    value = Memory.ReadByte(addr - Memory.StartAddress);
+                    if (addr - Memory.StartAddress < Memory.Length)
+                    {
+                        value = Memory.ReadByte(addr - Memory.StartAddress);
+                    }
+                    else
+                    {
+                        value = -1;
+                    }
                 }
                 else
                 {
                     value = Memory.ReadByte(addr);
                 }
-                
-                HighlightPanel.Left = col<10 ? col * colWidth + 47 : col * colWidth + 34;
-                HighlightPanel.Top = MemoryText.Top + line * 15 + 3;
-                HighlightPanel.Text = value.ToString("X2");
-                HighlightPanel.Visible = true;
+                if (value > -1)
+                {
+                    HighlightPanel.Left = col < 10 ? col * colWidth + 47 : col * colWidth + 34;
+                    HighlightPanel.Top = MemoryText.Top + line * 15 + 3;
+                    HighlightPanel.Text = value.ToString("X2");
+                    HighlightPanel.Visible = true;
+                }
+                else
+                {
+                    HighlightPanel.Visible = false;
+                }
             }
             else
             {

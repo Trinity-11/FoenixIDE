@@ -241,6 +241,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\Bm437_PhoenixEGA_8x8.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\C64_TrueType_v1.2-STYLE.zip" />
     <None Include="Resources\FOENIX-CHARACTER-ASCII.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

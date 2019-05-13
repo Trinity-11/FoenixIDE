@@ -1,3 +1,8 @@
+Release 0.2.2.3
+---------------
+Made the memory window aware of the loaded length.
+Added a new default fontset "Bm437_PhoenixEGA_8x8".
+
 Release 0.2.2.2
 ---------------
 Cleaned up the Tile Editor to be updated when images are loaded.

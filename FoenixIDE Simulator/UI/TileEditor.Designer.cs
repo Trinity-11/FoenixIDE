@@ -264,7 +264,7 @@
             this.Margin = new System.Windows.Forms.Padding(6);
             this.MaximizeBox = false;
             this.Name = "TileEditor";
-            this.Text = "TileEditor";
+            this.Text = "Tile Editor";
             this.Load += new System.EventHandler(this.TileEditor_Load);
             this.HeaderPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TilesetViewer)).EndInit();
