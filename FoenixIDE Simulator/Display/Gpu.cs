@@ -26,12 +26,14 @@ namespace FoenixIDE.Display
         const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0140;
         const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
         const int GRP_LUT_BASE_ADDR = 0xAF_2000;
+        const int GAMMA_BASE_ADDR = 0xAF_4000;
         const int charWidth = 8;
         const int charHeight = 8;
         const int tileSize = 16;
         const int spriteSize = 32;
 
-        int[][] graphicsLUT = null;
+        int[,] graphicsLUT = null;
+        byte[,] gammaCorrection = null;
 
         private int length = 128 * 64 * 2; //Text mode uses 16K, 1 page for text, the other for colors.
 
@@ -336,12 +338,38 @@ namespace FoenixIDE.Display
             }
             Graphics g = Graphics.FromImage(frameBuffer);
 
+            // Read the Master Control Register
+            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
+
             // Determine if we display a border
             int border_register = IO.ReadByte(4);
             bool displayBorder = (border_register & 1) == 1;
 
+            // Load Graphical LUTs
+            graphicsLUT = LoadLUT(IO);
+
+            // Apply gamma correct
+            if ((MCRegister & 0x40) == 0x40)
+            {
+                gammaCorrection = LoadGammaCorrection(IO);
+            }
+            else
+            {
+                gammaCorrection = null;
+            }
+
             // Default background color to border color
-            int borderColor = (int)((UInt32)(IO.ReadLong(5) | 0xFF000000));
+            byte borderRed = IO.ReadByte(5);
+            byte borderGreen = IO.ReadByte(6);
+            byte borderBlue = IO.ReadByte(7);
+
+            if (gammaCorrection != null)
+            {
+                borderRed = gammaCorrection[borderRed, 2];
+                borderGreen = gammaCorrection[borderGreen, 1];
+                borderBlue = gammaCorrection[borderBlue, 0];
+            }
+            int borderColor = (int)(0xFF000000 + (borderBlue << 16) + (borderGreen << 8) + borderRed);
             if (tileEditorMode)
             {
                 g.Clear(Color.LightGray);
@@ -354,7 +382,7 @@ namespace FoenixIDE.Display
             }
             
 
-            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
+            
             // Graphics Mode - I don't know what this is for... we already have bit for tiles, sprints and bitmaps.
             if ((MCRegister & 0x4) == 0x4) { }
 
@@ -370,8 +398,7 @@ namespace FoenixIDE.Display
             {
                 DrawBitmap(frameBuffer, displayBorder);
             }
-            // Load Graphical LUTs
-            graphicsLUT = LoadLUT(IO);
+            
 
             for (int layer = 4; layer > 0; --layer)
             {
@@ -413,21 +440,38 @@ namespace FoenixIDE.Display
             e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
-        public static int[][] LoadLUT(MemoryRAM IO)
+        public static byte[,] LoadGammaCorrection(MemoryRAM IO)
+        {
+            // Read the color lookup tables
+            int gamAddress = GAMMA_BASE_ADDR - IO_BASE_ADDR;
+            byte[,] result = new byte[256,3];
+            for (int c = 0; c < 256; c++)
+            {
+                byte blue = IO.ReadByte(gamAddress);
+                byte green = IO.ReadByte(0x100 + gamAddress);
+                byte red = IO.ReadByte(0x200 + gamAddress);
+                gamAddress++;
+                result[c, 0] = blue;
+                result[c, 1] = green;
+                result[c, 2] = red;
+            }
+            return result;
+        }
+
+        public static int[,] LoadLUT(MemoryRAM IO)
         {
             // Read the color lookup tables
             int lutAddress = GRP_LUT_BASE_ADDR - IO_BASE_ADDR;
-            int[][] result = new int[8][];
+            int[,] result = new int[8,256];
             for (int i = 0; i < 4; i++)
             {
-                result[i] = new int[256];
                 for (int c = 0; c < 256; c++)
                 {
                     byte blue = IO.ReadByte(lutAddress++);
                     byte green = IO.ReadByte(lutAddress++);
                     byte red = IO.ReadByte(lutAddress++);
                     lutAddress++;
-                    result[i][c] = (255 << 24) + (red << 16) + (green << 8) + blue;
+                    result[i,c] = (255 << 24) + (red << 16) + (green << 8) + blue;
                 }
             }
             return result;
@@ -462,7 +506,7 @@ namespace FoenixIDE.Display
             int x;
             int y;
 
-            Graphics g = Graphics.FromImage(bitmap);
+            Graphics gr = Graphics.FromImage(bitmap);
             
             // Read the color lookup tables
             int fgLUT = MemoryLocations.MemoryMap.FG_CHAR_LUT_PTR - IO.StartAddress;
@@ -470,9 +514,9 @@ namespace FoenixIDE.Display
 
             int col = 0, line = 0;
 
-            int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
-            int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
-            int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
+     int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
+                      int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
+         int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
             int lineOffset = (60 - LinesVisible) / 2 * charHeight;
             int fontBaseAddress = MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START - IO.StartAddress;
             Rectangle rect = new Rectangle(0, 0, 640, 480);
@@ -494,9 +538,30 @@ namespace FoenixIDE.Display
                     byte color = IO.ReadByte(colorAddr++);
                     byte fgColor = (byte)((color & 0xF0) >> 4);
                     byte bgColor = (byte)(color & 0x0F);
-                    int fgValue = (int)((UInt32)IO.ReadLong(fgLUT + fgColor * 4) | 0xFF000000);
-                    int bgValue = (int)((UInt32)IO.ReadLong(bgLUT + bgColor * 4) | 0xFF000000);
-                    
+
+                    // In order to reduce the load of applying Gamma correction, load single bytes
+                    byte fgValueRed = IO.ReadByte(fgLUT + fgColor * 4);
+                    byte fgValueGreen = IO.ReadByte(fgLUT + fgColor * 4 + 1);
+                    byte fgValueBlue = IO.ReadByte(fgLUT + fgColor * 4 + 2);
+
+                    byte bgValueRed = IO.ReadByte(bgLUT + bgColor * 4);
+                    byte bgValueGreen = IO.ReadByte(bgLUT + bgColor * 4 + 1);
+                    byte bgValueBlue = IO.ReadByte(bgLUT + bgColor * 4 + 2);
+
+                    if (gammaCorrection != null)
+                    {
+                        fgValueBlue = gammaCorrection[fgValueBlue, 0];
+                        fgValueGreen = gammaCorrection[fgValueGreen, 1];
+                        fgValueRed = gammaCorrection[fgValueRed, 2];
+
+                        bgValueBlue = gammaCorrection[bgValueBlue, 0];
+                        bgValueGreen = gammaCorrection[bgValueGreen, 1];
+                        bgValueRed = gammaCorrection[bgValueRed, 2];
+                    }
+                    int fgValue = (int)((fgValueBlue << 16) + (fgValueGreen << 8) + fgValueRed + 0xFF000000);
+                    int bgValue = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
+
+
                     // Each character is defined by 8 bytes
                     for (int i = 0; i < 8; i++)
                     {
@@ -609,7 +674,7 @@ namespace FoenixIDE.Display
             {
                 for (int col = 0; col < width; col++)
                 {
-                    int value = (int)graphicsLUT[lutIndex][VRAM.ReadByte(bitmapAddress++)];
+                    int value = (int)graphicsLUT[lutIndex,VRAM.ReadByte(bitmapAddress++)];
                     System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
                 }
             }
@@ -657,7 +722,7 @@ namespace FoenixIDE.Display
                             int pixelIndex = VRAM.ReadByte(tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + col + line * strideX);
                             if (pixelIndex != 0)
                             {
-                                int value = (int)graphicsLUT[lutIndex][pixelIndex];
+                                int value = (int)graphicsLUT[lutIndex,pixelIndex];
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
                             }
                         }
@@ -701,7 +766,7 @@ namespace FoenixIDE.Display
                             int pixelIndex = VRAM.ReadByte(spriteAddress++);
                             if (pixelIndex != 0)
                             {
-                                int value = (int)graphicsLUT[lutIndex][pixelIndex];
+                                int value = (int)graphicsLUT[lutIndex,pixelIndex];
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
                             }
                         }

@@ -1,5 +1,9 @@
 Release 0.2.2.3
 ---------------
+Added Gamma Correction when MCR Gamma Bit is set.
+
+Release 0.2.2.3
+---------------
 Made the memory window aware of the loaded length.
 Added a new default fontset "Bm437_PhoenixEGA_8x8".
 

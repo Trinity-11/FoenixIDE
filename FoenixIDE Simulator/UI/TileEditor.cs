@@ -64,14 +64,14 @@ namespace FoenixIDE.Simulator.UI
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
-            int[][] graphicsLUT = Display.Gpu.LoadLUT(memory.IO);
-            int[] LUT = graphicsLUT[Int32.Parse(LUTDomain.Text)];
+            int[,] graphicsLUT = Display.Gpu.LoadLUT(memory.IO);
+            int lut = Int32.Parse(LUTDomain.Text);
             for (int y = 0; y < 256; y++)
             {
                 for (int x = 0; x < 256; x++)
                 {
                     byte pixel = memory.VIDEO.ReadByte(LayersetAddress + y * 256 + x);
-                    int color = LUT[pixel];
+                    int color = graphicsLUT[lut, pixel];
                     int destX = x / 16 * TILE_WIDTH + x % 16 + 1;
                     int destY = y / 16 * TILE_WIDTH + y % 16 + 1;
                     System.Runtime.InteropServices.Marshal.WriteInt32(p, (destY * stride + destX * 4) , color);

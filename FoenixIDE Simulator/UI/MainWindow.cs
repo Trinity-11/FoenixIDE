@@ -240,7 +240,7 @@ namespace FoenixIDE.UI
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             ModeText.Text = "Shutting down CPU thread";
-
+            kernel.CPU.DebugPause = true;
             if (kernel.CPU.CPUThread != null)
             {
                 kernel.CPU.CPUThread.Abort();
