@@ -382,6 +382,13 @@ namespace FoenixIDE.UI
                 TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
             }
         }
+
+        private void toggleGammaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int gamSetting = kernel.Memory.IO.ReadByte(0);
+            gamSetting ^= 0x40;
+            kernel.Memory.IO.WriteByte(0,(byte)gamSetting);
+        }
     }
 }
 
