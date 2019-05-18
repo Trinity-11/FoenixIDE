@@ -68,6 +68,7 @@ namespace FoenixIDE.UI
                 HighlightPanel.ReadOnly = true;
                 HighlightPanel.ReadOnly = false;
             }
+
         }
 
         public void RefreshMemoryView()
@@ -422,6 +423,13 @@ namespace FoenixIDE.UI
         private void MemoryText_MouseLeave(object sender, EventArgs e)
         {
             HighlightPanel.Visible = false;
+        }
+
+        // Allows for manually refreshing memory snapshot
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            RefreshMemoryView();
+            UpdateMCRButtons();
         }
     }
 }
