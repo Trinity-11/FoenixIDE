@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.53.1515 listing file
 ; 64tass.exe --long-address -x --intel-hex -o kernel.hex --list kernel.lst kernel.asm
-; Sat May 18 13:42:33 2019
+; Sun May 19 15:19:52 2019
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -194,9 +194,9 @@
 ;******  Processing file: page_00_data.asm
 
 >180000	00 a0 af			                .long $AFA000       ; SCREENBEGIN, 3 bytes, Start of screen in video RAM. This is the upper-left corrner of the current video page being written to. This may not be what's being displayed by VICKY. Update this if you change VICKY's display page.
->180003	50 00				                .word 80            ; COLS_VISIBLE, 2 bytes, Columns visible per screen line. A virtual line can be longer than displayed, up to COLS_PER_LINE long. Default = 80
+>180003	48 00				                .word 72            ; COLS_VISIBLE, 2 bytes, Columns visible per screen line. A virtual line can be longer than displayed, up to COLS_PER_LINE long. Default = 80
 >180005	80 00				                .word 128           ; COLS_PER_LINE, 2 bytes, Columns in memory per screen line. A virtual line can be this long. Default=128
->180007	3c 00				                .word 60            ; LINES_VISIBLE, 2 bytes, The number of rows visible on the screen. Default=25
+>180007	34 00				                .word 52            ; LINES_VISIBLE, 2 bytes, The number of rows visible on the screen. Default=25
 >180009	40 00				                .word 64            ; LINES_MAX, 2 bytes, The number of rows in memory for the screen. Default=64
 >18000b	00 a0 af			                .long $AFA000       ; CURSORPOS, 3 bytes, The next character written to the screen will be written in this location.
 >18000e	00 00				                .word 0             ; CURSORX, 2 bytes, This is where the blinking cursor sits. Do not edit this direectly. Call LOCATE to update the location and handle moving the cursor correctly.
@@ -422,7 +422,7 @@
 =$af0015				VKY_TXT_CURSOR_X_REG_H  = $AF0015
 =$af0016				VKY_TXT_CURSOR_Y_REG_L  = $AF0016
 =$af0017				VKY_TXT_CURSOR_Y_REG_H  = $AF0017
-=$af0018				TXT_CLR_START_DISPLAY_PTR = $AF0018
+=$af0018				TXT_CLR_START_DISPLAY_PTR = $AF0018  ; (0 to 255) (this Add a X Offset to the Display Start Address)
 =$af001c				VKY_INFO_CHIP_NUM_L     = $AF001C
 =$af001d				VKY_INFO_CHIP_NUM_H     = $AF001D
 =$af001e				VKY_INFO_CHIP_VER_L     = $AF001E
@@ -1747,7 +1747,7 @@
 .1951a8	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
 .1951ac	29 01		and #$01	                AND #FNX1_INT00_KBD
 .1951ae	c9 01		cmp #$01	                CMP #FNX1_INT00_KBD
-.1951b0	d0 f6		bne $1951a8	                BNE SERVICE_NEXT_IRQ8
+.1951b0	d0 05		bne $1951b7	                BNE SERVICE_NEXT_IRQ11
 .1951b2	20 f4 51	jsr $1951f4	                JSR KEYBOARD_INTERRUPT
 .1951b5	80 3a		bra $1951f1	                BRA EXIT_IRQ_HANDLE
 .1951b7					SERVICE_NEXT_IRQ11

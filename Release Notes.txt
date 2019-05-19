@@ -1,3 +1,8 @@
+Release 0.2.2.6
+---------------
+Added the flashing cursor with the display of text.
+Handling bit $80 of the MCR to skip all display of graphics.
+
 Release 0.2.2.3
 ---------------
 Added Gamma Correction when MCR Gamma Bit is set.

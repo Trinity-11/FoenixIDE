@@ -33,6 +33,9 @@ namespace FoenixIDE.MemoryLocations
         public const int PAGE0_END_ = 0x000100; //  Byte 
 
         public const int GAVIN_BLOCK = 0x000100; // 256 Bytes Gavin reserved, overlaps debugging registers at $1F0
+
+        // Math co-processor
+        public const int MATH_START = 0x00_0100;
         public const int MULTIPLIER_0 = 0x000100; // 0 Byte Unsigned multiplier
         public const int M0_OPERAND_A = 0x000100; // 2 Bytes Operand A (ie: A x B)
         public const int M0_OPERAND_B = 0x000102; // 2 Bytes Operand B (ie: A x B)
@@ -51,6 +54,8 @@ namespace FoenixIDE.MemoryLocations
         public const int D1_OPERAND_B = 0x000112; // 2 Bytes Divider 1 Divisor ex B in A/B
         public const int D1_RESULT = 0x000114; // 2 Bytes Signed quotient result of A/B ex: 7/2 = 3 r 1
         public const int D1_REMAINDER = 0x000116; // 2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
+        public const int MATH_END = 0x00_012F;
+
         public const int VECTOR_STATE = 0x0001FF; // 1 Byte Interrupt Vector State. See VECTOR_STATE_ENUM
 
         public const int CPU_REGISTERS = 0x000200; //  Byte 
