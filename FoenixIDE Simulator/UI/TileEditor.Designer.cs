@@ -17,6 +17,10 @@
             {
                 components.Dispose();
             }
+            redPen.Dispose();
+            whiteBrush.Dispose();
+            whitePen.Dispose();
+            yellowPen.Dispose();
             base.Dispose(disposing);
         }
 
@@ -58,7 +62,7 @@
             this.HeaderPanel.Controls.Add(this.Layer1Button);
             this.HeaderPanel.Controls.Add(this.Layer0Button);
             this.HeaderPanel.Location = new System.Drawing.Point(1, -2);
-            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(435, 36);
             this.HeaderPanel.TabIndex = 0;
@@ -67,7 +71,7 @@
             // 
             this.Layer3Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Layer3Button.Location = new System.Drawing.Point(328, 4);
-            this.Layer3Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Layer3Button.Margin = new System.Windows.Forms.Padding(4);
             this.Layer3Button.Name = "Layer3Button";
             this.Layer3Button.Size = new System.Drawing.Size(100, 28);
             this.Layer3Button.TabIndex = 3;
@@ -80,7 +84,7 @@
             // 
             this.Layer2Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Layer2Button.Location = new System.Drawing.Point(220, 4);
-            this.Layer2Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Layer2Button.Margin = new System.Windows.Forms.Padding(4);
             this.Layer2Button.Name = "Layer2Button";
             this.Layer2Button.Size = new System.Drawing.Size(100, 28);
             this.Layer2Button.TabIndex = 2;
@@ -93,7 +97,7 @@
             // 
             this.Layer1Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Layer1Button.Location = new System.Drawing.Point(112, 4);
-            this.Layer1Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Layer1Button.Margin = new System.Windows.Forms.Padding(4);
             this.Layer1Button.Name = "Layer1Button";
             this.Layer1Button.Size = new System.Drawing.Size(100, 28);
             this.Layer1Button.TabIndex = 1;
@@ -108,7 +112,7 @@
             this.Layer0Button.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.Layer0Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Layer0Button.Location = new System.Drawing.Point(4, 4);
-            this.Layer0Button.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Layer0Button.Margin = new System.Windows.Forms.Padding(4);
             this.Layer0Button.Name = "Layer0Button";
             this.Layer0Button.Size = new System.Drawing.Size(100, 28);
             this.Layer0Button.TabIndex = 0;
@@ -121,7 +125,7 @@
             // 
             this.LayerEnabledCheckbox.AutoSize = true;
             this.LayerEnabledCheckbox.Location = new System.Drawing.Point(13, 37);
-            this.LayerEnabledCheckbox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LayerEnabledCheckbox.Margin = new System.Windows.Forms.Padding(4);
             this.LayerEnabledCheckbox.Name = "LayerEnabledCheckbox";
             this.LayerEnabledCheckbox.Size = new System.Drawing.Size(122, 21);
             this.LayerEnabledCheckbox.TabIndex = 1;
@@ -142,7 +146,7 @@
             // TilesetAddressText
             // 
             this.TilesetAddressText.Location = new System.Drawing.Point(131, 62);
-            this.TilesetAddressText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TilesetAddressText.Margin = new System.Windows.Forms.Padding(4);
             this.TilesetAddressText.MaxLength = 6;
             this.TilesetAddressText.Name = "TilesetAddressText";
             this.TilesetAddressText.Size = new System.Drawing.Size(132, 22);
@@ -155,7 +159,7 @@
             this.TilesetViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TilesetViewer.Cursor = System.Windows.Forms.Cursors.Hand;
             this.TilesetViewer.Location = new System.Drawing.Point(33, 91);
-            this.TilesetViewer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TilesetViewer.Margin = new System.Windows.Forms.Padding(4);
             this.TilesetViewer.Name = "TilesetViewer";
             this.TilesetViewer.Size = new System.Drawing.Size(367, 339);
             this.TilesetViewer.TabIndex = 4;
@@ -219,7 +223,7 @@
             // StrideXText
             // 
             this.StrideXText.Location = new System.Drawing.Point(351, 36);
-            this.StrideXText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.StrideXText.Margin = new System.Windows.Forms.Padding(4);
             this.StrideXText.MaxLength = 4;
             this.StrideXText.Name = "StrideXText";
             this.StrideXText.Size = new System.Drawing.Size(49, 22);
@@ -230,7 +234,7 @@
             // StrideYText
             // 
             this.StrideYText.Location = new System.Drawing.Point(351, 62);
-            this.StrideYText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.StrideYText.Margin = new System.Windows.Forms.Padding(4);
             this.StrideYText.MaxLength = 4;
             this.StrideYText.Name = "StrideYText";
             this.StrideYText.Size = new System.Drawing.Size(49, 22);
@@ -258,7 +262,7 @@
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.Name = "TileEditor";
             this.Text = "Tile Editor";

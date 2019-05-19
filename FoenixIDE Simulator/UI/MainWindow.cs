@@ -400,12 +400,20 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void gpu_MouseEnter(object sender, EventArgs e)
+
+        private void Gpu_MouseEnter(object sender, EventArgs e)
         {
             if (gpu.MousePointerMode && !gpu.TileEditorMode)
             {
                 Cursor.Hide();
             }
+        }
+
+        private void ToggleGammaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            byte gammaSetting = kernel.Memory.IO.ReadByte(0);
+            gammaSetting ^= 0x40;
+            kernel.Memory.IO.WriteByte(0,gammaSetting);
         }
     }
 }

@@ -68,6 +68,7 @@ namespace FoenixIDE.UI
                 HighlightPanel.ReadOnly = true;
                 HighlightPanel.ReadOnly = false;
             }
+
         }
 
         public void RefreshMemoryView()
@@ -134,7 +135,7 @@ namespace FoenixIDE.UI
         private void Timer1_Tick(object sender, EventArgs e)
         {
             RefreshMemoryView();
-            UpdateDisplayTimer.Enabled = false;
+            UpdateMCRButtons();
         }
 
         private void ViewButton_Click(object sender, EventArgs e)

@@ -370,10 +370,21 @@ namespace FoenixIDE.Display
             if (gammaCorrection != null)
             {
                 borderRed = gammaCorrection[borderRed, 2];
-                borderGreen = gammaCorrection[borderGreen, 1];
+                borderGreen = gammaCorrection[ borderGreen, 1];
                 borderBlue = gammaCorrection[borderBlue, 0];
             }
             int borderColor = (int)(0xFF000000 + (borderBlue << 16) + (borderGreen << 8) + borderRed);
+
+            if (tileEditorMode)
+            {
+                g.Clear(Color.LightGray);
+                DrawTextWithBackground("Tile Editing Mode", g, Color.Black, 240, 10);
+                DrawTextWithBackground("Tile Editing Mode", g, Color.Black, 240, 455);
+            }
+            else
+            {
+                g.Clear(Color.FromArgb(borderColor));
+            }
 
             // Graphics Mode
             if ((MCRegister & 0x4) == 0x4)
@@ -383,26 +394,15 @@ namespace FoenixIDE.Display
                 byte backBlue = IO.ReadByte(0xF);
                 if (gammaCorrection != null)
                 {
-                    backRed = gammaCorrection[borderRed, 2];
-                    backGreen = gammaCorrection[borderGreen, 1];
-                    backBlue = gammaCorrection[borderBlue, 0];
+                    backRed = gammaCorrection[backRed, 2];
+                    backGreen = gammaCorrection[backGreen, 1];
+                    backBlue = gammaCorrection[backBlue, 0];
                 }
                 int backgroundColor = (int)(0xFF000000 + (backBlue << 16) + (backGreen << 8) + backRed);
                 Brush graphBackgroundBrush = new SolidBrush(Color.FromArgb(backgroundColor));
                 g.FillRectangle(graphBackgroundBrush, colOffset, rowOffset, 640 - 2 * colOffset, 480 - 2 * rowOffset);
             }
-
-            if (tileEditorMode)
-            {
-                g.Clear(Color.LightGray);
-                DrawTextWithBackground("Tile Editing Mode",  g, Color.Black, 240, 10);
-                DrawTextWithBackground("Tile Editing Mode", g, Color.Black, 240, 455);
-            }
-            else
-            {
-                g.Clear(Color.FromArgb(borderColor));
-            }
-            
+       
 
             // Bitmap Mode
             if ((MCRegister & 0x8) == 0x8)
@@ -532,9 +532,9 @@ namespace FoenixIDE.Display
 
             int col = 0, line = 0;
 
-     int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
-                      int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
-         int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
+            int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
+            int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
+            int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
             int lineOffset = (60 - LinesVisible) / 2 * charHeight;
             int fontBaseAddress = MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START - IO.StartAddress;
             Rectangle rect = new Rectangle(0, 0, 640, 480);
@@ -688,11 +688,21 @@ namespace FoenixIDE.Display
 
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0,0,640, 480), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
+            int value = 0;
+
             for (int line = 0; line < height; line++)
             {
                 for (int col = 0; col < width; col++)
                 {
-                    int value = (int)graphicsLUT[lutIndex,VRAM.ReadByte(bitmapAddress++)];
+                    value = (int)graphicsLUT[lutIndex, VRAM.ReadByte(bitmapAddress++)];
+                    if (gammaCorrection != null )
+                    {
+                        //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
+                        value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10, 0] << 0x10) +
+                                      (gammaCorrection[(value & 0x0000FF00) >> 0x08, 1] << 0x08) +
+                                      (gammaCorrection[(value & 0x000000FF), 2]) + 0xFF000000);
+                    }
+
                     System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
                 }
             }
@@ -730,17 +740,26 @@ namespace FoenixIDE.Display
                 for (int tileCol = colOffset; tileCol < (40 - colOffset); tileCol++)
                 {
                     int tile = IO.ReadByte(tilemapAddress + tileCol + tileRow * 64 - IO_BASE_ADDR);
-                    
+                    int pixelIndex = 0;
+                    int value = 0;
+
                     // Tiles are 16 x 16
                     for (int line = 0; line < 16; line++)
                     {
                         for (int col = 0; col < 16; col++)
                         {
                             // Lookup the pixel in the tileset
-                            int pixelIndex = VRAM.ReadByte(tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + col + line * strideX);
+                            pixelIndex = VRAM.ReadByte(tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + col + line * strideX);
                             if (pixelIndex != 0)
                             {
-                                int value = (int)graphicsLUT[lutIndex,pixelIndex];
+                                value = (int)graphicsLUT[lutIndex, pixelIndex];
+                                if (gammaCorrection != null)
+                                {
+                                    //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
+                                    value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10, 0] << 0x10) +
+                                                  (gammaCorrection[(value & 0x0000FF00) >> 0x08, 1] << 0x08) +
+                                                  (gammaCorrection[(value & 0x000000FF), 2]) + 0xFF000000);
+                                }
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
                             }
                         }
@@ -775,16 +794,27 @@ namespace FoenixIDE.Display
                     BitmapData bitmapData = bitmap.LockBits(new Rectangle(posX, posY, 32, 32), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     IntPtr p = bitmapData.Scan0;
 
+                    int value = 0;
+                    int pixelIndex = 0;
+
                     // Sprites are 32 x 32
                     for (int line = 0; line < 32; line++)
                     {
                         for (int col = 0; col < 32; col++)
                         {
                             // Lookup the pixel in the tileset
-                            int pixelIndex = VRAM.ReadByte(spriteAddress++);
+                            pixelIndex = VRAM.ReadByte(spriteAddress++);
                             if (pixelIndex != 0)
                             {
-                                int value = (int)graphicsLUT[lutIndex,pixelIndex];
+                                value = (int)graphicsLUT[lutIndex, pixelIndex];
+                                if (gammaCorrection != null)
+                                {
+                                    //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
+                                    value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10, 0] << 0x10) +
+                                                  (gammaCorrection[(value & 0x0000FF00) >> 0x08, 1] << 0x08) +
+                                                  (gammaCorrection[(value & 0x000000FF), 2]) + 0xFF000000);
+                                }
+
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
                             }
                         }
