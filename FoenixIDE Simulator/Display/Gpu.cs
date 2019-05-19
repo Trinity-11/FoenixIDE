@@ -42,6 +42,7 @@ namespace FoenixIDE.Display
         public MemoryRAM IO = null;
         public int paintCycle = 0;
         private bool tileEditorMode = false;
+        public bool MousePointerMode = false;
 
         public int StartAddress
         {
@@ -345,6 +346,9 @@ namespace FoenixIDE.Display
             int border_register = IO.ReadByte(4);
             bool displayBorder = (border_register & 1) == 1;
 
+            int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
+            int rowOffset = (60 - LinesVisible) / 2 * charWidth;
+
             // Load Graphical LUTs
             graphicsLUT = LoadLUT(IO);
 
@@ -359,10 +363,10 @@ namespace FoenixIDE.Display
             }
 
             // Default background color to border color
+            // In Text mode, the border color is stored at $AF:0005.
             byte borderRed = IO.ReadByte(5);
             byte borderGreen = IO.ReadByte(6);
             byte borderBlue = IO.ReadByte(7);
-
             if (gammaCorrection != null)
             {
                 borderRed = gammaCorrection[borderRed, 2];
@@ -370,6 +374,24 @@ namespace FoenixIDE.Display
                 borderBlue = gammaCorrection[borderBlue, 0];
             }
             int borderColor = (int)(0xFF000000 + (borderBlue << 16) + (borderGreen << 8) + borderRed);
+
+            // Graphics Mode
+            if ((MCRegister & 0x4) == 0x4)
+            {
+                byte backRed = IO.ReadByte(0xD);
+                byte backGreen = IO.ReadByte(0XE);
+                byte backBlue = IO.ReadByte(0xF);
+                if (gammaCorrection != null)
+                {
+                    backRed = gammaCorrection[borderRed, 2];
+                    backGreen = gammaCorrection[borderGreen, 1];
+                    backBlue = gammaCorrection[borderBlue, 0];
+                }
+                int backgroundColor = (int)(0xFF000000 + (backBlue << 16) + (backGreen << 8) + backRed);
+                Brush graphBackgroundBrush = new SolidBrush(Color.FromArgb(backgroundColor));
+                g.FillRectangle(graphBackgroundBrush, colOffset, rowOffset, 640 - 2 * colOffset, 480 - 2 * rowOffset);
+            }
+
             if (tileEditorMode)
             {
                 g.Clear(Color.LightGray);
@@ -380,17 +402,6 @@ namespace FoenixIDE.Display
             {
                 g.Clear(Color.FromArgb(borderColor));
             }
-            
-
-            
-            // Graphics Mode - I don't know what this is for... we already have bit for tiles, sprints and bitmaps.
-            if ((MCRegister & 0x4) == 0x4) { }
-
-            int backgroundColor = (int)((UInt32)IO.ReadLong(8) | 0xFF000000);
-            Brush graphBackgroundBrush = new SolidBrush(Color.FromArgb(backgroundColor));
-            int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
-            int rowOffset = (60 - LinesVisible) / 2 * charWidth;
-            g.FillRectangle(graphBackgroundBrush, colOffset, rowOffset, 640 - 2 * colOffset, 480 - 2 * rowOffset);
             
 
             // Bitmap Mode
@@ -435,6 +446,13 @@ namespace FoenixIDE.Display
             // Overlay Mode - no need for this, the Text drawing method takes care of this
             if ((MCRegister & 0x2) == 0x2)
             {
+
+            }
+            byte mouseReg = IO.ReadByte(0x700);
+            MousePointerMode = (mouseReg & 1) == 1;
+            if (MousePointerMode && !TileEditorMode)
+            {
+                DrawMouse(frameBuffer);
 
             }
             e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
@@ -775,6 +793,43 @@ namespace FoenixIDE.Display
                     bitmap.UnlockBits(bitmapData);
                 }
             }
+        }
+
+        private void DrawMouse(Bitmap bitmap)
+        {
+            int X = IO.ReadWord(0x702);
+            int Y = IO.ReadWord(0x704);
+
+            byte mouseReg = IO.ReadByte(0x700);
+            int pointerAddress = 0xAF_0500  - IO.StartAddress;
+            if ((mouseReg & 2) == 2)
+            {
+                pointerAddress += 0x100;
+            }
+            // Mouse pointer is a 16x16 icon
+            int colsToDraw = X < 640 - 16 ? 16 : 640 - X;
+            int linesToDraw = Y < 480 - 16 ? 16 : 480 - Y;
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(X, Y, colsToDraw, linesToDraw), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            IntPtr p = bitmapData.Scan0;
+            for (int line = 0; line < linesToDraw; line++)
+            {
+                for (int col = 0; col < colsToDraw; col++)
+                {
+                    // Values are 0: transparent, 1:black, 255: white (gray scales)
+                    byte pixelIndex = IO.ReadByte(pointerAddress+line *  16 + col);
+                    if (pixelIndex != 0)
+                    {
+                        if (gammaCorrection != null)
+                        {
+
+                        }
+                        uint value = (uint)(0xFF000000 + (pixelIndex << 16) + (pixelIndex << 8) + pixelIndex);
+                        System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, (int)value);
+                    }
+                }
+            }
+
+            bitmap.UnlockBits(bitmapData);
         }
 
         private SizeF MeasureFont(Font font, Graphics g)

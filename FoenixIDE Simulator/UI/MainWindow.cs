@@ -349,10 +349,10 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseMove(object sender, MouseEventArgs e)
         {
+            double ratioW = gpu.Width / 640d;
+            double ratioH = gpu.Height / 480d;
             if (gpu.TileEditorMode)
             {
-                double ratioW = gpu.Width / 640d;
-                double ratioH = gpu.Height / 480d;
                 if ((e.X / ratioW > 32 && e.X / ratioW < 608) && (e.Y / ratioH > 32 && e.Y / ratioH < 448))
                 {
                     this.Cursor = Cursors.Hand;
@@ -364,12 +364,29 @@ namespace FoenixIDE.UI
             }
             else
             {
-                this.Cursor = Cursors.Default;
+                // Read the mouse pointer register
+                byte mouseReg = kernel.Memory.IO.ReadByte(0x700);
+                if ((mouseReg & 1) == 1)
+                {
+                    int X = (int)(e.X / ratioW);
+                    int Y = (int)(e.Y / ratioH);
+                    kernel.Memory.IO.WriteWord(0x702, X);
+                    kernel.Memory.IO.WriteWord(0x704, Y);
+                    
+                }
+                else
+                {
+                    this.Cursor = Cursors.Default;
+                }
             }
         }
 
         private void Gpu_MouseLeave(object sender, EventArgs e)
         {
+            if (gpu.MousePointerMode || gpu.TileEditorMode)
+            {
+                Cursor.Show();
+            }
             this.Cursor = Cursors.Default;
         }
 
@@ -380,6 +397,14 @@ namespace FoenixIDE.UI
                 double ratioW = gpu.Width / 640d;
                 double ratioH = gpu.Height / 480d;
                 TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
+            }
+        }
+
+        private void gpu_MouseEnter(object sender, EventArgs e)
+        {
+            if (gpu.MousePointerMode && !gpu.TileEditorMode)
+            {
+                Cursor.Hide();
             }
         }
     }

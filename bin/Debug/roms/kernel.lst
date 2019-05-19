@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.53.1515 listing file
-; 64tass.exe --long-address -x -b -o kernel.bin --list kernel.lst kernel.asm
-; Sun May 12 17:26:52 2019
+; 64tass.exe --long-address -x --intel-hex -o kernel.hex --list kernel.lst kernel.asm
+; Sat May 18 13:42:33 2019
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -194,9 +194,9 @@
 ;******  Processing file: page_00_data.asm
 
 >180000	00 a0 af			                .long $AFA000       ; SCREENBEGIN, 3 bytes, Start of screen in video RAM. This is the upper-left corrner of the current video page being written to. This may not be what's being displayed by VICKY. Update this if you change VICKY's display page.
->180003	48 00				                .word 72            ; COLS_VISIBLE, 2 bytes, Columns visible per screen line. A virtual line can be longer than displayed, up to COLS_PER_LINE long. Default = 80
+>180003	50 00				                .word 80            ; COLS_VISIBLE, 2 bytes, Columns visible per screen line. A virtual line can be longer than displayed, up to COLS_PER_LINE long. Default = 80
 >180005	80 00				                .word 128           ; COLS_PER_LINE, 2 bytes, Columns in memory per screen line. A virtual line can be this long. Default=128
->180007	34 00				                .word 52            ; LINES_VISIBLE, 2 bytes, The number of rows visible on the screen. Default=25
+>180007	3c 00				                .word 60            ; LINES_VISIBLE, 2 bytes, The number of rows visible on the screen. Default=25
 >180009	40 00				                .word 64            ; LINES_MAX, 2 bytes, The number of rows in memory for the screen. Default=64
 >18000b	00 a0 af			                .long $AFA000       ; CURSORPOS, 3 bytes, The next character written to the screen will be written in this location.
 >18000e	00 00				                .word 0             ; CURSORX, 2 bytes, This is where the blinking cursor sits. Do not edit this direectly. Call LOCATE to update the location and handle moving the cursor correctly.
@@ -245,7 +245,7 @@
 .18ff44	48		pha		                PHA
 .18ff45	da		phx		                PHX
 .18ff46	5a		phy		                PHY
-.18ff47	22 c8 10 19	jsl $1910c8	                JSL NMI_HANDLER
+.18ff47	22 3d 53 19	jsl $19533d	                JSL NMI_HANDLER
 .18ff4b	7a		ply		                PLY
 .18ff4c	fa		plx		                PLX
 .18ff4d	68		pla		                PLA
@@ -259,7 +259,7 @@
 .18ff64	48		pha		                PHA
 .18ff65	da		phx		                PHX
 .18ff66	5a		phy		                PHY
-.18ff67	22 78 0f 19	jsl $190f78	                JSL IRQ_HANDLER
+.18ff67	22 79 51 19	jsl $195179	                JSL IRQ_HANDLER
 .18ff6b	7a		ply		                PLY
 .18ff6c	fa		plx		                PLX
 .18ff6d	68		pla		                PLA
@@ -399,14 +399,16 @@
 =$af0001				MASTER_CTRL_REG_H	      = $AF0001
 =$af0002				VKY_RESERVED_00         = $AF0002
 =$af0003				VKY_RESERVED_01         = $AF0003
-=$af0004				BORDER_CTRL_REG         = $AF0004
+=$af0004				BORDER_CTRL_REG         = $AF0004   ; Bit[0] - Enable (1 by default)  Bit[4..6]: X Scroll Offset ( Will scroll Left) (Acceptable Value: 0..7)
 =$01					Border_Ctrl_Enable      = $01
 =$af0005				BORDER_COLOR_B          = $AF0005
 =$af0006				BORDER_COLOR_G          = $AF0006
 =$af0007				BORDER_COLOR_R          = $AF0007
-=$af0008				BACKGROUND_COLOR_B      = $AF0008 ; When in Graphic Mode, if a pixel is "0" then the Background pixel is chosen
-=$af0009				BACKGROUND_COLOR_G      = $AF0009
-=$af000a				BACKGROUND_COLOR_R      = $AF000A ;
+=$af0008				BORDER_X_SIZE           = $AF0008   ; X-  Values: 0 - 32 (Default: 32)
+=$af0009				BORDER_Y_SIZE           = $AF0009   ; Y- Values 0 -32 (Default: 32)
+=$af000d				BACKGROUND_COLOR_B      = $AF000D ; When in Graphic Mode, if a pixel is "0" then the Background pixel is chosen
+=$af000e				BACKGROUND_COLOR_G      = $AF000E
+=$af000f				BACKGROUND_COLOR_R      = $AF000F ;
 =$af0010				VKY_TXT_CURSOR_CTRL_REG = $AF0010   ;[0]  Enable Text Mode
 =$01					Vky_Cursor_Enable       = $01
 =$02					Vky_Cursor_Flash_Rate0  = $02
@@ -420,6 +422,7 @@
 =$af0015				VKY_TXT_CURSOR_X_REG_H  = $AF0015
 =$af0016				VKY_TXT_CURSOR_Y_REG_L  = $AF0016
 =$af0017				VKY_TXT_CURSOR_Y_REG_H  = $AF0017
+=$af0018				TXT_CLR_START_DISPLAY_PTR = $AF0018
 =$af001c				VKY_INFO_CHIP_NUM_L     = $AF001C
 =$af001d				VKY_INFO_CHIP_NUM_H     = $AF001D
 =$af001e				VKY_INFO_CHIP_VER_L     = $AF001E
@@ -1229,14 +1232,15 @@
 .193272	d0 ad		bne $193221	                BNE ERROR_PARAMETERMISSING
 .193274	a0 00 00	ldy #$0000	                LDY #$0000
 .193277	e8		inx		                INX
+.193278					KEEP_READING_FN
 .193278	bf 00 0f 00	lda $000f00,x	                LDA @lKEY_BUFFER, X     ; Fetch the first char
 .19327c	c9 22		cmp #$22	                CMP #'"'
 .19327e	f0 0a		beq $19328a	                BEQ DONE_FILE_SAVE
 .193280	99 80 03	sta $0380,y	                STA SDOS_FILE_NAME,Y
 .193283	e8		inx		                INX
 .193284	c8		iny		                INY
-.193285	c0 10 00	cpy #$0010	                CPY #$10
-.193288	d0 97		bne $193221	                BNE ERROR_PARAMETERMISSING
+.193285	c0 10 00	cpy #$0010	                CPY #$0010
+.193288	d0 ee		bne $193278	                BNE KEEP_READING_FN
 .19328a					DONE_FILE_SAVE
 .19328a	60		rts		                RTS
 .19328b					FIND_CMD_ARGTYPE_SA
@@ -1711,6 +1715,220 @@
 >195152	20 41 20 20 20 20 58 20 20 20 20 59 20 20 20 20
 >195162	53 50 20 20 20 44 42 52 20 44 50 20 20 20 4e 56
 >195172	4d 58 44 49 5a 43 00
+
+;******  Return to file: kernel.asm
+
+
+;******  Processing file: Interrupt_Handler.asm
+
+.195179					IRQ_HANDLER
+.195179	e2 20		sep #$20	                SEP #$20        ; set A short
+.19517b	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
+.19517f	29 01		and #$01	                AND #FNX0_INT00_SOF
+.195181	c9 01		cmp #$01	                CMP #FNX0_INT00_SOF
+.195183	d0 05		bne $19518a	                BNE SERVICE_NEXT_IRQ6
+.195185	20 d7 52	jsr $1952d7	                JSR SOF_INTERRUPT
+.195188	80 67		bra $1951f1	                BRA EXIT_IRQ_HANDLE
+.19518a					SERVICE_NEXT_IRQ6
+.19518a	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
+.19518e	29 40		and #$40	                AND #FNX0_INT06_FDC
+.195190	c9 40		cmp #$40	                CMP #FNX0_INT06_FDC
+.195192	d0 05		bne $195199	                BNE SERVICE_NEXT_IRQ7
+.195194	20 06 53	jsr $195306	                JSR FDC_INTERRUPT
+.195197	80 58		bra $1951f1	                BRA EXIT_IRQ_HANDLE
+.195199					SERVICE_NEXT_IRQ7
+.195199	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
+.19519d	29 80		and #$80	                AND #FNX0_INT07_MOUSE
+.19519f	c9 80		cmp #$80	                CMP #FNX0_INT07_MOUSE
+.1951a1	d0 05		bne $1951a8	                BNE SERVICE_NEXT_IRQ8
+.1951a3	20 e2 52	jsr $1952e2	                JSR MOUSE_INTERRUPT
+.1951a6	80 49		bra $1951f1	                BRA EXIT_IRQ_HANDLE
+.1951a8					SERVICE_NEXT_IRQ8
+.1951a8	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.1951ac	29 01		and #$01	                AND #FNX1_INT00_KBD
+.1951ae	c9 01		cmp #$01	                CMP #FNX1_INT00_KBD
+.1951b0	d0 f6		bne $1951a8	                BNE SERVICE_NEXT_IRQ8
+.1951b2	20 f4 51	jsr $1951f4	                JSR KEYBOARD_INTERRUPT
+.1951b5	80 3a		bra $1951f1	                BRA EXIT_IRQ_HANDLE
+.1951b7					SERVICE_NEXT_IRQ11
+.1951b7	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.1951bb	29 08		and #$08	                AND #FNX1_INT03_COM2
+.1951bd	c9 08		cmp #$08	                CMP #FNX1_INT03_COM2
+.1951bf	d0 05		bne $1951c6	                BNE SERVICE_NEXT_IRQ12
+.1951c1	20 11 53	jsr $195311	                JSR COM2_INTERRUPT
+.1951c4	80 2b		bra $1951f1	                BRA EXIT_IRQ_HANDLE
+.1951c6					SERVICE_NEXT_IRQ12
+.1951c6	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.1951ca	29 10		and #$10	                AND #FNX1_INT04_COM1
+.1951cc	c9 10		cmp #$10	                CMP #FNX1_INT04_COM1
+.1951ce	d0 05		bne $1951d5	                BNE SERVICE_NEXT_IRQ13
+.1951d0	20 1c 53	jsr $19531c	                JSR COM1_INTERRUPT
+.1951d3	80 1c		bra $1951f1	                BRA EXIT_IRQ_HANDLE
+.1951d5					SERVICE_NEXT_IRQ13
+.1951d5	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.1951d9	29 20		and #$20	                AND #FNX1_INT05_MPU401
+.1951db	c9 20		cmp #$20	                CMP #FNX1_INT05_MPU401
+.1951dd	d0 05		bne $1951e4	                BNE SERVICE_NEXT_IRQ14
+.1951df	20 27 53	jsr $195327	                JSR MPU401_INTERRUPT
+.1951e2	80 0d		bra $1951f1	                BRA EXIT_IRQ_HANDLE
+.1951e4					SERVICE_NEXT_IRQ14
+.1951e4	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.1951e8	29 40		and #$40	                AND #FNX1_INT06_LPT
+.1951ea	c9 40		cmp #$40	                CMP #FNX1_INT06_LPT
+.1951ec	d0 03		bne $1951f1	                BNE EXIT_IRQ_HANDLE
+.1951ee	20 32 53	jsr $195332	                JSR LPT1_INTERRUPT
+.1951f1					EXIT_IRQ_HANDLE
+.1951f1	c2 30		rep #$30	                REP #$30        ; set A&X long
+.1951f3	6b		rtl		                RTL
+.1951f4					KEYBOARD_INTERRUPT
+.1951f4	a2 00 00	ldx #$0000	                ldx #$0000
+.1951f7	e2 10		sep #$10	                SEP #$10        ; set X short
+.1951f9	e2 20		sep #$20	                SEP #$20        ; set A short
+.1951fb	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.1951ff	29 01		and #$01	                AND #FNX1_INT00_KBD
+.195201	8f 41 01 00	sta $000141	                STA @lINT_PENDING_REG1
+.195205					IRQ_HANDLER_FETCH
+.195205	af 60 10 af	lda $af1060	                LDA KBD_INPT_BUF        ; Get Scan Code from KeyBoard
+.195209	8d 88 0f	sta $0f88	                STA KEYBOARD_SC_TMP     ; Save Code Immediately
+.19520c	c9 2a		cmp #$2a	                CMP #$2A                ; Left Shift Pressed
+.19520e	d0 03		bne $195213	                BNE NOT_KB_SET_SHIFT
+.195210	82 75 00	brl $195288	                BRL KB_SET_SHIFT
+.195213					NOT_KB_SET_SHIFT
+.195213	c9 aa		cmp #$aa	                CMP #$AA                ; Left Shift Unpressed
+.195215	d0 03		bne $19521a	                BNE NOT_KB_CLR_SHIFT
+.195217	82 79 00	brl $195293	                BRL KB_CLR_SHIFT
+.19521a					NOT_KB_CLR_SHIFT
+.19521a	c9 1d		cmp #$1d	                CMP #$1D                ; Left CTRL pressed
+.19521c	d0 03		bne $195221	                BNE NOT_KB_SET_CTRL
+.19521e	82 7d 00	brl $19529e	                BRL KB_SET_CTRL
+.195221					NOT_KB_SET_CTRL
+.195221	c9 9d		cmp #$9d	                CMP #$9D                ; Left CTRL Unpressed
+.195223	d0 03		bne $195228	                BNE NOT_KB_CLR_CTRL
+.195225	82 81 00	brl $1952a9	                BRL KB_CLR_CTRL
+.195228					NOT_KB_CLR_CTRL
+.195228	c9 38		cmp #$38	                CMP #$38                ; Left ALT Pressed
+.19522a	d0 03		bne $19522f	                BNE NOT_KB_SET_ALT
+.19522c	82 85 00	brl $1952b4	                BRL KB_SET_ALT
+.19522f					NOT_KB_SET_ALT
+.19522f	c9 b8		cmp #$b8	                CMP #$B8                ; Left ALT Unpressed
+.195231	d0 03		bne $195236	                BNE KB_UNPRESSED
+.195233	82 89 00	brl $1952bf	                BRL KB_CLR_ALT
+.195236	29 80		and #$80	KB_UNPRESSED    AND #$80                ; See if the Scan Code is press or Depressed
+.195238	c9 80		cmp #$80	                CMP #$80                ; Depress Status - We will not do anything at this point
+.19523a	d0 03		bne $19523f	                BNE KB_NORM_SC
+.19523c	82 88 00	brl $1952c7	                BRL KB_CHECK_B_DONE
+.19523f	ad 88 0f	lda $0f88	KB_NORM_SC      LDA KEYBOARD_SC_TMP       ;
+.195242	aa		tax		                TAX
+.195243	ad 87 0f	lda $0f87	                LDA KEYBOARD_SC_FLG     ; Check to See if the SHIFT Key is being Pushed
+.195246	29 10		and #$10	                AND #$10
+.195248	c9 10		cmp #$10	                CMP #$10
+.19524a	f0 19		beq $195265	                BEQ SHIFT_KEY_ON
+.19524c	ad 87 0f	lda $0f87	                LDA KEYBOARD_SC_FLG     ; Check to See if the CTRL Key is being Pushed
+.19524f	29 20		and #$20	                AND #$20
+.195251	c9 20		cmp #$20	                CMP #$20
+.195253	f0 17		beq $19526c	                BEQ CTRL_KEY_ON
+.195255	ad 87 0f	lda $0f87	                LDA KEYBOARD_SC_FLG     ; Check to See if the ALT Key is being Pushed
+.195258	29 40		and #$40	                AND #$40
+.19525a	c9 40		cmp #$40	                CMP #$40
+.19525c	f0 15		beq $195273	                BEQ ALT_KEY_ON
+.19525e	bf 00 16 19	lda $191600,x	                LDA @lScanCode_Press_Set1, x
+.195262	82 12 00	brl $195277	                BRL KB_WR_2_SCREEN
+.195265	bf 80 16 19	lda $191680,x	SHIFT_KEY_ON    LDA @lScanCode_Shift_Set1, x
+.195269	82 0b 00	brl $195277	                BRL KB_WR_2_SCREEN
+.19526c	bf 00 17 19	lda $191700,x	CTRL_KEY_ON     LDA @lScanCode_Ctrl_Set1, x
+.195270	82 04 00	brl $195277	                BRL KB_WR_2_SCREEN
+.195273	bf 80 17 19	lda $191780,x	ALT_KEY_ON      LDA @lScanCode_Alt_Set1, x
+.195277					KB_WR_2_SCREEN
+.195277	48		pha		                PHA
+.195278	c2 10		rep #$10	                REP #$10        ; set X long
+.19527a	22 00 30 19	jsl $193000	                JSL SAVECHAR2CMDLINE
+.19527e	e2 20		sep #$20	                SEP #$20        ; set A short
+.195280	68		pla		                PLA
+.195281	22 18 00 19	jsl $190018	                JSL PUTC
+.195285	4c c7 52	jmp $1952c7	                JMP KB_CHECK_B_DONE
+.195288	ad 87 0f	lda $0f87	KB_SET_SHIFT    LDA KEYBOARD_SC_FLG
+.19528b	09 10		ora #$10	                ORA #$10
+.19528d	8d 87 0f	sta $0f87	                STA KEYBOARD_SC_FLG
+.195290	4c c7 52	jmp $1952c7	                JMP KB_CHECK_B_DONE
+.195293	ad 87 0f	lda $0f87	KB_CLR_SHIFT    LDA KEYBOARD_SC_FLG
+.195296	29 ef		and #$ef	                AND #$EF
+.195298	8d 87 0f	sta $0f87	                STA KEYBOARD_SC_FLG
+.19529b	4c c7 52	jmp $1952c7	                JMP KB_CHECK_B_DONE
+.19529e	ad 87 0f	lda $0f87	KB_SET_CTRL    LDA KEYBOARD_SC_FLG
+.1952a1	09 20		ora #$20	                ORA #$20
+.1952a3	8d 87 0f	sta $0f87	                STA KEYBOARD_SC_FLG
+.1952a6	4c c7 52	jmp $1952c7	                JMP KB_CHECK_B_DONE
+.1952a9	ad 87 0f	lda $0f87	KB_CLR_CTRL    LDA KEYBOARD_SC_FLG
+.1952ac	29 df		and #$df	                AND #$DF
+.1952ae	8d 87 0f	sta $0f87	                STA KEYBOARD_SC_FLG
+.1952b1	4c c7 52	jmp $1952c7	                JMP KB_CHECK_B_DONE
+.1952b4	ad 87 0f	lda $0f87	KB_SET_ALT      LDA KEYBOARD_SC_FLG
+.1952b7	09 40		ora #$40	                ORA #$40
+.1952b9	8d 87 0f	sta $0f87	                STA KEYBOARD_SC_FLG
+.1952bc	4c c7 52	jmp $1952c7	                JMP KB_CHECK_B_DONE
+.1952bf	ad 87 0f	lda $0f87	KB_CLR_ALT     LDA KEYBOARD_SC_FLG
+.1952c2	29 bf		and #$bf	                AND #$BF
+.1952c4	8d 87 0f	sta $0f87	                STA KEYBOARD_SC_FLG
+.1952c7					KB_CHECK_B_DONE
+.1952c7	af 64 10 af	lda $af1064	                LDA STATUS_PORT
+.1952cb	29 01		and #$01	                AND #OUT_BUF_FULL ; Test bit $01 (if 1, Full)
+.1952cd	c9 01		cmp #$01	                CMP #OUT_BUF_FULL ; if Still Byte in the Buffer, fetch it out
+.1952cf	d0 03		bne $1952d4	                BNE KB_DONE
+.1952d1	4c 05 52	jmp $195205	                JMP IRQ_HANDLER_FETCH
+.1952d4					KB_DONE
+.1952d4	c2 30		rep #$30	                REP #$30        ; set A&X long
+.1952d6	60		rts		                RTS
+.1952d7					SOF_INTERRUPT
+.1952d7	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
+.1952db	29 01		and #$01	                AND #FNX0_INT00_SOF
+.1952dd	8f 40 01 00	sta $000140	                STA @lINT_PENDING_REG0
+.1952e1	60		rts		                RTS
+.1952e2					MOUSE_INTERRUPT
+.1952e2	e2 20		sep #$20	                SEP #$20        ; set A short
+.1952e4	af 60 10 af	lda $af1060	                LDA KBD_INPT_BUF
+.1952e8	e2 10		sep #$10	                SEP #$10        ; set X short
+.1952ea	a6 e0		ldx $e0		                LDX MOUSE_PTR
+.1952ec	9f 06 07 af	sta $af0706,x	                STA @lMOUSE_PTR_BYTE0, X
+.1952f0	e8		inx		                INX
+.1952f1	e0 03		cpx #$03	                CPX #$03
+.1952f3	d0 02		bne $1952f7	                BNE EXIT_FOR_NEXT_VALUE
+.1952f5	a2 00		ldx #$00	                LDX #$00
+.1952f7					EXIT_FOR_NEXT_VALUE
+.1952f7	86 e0		stx $e0		                STX MOUSE_PTR
+.1952f9	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
+.1952fd	29 80		and #$80	                AND #FNX0_INT07_MOUSE
+.1952ff	8f 40 01 00	sta $000140	                STA @lINT_PENDING_REG0
+.195303	c2 10		rep #$10	                REP #$10        ; set X long
+.195305	60		rts		                RTS
+.195306					FDC_INTERRUPT
+.195306	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
+.19530a	29 40		and #$40	                AND #FNX0_INT06_FDC
+.19530c	8f 40 01 00	sta $000140	                STA @lINT_PENDING_REG0
+.195310	60		rts		                RTS
+.195311					COM2_INTERRUPT
+.195311	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.195315	29 08		and #$08	                AND #FNX1_INT03_COM2
+.195317	8f 41 01 00	sta $000141	                STA @lINT_PENDING_REG1
+.19531b	60		rts		                RTS
+.19531c					COM1_INTERRUPT
+.19531c	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.195320	29 10		and #$10	                AND #FNX1_INT04_COM1
+.195322	8f 41 01 00	sta $000141	                STA @lINT_PENDING_REG1
+.195326	60		rts		                RTS
+.195327					MPU401_INTERRUPT
+.195327	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.19532b	29 20		and #$20	                AND #FNX1_INT05_MPU401
+.19532d	8f 41 01 00	sta $000141	                STA @lINT_PENDING_REG1
+.195331	60		rts		                RTS
+.195332					LPT1_INTERRUPT
+.195332	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
+.195336	29 40		and #$40	                AND #FNX1_INT06_LPT
+.195338	8f 41 01 00	sta $000141	                STA @lINT_PENDING_REG1
+.19533c	60		rts		                RTS
+.19533d					NMI_HANDLER
+.19533d	a2 c0 14	ldx #$14c0	                LDX #<>nmi_Msg
+.195340	22 73 05 19	jsl $190573	                JSL IPRINT       ; print the Init
+.195344	6b		rtl		                RTL
 
 ;******  Return to file: kernel.asm
 
@@ -2812,46 +3030,46 @@
 ;******  Processing file: kernel_jumptable.asm
 
 .190000	5c 00 04 19	jmp $190400	BOOT            JML IBOOT
-.190004	5c d0 10 19	jmp $1910d0	RESTORE         JML IRESTORE
+.190004	5c 78 0f 19	jmp $190f78	RESTORE         JML IRESTORE
 .190008	5c 07 05 19	jmp $190507	BREAK           JML IBREAK
 .19000c	5c 4e 05 19	jmp $19054e	READY           JML IREADY
-.190010	5c d1 10 19	jmp $1910d1	SCINIT          JML ISCINIT
-.190014	5c d2 10 19	jmp $1910d2	IOINIT          JML IIOINIT
+.190010	5c 79 0f 19	jmp $190f79	SCINIT          JML ISCINIT
+.190014	5c 7a 0f 19	jmp $190f7a	IOINIT          JML IIOINIT
 .190018	5c 93 05 19	jmp $190593	PUTC            JML IPUTC
 .19001c	5c 7c 05 19	jmp $19057c	PUTS            JML IPUTS
 .190020	5c c0 05 19	jmp $1905c0	PUTB            JML IPUTB
-.190024	5c d3 10 19	jmp $1910d3	PUTBLOCK        JML IPUTBLOCK
-.190028	5c d4 10 19	jmp $1910d4	SETLFS          JML ISETLFS
-.19002c	5c d5 10 19	jmp $1910d5	SETNAM          JML ISETNAM
-.190030	5c d6 10 19	jmp $1910d6	OPEN            JML IOPEN
-.190034	5c d7 10 19	jmp $1910d7	CLOSE           JML ICLOSE
-.190038	5c d8 10 19	jmp $1910d8	SETIN           JML ISETIN
-.19003c	5c d9 10 19	jmp $1910d9	SETOUT          JML ISETOUT
-.190040	5c da 10 19	jmp $1910da	GETB            JML IGETB
-.190044	5c db 10 19	jmp $1910db	GETBLOCK        JML IGETBLOCK
-.190048	5c dc 10 19	jmp $1910dc	GETCH           JML IGETCH
+.190024	5c 7b 0f 19	jmp $190f7b	PUTBLOCK        JML IPUTBLOCK
+.190028	5c 7c 0f 19	jmp $190f7c	SETLFS          JML ISETLFS
+.19002c	5c 7d 0f 19	jmp $190f7d	SETNAM          JML ISETNAM
+.190030	5c 7e 0f 19	jmp $190f7e	OPEN            JML IOPEN
+.190034	5c 7f 0f 19	jmp $190f7f	CLOSE           JML ICLOSE
+.190038	5c 80 0f 19	jmp $190f80	SETIN           JML ISETIN
+.19003c	5c 81 0f 19	jmp $190f81	SETOUT          JML ISETOUT
+.190040	5c 82 0f 19	jmp $190f82	GETB            JML IGETB
+.190044	5c 83 0f 19	jmp $190f83	GETBLOCK        JML IGETBLOCK
+.190048	5c 84 0f 19	jmp $190f84	GETCH           JML IGETCH
 .19004c	5c 72 05 19	jmp $190572	GETCHW          JML IGETCHW
 .190050	5c 69 05 19	jmp $190569	GETCHE          JML IGETCHE
-.190054	5c dd 10 19	jmp $1910dd	GETS            JML IGETS
-.190058	5c de 10 19	jmp $1910de	GETLINE         JML IGETLINE
-.19005c	5c df 10 19	jmp $1910df	GETFIELD        JML IGETFIELD
-.190060	5c e0 10 19	jmp $1910e0	TRIM            JML ITRIM
-.190064	5c e1 10 19	jmp $1910e1	PRINTC          JML IPRINTC
-.190068	5c e2 10 19	jmp $1910e2	PRINTS          JML IPRINTS
+.190054	5c 85 0f 19	jmp $190f85	GETS            JML IGETS
+.190058	5c 86 0f 19	jmp $190f86	GETLINE         JML IGETLINE
+.19005c	5c 87 0f 19	jmp $190f87	GETFIELD        JML IGETFIELD
+.190060	5c 88 0f 19	jmp $190f88	TRIM            JML ITRIM
+.190064	5c 89 0f 19	jmp $190f89	PRINTC          JML IPRINTC
+.190068	5c 8a 0f 19	jmp $190f8a	PRINTS          JML IPRINTS
 .19006c	5c c1 05 19	jmp $1905c1	PRINTCR         JML IPRINTCR
-.190070	5c e3 10 19	jmp $1910e3	PRINTF          JML IPRINTF
-.190074	5c e4 10 19	jmp $1910e4	PRINTI          JML IPRINTI
+.190070	5c 8b 0f 19	jmp $190f8b	PRINTF          JML IPRINTF
+.190074	5c 8c 0f 19	jmp $190f8c	PRINTI          JML IPRINTI
 .190078	5c ac 06 19	jmp $1906ac	PRINTH          JML IPRINTH
-.19007c	5c e5 10 19	jmp $1910e5	PRINTAI         JML IPRINTAI
-.190080	5c e6 10 19	jmp $1910e6	PRINTAH         JML IPRINTAH
+.19007c	5c 8d 0f 19	jmp $190f8d	PRINTAI         JML IPRINTAI
+.190080	5c 8e 0f 19	jmp $190f8e	PRINTAH         JML IPRINTAH
 .190084	5c 5c 06 19	jmp $19065c	LOCATE          JML ILOCATE
-.190088	5c e7 10 19	jmp $1910e7	PUSHKEY         JML IPUSHKEY
-.19008c	5c e8 10 19	jmp $1910e8	PUSHKEYS        JML IPUSHKEYS
+.190088	5c 8f 0f 19	jmp $190f8f	PUSHKEY         JML IPUSHKEY
+.19008c	5c 90 0f 19	jmp $190f90	PUSHKEYS        JML IPUSHKEYS
 .190090	5c e2 05 19	jmp $1905e2	CSRRIGHT        JML ICSRRIGHT
-.190094	5c e9 10 19	jmp $1910e9	CSRLEFT         JML ICSRLEFT
+.190094	5c 91 0f 19	jmp $190f91	CSRLEFT         JML ICSRLEFT
 .190098	5c 37 06 19	jmp $190637	CSRUP           JML ICSRUP
 .19009c	5c 5b 06 19	jmp $19065b	CSRDOWN         JML ICSRDOWN
-.1900a0	5c ea 10 19	jmp $1910ea	CSRHOME         JML ICSRHOME
+.1900a0	5c 92 0f 19	jmp $190f92	CSRHOME         JML ICSRHOME
 .1900a4	5c 92 06 19	jmp $190692	SCROLLUP        JML ISCROLLUP
 .1900a8	5c da 06 19	jmp $1906da	CLRSCREEN       JML ICLRSCREEN
 .1900ac	5c 41 07 19	jmp $190741	INITCHLUT	      JML IINITCHLUT
@@ -2921,9 +3139,9 @@
 .19045c	a9 04		lda #$04	                LDA #$04                ; This is to make sure the RTC will keep working after unit is turn-off
 .19045e	8f 0e 08 af	sta $af080e	                STA @lRTC_CTRL
 .190462	c2 30		rep #$30	                REP #$30        ; set A&X long
-.190464	a2 48 00	ldx #$0048	                LDX #72
+.190464	a2 50 00	ldx #$0050	                LDX #80
 .190467	86 0f		stx $0f		                STX COLS_VISIBLE
-.190469	a0 38 00	ldy #$0038	                LDY #56
+.190469	a0 3c 00	ldy #$003c	                LDY #60
 .19046c	84 13		sty $13		                STY LINES_VISIBLE
 .19046e	a2 80 00	ldx #$0080	                LDX #128
 .190471	86 11		stx $11		                STX COLS_PER_LINE
@@ -2950,9 +3168,9 @@
 .1904ad	ab		plb		                PLB
 .1904ae	28		plp		                PLP
 .1904af	68		pla		                PLA             ; end setdbr macro
-.1904b0	a2 ed 10	ldx #$10ed	                LDX #<>greet_msg
+.1904b0	a2 95 0f	ldx #$0f95	                LDX #<>greet_msg
 .1904b3	22 73 05 19	jsl $190573	                JSL IPRINT       ; print the first line
-.1904b7	a2 d6 11	ldx #$11d6	                LDX #<>old_pc_style_stat
+.1904b7	a2 7e 10	ldx #$107e	                LDX #<>old_pc_style_stat
 .1904ba	22 73 05 19	jsl $190573	                JSL IPRINT       ; print the first line
 .1904be	48		pha		                PHA             ; begin setdp macro
 .1904bf	08		php			PHP
@@ -2964,7 +3182,7 @@
 .1904c8	22 b4 00 19	jsl $1900b4	                JSL INITKEYBOARD ;
 .1904cc	c2 30		rep #$30	                REP #$30        ; set A&X long
 .1904ce	22 ec 00 19	jsl $1900ec	                JSL OPL2_TONE_TEST
-.1904d2	a2 5e 16	ldx #$165e	                LDX #<>ready_msg
+.1904d2	a2 06 15	ldx #$1506	                LDX #<>ready_msg
 .1904d5	22 73 05 19	jsl $190573	                JSL IPRINT       ; print the first line
 .1904d9	58		cli		                CLI ; Make sure no Interrupt will come and fuck up Init before this point.
 .1904da	e2 20		sep #$20	                SEP #$20        ; set A short
@@ -2985,7 +3203,7 @@
 .1904f3	a9 00		lda #$00	                LDA #$00  ; Clear the Flag
 .1904f5	8f 83 0f 00	sta $000f83	                STA KEY_BUFFER_CMD
 .1904f9	22 56 30 19	jsl $193056	                JSL PROCESS_COMMAND_LINE
-.1904fd	a2 5e 16	ldx #$165e	                LDX #<>ready_msg
+.1904fd	a2 06 15	ldx #$1506	                LDX #<>ready_msg
 .190500	22 73 05 19	jsl $190573	                JSL IPRINT
 .190504	80 e0		bra $1904e6	                BRA  endlessloop
 .190506	00		brk #		greet_done      BRK             ;Terminate boot routine and go to Ready handler.
@@ -3032,7 +3250,7 @@
 .190556	28		plp		                PLP
 .190557	68		pla		                PLA             ; end setdbr macro
 .190558	e2 20		sep #$20	                SEP #$20        ; set A short
-.19055a	a2 5e 16	ldx #$165e	                LDX #<>ready_msg
+.19055a	a2 06 15	ldx #$1506	                LDX #<>ready_msg
 .19055d	22 73 05 19	jsl $190573	                JSL IPRINT
 .190561					IREADYWAIT
 .190561	22 69 05 19	jsl $190569	                JSL IGETCHE
@@ -3268,7 +3486,7 @@
 .1906ca	c2 20		rep #$20	                REP #$20        ; set A long
 .1906cc	29 0f 00	and #$000f	                AND #$0F
 .1906cf	aa		tax		                TAX
-.1906d0	bf e8 16 19	lda $1916e8,x	                LDA hex_digits,X
+.1906d0	bf 90 15 19	lda $191590,x	                LDA hex_digits,X
 .1906d4	22 93 05 19	jsl $190593	                JSL IPUTC       ; Print the digit
 .1906d8	fa		plx		                PLX
 .1906d9	6b		rtl		                RTL
@@ -3302,15 +3520,15 @@
 .19070b	08		php		                PHP
 .19070c	e2 30		sep #$30	                SEP #$30        ; set A&X short
 .19070e	a2 00		ldx #$00	                LDX #$00
-.190710	bf 5e 14 19	lda $19145e,x	iclearloop2	    LDA @lgreet_clr_line1,x
+.190710	bf 06 13 19	lda $191306,x	iclearloop2	    LDA @lgreet_clr_line1,x
 .190714	9f 00 c0 af	sta $afc000,x	                STA CS_COLOR_MEM_PTR,x
-.190718	bf 6c 14 19	lda $19146c,x	                LDA @lgreet_clr_line2,x
+.190718	bf 14 13 19	lda $191314,x	                LDA @lgreet_clr_line2,x
 .19071c	9f 80 c0 af	sta $afc080,x	                STA CS_COLOR_MEM_PTR + $80,x
-.190720	bf 7a 14 19	lda $19147a,x	                LDA @lgreet_clr_line3,x
+.190720	bf 22 13 19	lda $191322,x	                LDA @lgreet_clr_line3,x
 .190724	9f 00 c1 af	sta $afc100,x	                STA CS_COLOR_MEM_PTR + $100,x
-.190728	bf 88 14 19	lda $191488,x	                LDA @lgreet_clr_line4,x
+.190728	bf 30 13 19	lda $191330,x	                LDA @lgreet_clr_line4,x
 .19072c	9f 80 c1 af	sta $afc180,x	                STA CS_COLOR_MEM_PTR + $180,x
-.190730	bf 96 14 19	lda $191496,x	                LDA @lgreet_clr_line5,x
+.190730	bf 3e 13 19	lda $19133e,x	                LDA @lgreet_clr_line5,x
 .190734	9f 00 c2 af	sta $afc200,x	                STA CS_COLOR_MEM_PTR + $200,x
 .190738	e8		inx		                inx
 .190739	e0 0e		cpx #$0e	                cpx #$0E
@@ -3326,13 +3544,13 @@
 .190745	e2 20		sep #$20	                SEP #$20        ; set A short
 .190747	e2 10		sep #$10	                SEP #$10        ; set X short
 .190749	a2 00		ldx #$00					        LDX	#$00
-.19074b	bf a4 14 19	lda $1914a4,x	lutinitloop0	  LDA @lfg_color_lut,x		; get Local Data
+.19074b	bf 4c 13 19	lda $19134c,x	lutinitloop0	  LDA @lfg_color_lut,x		; get Local Data
 .19074f	9f 40 1f af	sta $af1f40,x	                STA FG_CHAR_LUT_PTR,x	; Write in LUT Memory
 .190753	e8		inx		                inx
 .190754	e0 40		cpx #$40	                cpx #$40
 .190756	d0 f3		bne $19074b	                bne lutinitloop0
 .190758	a2 00		ldx #$00	                LDX	#$00
-.19075a	bf e4 14 19	lda $1914e4,x	lutinitloop1	  LDA @lbg_color_lut,x		; get Local Data
+.19075a	bf 8c 13 19	lda $19138c,x	lutinitloop1	  LDA @lbg_color_lut,x		; get Local Data
 .19075e	9f 80 1f af	sta $af1f80,x	                STA BG_CHAR_LUT_PTR,x	; Write in LUT Memory
 .190762	e8		inx		                INX
 .190763	e0 40		cpx #$40	                CPX #$40
@@ -3348,7 +3566,7 @@
 .190770	e2 20		sep #$20	                SEP #$20        ; set A short
 .190772	c2 10		rep #$10	                REP #$10        ; set X long
 .190774	a2 00 00	ldx #$0000	                ldx #$0000
-.190777	bf 00 1b 19	lda $191b00,x	initgammaloop   LDA GAMMA_1_8_Tbl, x
+.190777	bf 00 1a 19	lda $191a00,x	initgammaloop   LDA GAMMA_1_8_Tbl, x
 .19077b	9f 00 40 af	sta $af4000,x	                STA GAMMA_B_LUT_PTR, x
 .19077f	9f 00 41 af	sta $af4100,x	                STA GAMMA_G_LUT_PTR, x
 .190783	9f 00 42 af	sta $af4200,x	                STA GAMMA_R_LUT_PTR, x
@@ -3366,7 +3584,7 @@
 .19079b					iinit_lut_loop
 .19079b	86 02		stx $02		                STX $02
 .19079d	a6 0a		ldx $0a		                LDX $0A
-.19079f	bf 00 1a 19	lda $191a00,x	                LDA GAMMA_2_2_Tbl, x
+.19079f	bf 00 19 19	lda $191900,x	                LDA GAMMA_2_2_Tbl, x
 .1907a3	49 55		eor #$55	                EOR  #$55
 .1907a5	a6 02		ldx $02		                LDX $02
 .1907a7	9f 00 20 af	sta $af2000,x	                STA @lGRPH_LUT0_PTR, x
@@ -3380,7 +3598,7 @@
 .1907c7	e8		inx		                inx
 .1907c8	86 02		stx $02		                STX $02
 .1907ca	a6 0a		ldx $0a		                LDX $0A
-.1907cc	bf 00 1c 19	lda $191c00,x	                LDA RANDOM_LUT_Tbl, x
+.1907cc	bf 00 1b 19	lda $191b00,x	                LDA RANDOM_LUT_Tbl, x
 .1907d0	a6 02		ldx $02		                LDX $02
 .1907d2	9f 00 20 af	sta $af2000,x	                STA @lGRPH_LUT0_PTR, x
 .1907d6	9f 00 24 af	sta $af2400,x	                STA @lGRPH_LUT1_PTR, x
@@ -3393,7 +3611,7 @@
 .1907f2	e8		inx		                inx
 .1907f3	86 02		stx $02		                STX $02
 .1907f5	a6 0a		ldx $0a		                LDX $0A
-.1907f7	bf 00 1b 19	lda $191b00,x	                LDA GAMMA_1_8_Tbl, x
+.1907f7	bf 00 1a 19	lda $191a00,x	                LDA GAMMA_1_8_Tbl, x
 .1907fb	49 aa		eor #$aa	                EOR  #$AA
 .1907fd	a6 02		ldx $02		                LDX $02
 .1907ff	9f 00 20 af	sta $af2000,x	                STA @lGRPH_LUT0_PTR, x
@@ -3582,7 +3800,7 @@
 .190a1d	c2 10		rep #$10	                REP #$10        ; set X long
 .190a1f	a2 00 00	ldx #$0000	                LDX #$0000
 .190a22					FILL_MOUSE_MARKER
-.190a22	bf 00 1d 19	lda $191d00,x	                LDA @lMOUSE_POINTER_PTR,X
+.190a22	bf 00 1c 19	lda $191c00,x	                LDA @lMOUSE_POINTER_PTR,X
 .190a26	9f 00 05 af	sta $af0500,x	                STA @lMOUSE_PTR_GRAP0_START, X
 .190a2a	e8		inx		                INX
 .190a2b	e0 00 01	cpx #$0100	                CPX #$0100
@@ -3710,7 +3928,7 @@
 .190b73	c9 55		cmp #$55					        CMP #$55
 .190b75	f0 03		beq $190b7a					        BEQ	passAAtest
 .190b77	82 a5 00	brl $190c1f	                BRL initkb_loop_out
-.190b7a	a2 51 15	ldx #$1551	passAAtest      LDX #<>pass_tst0xAAmsg
+.190b7a	a2 f9 13	ldx #$13f9	passAAtest      LDX #<>pass_tst0xAAmsg
 .190b7d	22 73 05 19	jsl $190573	                JSL IPRINT      ; print Message
 .190b81	a9 ab		lda #$ab					        LDA #$AB			;Send test Interface command
 .190b83	8f 64 10 af	sta $af1064					        STA KBD_CMD_BUF
@@ -3719,7 +3937,7 @@
 .190b8e	c9 00		cmp #$00					        CMP #$00			;Should be 00
 .190b90	f0 03		beq $190b95					        BEQ	passABtest
 .190b92	82 8a 00	brl $190c1f	                BRL initkb_loop_out
-.190b95	a2 6a 15	ldx #$156a	passABtest      LDX #<>pass_tst0xABmsg
+.190b95	a2 12 14	ldx #$1412	passABtest      LDX #<>pass_tst0xABmsg
 .190b98	22 73 05 19	jsl $190573	                JSL IPRINT       ; print Message
 .190b9c	a9 60		lda #$60	                LDA #$60            ; Send Command 0x60 so to Enable Interrupt
 .190b9e	8f 64 10 af	sta $af1064	                STA KBD_CMD_BUF
@@ -3727,7 +3945,7 @@
 .190ba5	a9 69		lda #$69	                LDA #%01101001      ; Enable Interrupt
 .190ba7	8f 60 10 af	sta $af1060	                STA KBD_DATA_BUF
 .190bab	20 2f 0c	jsr $190c2f	                JSR Poll_Inbuf ;
-.190bae	a2 83 15	ldx #$1583	                LDX #<>pass_cmd0x60msg
+.190bae	a2 2b 14	ldx #$142b	                LDX #<>pass_cmd0x60msg
 .190bb1	22 73 05 19	jsl $190573	                JSL IPRINT       ; print Message
 .190bb5	a9 ff		lda #$ff	                LDA #$FF      ; Send Keyboard Reset command
 .190bb7	8f 60 10 af	sta $af1060	                STA KBD_DATA_BUF
@@ -3745,7 +3963,7 @@
 .190bca	d0 f2		bne $190bbe	                BNE DLY_LOOP1
 .190bcc	20 3a 0c	jsr $190c3a	                JSR Poll_Outbuf ;
 .190bcf	af 60 10 af	lda $af1060	                LDA KBD_OUT_BUF   ; Read Output Buffer
-.190bd3	a2 97 15	ldx #$1597	                LDX #<>pass_cmd0xFFmsg
+.190bd3	a2 3f 14	ldx #$143f	                LDX #<>pass_cmd0xFFmsg
 .190bd6	22 73 05 19	jsl $190573	                JSL IPRINT       ; print Message
 .190bda					DO_CMD_F4_AGAIN
 .190bda	20 2f 0c	jsr $190c2f	                JSR Poll_Inbuf ;
@@ -3768,10 +3986,10 @@
 .190c0f	af 4c 01 00	lda $00014c	                LDA @lINT_MASK_REG0
 .190c13	29 7f		and #$7f	                AND #~FNX0_INT07_MOUSE
 .190c15	8f 4c 01 00	sta $00014c	                STA @lINT_MASK_REG0
-.190c19	a2 cd 15	ldx #$15cd	                LDX #<>Success_kb_init
+.190c19	a2 75 14	ldx #$1475	                LDX #<>Success_kb_init
 .190c1c	38		sec		                SEC
 .190c1d	b0 03		bcs $190c22	                BCS InitSuccess
-.190c1f	a2 df 15	ldx #$15df	initkb_loop_out LDX #<>Failed_kb_init
+.190c1f	a2 87 14	ldx #$1487	initkb_loop_out LDX #<>Failed_kb_init
 .190c22	22 73 05 19	jsl $190573	InitSuccess     JSL IPRINT       ; print Message
 .190c26	c2 20		rep #$20	                REP #$20        ; set A long
 .190c28	c2 10		rep #$10	                REP #$10        ; set X long
@@ -4042,10 +4260,10 @@
 .190eb9	af 2a 01 00	lda $00012a	                LDA @lADDER32_R_HL
 .190ebd	85 46		sta $46		                STA BMP_PRSE_SRC_PTR+2
 .190ebf	20 2f 0f	jsr $190f2f	                JSR BMP_PARSER_DMA_SHIT_OUT  ; We are going to start with the slow method
-.190ec2	a2 3d 16	ldx #$163d	                LDX #<>bmp_parser_msg0
+.190ec2	a2 e5 14	ldx #$14e5	                LDX #<>bmp_parser_msg0
 .190ec5	80 03		bra $190eca	                BRA BMP_PARSER_END_NO_ERROR
 .190ec7					BMP_PARSER_END_WITH_ERROR
-.190ec7	a2 29 16	ldx #$1629	                LDX #<>bmp_parser_err0
+.190ec7	a2 d1 14	ldx #$14d1	                LDX #<>bmp_parser_err0
 .190eca					BMP_PARSER_END_NO_ERROR
 .190eca	22 73 05 19	jsl $190573	                JSL IPRINT       ; print the first line
 .190ece	6b		rtl		                RTL
@@ -4139,345 +4357,230 @@
 .190f72	69 00 00	adc #$0000	                ADC #$0000
 .190f75	85 4a		sta $4a		                STA BMP_PRSE_DST_PTR+2
 .190f77	60		rts		                RTS
-.190f78					IRQ_HANDLER
-.190f78	e2 20		sep #$20	                SEP #$20        ; set A short
-.190f7a	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
-.190f7e	29 01		and #$01	                AND #FNX0_INT00_SOF
-.190f80	c9 01		cmp #$01	                CMP #FNX0_INT00_SOF
-.190f82	d0 05		bne $190f89	                BNE SERVICE_NEXT_IRQ0
-.190f84	20 99 10	jsr $191099	                JSR SOF_INTERRUPT
-.190f87	80 19		bra $190fa2	                BRA EXIT_IRQ_HANDLE
-.190f89					SERVICE_NEXT_IRQ0
-.190f89	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
-.190f8d	29 80		and #$80	                AND #FNX0_INT07_MOUSE
-.190f8f	c9 80		cmp #$80	                CMP #FNX0_INT07_MOUSE
-.190f91	d0 05		bne $190f98	                BNE SERVICE_NEXT_IRQ7
-.190f93	20 a4 10	jsr $1910a4	                JSR MOUSE_INTERRUPT
-.190f96	80 0a		bra $190fa2	                BRA EXIT_IRQ_HANDLE
-.190f98					SERVICE_NEXT_IRQ7
-.190f98	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
-.190f9c	29 01		and #$01	                AND #FNX1_INT00_KBD
-.190f9e	c9 01		cmp #$01	                CMP #FNX1_INT00_KBD
-.190fa0	f0 03		beq $190fa5	                BEQ SERVICE_NEXT_IRQ8
-.190fa2					EXIT_IRQ_HANDLE
-.190fa2	c2 30		rep #$30	                REP #$30        ; set A&X long
-.190fa4	6b		rtl		                RTL
-.190fa5					SERVICE_NEXT_IRQ8
-.190fa5	a2 00 00	ldx #$0000	                ldx #$0000
-.190fa8	e2 10		sep #$10	                SEP #$10        ; set X short
-.190faa	e2 20		sep #$20	                SEP #$20        ; set A short
-.190fac	af 41 01 00	lda $000141	                LDA @lINT_PENDING_REG1
-.190fb0	29 01		and #$01	                AND #FNX1_INT00_KBD
-.190fb2	8f 41 01 00	sta $000141	                STA @lINT_PENDING_REG1
-.190fb6					IRQ_HANDLER_FETCH
-.190fb6	af 60 10 af	lda $af1060	                LDA KBD_INPT_BUF        ; Get Scan Code from KeyBoard
-.190fba	8f 88 0f 00	sta $000f88	                STA KEYBOARD_SC_TMP     ; Save Code Immediately
-.190fbe	c9 2a		cmp #$2a	                CMP #$2A                ; Left Shift Pressed
-.190fc0	d0 03		bne $190fc5	                BNE NOT_KB_SET_SHIFT
-.190fc2	82 79 00	brl $19103e	                BRL KB_SET_SHIFT
-.190fc5					NOT_KB_SET_SHIFT
-.190fc5	c9 aa		cmp #$aa	                CMP #$AA                ; Left Shift Unpressed
-.190fc7	d0 03		bne $190fcc	                BNE NOT_KB_CLR_SHIFT
-.190fc9	82 7f 00	brl $19104b	                BRL KB_CLR_SHIFT
-.190fcc					NOT_KB_CLR_SHIFT
-.190fcc	c9 1d		cmp #$1d	                CMP #$1D                ; Left CTRL pressed
-.190fce	d0 03		bne $190fd3	                BNE NOT_KB_SET_CTRL
-.190fd0	82 85 00	brl $191058	                BRL KB_SET_CTRL
-.190fd3					NOT_KB_SET_CTRL
-.190fd3	c9 9d		cmp #$9d	                CMP #$9D                ; Left CTRL Unpressed
-.190fd5	d0 03		bne $190fda	                BNE NOT_KB_CLR_CTRL
-.190fd7	82 8b 00	brl $191065	                BRL KB_CLR_CTRL
-.190fda					NOT_KB_CLR_CTRL
-.190fda	c9 38		cmp #$38	                CMP #$38                ; Left ALT Pressed
-.190fdc	d0 03		bne $190fe1	                BNE NOT_KB_SET_ALT
-.190fde	82 91 00	brl $191072	                BRL KB_SET_ALT
-.190fe1					NOT_KB_SET_ALT
-.190fe1	c9 b8		cmp #$b8	                CMP #$B8                ; Left ALT Unpressed
-.190fe3	d0 03		bne $190fe8	                BNE KB_UNPRESSED
-.190fe5	82 97 00	brl $19107f	                BRL KB_CLR_ALT
-.190fe8	29 80		and #$80	KB_UNPRESSED    AND #$80                ; See if the Scan Code is press or Depressed
-.190fea	c9 80		cmp #$80	                CMP #$80                ; Depress Status - We will not do anything at this point
-.190fec	d0 03		bne $190ff1	                BNE KB_NORM_SC
-.190fee	82 98 00	brl $191089	                BRL KB_CHECK_B_DONE
-.190ff1	af 88 0f 00	lda $000f88	KB_NORM_SC      LDA KEYBOARD_SC_TMP       ;
-.190ff5	aa		tax		                TAX
-.190ff6	af 87 0f 00	lda $000f87	                LDA KEYBOARD_SC_FLG     ; Check to See if the SHIFT Key is being Pushed
-.190ffa	29 10		and #$10	                AND #$10
-.190ffc	c9 10		cmp #$10	                CMP #$10
-.190ffe	f0 1b		beq $19101b	                BEQ SHIFT_KEY_ON
-.191000	af 87 0f 00	lda $000f87	                LDA KEYBOARD_SC_FLG     ; Check to See if the CTRL Key is being Pushed
-.191004	29 20		and #$20	                AND #$20
-.191006	c9 20		cmp #$20	                CMP #$20
-.191008	f0 18		beq $191022	                BEQ CTRL_KEY_ON
-.19100a	af 87 0f 00	lda $000f87	                LDA KEYBOARD_SC_FLG     ; Check to See if the ALT Key is being Pushed
-.19100e	29 40		and #$40	                AND #$40
-.191010	c9 40		cmp #$40	                CMP #$40
-.191012	f0 15		beq $191029	                BEQ ALT_KEY_ON
-.191014	bf 00 17 19	lda $191700,x	                LDA @lScanCode_Press_Set1, x
-.191018	82 12 00	brl $19102d	                BRL KB_WR_2_SCREEN
-.19101b	bf 80 17 19	lda $191780,x	SHIFT_KEY_ON    LDA @lScanCode_Shift_Set1, x
-.19101f	82 0b 00	brl $19102d	                BRL KB_WR_2_SCREEN
-.191022	bf 00 18 19	lda $191800,x	CTRL_KEY_ON     LDA @lScanCode_Ctrl_Set1, x
-.191026	82 04 00	brl $19102d	                BRL KB_WR_2_SCREEN
-.191029	bf 80 18 19	lda $191880,x	ALT_KEY_ON      LDA @lScanCode_Alt_Set1, x
-.19102d					KB_WR_2_SCREEN
-.19102d	48		pha		                PHA
-.19102e	c2 10		rep #$10	                REP #$10        ; set X long
-.191030	22 00 30 19	jsl $193000	                JSL SAVECHAR2CMDLINE
-.191034	e2 20		sep #$20	                SEP #$20        ; set A short
-.191036	68		pla		                PLA
-.191037	22 18 00 19	jsl $190018	                JSL PUTC
-.19103b	4c 89 10	jmp $191089	                JMP KB_CHECK_B_DONE
-.19103e	af 87 0f 00	lda $000f87	KB_SET_SHIFT    LDA KEYBOARD_SC_FLG
-.191042	09 10		ora #$10	                ORA #$10
-.191044	8f 87 0f 00	sta $000f87	                STA KEYBOARD_SC_FLG
-.191048	4c 89 10	jmp $191089	                JMP KB_CHECK_B_DONE
-.19104b	af 87 0f 00	lda $000f87	KB_CLR_SHIFT    LDA KEYBOARD_SC_FLG
-.19104f	29 ef		and #$ef	                AND #$EF
-.191051	8f 87 0f 00	sta $000f87	                STA KEYBOARD_SC_FLG
-.191055	4c 89 10	jmp $191089	                JMP KB_CHECK_B_DONE
-.191058	af 87 0f 00	lda $000f87	KB_SET_CTRL    LDA KEYBOARD_SC_FLG
-.19105c	09 20		ora #$20	                ORA #$20
-.19105e	8f 87 0f 00	sta $000f87	                STA KEYBOARD_SC_FLG
-.191062	4c 89 10	jmp $191089	                JMP KB_CHECK_B_DONE
-.191065	af 87 0f 00	lda $000f87	KB_CLR_CTRL    LDA KEYBOARD_SC_FLG
-.191069	29 df		and #$df	                AND #$DF
-.19106b	8f 87 0f 00	sta $000f87	                STA KEYBOARD_SC_FLG
-.19106f	4c 89 10	jmp $191089	                JMP KB_CHECK_B_DONE
-.191072	af 87 0f 00	lda $000f87	KB_SET_ALT      LDA KEYBOARD_SC_FLG
-.191076	09 40		ora #$40	                ORA #$40
-.191078	8f 87 0f 00	sta $000f87	                STA KEYBOARD_SC_FLG
-.19107c	4c 89 10	jmp $191089	                JMP KB_CHECK_B_DONE
-.19107f	af 87 0f 00	lda $000f87	KB_CLR_ALT     LDA KEYBOARD_SC_FLG
-.191083	29 bf		and #$bf	                AND #$BF
-.191085	8f 87 0f 00	sta $000f87	                STA KEYBOARD_SC_FLG
-.191089					KB_CHECK_B_DONE
-.191089	af 64 10 af	lda $af1064	                LDA STATUS_PORT
-.19108d	29 01		and #$01	                AND #OUT_BUF_FULL ; Test bit $01 (if 1, Full)
-.19108f	c9 01		cmp #$01	                CMP #OUT_BUF_FULL ; if Still Byte in the Buffer, fetch it out
-.191091	d0 03		bne $191096	                BNE KB_DONE
-.191093	4c b6 0f	jmp $190fb6	                JMP IRQ_HANDLER_FETCH
-.191096					KB_DONE
-.191096	c2 30		rep #$30	                REP #$30        ; set A&X long
-.191098	6b		rtl		                RTL
-.191099					SOF_INTERRUPT
-.191099	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
-.19109d	29 01		and #$01	                AND #FNX0_INT00_SOF
-.19109f	8f 40 01 00	sta $000140	                STA @lINT_PENDING_REG0
-.1910a3	60		rts		                RTS
-.1910a4					MOUSE_INTERRUPT
-.1910a4	e2 20		sep #$20	                SEP #$20        ; set A short
-.1910a6	af 60 10 af	lda $af1060	                LDA KBD_INPT_BUF
-.1910aa	e2 10		sep #$10	                SEP #$10        ; set X short
-.1910ac	a6 e0		ldx $e0		                LDX MOUSE_PTR
-.1910ae	9f 06 07 af	sta $af0706,x	                STA @lMOUSE_PTR_BYTE0, X
-.1910b2	e8		inx		                INX
-.1910b3	e0 03		cpx #$03	                CPX #$03
-.1910b5	d0 02		bne $1910b9	                BNE EXIT_FOR_NEXT_VALUE
-.1910b7	a2 00		ldx #$00	                LDX #$00
-.1910b9					EXIT_FOR_NEXT_VALUE
-.1910b9	86 e0		stx $e0		                STX MOUSE_PTR
-.1910bb	af 40 01 00	lda $000140	                LDA @lINT_PENDING_REG0
-.1910bf	29 80		and #$80	                AND #FNX0_INT07_MOUSE
-.1910c1	8f 40 01 00	sta $000140	                STA @lINT_PENDING_REG0
-.1910c5	c2 10		rep #$10	                REP #$10        ; set X long
-.1910c7	60		rts		                RTS
-.1910c8					NMI_HANDLER
-.1910c8	a2 18 16	ldx #$1618	                LDX #<>nmi_Msg
-.1910cb	22 73 05 19	jsl $190573	                JSL IPRINT       ; print the Init
-.1910cf	6b		rtl		                RTL
-.1910d0	00		brk #		IRESTORE        BRK ; Warm boot routine
-.1910d1	00		brk #		ISCINIT         BRK ;
-.1910d2	00		brk #		IIOINIT         BRK ;
-.1910d3	00		brk #		IPUTBLOCK       BRK ; Ouput a binary block to the currently selected channel
-.1910d4	00		brk #		ISETLFS         BRK ; Obsolete (done in OPEN)
-.1910d5	00		brk #		ISETNAM         BRK ; Obsolete (done in OPEN)
-.1910d6	00		brk #		IOPEN           BRK ; Open a channel for reading and/or writing. Use SETLFS and SETNAM to set the channels and filename first.
-.1910d7	00		brk #		ICLOSE          BRK ; Close a channel
-.1910d8	00		brk #		ISETIN          BRK ; Set the current input channel
-.1910d9	00		brk #		ISETOUT         BRK ; Set the current output channel
-.1910da	00		brk #		IGETB           BRK ; Get a byte from input channel. Return 0 if no input. Carry is set if no input.
-.1910db	00		brk #		IGETBLOCK       BRK ; Get a X byes from input channel. If Carry is set, wait. If Carry is clear, do not wait.
-.1910dc	00		brk #		IGETCH          BRK ; Get a character from the input channel. A=0 and Carry=1 if no data is wating
-.1910dd	00		brk #		IGETS           BRK ; Get a string from the input channel. NULL terminates
-.1910de	00		brk #		IGETLINE        BRK ; Get a line of text from input channel. CR or NULL terminates.
-.1910df	00		brk #		IGETFIELD       BRK ; Get a field from the input channel. Value in A, CR, or NULL terminates
-.1910e0	00		brk #		ITRIM           BRK ; Removes spaces at beginning and end of string.
-.1910e1	00		brk #		IPRINTC         BRK ; Print character to screen. Handles terminal commands
-.1910e2	00		brk #		IPRINTS         BRK ; Print string to screen. Handles terminal commands
-.1910e3	00		brk #		IPRINTF         BRK ; Print a float value
-.1910e4	00		brk #		IPRINTI         BRK ; Prints integer value in TEMP
-.1910e5	00		brk #		IPRINTAI        BRK ; Prints integer value in A
-.1910e6	00		brk #		IPRINTAH        BRK ; Prints hex value in A. Printed value is 2 wide if M flag is 1, 4 wide if M=0
-.1910e7	00		brk #		IPUSHKEY        BRK ;
-.1910e8	00		brk #		IPUSHKEYS       BRK ;
-.1910e9	00		brk #		ICSRLEFT        BRK ;
-.1910ea	00		brk #		ICSRHOME        BRK ;
-.1910eb	00		brk #		ISCRREADLINE    BRK ; Loads the MCMDADDR/BCMDADDR variable with the address of the current line on the screen. This is called when the RETURN key is pressed and is the first step in processing an immediate mode command.
-.1910ec	00		brk #		ISCRGETWORD     BRK ; Read a current word on the screen. A word ends with a space, punctuation (except _), or any control character (value < 32). Loads the address into CMPTEXT_VAL and length into CMPTEXT_LEN variables.
-.1910ed					KERNEL_DATA
->1910ed	20 20 20 20 0b 0c 0b 0c		greet_msg       .text $20, $20, $20, $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, "C256 FOENIX DEVELOPMENT SYSTEM",$0D
->1910f5	0b 0c 0b 0c 0b 0c 43 32 35 36 20 46 4f 45 4e 49
->191105	58 20 44 45 56 45 4c 4f 50 4d 45 4e 54 20 53 59
->191115	53 54 45 4d 0d
->19111a	20 20 20 0b 0c 0b 0c 0b		                .text $20, $20, $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, "May the Power of the 65C816 Bring You Joy!",$0D
->191122	0c 0b 0c 0b 0c 20 4d 61 79 20 74 68 65 20 50 6f
->191132	77 65 72 20 6f 66 20 74 68 65 20 36 35 43 38 31
->191142	36 20 42 72 69 6e 67 20 59 6f 75 20 4a 6f 79 21
->191152	0d
->191153	20 20 0b 0c 0b 0c 0b 0c		                .text $20, $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, $20, "System Designed by: Stefany Allaire",$0D
->19115b	0b 0c 0b 0c 20 20 53 79 73 74 65 6d 20 44 65 73
->19116b	69 67 6e 65 64 20 62 79 3a 20 53 74 65 66 61 6e
->19117b	79 20 41 6c 6c 61 69 72 65 0d
->191185	20 0b 0c 0b 0c 0b 0c 0b		                .text $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, $20, $20, "www.c256foenix.com",$0D
->19118d	0c 0b 0c 20 20 20 77 77 77 2e 63 32 35 36 66 6f
->19119d	65 6e 69 78 2e 63 6f 6d 0d
->1911a6	0b 0c 0b 0c 0b 0c 0b 0c		                .text $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, $20, $20, $20, "2048KB CODE RAM  4096K VIDEO MEM",$0D, $00
->1911ae	0b 0c 20 20 20 20 32 30 34 38 4b 42 20 43 4f 44
->1911be	45 20 52 41 4d 20 20 34 30 39 36 4b 20 56 49 44
->1911ce	45 4f 20 4d 45 4d 0d 00
-.1911d6					old_pc_style_stat
->1911d6	d6 c4 c4 c4 c4 c4 c4 c4		                .text $D6, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C2
->1911de	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
->1911ee	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c2
->1911fa	c4 c4 c4 c4 c4 c4 c4 c4		                .text      $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $B7, $0D
->191202	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
->191212	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 b7 0d
->19121e	ba 20 4d 61 69 6e 20 50		                .text $BA, " Main Processor     : 65C816      ",$B3," Base Memory Size     : 2048K     ",$BA, $0D
->191226	72 6f 63 65 73 73 6f 72 20 20 20 20 20 3a 20 36
->191236	35 43 38 31 36 20 20 20 20 20 20 b3 20 42 61 73
->191246	65 20 4d 65 6d 6f 72 79 20 53 69 7a 65 20 20 20
->191256	20 20 3a 20 32 30 34 38 4b 20 20 20 20 20 ba 0d
->191266	ba 20 4e 75 6d 65 72 69		                .text $BA, " Numeric Processor  : CFP9518     ",$B3," Video Memory Size    : 4096K     ",$BA, $0D
->19126e	63 20 50 72 6f 63 65 73 73 6f 72 20 20 3a 20 43
->19127e	46 50 39 35 31 38 20 20 20 20 20 b3 20 56 69 64
->19128e	65 6f 20 4d 65 6d 6f 72 79 20 53 69 7a 65 20 20
->19129e	20 20 3a 20 34 30 39 36 4b 20 20 20 20 20 ba 0d
->1912ae	ba 20 46 6c 6f 70 70 79		                .text $BA, " Floppy Driver A:   : Yes         ",$B3," Hard Disk C: Type    : None      ",$BA, $0D
->1912b6	20 44 72 69 76 65 72 20 41 3a 20 20 20 3a 20 59
->1912c6	65 73 20 20 20 20 20 20 20 20 20 b3 20 48 61 72
->1912d6	64 20 44 69 73 6b 20 43 3a 20 54 79 70 65 20 20
->1912e6	20 20 3a 20 4e 6f 6e 65 20 20 20 20 20 20 ba 0d
->1912f6	ba 20 53 44 43 61 72 64		                .text $BA, " SDCard Card Reader : Yes         ",$B3," Serial Port(s)       : $AF:13F8, ",$BA, $0D
->1912fe	20 43 61 72 64 20 52 65 61 64 65 72 20 3a 20 59
->19130e	65 73 20 20 20 20 20 20 20 20 20 b3 20 53 65 72
->19131e	69 61 6c 20 50 6f 72 74 28 73 29 20 20 20 20 20
->19132e	20 20 3a 20 24 41 46 3a 31 33 46 38 2c 20 ba 0d
->19133e	ba 20 44 69 73 70 6c 61		                .text $BA, " Display Type       : VGA         ",$B3,"                        $AF:12F8  ",$BA, $0D
->191346	79 20 54 79 70 65 20 20 20 20 20 20 20 3a 20 56
->191356	47 41 20 20 20 20 20 20 20 20 20 b3 20 20 20 20
->191366	20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20
->191376	20 20 20 20 24 41 46 3a 31 32 46 38 20 20 ba 0d
->191386	ba 20 46 6f 65 6e 69 78		                .text $BA, " Foenix Kernel Date : 050419      ",$B3," Parallel Ports(s)    : $AF:1378  ",$BA, $0D
->19138e	20 4b 65 72 6e 65 6c 20 44 61 74 65 20 3a 20 30
->19139e	35 30 34 31 39 20 20 20 20 20 20 b3 20 50 61 72
->1913ae	61 6c 6c 65 6c 20 50 6f 72 74 73 28 73 29 20 20
->1913be	20 20 3a 20 24 41 46 3a 31 33 37 38 20 20 ba 0d
->1913ce	ba 20 4b 65 79 62 6f 61		                .text $BA, " Keyboard Type      : PS2         ",$B3," Sound Chip Installed : OPL2(2)   ",$BA, $0D
->1913d6	72 64 20 54 79 70 65 20 20 20 20 20 20 3a 20 50
->1913e6	53 32 20 20 20 20 20 20 20 20 20 b3 20 53 6f 75
->1913f6	6e 64 20 43 68 69 70 20 49 6e 73 74 61 6c 6c 65
->191406	64 20 3a 20 4f 50 4c 32 28 32 29 20 20 20 ba 0d
->191416	d3 c4 c4 c4 c4 c4 c4 c4		                .text $D3, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C1
->19141e	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
->19142e	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c1
->19143a	c4 c4 c4 c4 c4 c4 c4 c4		                .text      $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $BD, $00
->191442	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
->191452	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 bd 00
->19145e	1d 1d 1d 1d 1d 1d 8d 8d		greet_clr_line1 .text $1D, $1D, $1D, $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D
->191466	4d 4d 2d 2d 5d 5d
->19146c	1d 1d 1d 1d 1d 8d 8d 4d		greet_clr_line2 .text $1D, $1D, $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D
->191474	4d 2d 2d 5d 5d 5d
->19147a	1d 1d 1d 1d 8d 8d 4d 4d		greet_clr_line3 .text $1D, $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D, $5D
->191482	2d 2d 5d 5d 5d 5d
->191488	1d 1d 1d 8d 8d 4d 4d 2d		greet_clr_line4 .text $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D, $5D, $5D
->191490	2d 5d 5d 5d 5d 5d
->191496	1d 1d 8d 8d 4d 4d 2d 2d		greet_clr_line5 .text $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D, $5D, $5D, $5D
->19149e	5d 5d 5d 5d 5d 5d
->1914a4	00 00 00 ff			fg_color_lut	  .text $00, $00, $00, $FF
->1914a8	00 00 80 ff			                .text $00, $00, $80, $FF
->1914ac	00 80 00 ff			                .text $00, $80, $00, $FF
->1914b0	80 00 00 ff			                .text $80, $00, $00, $FF
->1914b4	00 80 80 ff			                .text $00, $80, $80, $FF
->1914b8	80 80 00 ff			                .text $80, $80, $00, $FF
->1914bc	80 00 80 ff			                .text $80, $00, $80, $FF
->1914c0	80 80 80 ff			                .text $80, $80, $80, $FF
->1914c4	00 45 ff ff			                .text $00, $45, $FF, $FF
->1914c8	13 45 8b ff			                .text $13, $45, $8B, $FF
->1914cc	00 00 20 ff			                .text $00, $00, $20, $FF
->1914d0	00 20 00 ff			                .text $00, $20, $00, $FF
->1914d4	20 00 00 ff			                .text $20, $00, $00, $FF
->1914d8	20 20 20 ff			                .text $20, $20, $20, $FF
->1914dc	40 40 40 ff			                .text $40, $40, $40, $FF
->1914e0	ff ff ff ff			                .text $FF, $FF, $FF, $FF
->1914e4	00 00 00 ff			bg_color_lut	  .text $00, $00, $00, $FF
->1914e8	00 00 80 ff			                .text $00, $00, $80, $FF
->1914ec	00 80 00 ff			                .text $00, $80, $00, $FF
->1914f0	80 00 00 ff			                .text $80, $00, $00, $FF
->1914f4	00 20 20 ff			                .text $00, $20, $20, $FF
->1914f8	20 20 00 ff			                .text $20, $20, $00, $FF
->1914fc	20 00 20 ff			                .text $20, $00, $20, $FF
->191500	20 20 20 ff			                .text $20, $20, $20, $FF
->191504	1e 69 d2 ff			                .text $1E, $69, $D2, $FF
->191508	13 45 8b ff			                .text $13, $45, $8B, $FF
->19150c	00 00 20 ff			                .text $00, $00, $20, $FF
->191510	00 20 00 ff			                .text $00, $20, $00, $FF
->191514	40 00 00 ff			                .text $40, $00, $00, $FF
->191518	10 10 10 ff			                .text $10, $10, $10, $FF
->19151c	40 40 40 ff			                .text $40, $40, $40, $FF
->191520	ff ff ff ff			                .text $FF, $FF, $FF, $FF
->191524	0d 44 65 62 75 67 20 43		version_msg     .text $0D, "Debug Code Version 0.0.0 - March 26th, 2019", $00
->19152c	6f 64 65 20 56 65 72 73 69 6f 6e 20 30 2e 30 2e
->19153c	30 20 2d 20 4d 61 72 63 68 20 32 36 74 68 2c 20
->19154c	32 30 31 39 00
->191551	43 6d 64 20 30 78 41 41		pass_tst0xAAmsg .text "Cmd 0xAA Test passed...", $0D, $00
->191559	20 54 65 73 74 20 70 61 73 73 65 64 2e 2e 2e 0d
->191569	00
->19156a	43 6d 64 20 30 78 41 42		pass_tst0xABmsg .text "Cmd 0xAB Test passed...", $0D, $00
->191572	20 54 65 73 74 20 70 61 73 73 65 64 2e 2e 2e 0d
->191582	00
->191583	43 6d 64 20 30 78 36 30		pass_cmd0x60msg .text "Cmd 0x60 Executed.", $0D, $00
->19158b	20 45 78 65 63 75 74 65 64 2e 0d 00
->191597	43 6d 64 20 30 78 46 46		pass_cmd0xFFmsg .text "Cmd 0xFF (Reset) Done.", $0D, $00
->19159f	20 28 52 65 73 65 74 29 20 44 6f 6e 65 2e 0d 00
->1915af	43 6d 64 20 30 78 45 45		pass_cmd0xEEmsg .text "Cmd 0xEE Echo Test passed...", $0D, $00
->1915b7	20 45 63 68 6f 20 54 65 73 74 20 70 61 73 73 65
->1915c7	64 2e 2e 2e 0d 00
->1915cd	4b 65 79 62 6f 61 72 64		Success_kb_init .text "Keyboard Present", $0D, $00
->1915d5	20 50 72 65 73 65 6e 74 0d 00
->1915df	4e 6f 20 4b 65 79 62 6f		Failed_kb_init  .text "No Keyboard Attached or Failed Init...", $0D, $00
->1915e7	61 72 64 20 41 74 74 61 63 68 65 64 20 6f 72 20
->1915f7	46 61 69 6c 65 64 20 49 6e 69 74 2e 2e 2e 0d 00
->191607	5b 49 52 51 20 49 6e 74		irq_Msg         .text "[IRQ Interrupt]", $0D, $00
->19160f	65 72 72 75 70 74 5d 0d 00
->191618	5b 4e 4d 49 20 49 6e 74		nmi_Msg         .text "[NMI Interrupt]", $0D, $00
->191620	65 72 72 75 70 74 5d 0d 00
->191629	4e 4f 20 53 49 47 4e 41		bmp_parser_err0 .text "NO SIGNATURE FOUND.", $00
->191631	54 55 52 45 20 46 4f 55 4e 44 2e 00
->19163d	42 4d 50 20 4c 4f 41 44		bmp_parser_msg0 .text "BMP LOADED.", $00
->191645	45 44 2e 00
->191649	45 58 45 43 55 54 49 4e		bmp_parser_msg1 .text "EXECUTING BMP PARSER", $00
->191651	47 20 42 4d 50 20 50 41 52 53 45 52 00
->19165e	0d 52 45 41 44 59 2e 00		ready_msg       .null $0D,"READY."
->191666	47 20 30 32 30 30 30 30		hello_ml        .null "G 020000",$0D
->19166e	0d 00
->191670	48 45 4c 4c 4f 20 57 4f		                .null "HELLO WORLD",$0D
->191678	52 4c 44 0d 00
->19167d	0d 00				                .null $0D
->19167f	20 50 43 20 20 20 20 20		                .null " PC     A    X    Y    SP   DBR DP   NVMXDIZC",$0D
->191687	41 20 20 20 20 58 20 20 20 20 59 20 20 20 20 53
->191697	50 20 20 20 44 42 52 20 44 50 20 20 20 4e 56 4d
->1916a7	58 44 49 5a 43 0d 00
->1916ae	3b 30 30 32 31 31 32 20		                .null ";002112 0019 F0AA 0000 D6FF F8  0000 --M-----"
->1916b6	30 30 31 39 20 46 30 41 41 20 30 30 30 30 20 44
->1916c6	36 46 46 20 46 38 20 20 30 30 30 30 20 2d 2d 4d
->1916d6	2d 2d 2d 2d 2d 00
->1916dc	41 42 4f 52 54 20 45 52		error_01        .null "ABORT ERROR"
->1916e4	52 4f 52 00
->1916e8	30 31 32 33 34 35 36 37		hex_digits      .text "0123456789ABCDEF",0
->1916f0	38 39 41 42 43 44 45 46 00
->1916f9					.align 256
->191700	00 1b 31 32 33 34 35 36		ScanCode_Press_Set1   .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
+.190f78	00		brk #		IRESTORE        BRK ; Warm boot routine
+.190f79	00		brk #		ISCINIT         BRK ;
+.190f7a	00		brk #		IIOINIT         BRK ;
+.190f7b	00		brk #		IPUTBLOCK       BRK ; Ouput a binary block to the currently selected channel
+.190f7c	00		brk #		ISETLFS         BRK ; Obsolete (done in OPEN)
+.190f7d	00		brk #		ISETNAM         BRK ; Obsolete (done in OPEN)
+.190f7e	00		brk #		IOPEN           BRK ; Open a channel for reading and/or writing. Use SETLFS and SETNAM to set the channels and filename first.
+.190f7f	00		brk #		ICLOSE          BRK ; Close a channel
+.190f80	00		brk #		ISETIN          BRK ; Set the current input channel
+.190f81	00		brk #		ISETOUT         BRK ; Set the current output channel
+.190f82	00		brk #		IGETB           BRK ; Get a byte from input channel. Return 0 if no input. Carry is set if no input.
+.190f83	00		brk #		IGETBLOCK       BRK ; Get a X byes from input channel. If Carry is set, wait. If Carry is clear, do not wait.
+.190f84	00		brk #		IGETCH          BRK ; Get a character from the input channel. A=0 and Carry=1 if no data is wating
+.190f85	00		brk #		IGETS           BRK ; Get a string from the input channel. NULL terminates
+.190f86	00		brk #		IGETLINE        BRK ; Get a line of text from input channel. CR or NULL terminates.
+.190f87	00		brk #		IGETFIELD       BRK ; Get a field from the input channel. Value in A, CR, or NULL terminates
+.190f88	00		brk #		ITRIM           BRK ; Removes spaces at beginning and end of string.
+.190f89	00		brk #		IPRINTC         BRK ; Print character to screen. Handles terminal commands
+.190f8a	00		brk #		IPRINTS         BRK ; Print string to screen. Handles terminal commands
+.190f8b	00		brk #		IPRINTF         BRK ; Print a float value
+.190f8c	00		brk #		IPRINTI         BRK ; Prints integer value in TEMP
+.190f8d	00		brk #		IPRINTAI        BRK ; Prints integer value in A
+.190f8e	00		brk #		IPRINTAH        BRK ; Prints hex value in A. Printed value is 2 wide if M flag is 1, 4 wide if M=0
+.190f8f	00		brk #		IPUSHKEY        BRK ;
+.190f90	00		brk #		IPUSHKEYS       BRK ;
+.190f91	00		brk #		ICSRLEFT        BRK ;
+.190f92	00		brk #		ICSRHOME        BRK ;
+.190f93	00		brk #		ISCRREADLINE    BRK ; Loads the MCMDADDR/BCMDADDR variable with the address of the current line on the screen. This is called when the RETURN key is pressed and is the first step in processing an immediate mode command.
+.190f94	00		brk #		ISCRGETWORD     BRK ; Read a current word on the screen. A word ends with a space, punctuation (except _), or any control character (value < 32). Loads the address into CMPTEXT_VAL and length into CMPTEXT_LEN variables.
+.190f95					KERNEL_DATA
+>190f95	20 20 20 20 0b 0c 0b 0c		greet_msg       .text $20, $20, $20, $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, "C256 FOENIX DEVELOPMENT SYSTEM",$0D
+>190f9d	0b 0c 0b 0c 0b 0c 43 32 35 36 20 46 4f 45 4e 49
+>190fad	58 20 44 45 56 45 4c 4f 50 4d 45 4e 54 20 53 59
+>190fbd	53 54 45 4d 0d
+>190fc2	20 20 20 0b 0c 0b 0c 0b		                .text $20, $20, $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, "May the Power of the 65C816 Bring You Joy!",$0D
+>190fca	0c 0b 0c 0b 0c 20 4d 61 79 20 74 68 65 20 50 6f
+>190fda	77 65 72 20 6f 66 20 74 68 65 20 36 35 43 38 31
+>190fea	36 20 42 72 69 6e 67 20 59 6f 75 20 4a 6f 79 21
+>190ffa	0d
+>190ffb	20 20 0b 0c 0b 0c 0b 0c		                .text $20, $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, $20, "System Designed by: Stefany Allaire",$0D
+>191003	0b 0c 0b 0c 20 20 53 79 73 74 65 6d 20 44 65 73
+>191013	69 67 6e 65 64 20 62 79 3a 20 53 74 65 66 61 6e
+>191023	79 20 41 6c 6c 61 69 72 65 0d
+>19102d	20 0b 0c 0b 0c 0b 0c 0b		                .text $20, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, $20, $20, "www.c256foenix.com",$0D
+>191035	0c 0b 0c 20 20 20 77 77 77 2e 63 32 35 36 66 6f
+>191045	65 6e 69 78 2e 63 6f 6d 0d
+>19104e	0b 0c 0b 0c 0b 0c 0b 0c		                .text $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $0B, $0C, $20, $20, $20, $20, "2048KB CODE RAM  4096K VIDEO MEM",$0D, $00
+>191056	0b 0c 20 20 20 20 32 30 34 38 4b 42 20 43 4f 44
+>191066	45 20 52 41 4d 20 20 34 30 39 36 4b 20 56 49 44
+>191076	45 4f 20 4d 45 4d 0d 00
+.19107e					old_pc_style_stat
+>19107e	d6 c4 c4 c4 c4 c4 c4 c4		                .text $D6, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C2
+>191086	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
+>191096	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c2
+>1910a2	c4 c4 c4 c4 c4 c4 c4 c4		                .text      $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $B7, $0D
+>1910aa	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
+>1910ba	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 b7 0d
+>1910c6	ba 20 4d 61 69 6e 20 50		                .text $BA, " Main Processor     : 65C816      ",$B3," Base Memory Size     : 2048K     ",$BA, $0D
+>1910ce	72 6f 63 65 73 73 6f 72 20 20 20 20 20 3a 20 36
+>1910de	35 43 38 31 36 20 20 20 20 20 20 b3 20 42 61 73
+>1910ee	65 20 4d 65 6d 6f 72 79 20 53 69 7a 65 20 20 20
+>1910fe	20 20 3a 20 32 30 34 38 4b 20 20 20 20 20 ba 0d
+>19110e	ba 20 4e 75 6d 65 72 69		                .text $BA, " Numeric Processor  : CFP9518     ",$B3," Video Memory Size    : 4096K     ",$BA, $0D
+>191116	63 20 50 72 6f 63 65 73 73 6f 72 20 20 3a 20 43
+>191126	46 50 39 35 31 38 20 20 20 20 20 b3 20 56 69 64
+>191136	65 6f 20 4d 65 6d 6f 72 79 20 53 69 7a 65 20 20
+>191146	20 20 3a 20 34 30 39 36 4b 20 20 20 20 20 ba 0d
+>191156	ba 20 46 6c 6f 70 70 79		                .text $BA, " Floppy Driver A:   : Yes         ",$B3," Hard Disk C: Type    : None      ",$BA, $0D
+>19115e	20 44 72 69 76 65 72 20 41 3a 20 20 20 3a 20 59
+>19116e	65 73 20 20 20 20 20 20 20 20 20 b3 20 48 61 72
+>19117e	64 20 44 69 73 6b 20 43 3a 20 54 79 70 65 20 20
+>19118e	20 20 3a 20 4e 6f 6e 65 20 20 20 20 20 20 ba 0d
+>19119e	ba 20 53 44 43 61 72 64		                .text $BA, " SDCard Card Reader : Yes         ",$B3," Serial Port(s)       : $AF:13F8, ",$BA, $0D
+>1911a6	20 43 61 72 64 20 52 65 61 64 65 72 20 3a 20 59
+>1911b6	65 73 20 20 20 20 20 20 20 20 20 b3 20 53 65 72
+>1911c6	69 61 6c 20 50 6f 72 74 28 73 29 20 20 20 20 20
+>1911d6	20 20 3a 20 24 41 46 3a 31 33 46 38 2c 20 ba 0d
+>1911e6	ba 20 44 69 73 70 6c 61		                .text $BA, " Display Type       : VGA         ",$B3,"                        $AF:12F8  ",$BA, $0D
+>1911ee	79 20 54 79 70 65 20 20 20 20 20 20 20 3a 20 56
+>1911fe	47 41 20 20 20 20 20 20 20 20 20 b3 20 20 20 20
+>19120e	20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20
+>19121e	20 20 20 20 24 41 46 3a 31 32 46 38 20 20 ba 0d
+>19122e	ba 20 46 6f 65 6e 69 78		                .text $BA, " Foenix Kernel Date : 051719      ",$B3," Parallel Ports(s)    : $AF:1378  ",$BA, $0D
+>191236	20 4b 65 72 6e 65 6c 20 44 61 74 65 20 3a 20 30
+>191246	35 31 37 31 39 20 20 20 20 20 20 b3 20 50 61 72
+>191256	61 6c 6c 65 6c 20 50 6f 72 74 73 28 73 29 20 20
+>191266	20 20 3a 20 24 41 46 3a 31 33 37 38 20 20 ba 0d
+>191276	ba 20 4b 65 79 62 6f 61		                .text $BA, " Keyboard Type      : PS2         ",$B3," Sound Chip Installed : OPL2(2)   ",$BA, $0D
+>19127e	72 64 20 54 79 70 65 20 20 20 20 20 20 3a 20 50
+>19128e	53 32 20 20 20 20 20 20 20 20 20 b3 20 53 6f 75
+>19129e	6e 64 20 43 68 69 70 20 49 6e 73 74 61 6c 6c 65
+>1912ae	64 20 3a 20 4f 50 4c 32 28 32 29 20 20 20 ba 0d
+>1912be	d3 c4 c4 c4 c4 c4 c4 c4		                .text $D3, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C1
+>1912c6	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
+>1912d6	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c1
+>1912e2	c4 c4 c4 c4 c4 c4 c4 c4		                .text      $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $C4, $BD, $00
+>1912ea	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
+>1912fa	c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 bd 00
+>191306	1d 1d 1d 1d 1d 1d 8d 8d		greet_clr_line1 .text $1D, $1D, $1D, $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D
+>19130e	4d 4d 2d 2d 5d 5d
+>191314	1d 1d 1d 1d 1d 8d 8d 4d		greet_clr_line2 .text $1D, $1D, $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D
+>19131c	4d 2d 2d 5d 5d 5d
+>191322	1d 1d 1d 1d 8d 8d 4d 4d		greet_clr_line3 .text $1D, $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D, $5D
+>19132a	2d 2d 5d 5d 5d 5d
+>191330	1d 1d 1d 8d 8d 4d 4d 2d		greet_clr_line4 .text $1D, $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D, $5D, $5D
+>191338	2d 5d 5d 5d 5d 5d
+>19133e	1d 1d 8d 8d 4d 4d 2d 2d		greet_clr_line5 .text $1D, $1D, $8D, $8D, $4D, $4D, $2D, $2D, $5D, $5D, $5D, $5D, $5D, $5D
+>191346	5d 5d 5d 5d 5d 5d
+>19134c	00 00 00 ff			fg_color_lut	  .text $00, $00, $00, $FF
+>191350	00 00 80 ff			                .text $00, $00, $80, $FF
+>191354	00 80 00 ff			                .text $00, $80, $00, $FF
+>191358	80 00 00 ff			                .text $80, $00, $00, $FF
+>19135c	00 80 80 ff			                .text $00, $80, $80, $FF
+>191360	80 80 00 ff			                .text $80, $80, $00, $FF
+>191364	80 00 80 ff			                .text $80, $00, $80, $FF
+>191368	80 80 80 ff			                .text $80, $80, $80, $FF
+>19136c	00 45 ff ff			                .text $00, $45, $FF, $FF
+>191370	13 45 8b ff			                .text $13, $45, $8B, $FF
+>191374	00 00 20 ff			                .text $00, $00, $20, $FF
+>191378	00 20 00 ff			                .text $00, $20, $00, $FF
+>19137c	20 00 00 ff			                .text $20, $00, $00, $FF
+>191380	20 20 20 ff			                .text $20, $20, $20, $FF
+>191384	40 40 40 ff			                .text $40, $40, $40, $FF
+>191388	ff ff ff ff			                .text $FF, $FF, $FF, $FF
+>19138c	00 00 00 ff			bg_color_lut	  .text $00, $00, $00, $FF
+>191390	00 00 80 ff			                .text $00, $00, $80, $FF
+>191394	00 80 00 ff			                .text $00, $80, $00, $FF
+>191398	80 00 00 ff			                .text $80, $00, $00, $FF
+>19139c	00 20 20 ff			                .text $00, $20, $20, $FF
+>1913a0	20 20 00 ff			                .text $20, $20, $00, $FF
+>1913a4	20 00 20 ff			                .text $20, $00, $20, $FF
+>1913a8	20 20 20 ff			                .text $20, $20, $20, $FF
+>1913ac	1e 69 d2 ff			                .text $1E, $69, $D2, $FF
+>1913b0	13 45 8b ff			                .text $13, $45, $8B, $FF
+>1913b4	00 00 20 ff			                .text $00, $00, $20, $FF
+>1913b8	00 20 00 ff			                .text $00, $20, $00, $FF
+>1913bc	40 00 00 ff			                .text $40, $00, $00, $FF
+>1913c0	10 10 10 ff			                .text $10, $10, $10, $FF
+>1913c4	40 40 40 ff			                .text $40, $40, $40, $FF
+>1913c8	ff ff ff ff			                .text $FF, $FF, $FF, $FF
+>1913cc	0d 44 65 62 75 67 20 43		version_msg     .text $0D, "Debug Code Version 0.0.0 - March 26th, 2019", $00
+>1913d4	6f 64 65 20 56 65 72 73 69 6f 6e 20 30 2e 30 2e
+>1913e4	30 20 2d 20 4d 61 72 63 68 20 32 36 74 68 2c 20
+>1913f4	32 30 31 39 00
+>1913f9	43 6d 64 20 30 78 41 41		pass_tst0xAAmsg .text "Cmd 0xAA Test passed...", $0D, $00
+>191401	20 54 65 73 74 20 70 61 73 73 65 64 2e 2e 2e 0d
+>191411	00
+>191412	43 6d 64 20 30 78 41 42		pass_tst0xABmsg .text "Cmd 0xAB Test passed...", $0D, $00
+>19141a	20 54 65 73 74 20 70 61 73 73 65 64 2e 2e 2e 0d
+>19142a	00
+>19142b	43 6d 64 20 30 78 36 30		pass_cmd0x60msg .text "Cmd 0x60 Executed.", $0D, $00
+>191433	20 45 78 65 63 75 74 65 64 2e 0d 00
+>19143f	43 6d 64 20 30 78 46 46		pass_cmd0xFFmsg .text "Cmd 0xFF (Reset) Done.", $0D, $00
+>191447	20 28 52 65 73 65 74 29 20 44 6f 6e 65 2e 0d 00
+>191457	43 6d 64 20 30 78 45 45		pass_cmd0xEEmsg .text "Cmd 0xEE Echo Test passed...", $0D, $00
+>19145f	20 45 63 68 6f 20 54 65 73 74 20 70 61 73 73 65
+>19146f	64 2e 2e 2e 0d 00
+>191475	4b 65 79 62 6f 61 72 64		Success_kb_init .text "Keyboard Present", $0D, $00
+>19147d	20 50 72 65 73 65 6e 74 0d 00
+>191487	4e 6f 20 4b 65 79 62 6f		Failed_kb_init  .text "No Keyboard Attached or Failed Init...", $0D, $00
+>19148f	61 72 64 20 41 74 74 61 63 68 65 64 20 6f 72 20
+>19149f	46 61 69 6c 65 64 20 49 6e 69 74 2e 2e 2e 0d 00
+>1914af	5b 49 52 51 20 49 6e 74		irq_Msg         .text "[IRQ Interrupt]", $0D, $00
+>1914b7	65 72 72 75 70 74 5d 0d 00
+>1914c0	5b 4e 4d 49 20 49 6e 74		nmi_Msg         .text "[NMI Interrupt]", $0D, $00
+>1914c8	65 72 72 75 70 74 5d 0d 00
+>1914d1	4e 4f 20 53 49 47 4e 41		bmp_parser_err0 .text "NO SIGNATURE FOUND.", $00
+>1914d9	54 55 52 45 20 46 4f 55 4e 44 2e 00
+>1914e5	42 4d 50 20 4c 4f 41 44		bmp_parser_msg0 .text "BMP LOADED.", $00
+>1914ed	45 44 2e 00
+>1914f1	45 58 45 43 55 54 49 4e		bmp_parser_msg1 .text "EXECUTING BMP PARSER", $00
+>1914f9	47 20 42 4d 50 20 50 41 52 53 45 52 00
+>191506	0d 52 45 41 44 59 2e 00		ready_msg       .null $0D,"READY."
+>19150e	47 20 30 32 30 30 30 30		hello_ml        .null "G 020000",$0D
+>191516	0d 00
+>191518	48 45 4c 4c 4f 20 57 4f		                .null "HELLO WORLD",$0D
+>191520	52 4c 44 0d 00
+>191525	0d 00				                .null $0D
+>191527	20 50 43 20 20 20 20 20		                .null " PC     A    X    Y    SP   DBR DP   NVMXDIZC",$0D
+>19152f	41 20 20 20 20 58 20 20 20 20 59 20 20 20 20 53
+>19153f	50 20 20 20 44 42 52 20 44 50 20 20 20 4e 56 4d
+>19154f	58 44 49 5a 43 0d 00
+>191556	3b 30 30 32 31 31 32 20		                .null ";002112 0019 F0AA 0000 D6FF F8  0000 --M-----"
+>19155e	30 30 31 39 20 46 30 41 41 20 30 30 30 30 20 44
+>19156e	36 46 46 20 46 38 20 20 30 30 30 30 20 2d 2d 4d
+>19157e	2d 2d 2d 2d 2d 00
+>191584	41 42 4f 52 54 20 45 52		error_01        .null "ABORT ERROR"
+>19158c	52 4f 52 00
+>191590	30 31 32 33 34 35 36 37		hex_digits      .text "0123456789ABCDEF",0
+>191598	38 39 41 42 43 44 45 46 00
+>1915a1					.align 256
+>191600	00 1b 31 32 33 34 35 36		ScanCode_Press_Set1   .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
+>191608	37 38 39 30 2d 3d 08 09
+>191610	71 77 65 72 74 79 75 69		                      .text $71, $77, $65, $72, $74, $79, $75, $69, $6F, $70, $5B, $5D, $0D, $00, $61, $73    ; $10
+>191618	6f 70 5b 5d 0d 00 61 73
+>191620	64 66 67 68 6a 6b 6c 3b		                      .text $64, $66, $67, $68, $6A, $6B, $6C, $3B, $27, $60, $00, $5C, $7A, $78, $63, $76    ; $20
+>191628	27 60 00 5c 7a 78 63 76
+>191630	62 6e 6d 2c 2e 2f 00 2a		                      .text $62, $6E, $6D, $2C, $2E, $2F, $00, $2A, $00, $20, $00, $00, $00, $00, $00, $00    ; $30
+>191638	00 20 00 00 00 00 00 00
+>191640	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $40
+>191648	00 00 00 00 00 00 00 00
+>191650	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $50
+>191658	00 00 00 00 00 00 00 00
+>191660	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $60
+>191668	00 00 00 00 00 00 00 00
+>191670	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $70
+>191678	00 00 00 00 00 00 00 00
+>191680	00 00 21 40 23 24 25 5e		ScanCode_Shift_Set1   .text $00, $00, $21, $40, $23, $24, $25, $5E, $26, $2A, $28, $29, $5F, $2B, $08, $09    ; $00
+>191688	26 2a 28 29 5f 2b 08 09
+>191690	51 57 45 52 54 59 55 49		                      .text $51, $57, $45, $52, $54, $59, $55, $49, $4F, $50, $7B, $7D, $0D, $00, $41, $53    ; $10
+>191698	4f 50 7b 7d 0d 00 41 53
+>1916a0	44 46 47 48 4a 4b 4c 3a		                      .text $44, $46, $47, $48, $4A, $4B, $4C, $3A, $22, $7E, $00, $5C, $5A, $58, $43, $56    ; $20
+>1916a8	22 7e 00 5c 5a 58 43 56
+>1916b0	42 4e 4d 3c 3e 3f 00 2a		                      .text $42, $4E, $4D, $3C, $3E, $3F, $00, $2A, $00, $20, $00, $00, $00, $00, $00, $00    ; $30
+>1916b8	00 20 00 00 00 00 00 00
+>1916c0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $40
+>1916c8	00 00 00 00 00 00 00 00
+>1916d0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $50
+>1916d8	00 00 00 00 00 00 00 00
+>1916e0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $60
+>1916e8	00 00 00 00 00 00 00 00
+>1916f0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $70
+>1916f8	00 00 00 00 00 00 00 00
+>191700	00 1b 31 32 33 34 35 36		ScanCode_Ctrl_Set1    .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
 >191708	37 38 39 30 2d 3d 08 09
 >191710	71 77 65 72 74 79 75 69		                      .text $71, $77, $65, $72, $74, $79, $75, $69, $6F, $70, $5B, $5D, $0D, $00, $61, $73    ; $10
 >191718	6f 70 5b 5d 0d 00 61 73
@@ -4493,13 +4596,13 @@
 >191768	00 00 00 00 00 00 00 00
 >191770	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $70
 >191778	00 00 00 00 00 00 00 00
->191780	00 00 21 40 23 24 25 5e		ScanCode_Shift_Set1   .text $00, $00, $21, $40, $23, $24, $25, $5E, $26, $2A, $28, $29, $5F, $2B, $08, $09    ; $00
->191788	26 2a 28 29 5f 2b 08 09
->191790	51 57 45 52 54 59 55 49		                      .text $51, $57, $45, $52, $54, $59, $55, $49, $4F, $50, $7B, $7D, $0D, $00, $41, $53    ; $10
->191798	4f 50 7b 7d 0d 00 41 53
->1917a0	44 46 47 48 4a 4b 4c 3a		                      .text $44, $46, $47, $48, $4A, $4B, $4C, $3A, $22, $7E, $00, $5C, $5A, $58, $43, $56    ; $20
->1917a8	22 7e 00 5c 5a 58 43 56
->1917b0	42 4e 4d 3c 3e 3f 00 2a		                      .text $42, $4E, $4D, $3C, $3E, $3F, $00, $2A, $00, $20, $00, $00, $00, $00, $00, $00    ; $30
+>191780	00 1b 31 32 33 34 35 36		ScanCode_Alt_Set1     .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
+>191788	37 38 39 30 2d 3d 08 09
+>191790	71 77 65 72 74 79 75 69		                      .text $71, $77, $65, $72, $74, $79, $75, $69, $6F, $70, $5B, $5D, $0D, $00, $61, $73    ; $10
+>191798	6f 70 5b 5d 0d 00 61 73
+>1917a0	64 66 67 68 6a 6b 6c 3b		                      .text $64, $66, $67, $68, $6A, $6B, $6C, $3B, $27, $60, $00, $5C, $7A, $78, $63, $76    ; $20
+>1917a8	27 60 00 5c 7a 78 63 76
+>1917b0	62 6e 6d 2c 2e 2f 00 2a		                      .text $62, $6E, $6D, $2C, $2E, $2F, $00, $2A, $00, $20, $00, $00, $00, $00, $00, $00    ; $30
 >1917b8	00 20 00 00 00 00 00 00
 >1917c0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $40
 >1917c8	00 00 00 00 00 00 00 00
@@ -4509,7 +4612,7 @@
 >1917e8	00 00 00 00 00 00 00 00
 >1917f0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $70
 >1917f8	00 00 00 00 00 00 00 00
->191800	00 1b 31 32 33 34 35 36		ScanCode_Ctrl_Set1    .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
+>191800	00 1b 31 32 33 34 35 36		ScanCode_NumLock_Set1 .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
 >191808	37 38 39 30 2d 3d 08 09
 >191810	71 77 65 72 74 79 75 69		                      .text $71, $77, $65, $72, $74, $79, $75, $69, $6F, $70, $5B, $5D, $0D, $00, $61, $73    ; $10
 >191818	6f 70 5b 5d 0d 00 61 73
@@ -4525,170 +4628,138 @@
 >191868	00 00 00 00 00 00 00 00
 >191870	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $70
 >191878	00 00 00 00 00 00 00 00
->191880	00 1b 31 32 33 34 35 36		ScanCode_Alt_Set1     .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
->191888	37 38 39 30 2d 3d 08 09
->191890	71 77 65 72 74 79 75 69		                      .text $71, $77, $65, $72, $74, $79, $75, $69, $6F, $70, $5B, $5D, $0D, $00, $61, $73    ; $10
->191898	6f 70 5b 5d 0d 00 61 73
->1918a0	64 66 67 68 6a 6b 6c 3b		                      .text $64, $66, $67, $68, $6A, $6B, $6C, $3B, $27, $60, $00, $5C, $7A, $78, $63, $76    ; $20
->1918a8	27 60 00 5c 7a 78 63 76
->1918b0	62 6e 6d 2c 2e 2f 00 2a		                      .text $62, $6E, $6D, $2C, $2E, $2F, $00, $2A, $00, $20, $00, $00, $00, $00, $00, $00    ; $30
->1918b8	00 20 00 00 00 00 00 00
->1918c0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $40
->1918c8	00 00 00 00 00 00 00 00
->1918d0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $50
->1918d8	00 00 00 00 00 00 00 00
->1918e0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $60
->1918e8	00 00 00 00 00 00 00 00
->1918f0	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $70
->1918f8	00 00 00 00 00 00 00 00
->191900	00 1b 31 32 33 34 35 36		ScanCode_NumLock_Set1 .text $00, $1B, $31, $32, $33, $34, $35, $36, $37, $38, $39, $30, $2D, $3D, $08, $09    ; $00
->191908	37 38 39 30 2d 3d 08 09
->191910	71 77 65 72 74 79 75 69		                      .text $71, $77, $65, $72, $74, $79, $75, $69, $6F, $70, $5B, $5D, $0D, $00, $61, $73    ; $10
->191918	6f 70 5b 5d 0d 00 61 73
->191920	64 66 67 68 6a 6b 6c 3b		                      .text $64, $66, $67, $68, $6A, $6B, $6C, $3B, $27, $60, $00, $5C, $7A, $78, $63, $76    ; $20
->191928	27 60 00 5c 7a 78 63 76
->191930	62 6e 6d 2c 2e 2f 00 2a		                      .text $62, $6E, $6D, $2C, $2E, $2F, $00, $2A, $00, $20, $00, $00, $00, $00, $00, $00    ; $30
->191938	00 20 00 00 00 00 00 00
->191940	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $40
->191948	00 00 00 00 00 00 00 00
->191950	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $50
->191958	00 00 00 00 00 00 00 00
->191960	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $60
->191968	00 00 00 00 00 00 00 00
->191970	00 00 00 00 00 00 00 00		                      .text $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00    ; $70
->191978	00 00 00 00 00 00 00 00
->191980					.align 256
->191a00	00 14 1c 21 26 2a 2e 31		GAMMA_2_2_Tbl         .text  $00, $14, $1c, $21, $26, $2a, $2e, $31, $34, $37, $3a, $3d, $3f, $41, $44, $46
->191a08	34 37 3a 3d 3f 41 44 46
->191a10	48 4a 4c 4e 50 51 53 55		                      .text  $48, $4a, $4c, $4e, $50, $51, $53, $55, $57, $58, $5a, $5b, $5d, $5e, $60, $61
->191a18	57 58 5a 5b 5d 5e 60 61
->191a20	63 64 66 67 68 6a 6b 6c		                      .text  $63, $64, $66, $67, $68, $6a, $6b, $6c, $6d, $6f, $70, $71, $72, $73, $75, $76
->191a28	6d 6f 70 71 72 73 75 76
->191a30	77 78 79 7a 7b 7c 7d 7e		                      .text  $77, $78, $79, $7a, $7b, $7c, $7d, $7e, $80, $81, $82, $83, $84, $85, $86, $87
->191a38	80 81 82 83 84 85 86 87
->191a40	88 88 89 8a 8b 8c 8d 8e		                      .text  $88, $88, $89, $8a, $8b, $8c, $8d, $8e, $8f, $90, $91, $92, $93, $93, $94, $95
->191a48	8f 90 91 92 93 93 94 95
->191a50	96 97 98 99 99 9a 9b 9c		                      .text  $96, $97, $98, $99, $99, $9a, $9b, $9c, $9d, $9e, $9e, $9f, $a0, $a1, $a2, $a2
->191a58	9d 9e 9e 9f a0 a1 a2 a2
->191a60	a3 a4 a5 a5 a6 a7 a8 a8		                      .text  $a3, $a4, $a5, $a5, $a6, $a7, $a8, $a8, $a9, $aa, $ab, $ab, $ac, $ad, $ae, $ae
->191a68	a9 aa ab ab ac ad ae ae
->191a70	af b0 b0 b1 b2 b2 b3 b4		                      .text  $AF, $b0, $b0, $b1, $b2, $b2, $b3, $b4, $b5, $b5, $b6, $b7, $b7, $b8, $b9, $b9
->191a78	b5 b5 b6 b7 b7 b8 b9 b9
->191a80	ba bb bb bc bd bd be be		                      .text  $ba, $bb, $bb, $bc, $bd, $bd, $be, $be, $bf, $c0, $c0, $c1, $c2, $c2, $c3, $c4
->191a88	bf c0 c0 c1 c2 c2 c3 c4
->191a90	c4 c5 c5 c6 c7 c7 c8 c8		                      .text  $c4, $c5, $c5, $c6, $c7, $c7, $c8, $c8, $c9, $ca, $ca, $cb, $cb, $cc, $cd, $cd
->191a98	c9 ca ca cb cb cc cd cd
->191aa0	ce ce cf d0 d0 d1 d1 d2		                      .text  $ce, $ce, $cf, $d0, $d0, $d1, $d1, $d2, $d2, $d3, $d4, $d4, $d5, $d5, $d6, $d6
->191aa8	d2 d3 d4 d4 d5 d5 d6 d6
->191ab0	d7 d8 d8 d9 d9 da da db		                      .text  $d7, $d8, $d8, $d9, $d9, $da, $da, $db, $db, $dc, $dc, $dd, $de, $de, $df, $df
->191ab8	db dc dc dd de de df df
->191ac0	e0 e0 e1 e1 e2 e2 e3 e3		                      .text  $e0, $e0, $e1, $e1, $e2, $e2, $e3, $e3, $e4, $e4, $e5, $e5, $e6, $e6, $e7, $e7
->191ac8	e4 e4 e5 e5 e6 e6 e7 e7
->191ad0	e8 e8 e9 e9 ea ea eb eb		                      .text  $e8, $e8, $e9, $e9, $ea, $ea, $eb, $eb, $ec, $ec, $ed, $ed, $ee, $ee, $ef, $ef
->191ad8	ec ec ed ed ee ee ef ef
->191ae0	f0 f0 f1 f1 f2 f2 f3 f3		                      .text  $f0, $f0, $f1, $f1, $f2, $f2, $f3, $f3, $f4, $f4, $f5, $f5, $f6, $f6, $f7, $f7
->191ae8	f4 f4 f5 f5 f6 f6 f7 f7
->191af0	f8 f8 f9 f9 f9 fa fa fb		                      .text  $f8, $f8, $f9, $f9, $f9, $fa, $fa, $fb, $fb, $fc, $fc, $fd, $fd, $fe, $fe, $ff
->191af8	fb fc fc fd fd fe fe ff
+>191880					.align 256
+>191900	00 14 1c 21 26 2a 2e 31		GAMMA_2_2_Tbl         .text  $00, $14, $1c, $21, $26, $2a, $2e, $31, $34, $37, $3a, $3d, $3f, $41, $44, $46
+>191908	34 37 3a 3d 3f 41 44 46
+>191910	48 4a 4c 4e 50 51 53 55		                      .text  $48, $4a, $4c, $4e, $50, $51, $53, $55, $57, $58, $5a, $5b, $5d, $5e, $60, $61
+>191918	57 58 5a 5b 5d 5e 60 61
+>191920	63 64 66 67 68 6a 6b 6c		                      .text  $63, $64, $66, $67, $68, $6a, $6b, $6c, $6d, $6f, $70, $71, $72, $73, $75, $76
+>191928	6d 6f 70 71 72 73 75 76
+>191930	77 78 79 7a 7b 7c 7d 7e		                      .text  $77, $78, $79, $7a, $7b, $7c, $7d, $7e, $80, $81, $82, $83, $84, $85, $86, $87
+>191938	80 81 82 83 84 85 86 87
+>191940	88 88 89 8a 8b 8c 8d 8e		                      .text  $88, $88, $89, $8a, $8b, $8c, $8d, $8e, $8f, $90, $91, $92, $93, $93, $94, $95
+>191948	8f 90 91 92 93 93 94 95
+>191950	96 97 98 99 99 9a 9b 9c		                      .text  $96, $97, $98, $99, $99, $9a, $9b, $9c, $9d, $9e, $9e, $9f, $a0, $a1, $a2, $a2
+>191958	9d 9e 9e 9f a0 a1 a2 a2
+>191960	a3 a4 a5 a5 a6 a7 a8 a8		                      .text  $a3, $a4, $a5, $a5, $a6, $a7, $a8, $a8, $a9, $aa, $ab, $ab, $ac, $ad, $ae, $ae
+>191968	a9 aa ab ab ac ad ae ae
+>191970	af b0 b0 b1 b2 b2 b3 b4		                      .text  $AF, $b0, $b0, $b1, $b2, $b2, $b3, $b4, $b5, $b5, $b6, $b7, $b7, $b8, $b9, $b9
+>191978	b5 b5 b6 b7 b7 b8 b9 b9
+>191980	ba bb bb bc bd bd be be		                      .text  $ba, $bb, $bb, $bc, $bd, $bd, $be, $be, $bf, $c0, $c0, $c1, $c2, $c2, $c3, $c4
+>191988	bf c0 c0 c1 c2 c2 c3 c4
+>191990	c4 c5 c5 c6 c7 c7 c8 c8		                      .text  $c4, $c5, $c5, $c6, $c7, $c7, $c8, $c8, $c9, $ca, $ca, $cb, $cb, $cc, $cd, $cd
+>191998	c9 ca ca cb cb cc cd cd
+>1919a0	ce ce cf d0 d0 d1 d1 d2		                      .text  $ce, $ce, $cf, $d0, $d0, $d1, $d1, $d2, $d2, $d3, $d4, $d4, $d5, $d5, $d6, $d6
+>1919a8	d2 d3 d4 d4 d5 d5 d6 d6
+>1919b0	d7 d8 d8 d9 d9 da da db		                      .text  $d7, $d8, $d8, $d9, $d9, $da, $da, $db, $db, $dc, $dc, $dd, $de, $de, $df, $df
+>1919b8	db dc dc dd de de df df
+>1919c0	e0 e0 e1 e1 e2 e2 e3 e3		                      .text  $e0, $e0, $e1, $e1, $e2, $e2, $e3, $e3, $e4, $e4, $e5, $e5, $e6, $e6, $e7, $e7
+>1919c8	e4 e4 e5 e5 e6 e6 e7 e7
+>1919d0	e8 e8 e9 e9 ea ea eb eb		                      .text  $e8, $e8, $e9, $e9, $ea, $ea, $eb, $eb, $ec, $ec, $ed, $ed, $ee, $ee, $ef, $ef
+>1919d8	ec ec ed ed ee ee ef ef
+>1919e0	f0 f0 f1 f1 f2 f2 f3 f3		                      .text  $f0, $f0, $f1, $f1, $f2, $f2, $f3, $f3, $f4, $f4, $f5, $f5, $f6, $f6, $f7, $f7
+>1919e8	f4 f4 f5 f5 f6 f6 f7 f7
+>1919f0	f8 f8 f9 f9 f9 fa fa fb		                      .text  $f8, $f8, $f9, $f9, $f9, $fa, $fa, $fb, $fb, $fc, $fc, $fd, $fd, $fe, $fe, $ff
+>1919f8	fb fc fc fd fd fe fe ff
+>191a00					.align 256
+>191a00	00 0b 11 15 19 1c 1f 22		GAMMA_1_8_Tbl         .text  $00, $0b, $11, $15, $19, $1c, $1f, $22, $25, $27, $2a, $2c, $2e, $30, $32, $34
+>191a08	25 27 2a 2c 2e 30 32 34
+>191a10	36 38 3a 3c 3d 3f 41 43		                      .text  $36, $38, $3a, $3c, $3d, $3f, $41, $43, $44, $46, $47, $49, $4a, $4c, $4d, $4f
+>191a18	44 46 47 49 4a 4c 4d 4f
+>191a20	50 51 53 54 55 57 58 59		                      .text  $50, $51, $53, $54, $55, $57, $58, $59, $5b, $5c, $5d, $5e, $60, $61, $62, $63
+>191a28	5b 5c 5d 5e 60 61 62 63
+>191a30	64 65 67 68 69 6a 6b 6c		                      .text  $64, $65, $67, $68, $69, $6a, $6b, $6c, $6d, $6e, $70, $71, $72, $73, $74, $75
+>191a38	6d 6e 70 71 72 73 74 75
+>191a40	76 77 78 79 7a 7b 7c 7d		                      .text  $76, $77, $78, $79, $7a, $7b, $7c, $7d, $7e, $7f, $80, $81, $82, $83, $84, $84
+>191a48	7e 7f 80 81 82 83 84 84
+>191a50	85 86 87 88 89 8a 8b 8c		                      .text  $85, $86, $87, $88, $89, $8a, $8b, $8c, $8d, $8e, $8e, $8f, $90, $91, $92, $93
+>191a58	8d 8e 8e 8f 90 91 92 93
+>191a60	94 95 95 96 97 98 99 9a		                      .text  $94, $95, $95, $96, $97, $98, $99, $9a, $9a, $9b, $9c, $9d, $9e, $9f, $9f, $a0
+>191a68	9a 9b 9c 9d 9e 9f 9f a0
+>191a70	a1 a2 a3 a3 a4 a5 a6 a6		                      .text  $a1, $a2, $a3, $a3, $a4, $a5, $a6, $a6, $a7, $a8, $a9, $aa, $aa, $ab, $ac, $ad
+>191a78	a7 a8 a9 aa aa ab ac ad
+>191a80	ad ae af b0 b0 b1 b2 b3		                      .text  $ad, $ae, $af, $b0, $b0, $b1, $b2, $b3, $b3, $b4, $b5, $b6, $b6, $b7, $b8, $b8
+>191a88	b3 b4 b5 b6 b6 b7 b8 b8
+>191a90	b9 ba bb bb bc bd bd be		                      .text  $b9, $ba, $bb, $bb, $bc, $bd, $bd, $be, $bf, $bf, $c0, $c1, $c2, $c2, $c3, $c4
+>191a98	bf bf c0 c1 c2 c2 c3 c4
+>191aa0	c4 c5 c6 c6 c7 c8 c8 c9		                      .text  $c4, $c5, $c6, $c6, $c7, $c8, $c8, $c9, $ca, $ca, $cb, $cc, $cc, $cd, $ce, $ce
+>191aa8	ca ca cb cc cc cd ce ce
+>191ab0	cf d0 d0 d1 d2 d2 d3 d4		                      .text  $cf, $d0, $d0, $d1, $d2, $d2, $d3, $d4, $d4, $d5, $d6, $d6, $d7, $d7, $d8, $d9
+>191ab8	d4 d5 d6 d6 d7 d7 d8 d9
+>191ac0	d9 da db db dc dc dd de		                      .text  $d9, $da, $db, $db, $dc, $dc, $dd, $de, $de, $df, $e0, $e0, $e1, $e1, $e2, $e3
+>191ac8	de df e0 e0 e1 e1 e2 e3
+>191ad0	e3 e4 e4 e5 e6 e6 e7 e7		                      .text  $e3, $e4, $e4, $e5, $e6, $e6, $e7, $e7, $e8, $e9, $e9, $ea, $ea, $eb, $ec, $ec
+>191ad8	e8 e9 e9 ea ea eb ec ec
+>191ae0	ed ed ee ef ef f0 f0 f1		                      .text  $ed, $ed, $ee, $ef, $ef, $f0, $f0, $f1, $f1, $f2, $f3, $f3, $f4, $f4, $f5, $f5
+>191ae8	f1 f2 f3 f3 f4 f4 f5 f5
+>191af0	f6 f7 f7 f8 f8 f9 f9 fa		                      .text  $f6, $f7, $f7, $f8, $f8, $f9, $f9, $fa, $fb, $fb, $fc, $fc, $fd, $fd, $fe, $ff
+>191af8	fb fb fc fc fd fd fe ff
 >191b00					.align 256
->191b00	00 0b 11 15 19 1c 1f 22		GAMMA_1_8_Tbl         .text  $00, $0b, $11, $15, $19, $1c, $1f, $22, $25, $27, $2a, $2c, $2e, $30, $32, $34
->191b08	25 27 2a 2c 2e 30 32 34
->191b10	36 38 3a 3c 3d 3f 41 43		                      .text  $36, $38, $3a, $3c, $3d, $3f, $41, $43, $44, $46, $47, $49, $4a, $4c, $4d, $4f
->191b18	44 46 47 49 4a 4c 4d 4f
->191b20	50 51 53 54 55 57 58 59		                      .text  $50, $51, $53, $54, $55, $57, $58, $59, $5b, $5c, $5d, $5e, $60, $61, $62, $63
->191b28	5b 5c 5d 5e 60 61 62 63
->191b30	64 65 67 68 69 6a 6b 6c		                      .text  $64, $65, $67, $68, $69, $6a, $6b, $6c, $6d, $6e, $70, $71, $72, $73, $74, $75
->191b38	6d 6e 70 71 72 73 74 75
->191b40	76 77 78 79 7a 7b 7c 7d		                      .text  $76, $77, $78, $79, $7a, $7b, $7c, $7d, $7e, $7f, $80, $81, $82, $83, $84, $84
->191b48	7e 7f 80 81 82 83 84 84
->191b50	85 86 87 88 89 8a 8b 8c		                      .text  $85, $86, $87, $88, $89, $8a, $8b, $8c, $8d, $8e, $8e, $8f, $90, $91, $92, $93
->191b58	8d 8e 8e 8f 90 91 92 93
->191b60	94 95 95 96 97 98 99 9a		                      .text  $94, $95, $95, $96, $97, $98, $99, $9a, $9a, $9b, $9c, $9d, $9e, $9f, $9f, $a0
->191b68	9a 9b 9c 9d 9e 9f 9f a0
->191b70	a1 a2 a3 a3 a4 a5 a6 a6		                      .text  $a1, $a2, $a3, $a3, $a4, $a5, $a6, $a6, $a7, $a8, $a9, $aa, $aa, $ab, $ac, $ad
->191b78	a7 a8 a9 aa aa ab ac ad
->191b80	ad ae af b0 b0 b1 b2 b3		                      .text  $ad, $ae, $af, $b0, $b0, $b1, $b2, $b3, $b3, $b4, $b5, $b6, $b6, $b7, $b8, $b8
->191b88	b3 b4 b5 b6 b6 b7 b8 b8
->191b90	b9 ba bb bb bc bd bd be		                      .text  $b9, $ba, $bb, $bb, $bc, $bd, $bd, $be, $bf, $bf, $c0, $c1, $c2, $c2, $c3, $c4
->191b98	bf bf c0 c1 c2 c2 c3 c4
->191ba0	c4 c5 c6 c6 c7 c8 c8 c9		                      .text  $c4, $c5, $c6, $c6, $c7, $c8, $c8, $c9, $ca, $ca, $cb, $cc, $cc, $cd, $ce, $ce
->191ba8	ca ca cb cc cc cd ce ce
->191bb0	cf d0 d0 d1 d2 d2 d3 d4		                      .text  $cf, $d0, $d0, $d1, $d2, $d2, $d3, $d4, $d4, $d5, $d6, $d6, $d7, $d7, $d8, $d9
->191bb8	d4 d5 d6 d6 d7 d7 d8 d9
->191bc0	d9 da db db dc dc dd de		                      .text  $d9, $da, $db, $db, $dc, $dc, $dd, $de, $de, $df, $e0, $e0, $e1, $e1, $e2, $e3
->191bc8	de df e0 e0 e1 e1 e2 e3
->191bd0	e3 e4 e4 e5 e6 e6 e7 e7		                      .text  $e3, $e4, $e4, $e5, $e6, $e6, $e7, $e7, $e8, $e9, $e9, $ea, $ea, $eb, $ec, $ec
->191bd8	e8 e9 e9 ea ea eb ec ec
->191be0	ed ed ee ef ef f0 f0 f1		                      .text  $ed, $ed, $ee, $ef, $ef, $f0, $f0, $f1, $f1, $f2, $f3, $f3, $f4, $f4, $f5, $f5
->191be8	f1 f2 f3 f3 f4 f4 f5 f5
->191bf0	f6 f7 f7 f8 f8 f9 f9 fa		                      .text  $f6, $f7, $f7, $f8, $f8, $f9, $f9, $fa, $fb, $fb, $fc, $fc, $fd, $fd, $fe, $ff
->191bf8	fb fb fc fc fd fd fe ff
->191c00					.align 256
->191c00	1d c8 a7 ac 10 d6 52 7c		RANDOM_LUT_Tbl		    .text  $1d, $c8, $a7, $ac, $10, $d6, $52, $7c, $83, $dd, $ce, $39, $cd, $c5, $3b, $15
->191c08	83 dd ce 39 cd c5 3b 15
->191c10	22 55 3b 94 e0 33 1f 38						              .text  $22, $55, $3b, $94, $e0, $33, $1f, $38, $87, $12, $31, $65, $89, $27, $88, $42
->191c18	87 12 31 65 89 27 88 42
->191c20	b2 32 72 84 b2 b2 31 52						              .text  $b2, $32, $72, $84, $b2, $b2, $31, $52, $94, $ce, $56, $ec, $fe, $da, $58, $c9
->191c28	94 ce 56 ec fe da 58 c9
->191c30	c8 5b 53 2a 08 3b 19 c1						              .text  $c8, $5b, $53, $2a, $08, $3b, $19, $c1, $d0, $10, $2c, $b2, $4b, $ea, $32, $61
->191c38	d0 10 2c b2 4b ea 32 61
->191c40	da 34 33 8f 2b da 49 89						              .text  $da, $34, $33, $8f, $2b, $da, $49, $89, $a1, $e6, $ca, $2d, $b3, $ce, $b0, $79
->191c48	a1 e6 ca 2d b3 ce b0 79
->191c50	44 aa 32 82 91 e9 29 16						              .text  $44, $aa, $32, $82, $91, $e9, $29, $16, $5f, $e3, $fb, $bd, $15, $2e, $be, $f5
->191c58	5f e3 fb bd 15 2e be f5
->191c60	e9 4a e4 2e 60 24 94 35						              .text  $e9, $4a, $e4, $2e, $60, $24, $94, $35, $8d, $8f, $2c, $80, $0a, $5e, $99, $36
->191c68	8d 8f 2c 80 0a 5e 99 36
->191c70	ac ab 21 26 42 7c 5e bc						              .text  $ac, $ab, $21, $26, $42, $7c, $5e, $bc, $13, $52, $44, $2f, $e3, $ef, $44, $a2
->191c78	13 52 44 2f e3 ef 44 a2
->191c80	86 c1 9c 47 5f 36 6d 02						              .text  $86, $c1, $9c, $47, $5f, $36, $6d, $02, $be, $23, $02, $58, $0a, $52, $5e, $b4
->191c88	be 23 02 58 0a 52 5e b4
->191c90	9f 06 08 c9 97 cb 9e dd						              .text  $9f, $06, $08, $c9, $97, $cb, $9e, $dd, $d5, $cf, $3e, $df, $c4, $9e, $da, $bb
->191c98	d5 cf 3e df c4 9e da bb
->191ca0	9b 5d c9 f5 d9 c3 7e 87						              .text  $9b, $5d, $c9, $f5, $d9, $c3, $7e, $87, $77, $7d, $b1, $3b, $4a, $68, $35, $6e
->191ca8	77 7d b1 3b 4a 68 35 6e
->191cb0	ee 47 ad 8f fd 73 2e 46						              .text  $ee, $47, $ad, $8f, $fd, $73, $2e, $46, $b5, $8f, $44, $63, $55, $6f, $e1, $50
->191cb8	b5 8f 44 63 55 6f e1 50
->191cc0	f4 b6 a3 4f 68 c4 a5 a4						              .text  $f4, $b6, $a3, $4f, $68, $c4, $a5, $a4, $57, $74, $b9, $bd, $05, $14, $50, $eb
->191cc8	57 74 b9 bd 05 14 50 eb
->191cd0	a5 5c 57 2f 99 dc 2e 8a						              .text  $a5, $5c, $57, $2f, $99, $dc, $2e, $8a, $44, $bc, $ec, $db, $22, $58, $fc, $be
->191cd8	44 bc ec db 22 58 fc be
->191ce0	5f 3f 50 bd 2a 36 ab ae						              .text  $5f, $3f, $50, $bd, $2a, $36, $ab, $ae, $24, $aa, $82, $11, $5c, $9f, $43, $4d
->191ce8	24 aa 82 11 5c 9f 43 4d
->191cf0	8f 0c 20 00 91 b6 45 9e						              .text  $8f, $0c, $20, $00, $91, $b6, $45, $9e, $3e, $3d, $66, $7e, $0a, $1c, $6b, $74
->191cf8	3e 3d 66 7e 0a 1c 6b 74
->191d00					.align 16
->191d00	00 01 01 00 00 00 00 00		MOUSE_POINTER_PTR     .text $00,$01,$01,$00,$00,$00,$00,$00,$01,$01,$01,$00,$00,$00,$00,$00
->191d08	01 01 01 00 00 00 00 00
->191d10	01 ff ff 01 00 00 01 01		                      .text $01,$FF,$FF,$01,$00,$00,$01,$01,$FF,$FF,$FF,$01,$00,$00,$00,$00
->191d18	ff ff ff 01 00 00 00 00
->191d20	01 ff ff ff 01 01 55 ff		                      .text $01,$FF,$FF,$FF,$01,$01,$55,$FF,$01,$55,$FF,$FF,$01,$00,$00,$00
->191d28	01 55 ff ff 01 00 00 00
->191d30	01 55 ff ff ff ff 01 55		                      .text $01,$55,$FF,$FF,$FF,$FF,$01,$55,$FF,$FF,$FF,$FF,$01,$00,$00,$00
->191d38	ff ff ff ff 01 00 00 00
->191d40	00 01 55 ff ff ff ff ff		                      .text $00,$01,$55,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$01,$FF,$FF,$01,$00,$00
->191d48	ff ff 01 ff ff 01 00 00
->191d50	00 00 01 55 ff ff ff ff		                      .text $00,$00,$01,$55,$FF,$FF,$FF,$FF,$01,$FF,$FF,$01,$FF,$01,$00,$00
->191d58	01 ff ff 01 ff 01 00 00
->191d60	00 00 01 01 55 ff ff ff		                      .text $00,$00,$01,$01,$55,$FF,$FF,$FF,$FF,$01,$FF,$FF,$FF,$01,$00,$00
->191d68	ff 01 ff ff ff 01 00 00
->191d70	00 00 01 55 01 55 ff ff		                      .text $00,$00,$01,$55,$01,$55,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$01,$01,$00
->191d78	ff ff ff ff ff 01 01 00
->191d80	00 00 01 55 55 55 ff ff		                      .text $00,$00,$01,$55,$55,$55,$FF,$FF,$FF,$FF,$FF,$FF,$01,$FF,$FF,$01
->191d88	ff ff ff ff 01 ff ff 01
->191d90	00 00 00 01 55 55 55 ff		                      .text $00,$00,$00,$01,$55,$55,$55,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$01
->191d98	ff ff ff ff ff ff ff 01
->191da0	00 00 00 00 01 55 55 55		                      .text $00,$00,$00,$00,$01,$55,$55,$55,$55,$55,$01,$FF,$FF,$55,$01,$00
->191da8	55 55 01 ff ff 55 01 00
->191db0	00 00 00 00 00 01 01 01		                      .text $00,$00,$00,$00,$00,$01,$01,$01,$01,$01,$55,$FF,$55,$01,$00,$00
->191db8	01 01 55 ff 55 01 00 00
->191dc0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$01,$55,$55,$55,$01,$00,$00,$00
->191dc8	01 55 55 55 01 00 00 00
->191dd0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$01,$55,$55,$01,$00,$00,$00,$00
->191dd8	01 55 55 01 00 00 00 00
->191de0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$00,$01,$01,$00,$00,$00,$00,$00
->191de8	00 01 01 00 00 00 00 00
->191df0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
->191df8	00 00 00 00 00 00 00 00
+>191b00	1d c8 a7 ac 10 d6 52 7c		RANDOM_LUT_Tbl		    .text  $1d, $c8, $a7, $ac, $10, $d6, $52, $7c, $83, $dd, $ce, $39, $cd, $c5, $3b, $15
+>191b08	83 dd ce 39 cd c5 3b 15
+>191b10	22 55 3b 94 e0 33 1f 38						              .text  $22, $55, $3b, $94, $e0, $33, $1f, $38, $87, $12, $31, $65, $89, $27, $88, $42
+>191b18	87 12 31 65 89 27 88 42
+>191b20	b2 32 72 84 b2 b2 31 52						              .text  $b2, $32, $72, $84, $b2, $b2, $31, $52, $94, $ce, $56, $ec, $fe, $da, $58, $c9
+>191b28	94 ce 56 ec fe da 58 c9
+>191b30	c8 5b 53 2a 08 3b 19 c1						              .text  $c8, $5b, $53, $2a, $08, $3b, $19, $c1, $d0, $10, $2c, $b2, $4b, $ea, $32, $61
+>191b38	d0 10 2c b2 4b ea 32 61
+>191b40	da 34 33 8f 2b da 49 89						              .text  $da, $34, $33, $8f, $2b, $da, $49, $89, $a1, $e6, $ca, $2d, $b3, $ce, $b0, $79
+>191b48	a1 e6 ca 2d b3 ce b0 79
+>191b50	44 aa 32 82 91 e9 29 16						              .text  $44, $aa, $32, $82, $91, $e9, $29, $16, $5f, $e3, $fb, $bd, $15, $2e, $be, $f5
+>191b58	5f e3 fb bd 15 2e be f5
+>191b60	e9 4a e4 2e 60 24 94 35						              .text  $e9, $4a, $e4, $2e, $60, $24, $94, $35, $8d, $8f, $2c, $80, $0a, $5e, $99, $36
+>191b68	8d 8f 2c 80 0a 5e 99 36
+>191b70	ac ab 21 26 42 7c 5e bc						              .text  $ac, $ab, $21, $26, $42, $7c, $5e, $bc, $13, $52, $44, $2f, $e3, $ef, $44, $a2
+>191b78	13 52 44 2f e3 ef 44 a2
+>191b80	86 c1 9c 47 5f 36 6d 02						              .text  $86, $c1, $9c, $47, $5f, $36, $6d, $02, $be, $23, $02, $58, $0a, $52, $5e, $b4
+>191b88	be 23 02 58 0a 52 5e b4
+>191b90	9f 06 08 c9 97 cb 9e dd						              .text  $9f, $06, $08, $c9, $97, $cb, $9e, $dd, $d5, $cf, $3e, $df, $c4, $9e, $da, $bb
+>191b98	d5 cf 3e df c4 9e da bb
+>191ba0	9b 5d c9 f5 d9 c3 7e 87						              .text  $9b, $5d, $c9, $f5, $d9, $c3, $7e, $87, $77, $7d, $b1, $3b, $4a, $68, $35, $6e
+>191ba8	77 7d b1 3b 4a 68 35 6e
+>191bb0	ee 47 ad 8f fd 73 2e 46						              .text  $ee, $47, $ad, $8f, $fd, $73, $2e, $46, $b5, $8f, $44, $63, $55, $6f, $e1, $50
+>191bb8	b5 8f 44 63 55 6f e1 50
+>191bc0	f4 b6 a3 4f 68 c4 a5 a4						              .text  $f4, $b6, $a3, $4f, $68, $c4, $a5, $a4, $57, $74, $b9, $bd, $05, $14, $50, $eb
+>191bc8	57 74 b9 bd 05 14 50 eb
+>191bd0	a5 5c 57 2f 99 dc 2e 8a						              .text  $a5, $5c, $57, $2f, $99, $dc, $2e, $8a, $44, $bc, $ec, $db, $22, $58, $fc, $be
+>191bd8	44 bc ec db 22 58 fc be
+>191be0	5f 3f 50 bd 2a 36 ab ae						              .text  $5f, $3f, $50, $bd, $2a, $36, $ab, $ae, $24, $aa, $82, $11, $5c, $9f, $43, $4d
+>191be8	24 aa 82 11 5c 9f 43 4d
+>191bf0	8f 0c 20 00 91 b6 45 9e						              .text  $8f, $0c, $20, $00, $91, $b6, $45, $9e, $3e, $3d, $66, $7e, $0a, $1c, $6b, $74
+>191bf8	3e 3d 66 7e 0a 1c 6b 74
+>191c00					.align 16
+>191c00	00 01 01 00 00 00 00 00		MOUSE_POINTER_PTR     .text $00,$01,$01,$00,$00,$00,$00,$00,$01,$01,$01,$00,$00,$00,$00,$00
+>191c08	01 01 01 00 00 00 00 00
+>191c10	01 ff ff 01 00 00 01 01		                      .text $01,$FF,$FF,$01,$00,$00,$01,$01,$FF,$FF,$FF,$01,$00,$00,$00,$00
+>191c18	ff ff ff 01 00 00 00 00
+>191c20	01 ff ff ff 01 01 55 ff		                      .text $01,$FF,$FF,$FF,$01,$01,$55,$FF,$01,$55,$FF,$FF,$01,$00,$00,$00
+>191c28	01 55 ff ff 01 00 00 00
+>191c30	01 55 ff ff ff ff 01 55		                      .text $01,$55,$FF,$FF,$FF,$FF,$01,$55,$FF,$FF,$FF,$FF,$01,$00,$00,$00
+>191c38	ff ff ff ff 01 00 00 00
+>191c40	00 01 55 ff ff ff ff ff		                      .text $00,$01,$55,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$01,$FF,$FF,$01,$00,$00
+>191c48	ff ff 01 ff ff 01 00 00
+>191c50	00 00 01 55 ff ff ff ff		                      .text $00,$00,$01,$55,$FF,$FF,$FF,$FF,$01,$FF,$FF,$01,$FF,$01,$00,$00
+>191c58	01 ff ff 01 ff 01 00 00
+>191c60	00 00 01 01 55 ff ff ff		                      .text $00,$00,$01,$01,$55,$FF,$FF,$FF,$FF,$01,$FF,$FF,$FF,$01,$00,$00
+>191c68	ff 01 ff ff ff 01 00 00
+>191c70	00 00 01 55 01 55 ff ff		                      .text $00,$00,$01,$55,$01,$55,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$01,$01,$00
+>191c78	ff ff ff ff ff 01 01 00
+>191c80	00 00 01 55 55 55 ff ff		                      .text $00,$00,$01,$55,$55,$55,$FF,$FF,$FF,$FF,$FF,$FF,$01,$FF,$FF,$01
+>191c88	ff ff ff ff 01 ff ff 01
+>191c90	00 00 00 01 55 55 55 ff		                      .text $00,$00,$00,$01,$55,$55,$55,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$01
+>191c98	ff ff ff ff ff ff ff 01
+>191ca0	00 00 00 00 01 55 55 55		                      .text $00,$00,$00,$00,$01,$55,$55,$55,$55,$55,$01,$FF,$FF,$55,$01,$00
+>191ca8	55 55 01 ff ff 55 01 00
+>191cb0	00 00 00 00 00 01 01 01		                      .text $00,$00,$00,$00,$00,$01,$01,$01,$01,$01,$55,$FF,$55,$01,$00,$00
+>191cb8	01 01 55 ff 55 01 00 00
+>191cc0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$01,$55,$55,$55,$01,$00,$00,$00
+>191cc8	01 55 55 55 01 00 00 00
+>191cd0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$01,$55,$55,$01,$00,$00,$00,$00
+>191cd8	01 55 55 01 00 00 00 00
+>191ce0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$00,$01,$01,$00,$00,$00,$00,$00
+>191ce8	00 01 01 00 00 00 00 00
+>191cf0	00 00 00 00 00 00 00 00		                      .text $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+>191cf8	00 00 00 00 00 00 00 00
 .1ff000					FONT_4_BANK0
 >1ff000	00 00 00 00 00 00 00 00		.binary "FONT/Bm437_PhoenixEGA_8x8.bin", 0, 2048
 >1ff008	7e 81 a5 81 bd 99 81 7e 3c 7e db ff c3 7e 3c 00
