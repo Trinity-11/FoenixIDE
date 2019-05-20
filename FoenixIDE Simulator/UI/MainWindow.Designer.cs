@@ -185,21 +185,22 @@ namespace FoenixIDE.UI
             // loadImageToolStripMenuItem
             // 
             this.loadImageToolStripMenuItem.Name = "loadImageToolStripMenuItem";
-            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
             this.loadImageToolStripMenuItem.Text = "&Load Image";
             this.loadImageToolStripMenuItem.Click += new System.EventHandler(this.LoadImageToolStripMenuItem_Click);
             // 
             // tileEditorToolStripMenuItem
             // 
             this.tileEditorToolStripMenuItem.Name = "tileEditorToolStripMenuItem";
-            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+
+            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
             this.tileEditorToolStripMenuItem.Text = "&Tile Editor";
             this.tileEditorToolStripMenuItem.Click += new System.EventHandler(this.TileEditorToolStripMenuItem_Click);
             // 
             // uploaderToolStripMenuItem
             // 
             this.uploaderToolStripMenuItem.Name = "uploaderToolStripMenuItem";
-            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(163, 26);
             this.uploaderToolStripMenuItem.Text = "&Uploader";
             this.uploaderToolStripMenuItem.Click += new System.EventHandler(this.UploaderToolStripMenuItem_Click);
             // 
@@ -215,14 +216,14 @@ namespace FoenixIDE.UI
             // cPUToolStripMenuItem
             // 
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(139, 26);
             this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.CPUToolStripMenuItem_Click);
             // 
             // memoryToolStripMenuItem
             // 
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(139, 26);
             this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.MemoryToolStripMenuItem_Click);
             // 
@@ -276,7 +277,8 @@ namespace FoenixIDE.UI
             // 
             this.panel1.BackColor = System.Drawing.Color.LightBlue;
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 40);
+            this.panel1.Location = new System.Drawing.Point(0, 48);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(16, 381);
             this.panel1.TabIndex = 3;
@@ -285,7 +287,8 @@ namespace FoenixIDE.UI
             // 
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(496, 40);
+            this.panel2.Location = new System.Drawing.Point(662, 48);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(16, 381);
             this.panel2.TabIndex = 4;
@@ -294,7 +297,8 @@ namespace FoenixIDE.UI
             // 
             this.panel3.BackColor = System.Drawing.Color.LightBlue;
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(16, 405);
+            this.panel3.Location = new System.Drawing.Point(21, 500);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(480, 16);
             this.panel3.TabIndex = 5;
@@ -303,7 +307,8 @@ namespace FoenixIDE.UI
             // 
             this.panel4.BackColor = System.Drawing.Color.LightBlue;
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel4.Location = new System.Drawing.Point(0, 24);
+            this.panel4.Location = new System.Drawing.Point(0, 28);
+            this.panel4.Margin = new System.Windows.Forms.Padding(4);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(512, 16);
             this.panel4.TabIndex = 6;
@@ -329,6 +334,7 @@ namespace FoenixIDE.UI
             this.gpu.Y = 0;
             this.gpu.VisibleChanged += new System.EventHandler(this.GPU_VisibleChanged);
             this.gpu.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseClick);
+            this.gpu.MouseEnter += new System.EventHandler(this.Gpu_MouseEnter);
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
             // 
@@ -337,7 +343,7 @@ namespace FoenixIDE.UI
             this.toggleGammaToolStripMenuItem.Name = "toggleGammaToolStripMenuItem";
             this.toggleGammaToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.toggleGammaToolStripMenuItem.Text = "Toggle Gamma";
-            this.toggleGammaToolStripMenuItem.Click += new System.EventHandler(this.toggleGammaToolStripMenuItem_Click);
+            this.toggleGammaToolStripMenuItem.Click += new System.EventHandler(this.ToggleGammaToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -355,6 +361,7 @@ namespace FoenixIDE.UI
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(300, 300);
             this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MinimumSize = new System.Drawing.Size(527, 483);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;

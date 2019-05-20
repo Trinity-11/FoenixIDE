@@ -71,10 +71,13 @@ namespace FoenixIDE.Simulator.UI
                 for (int x = 0; x < 256; x++)
                 {
                     byte pixel = memory.VIDEO.ReadByte(LayersetAddress + y * 256 + x);
-                    int color = graphicsLUT[lut, pixel];
-                    int destX = x / 16 * TILE_WIDTH + x % 16 + 1;
-                    int destY = y / 16 * TILE_WIDTH + y % 16 + 1;
-                    System.Runtime.InteropServices.Marshal.WriteInt32(p, (destY * stride + destX * 4) , color);
+                    if (pixel != 0)
+                    {
+                        int color = graphicsLUT[lut, pixel];
+                        int destX = x / 16 * TILE_WIDTH + x % 16 + 1;
+                        int destY = y / 16 * TILE_WIDTH + y % 16 + 1;
+                        System.Runtime.InteropServices.Marshal.WriteInt32(p, (destY * stride + destX * 4), color);
+                    }
                 }
             }
             frameBuffer.UnlockBits(bitmapData);

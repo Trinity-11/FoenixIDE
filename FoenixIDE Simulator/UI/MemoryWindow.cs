@@ -135,7 +135,7 @@ namespace FoenixIDE.UI
         private void Timer1_Tick(object sender, EventArgs e)
         {
             RefreshMemoryView();
-            UpdateDisplayTimer.Enabled = false;
+            UpdateMCRButtons();
         }
 
         private void ViewButton_Click(object sender, EventArgs e)
@@ -423,13 +423,6 @@ namespace FoenixIDE.UI
         private void MemoryText_MouseLeave(object sender, EventArgs e)
         {
             HighlightPanel.Visible = false;
-        }
-
-        // Allows for manually refreshing memory snapshot
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            RefreshMemoryView();
-            UpdateMCRButtons();
         }
     }
 }
