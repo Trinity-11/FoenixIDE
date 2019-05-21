@@ -35,13 +35,21 @@ namespace FoenixIDE.Processor
         public bool IRQ = false;
 
         /// <summary>
+        /// Aborts the current instruction. Control is shifted to the Abort vector.
+        /// </summary>
+        public bool Abort = false;
+
+        /// <summary>
         /// When high, the CPU is reading interrupt/reset vectors
         /// </summary>
         public bool VectorPull = false;
 
         /// <summary>
-        /// Aborts the current instruction. Control is shifted to the Abort vector.
+        /// Helper method to let CPU class know an interrutp pin is high
         /// </summary>
-        public bool Abort = false;
+        public bool getInterruptPinActive
+        {
+            get { return Reset || NMI || IRQ || Abort; }
+        }
     }
 }

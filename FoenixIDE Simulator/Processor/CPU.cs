@@ -137,6 +137,12 @@ namespace FoenixIDE.Processor
             if (Waiting)
                 return;
 
+            if (this.Pins.getInterruptPinActive)
+            {
+                ServiceNextHWInterrupt();
+                return;
+            }
+
             opcodeByte = GetNextInstruction();
             this.Opcode = Decode(opcodeByte);
             PC.Value += OpcodeLength;
@@ -410,6 +416,39 @@ namespace FoenixIDE.Processor
         public void PullInto(Register Register)
         {
             Register.Value = Pull(Register.Width);
+        }
+
+        /// <summary>
+        /// Service highest priority interrupt
+        /// </summary>
+        public void ServiceNextHWInterrupt()
+        {
+            if (this.Pins.IRQ)
+            {
+                DebugPause = true;
+                this.Interrupt(InteruptTypes.IRQ);
+                this.Pins.IRQ = false;
+                Pins.IRQ = false;
+            }
+            else if (this.Pins.NMI)
+            {
+                DebugPause = true;
+                this.Interrupt(InteruptTypes.NMI);
+                this.Pins.NMI = false;
+            }
+            else if (this.Pins.Abort)
+            {
+                DebugPause = true;
+                this.Interrupt(InteruptTypes.ABORT);
+                this.Pins.Abort = false;
+            }
+            else if (this.Pins.Reset)
+            {
+                DebugPause = true;
+                this.Interrupt(InteruptTypes.RESET);
+                this.Pins.Reset = false;
+            }
+            return;
         }
 
         public void Interrupt(InteruptTypes T)
