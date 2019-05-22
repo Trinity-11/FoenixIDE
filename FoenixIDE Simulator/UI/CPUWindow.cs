@@ -383,32 +383,37 @@ namespace FoenixIDE.UI
             StepCounter++;
 
             int currentPC = kernel.CPU.GetLongPC();
-            kernel.CPU.ExecuteNext();
-            int cmdLength = kernel.CPU.OpcodeLength;
-                
-            int start = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
-            byte[] command = new byte[cmdLength];
-            for (int i = 0; i < cmdLength; i++)
+            if (!kernel.CPU.ExecuteNext())
             {
-                command[i] = kernel.CPU.Memory[currentPC + i];
-            }
-            string opcodes = kernel.CPU.Opcode.ToString(kernel.CPU.SignatureBytes);
-            string status = kernel.Monitor.GetRegisterText();
-            DebugLine line = new DebugLine(currentPC, command, opcodes, status);
-            queue.Enqueue(line);
-            if (queue.Count > (DebugPanel.Height/ROW_HEIGHT))
-            {
-                queue.Dequeue();
-            }
-            if (breakpoints.ContainsKey(currentPC))
-            {
-                kernel.CPU.DebugPause = true;
-                line.isBreakpoint = true;
-                UpdateTraceTimer.Enabled = false;
+                int cmdLength = kernel.CPU.OpcodeLength;
 
-                Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
-            }
+                int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
+                byte[] command = new byte[cmdLength];
+                for (int i = 0; i < cmdLength; i++)
+                {
+                    command[i] = kernel.CPU.Memory[currentPC + i];
+                }
+                string opcodes = kernel.CPU.Opcode.ToString(kernel.CPU.SignatureBytes);
+                string status = kernel.Monitor.GetRegisterText();
+                DebugLine line = new DebugLine(currentPC, command, opcodes, status);
+                queue.Enqueue(line);
+                if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
+                {
+                    queue.Dequeue();
+                }
+                if (breakpoints.ContainsKey(currentPC))
+                {
+                    kernel.CPU.DebugPause = true;
+                    line.isBreakpoint = true;
+                    UpdateTraceTimer.Enabled = false;
 
+                    Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
+                }
+            }
+            else
+            {
+                PrintNextInstruction(kernel.CPU.GetLongPC());
+            }
             // Print the next instruction on lastLine
             if (!UpdateTraceTimer.Enabled)
             {

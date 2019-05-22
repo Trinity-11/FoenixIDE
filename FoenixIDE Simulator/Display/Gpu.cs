@@ -322,13 +322,6 @@ namespace FoenixIDE.Display
         {
             paintCycle++;
 
-            // Read the Master Control Register
-            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
-            if ((MCRegister & 0x80) == 0x80)
-            {
-                e.Graphics.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
-                return;
-            }
             if (IO == null)
             {
                 e.Graphics.DrawString("IO Memory Not Initialized", this.Font, TextBrush, 0, 0);
@@ -341,7 +334,14 @@ namespace FoenixIDE.Display
             }
             if (RAM == null)
             {
-                e.Graphics.DrawString("CodeRAM Not Initialized", this.Font, TextBrush, 0, 0);
+                e.Graphics.DrawString("RAM Not Initialized", this.Font, TextBrush, 0, 0);
+                return;
+            }
+            // Read the Master Control Register
+            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
+            if ((MCRegister & 0x80) == 0x80)
+            {
+                e.Graphics.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
                 return;
             }
             Graphics g = Graphics.FromImage(frameBuffer);

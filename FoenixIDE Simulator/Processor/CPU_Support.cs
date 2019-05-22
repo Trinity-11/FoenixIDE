@@ -38,12 +38,12 @@ namespace FoenixIDE.Processor
         {
             if (Flags.Emulation)
             {
-                Flags.accMemWidth = true;
-                Flags.indeXregisterwidth = true;
+                Flags.accumulatorShort = true;
+                Flags.xRegisterShort = true;
             }
-            A.Width = Flags.accMemWidth ? 1 : 2;
-            X.Width = Flags.indeXregisterwidth ? 1 : 2;
-            Y.Width = Flags.indeXregisterwidth ? 1 : 2;
+            A.Width = Flags.accumulatorShort ? 1 : 2;
+            X.Width = Flags.xRegisterShort ? 1 : 2;
+            Y.Width = Flags.xRegisterShort ? 1 : 2;
         }
 
     }

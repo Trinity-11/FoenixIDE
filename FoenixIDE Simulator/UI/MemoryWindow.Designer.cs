@@ -210,7 +210,7 @@
             // 
             this.UpdateDisplayTimer.Enabled = true;
             this.UpdateDisplayTimer.Interval = 1000;
-            this.UpdateDisplayTimer.Tick += new System.EventHandler(this.Timer1_Tick);
+            this.UpdateDisplayTimer.Tick += new System.EventHandler(this.UpdateDisplayTimer_Tick);
             // 
             // MemoryWindowTooltips
             // 

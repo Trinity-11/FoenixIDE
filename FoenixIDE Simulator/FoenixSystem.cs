@@ -19,14 +19,12 @@ namespace FoenixIDE
         public MemoryManager Memory = null;
         public Processor.CPU CPU = null;
         public Gpu gpu = null;
-        public MemoryBuffer KeyboardBuffer = null;
+        //public MemoryBuffer KeyboardBuffer = null;
         public ColorCodes CurrentColor = ColorCodes.Green;
         public bool ConsoleEcho = false;
 
         public Basic.Immediate Basic = null;
         public Monitor.Monitor Monitor = null;
-
-        public global::System.Timers.Timer TickTimer = new global::System.Timers.Timer();
 
         public ReadyHandler ReadyHandler = null;
 
@@ -64,12 +62,12 @@ namespace FoenixIDE
             //gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
-            KeyboardBuffer = new MemoryBuffer(
-                Memory.RAM,
-                MemoryMap.KEY_BUFFER,
-                MemoryMap.KEY_BUFFER_SIZE,
-                MemoryMap.KEY_BUFFER_RPOS,
-                MemoryMap.KEY_BUFFER_WPOS);
+            //KeyboardBuffer = new MemoryBuffer(
+            //    Memory.RAM,
+            //    MemoryMap.KEY_BUFFER,
+            //    MemoryMap.KEY_BUFFER_SIZE,
+            //    MemoryMap.KEY_BUFFER_RPOS,
+            //    MemoryMap.KEY_BUFFER_WPOS);
 
             for (int i = MemoryMap.SCREEN_PAGE0; i < MemoryMap.SCREEN_PAGE1; i++)
             {
@@ -120,10 +118,6 @@ namespace FoenixIDE
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
             }
             CPU.Reset();
-            
-            this.TickTimer.Interval = 1000 / 60;
-            this.TickTimer.Elapsed += TickTimer_Elapsed;
-            this.TickTimer.Enabled = true;
         }
 
         private void PrintCopyright()
@@ -133,11 +127,6 @@ namespace FoenixIDE
             PrintLine("(c) C256 Foenix");
             PrintTab(60);
             PrintLine("wilsontp@gmail and others");
-        }
-
-        private void TickTimer_Elapsed(object sender, global::System.Timers.ElapsedEventArgs e)
-        {
-            DoConsoleEcho();
         }
 
         public virtual void PrintChar(char c)
@@ -431,27 +420,6 @@ namespace FoenixIDE
         public int Columns
         {
             get { return gpu.ColumnsVisible; }
-        }
-
-        public void DoConsoleEcho()
-        {
-            if (!ConsoleEcho)
-                return;
-            if (KeyboardBuffer.Count == 0)
-                return;
-
-            int c = KeyboardBuffer.Read(1);
-            int shift = KeyboardBuffer.Read(1);
-            int pos = GetStartOfLine();
-            switch ((char)c)
-            {
-                case '\r':
-                    ReturnPressed(pos);
-                    break;
-                default:
-                    PrintChar((char)c);
-                    break;
-            }
         }
 
         public void PrintMemBinary(int Bytes, int Address)

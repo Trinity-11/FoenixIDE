@@ -56,6 +56,10 @@ namespace FoenixIDE.MemoryLocations
         public const int D1_REMAINDER = 0x000116; // 2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
         public const int MATH_END = 0x00_012F;
 
+        public const int INT_PENDING_REG0 = 0x00_0140;
+        public const int INT_PENDING_REG1 = 0x00_0141;
+        public const int INT_PENDING_REG2 = 0x00_0142;
+
         public const int VECTOR_STATE = 0x0001FF; // 1 Byte Interrupt Vector State. See VECTOR_STATE_ENUM
 
         public const int CPU_REGISTERS = 0x000200; //  Byte 

@@ -826,6 +826,7 @@ namespace FoenixIDE.Processor
                         address += (cpu.DataBank.Value << 16);
                     }
                     cpu.JumpLong(address);
+                    cpu.SyncFlags();
                     return;
                 case OpcodeList.RTL_StackImplied:
                     addr = cpu.Pull(3);

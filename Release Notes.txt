@@ -1,3 +1,7 @@
+Release 0.2.2.7
+---------------
+Added interrupt handling for keyboard key presses.
+
 Release 0.2.2.6
 ---------------
 Added the flashing cursor with the display of text.

@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basic\ScanCodes.cs" />
     <Compile Include="Deprecated\Address.cs" />
     <Compile Include="Deprecated\AddressRange.cs" />
     <Compile Include="Basic\Editor.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="FileFormat\FoenixmlFile.cs" />
     <Compile Include="FileFormat\HexFile.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
-    <Compile Include="KeyboardMap.cs" />
     <Compile Include="MemoryBuffer.cs" />
     <Compile Include="MemoryLocations\MathCoproMemoryRAM.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />

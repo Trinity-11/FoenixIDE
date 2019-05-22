@@ -12,8 +12,8 @@ namespace FoenixIDE.Processor
         public bool Negative;
         public bool oVerflow;
         public bool Break;
-        public bool accMemWidth;
-        public bool indeXregisterwidth;
+        public bool accumulatorShort;
+        public bool xRegisterShort;
         public bool Decimal;
         public bool Irqdisable;
         public bool Zero;
@@ -53,8 +53,8 @@ namespace FoenixIDE.Processor
                     return GetFlags(
                         Negative,
                         oVerflow,
-                        accMemWidth,
-                        indeXregisterwidth,
+                        accumulatorShort,
+                        xRegisterShort,
                         Decimal,
                         Irqdisable,
                         Zero,
@@ -94,13 +94,13 @@ namespace FoenixIDE.Processor
 
         public void SetFlags(int value)
         {
-            Negative = (value & 128) != 0;
-            oVerflow = (value & 64) != 0;
+            Negative = (value & 0x80) != 0;
+            oVerflow = (value & 0x40) != 0;
             if (!Emulation)
-                accMemWidth = (value & 32) != 0;
+                accumulatorShort = (value & 0x20) != 0;
             else
-                Break = (value & 32) != 0;
-            indeXregisterwidth = (value & 16) != 0;
+                Break = (value & 0x20) != 0;
+            xRegisterShort = (value & 0x10) != 0;
             Decimal = (value & 8) != 0;
             Irqdisable = (value & 4) != 0;
             Zero = (value & 2) != 0;
@@ -123,8 +123,8 @@ namespace FoenixIDE.Processor
             else
                 return (Negative ? "N" : "-")
                     + (oVerflow ? "V" : "-")
-                    + (accMemWidth ? "M" : "-")
-                    + (indeXregisterwidth ? "X" : "-")
+                    + (accumulatorShort ? "M" : "-")
+                    + (xRegisterShort ? "X" : "-")
                     + (Decimal ? "D" : "-")
                     + (Irqdisable ? "I" : "-")
                     + (Zero ? "Z" : "-")
@@ -175,8 +175,8 @@ namespace FoenixIDE.Processor
             Negative = false;
             oVerflow = false;
             Break = false;
-            accMemWidth = false;
-            indeXregisterwidth = false;
+            accumulatorShort = false;
+            xRegisterShort = false;
             Decimal = false;
             Irqdisable = false;
             Zero = false;

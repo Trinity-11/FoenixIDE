@@ -61,6 +61,7 @@ namespace FoenixIDE.UI
                 AddressCombo.Enabled = false;
                 HighlightPanel.ReadOnly = true;
                 FooterPanel.Visible = false;
+                UpdateDisplayTimer.Enabled = false;
             }
             else
             {
@@ -132,10 +133,13 @@ namespace FoenixIDE.UI
             MemoryText.Text = s.ToString();
         }
 
-        private void Timer1_Tick(object sender, EventArgs e)
+        private void UpdateDisplayTimer_Tick(object sender, EventArgs e)
         {
-            RefreshMemoryView();
-            UpdateMCRButtons();
+            if (!(Memory is MemoryRAM))
+            {
+                RefreshMemoryView();
+                UpdateMCRButtons();
+            }
         }
 
         private void ViewButton_Click(object sender, EventArgs e)

@@ -1,4 +1,5 @@
-﻿using FoenixIDE.Simulator.UI;
+﻿using FoenixIDE.Simulator.Basic;
+using FoenixIDE.Simulator.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,12 +31,6 @@ namespace FoenixIDE.UI
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void BasicWindow_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            lastKeyPressed.Text = "$" + ((UInt16)e.KeyChar).ToString("X2");
-            kernel.KeyboardBuffer.Write(e.KeyChar, 2);
         }
 
         private void BasicWindow_Load(object sender, EventArgs e)
@@ -139,28 +134,43 @@ namespace FoenixIDE.UI
             kernel.Reset();
         }
 
+        private void WriteKey(ScanCode key)
+        {
+            kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
+            kernel.Memory.KEYBOARD.WriteByte(4, 0);
+            kernel.CPU.Pins.IRQ = true;
+            // Set the Keyboard Interrupt
+            byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
+            IRQ1 |= 1;
+            kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+        }
+
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)
+            ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
+            if (scanCode != ScanCode.sc_null)
             {
-                case Keys.Up:
-                    kernel.KeyboardBuffer.Write(KeyboardMap.KEY_Up);
-                    break;
-                case Keys.Down:
-                    kernel.KeyboardBuffer.Write(KeyboardMap.KEY_Down);
-                    break;
-                case Keys.Left:
-                    kernel.KeyboardBuffer.Write(KeyboardMap.KEY_Left);
-                    break;
-                case Keys.Right:
-                    kernel.KeyboardBuffer.Write(KeyboardMap.KEY_Right);
-                    break;
-                case Keys.Home:
-                    kernel.KeyboardBuffer.Write(KeyboardMap.KEY_Home);
-                    break;
-                default:
-                    global::System.Diagnostics.Debug.WriteLine("KeyDown: " + e.KeyCode.ToString());
-                    break;
+                lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
+                WriteKey(scanCode);
+            }
+            else
+            {
+                lastKeyPressed.Text = "";
+            }
+        }
+
+        private void BasicWindow_KeyUp(object sender, KeyEventArgs e)
+        {
+            ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
+            if (scanCode != ScanCode.sc_null)
+            {
+                scanCode += 0x80;
+                lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
+                WriteKey(scanCode);
+            }
+            else
+            {
+                lastKeyPressed.Text = "";
             }
         }
 

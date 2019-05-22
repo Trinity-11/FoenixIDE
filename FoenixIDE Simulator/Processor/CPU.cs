@@ -130,17 +130,19 @@ namespace FoenixIDE.Processor
         /// <summary>
         /// Execute a single instruction
         /// </summary>
-        public void ExecuteNext()
+        public bool ExecuteNext()
         {
             if (Pins.Ready_)
-                return;
+                return false;
             if (Waiting)
-                return;
+                return false;
 
             if (this.Pins.getInterruptPinActive)
             {
-                ServiceNextHWInterrupt();
-                return;
+                if (ServiceHardwareInterrupt())
+                {
+                    return true;
+                }
             }
 
             opcodeByte = GetNextInstruction();
@@ -148,6 +150,7 @@ namespace FoenixIDE.Processor
             PC.Value += OpcodeLength;
             Opcode.Execute(SignatureBytes);
             clockCyles += OpcodeCycles;
+            return false;
         }
 
         /// <summary>
@@ -203,8 +206,8 @@ namespace FoenixIDE.Processor
             ProgramBank.Value = 0;
 
             PC.Value = Memory.ReadWord(MemoryMap.VECTOR_ERESET);
-            //SetLongPC(0xF80000);
 
+            Pins.IRQ = false;
             Pins.VectorPull = false;
             Memory.VectorPull = false;
         }
@@ -421,34 +424,37 @@ namespace FoenixIDE.Processor
         /// <summary>
         /// Service highest priority interrupt
         /// </summary>
-        public void ServiceNextHWInterrupt()
+        public bool ServiceHardwareInterrupt()
         {
-            if (this.Pins.IRQ)
+            if (Pins.IRQ && !Flags.Irqdisable)
             {
-                DebugPause = true;
-                this.Interrupt(InteruptTypes.IRQ);
-                this.Pins.IRQ = false;
+                //DebugPause = true;
                 Pins.IRQ = false;
+                Interrupt(InteruptTypes.IRQ);
+                return true;
             }
-            else if (this.Pins.NMI)
+            else if (Pins.NMI)
             {
                 DebugPause = true;
-                this.Interrupt(InteruptTypes.NMI);
-                this.Pins.NMI = false;
+                Pins.NMI = false;
+                Interrupt(InteruptTypes.NMI);
+                return true;
             }
-            else if (this.Pins.Abort)
+            else if (Pins.Abort)
             {
                 DebugPause = true;
-                this.Interrupt(InteruptTypes.ABORT);
-                this.Pins.Abort = false;
+                Pins.Abort = false;
+                Interrupt(InteruptTypes.ABORT);
+                return true;
             }
             else if (this.Pins.Reset)
             {
                 DebugPause = true;
-                this.Interrupt(InteruptTypes.RESET);
-                this.Pins.Reset = false;
+                Pins.Reset = false;
+                Interrupt(InteruptTypes.RESET);
+                return true;
             }
-            return;
+            return false;
         }
 
         public void Interrupt(InteruptTypes T)
