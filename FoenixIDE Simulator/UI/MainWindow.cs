@@ -206,6 +206,7 @@ namespace FoenixIDE.UI
             kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_MONTH - kernel.Memory.IO.StartAddress, BCD(currentTime.Month));
             kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_YEAR - kernel.Memory.IO.StartAddress, BCD(currentTime.Year % 100));
             kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_CENTURY - kernel.Memory.IO.StartAddress, BCD(currentTime.Year / 100));
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_DOW - kernel.Memory.IO.StartAddress, (byte)(currentTime.DayOfWeek+1));
         }
 
         private byte BCD(int val)
