@@ -1,3 +1,7 @@
+Release 0.2.2.8
+---------------
+Added the Real-Time Clock.
+
 Release 0.2.2.7
 ---------------
 Added interrupt handling for keyboard key presses.

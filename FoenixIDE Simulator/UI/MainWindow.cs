@@ -198,9 +198,20 @@ namespace FoenixIDE.UI
             previousFrame = currentFrame;
             cpsPerf.Text = "CPS: " + cps.ToString("N0");
             fpsPerf.Text = "FPS: " + fps.ToString("N0");
-
+            // write the time to memory - values are BCD
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.Memory.IO.StartAddress, BCD(currentTime.Second));
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.Memory.IO.StartAddress, BCD(currentTime.Minute));
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_HRS - kernel.Memory.IO.StartAddress, BCD(currentTime.Hour));
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_DAY - kernel.Memory.IO.StartAddress, BCD(currentTime.Day));
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_MONTH - kernel.Memory.IO.StartAddress, BCD(currentTime.Month));
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_YEAR - kernel.Memory.IO.StartAddress, BCD(currentTime.Year % 100));
+            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_CENTURY - kernel.Memory.IO.StartAddress, BCD(currentTime.Year / 100));
         }
 
+        private byte BCD(int val)
+        {
+            return (byte)(val / 10 * 0x10 + val % 10);
+        }
         private void GPU_VisibleChanged(object sender, EventArgs e)
         {
             BootTimer.Enabled = gpu.Visible;
