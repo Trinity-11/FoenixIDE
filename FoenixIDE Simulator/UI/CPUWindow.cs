@@ -57,34 +57,36 @@ namespace FoenixIDE.UI
         {
             public bool isBreakpoint = false;
             public readonly int PC;
-            readonly string Status;
-            public readonly string Command;
-            public readonly string OpCodes;
-            private readonly String pcString;
-            public int commandLength = 1;
+            byte[] command;
+            public int commandLength;
+            private String opcodes;
+            readonly int[] cpu;
+            public bool StepOver = false;
 
+            // Only expand when it's going to be displayed
             override public string ToString()
             {
-                return string.Format(">{0}  {1} {2}  {3}", pcString, Command, OpCodes, Status);
+                StringBuilder c = new StringBuilder();
+                int commandLength = command.Length;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (i < command.Length)
+                        c.Append(command[i].ToString("X2")).Append(" ");
+                    else
+                        c.Append("   ");
+                }
+                String OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
+                String state = Monitor.Monitor.Format(cpu);
+                StepOver = (opcodes.StartsWith("B") || opcodes.StartsWith("J"));
+                return string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), OpCodes, state);
             }
-            public DebugLine(int pc, byte[] command, string opcodes, string status)
+            public DebugLine(int pc, byte[] cmd, String oc, int[] cpuSnapshot)
             {
                 PC = pc;
-                pcString = pc.ToString("X6");
-
-                StringBuilder c = new StringBuilder();
-                commandLength = command.Length;
-                for (int i = 0; i < command.Length; i++)
-                {
-                    c.Append(command[i].ToString("X2")).Append(" ");
-                }
-                for (int i = command.Length; i < 4; i++)
-                {
-                    c.Append("   ");
-                }
-                Command = c.ToString();
-                OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
-                Status = status;
+                command = cmd;
+                commandLength = cmd.Length;
+                opcodes = oc;
+                cpu = cpuSnapshot;
             }
         }
         private List<string> lines = new List<string>();
@@ -165,7 +167,7 @@ namespace FoenixIDE.UI
                         if (queue.Count > row)
                         {
                             DebugLine line = queue.ToArray()[row];
-                            StepOverButton.Visible = line.OpCodes.StartsWith("B") || line.OpCodes.StartsWith("J");
+                            StepOverButton.Visible = line.StepOver;
                         }
                     }
                 }
@@ -394,8 +396,8 @@ namespace FoenixIDE.UI
                     command[i] = kernel.Memory.RAM.ReadByte(currentPC + i);
                 }
                 string opcodes = kernel.CPU.Opcode.ToString(kernel.CPU.SignatureBytes);
-                string status = kernel.Monitor.GetRegisterText();
-                DebugLine line = new DebugLine(currentPC, command, opcodes, status);
+                //string status = kernel.Monitor.GetRegisterText();
+                DebugLine line = new DebugLine(currentPC, command, opcodes, kernel.CPU.snapshot);
                 queue.Enqueue(line);
                 if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
                 {
@@ -429,11 +431,11 @@ namespace FoenixIDE.UI
             byte[] command = new byte[cmdLength];
             for (int i = 0; i < cmdLength; i++)
             {
-                command[i] = kernel.CPU.Memory[pc + i];
+                command[i] = kernel.Memory.RAM.ReadByte(pc + i);
             }
             string opcodes = oc.ToString(kernel.CPU.ReadSignature(oc));
-            string status = "";
-            DebugLine line = new DebugLine(pc, command, opcodes, status);
+            //string status = "";
+            DebugLine line = new DebugLine(pc, command, opcodes, null);
             if (!lastLine.InvokeRequired)
             {
                 lastLine.Text = line.ToString();
