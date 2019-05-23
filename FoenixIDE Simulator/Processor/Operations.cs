@@ -570,10 +570,10 @@ namespace FoenixIDE.Processor
                     cpu.Flags.Decimal = true;
                     break;
                 case OpcodeList.CLI_Implied:
-                    cpu.Flags.Irqdisable = false;
+                    cpu.Flags.IrqDisable = false;
                     break;
                 case OpcodeList.SEI_Implied:
-                    cpu.Flags.Irqdisable = true;
+                    cpu.Flags.IrqDisable = true;
                     break;
                 case OpcodeList.CLV_Implied:
                     cpu.Flags.oVerflow = false;
@@ -972,7 +972,7 @@ namespace FoenixIDE.Processor
         {
             int val = GetValue(addressMode, signature);
             if (addressMode == AddressModes.AbsoluteIndexedWithX && (val & 0xff) == 0)
-                global::System.Diagnostics.Debug.WriteLine("break");
+                global::System.Diagnostics.Debug.WriteLine("LDA break " + instruction + "," + signature);
             cpu.A.Value = val;
             cpu.Flags.SetNZ(cpu.A);
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Basic
 {
-    public class Immediate : ReadyHandler
+    public class Immediate : IReadyHandler
     {
         public FoenixSystem kernel = null;
 

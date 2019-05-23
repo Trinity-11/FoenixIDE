@@ -426,7 +426,7 @@ namespace FoenixIDE.Processor
         /// </summary>
         public bool ServiceHardwareInterrupt()
         {
-            if (Pins.IRQ && !Flags.Irqdisable)
+            if (Pins.IRQ && !Flags.IrqDisable)
             {
                 //DebugPause = true;
                 Pins.IRQ = false;
@@ -470,7 +470,7 @@ namespace FoenixIDE.Processor
 
             int addr = 0;
             int emuAddr = 0;
-            Flags.Irqdisable = true;
+            Flags.IrqDisable = true;
             Flags.Decimal = false;
 
             switch (T)

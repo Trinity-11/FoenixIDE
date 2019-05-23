@@ -65,12 +65,12 @@ namespace FoenixIDE.UI
 
             override public string ToString()
             {
-                return string.Format("{0}  {1} {2}  {3}", pcString, Command, OpCodes, Status);
+                return string.Format(">{0}  {1} {2}  {3}", pcString, Command, OpCodes, Status);
             }
             public DebugLine(int pc, byte[] command, string opcodes, string status)
             {
                 PC = pc;
-                pcString = ">" + pc.ToString("X6");
+                pcString = pc.ToString("X6");
 
                 StringBuilder c = new StringBuilder();
                 commandLength = command.Length;
@@ -391,7 +391,7 @@ namespace FoenixIDE.UI
                 byte[] command = new byte[cmdLength];
                 for (int i = 0; i < cmdLength; i++)
                 {
-                    command[i] = kernel.CPU.Memory[currentPC + i];
+                    command[i] = kernel.Memory.RAM.ReadByte(currentPC + i);
                 }
                 string opcodes = kernel.CPU.Opcode.ToString(kernel.CPU.SignatureBytes);
                 string status = kernel.Monitor.GetRegisterText();
@@ -410,10 +410,7 @@ namespace FoenixIDE.UI
                     Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
                 }
             }
-            else
-            {
-                PrintNextInstruction(kernel.CPU.GetLongPC());
-            }
+
             // Print the next instruction on lastLine
             if (!UpdateTraceTimer.Enabled)
             {

@@ -15,7 +15,7 @@ namespace FoenixIDE.Processor
         public bool accumulatorShort;
         public bool xRegisterShort;
         public bool Decimal;
-        public bool Irqdisable;
+        public bool IrqDisable;
         public bool Zero;
         public bool Carry;
         public bool Emulation;
@@ -46,7 +46,7 @@ namespace FoenixIDE.Processor
                         Break,
                         false,
                         Decimal,
-                        Irqdisable,
+                        IrqDisable,
                         Zero,
                         Carry);
                 else
@@ -56,7 +56,7 @@ namespace FoenixIDE.Processor
                         accumulatorShort,
                         xRegisterShort,
                         Decimal,
-                        Irqdisable,
+                        IrqDisable,
                         Zero,
                         Carry);
             }
@@ -102,7 +102,7 @@ namespace FoenixIDE.Processor
                 Break = (value & 0x20) != 0;
             xRegisterShort = (value & 0x10) != 0;
             Decimal = (value & 8) != 0;
-            Irqdisable = (value & 4) != 0;
+            IrqDisable = (value & 4) != 0;
             Zero = (value & 2) != 0;
             Carry = (value & 1) != 0;
         }
@@ -110,26 +110,34 @@ namespace FoenixIDE.Processor
         public override string ToString()
         {
             //NVMXDIZC
+            char[] s = new char[10];
             if (Emulation)
-                return (Negative ? "N" : "-")
-                    + (oVerflow ? "V" : "-")
-                    + (Break ? "B" : "-")
-                    + "-"
-                    + (Decimal ? "D" : "-")
-                    + (Irqdisable ? "I" : "-")
-                    + (Zero ? "Z" : "-")
-                    + (Carry ? "C" : "-")
-                    + " " + (Emulation ? "E" : " ");
+            {
+                s[0] = Negative ? 'N' : '-';
+                s[1] = oVerflow ? 'V' : '-';
+                s[2] = Break ? 'B' : '-';
+                s[3] = '-';
+                s[4] = Decimal ? 'D' : '-';
+                s[5] = IrqDisable ? 'I' : '-';
+                s[6] = Zero ? 'Z' : '-';
+                s[7] = Carry ? 'C' : '-';
+                s[8] = ' ';
+                s[9] = 'E';
+            }
             else
-                return (Negative ? "N" : "-")
-                    + (oVerflow ? "V" : "-")
-                    + (accumulatorShort ? "M" : "-")
-                    + (xRegisterShort ? "X" : "-")
-                    + (Decimal ? "D" : "-")
-                    + (Irqdisable ? "I" : "-")
-                    + (Zero ? "Z" : "-")
-                    + (Carry ? "C" : "-")
-                    + " " + (Emulation ? "E" : " ");
+            {
+                s[0] = Negative ? 'N' : '-';
+                s[1] = oVerflow ? 'V' : '-';
+                s[2] = accumulatorShort ? 'M' : '-';
+                s[3] = xRegisterShort ? 'X' : '-';
+                s[4] = Decimal ? 'D' : '-';
+                s[5] = IrqDisable ? 'I' : '-';
+                s[6] = Zero ? 'Z' : '-';
+                s[7] = Carry ? 'C' : '-';
+                s[8] = ' ';
+                s[9] = ' ';
+            }
+            return new string(s);
         }
 
         public void SetZ(int Val)
@@ -178,7 +186,7 @@ namespace FoenixIDE.Processor
             accumulatorShort = false;
             xRegisterShort = false;
             Decimal = false;
-            Irqdisable = false;
+            IrqDisable = false;
             Zero = false;
             Carry = false;
             Emulation = false;

@@ -39,7 +39,7 @@
             this.MinimumSize = new System.Drawing.Size(640, 480);
             this.Name = "Gpu";
             this.Size = new System.Drawing.Size(659, 480);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FrameBuffer_KeyPress);
+            //this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FrameBuffer_KeyPress);
             this.ResumeLayout(false);
 
         }

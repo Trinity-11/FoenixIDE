@@ -15,7 +15,7 @@ namespace FoenixIDE
         private readonly int startAddress;
         private readonly int length;
         private readonly int endAddress;
-        public delegate void PostWriteFn(int address);
+        public delegate void PostWriteFn(int address, byte o, byte n);
         public PostWriteFn postWrite = null;
 
         public int StartAddress
@@ -79,8 +79,17 @@ namespace FoenixIDE
 
         public virtual void WriteByte(int Address, byte Value)
         {
-            data[Address] = Value;
-            postWrite?.Invoke(Address);
+            if (postWrite != null)
+            {
+                byte old = data[Address];
+                data[Address] = Value;
+                postWrite.Invoke(Address, old, Value);
+            }
+            else
+            {
+                data[Address] = Value;
+            }
+            
         }
 
         public void WriteWord(int Address, int Value)
@@ -103,14 +112,14 @@ namespace FoenixIDE
         }
 
         // When the codec write address is written to, wait 200ms then write a zero to signify that we're finished
-        public async void OnCodecWait5SecondsAndWrite00(int address)
+        public async void OnCodecWait5SecondsAndWrite00(int address, byte o, byte n)
         {
             await Task.Delay(200);
             data[0] = 0;
         }
 
         // This is used to simulate the Keyboard Register
-        public void OnKeyboardStatusCodeChange(int address)
+        public void OnKeyboardStatusCodeChange(int address, byte o, byte n)
         {
             // In order to avoid an infinite loop, we write to the device directly
             switch (address)
@@ -166,7 +175,7 @@ namespace FoenixIDE
             }
         }
 
-        public void OnSDCARDCommand(int address)
+        public void OnSDCARDCommand(int address, byte o, byte n)
         {
             byte command = data[1];
             switch (command)
@@ -174,6 +183,19 @@ namespace FoenixIDE
                 case 0x15:
                     data[0] = 0x51;
                     break;
+            }
+        }
+
+        public void OnInterruptPending(int address, byte o, byte n)
+        {
+            if (address >= MemoryLocations.MemoryMap.INT_PENDING_REG0 && address <= MemoryLocations.MemoryMap.INT_PENDING_REG2)
+            {
+                // If a bit gets set from 0 to 1, leave it.  If a bit gets set a second time, reset to 0.
+                byte combo = (byte)(o & n);
+                if (combo > 0)
+                {
+                    data[address] = (byte)(data[address] & (byte)(~combo));
+                }
             }
         }
     }
