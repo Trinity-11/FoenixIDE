@@ -1,0 +1,18 @@
+﻿;Short  Command       Params
+;A      ASSEMBLE      [Start] [Assembly code]
+;C      COMPARE       Start1 Start2 [Len (1 if blank)]
+;D      DISASSEMBLE   Start [End]
+;F      FILL          Start End Byte
+;G      GO            [Address] 
+;J                    [Address]
+;H      HUNT          Start End Byte [Byte]...
+;L      LOAD          "File" [Device] [Start] 
+;M      MEMORY        [Start] [End]
+;R      REGISTERS     Register [Value]  (A 1234, F 00100011)
+;;                    PC A X Y SP DBR DP NVMXDIZC
+;S      SAVE          "File" Device Start End
+;T      TRANSFER      Start End Destination 
+;V      VERIFY        "File" [Device] [Start]
+;X      EXIT
+;>      MODIFY        Start Byte [Byte]...
+;@      DOS           [Command] Returns drive status if no params.

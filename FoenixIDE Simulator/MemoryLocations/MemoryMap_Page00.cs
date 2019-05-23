@@ -32,6 +32,7 @@ namespace FoenixIDE.MemoryLocations
         public const int USER_TEMP = 0x0000E0; // 32 Bytes Temp space for user programs
         public const int PAGE0_END_ = 0x000100; //  Byte 
 
+        #region GAVIN
         public const int GAVIN_BLOCK = 0x000100; // 256 Bytes Gavin reserved, overlaps debugging registers at $1F0
 
         // Math co-processor
@@ -56,11 +57,29 @@ namespace FoenixIDE.MemoryLocations
         public const int D1_REMAINDER = 0x000116; // 2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
         public const int MATH_END = 0x00_012F;
 
-        public const int INT_PENDING_REG0 = 0x00_0140;
-        public const int INT_PENDING_REG1 = 0x00_0141;
-        public const int INT_PENDING_REG2 = 0x00_0142;
+        //// Interrupt Pending Source Registers
+        //public const int INT_PENDING_REG0 = 0x00_0140; //[0]-Always 1, [1]-VICKY_INT0, [2]-VICKY_INT1, [3]-Timer0, [4]-Timer1, [5]-Timer2, [6]-RTC, [7]-LPC_INT[6] Floppy
+        //public const int INT_PENDING_REG1 = 0x00_0141; //[0]-LPC_INT[1] KB, [1]-VICKY_INT2, [2]-VICKY_INT3, [4]-LPC_INT[4] COM1, [5]-LPC_INT[5] Midi, [6]-LPC_INT[7] LPT1, [7]-SDCARD
+        //public const int INT_PENDING_REG2 = 0x00_0142; //[0]-OPL2_Right, [1]-OPL2_Left-, [2]-Beatrix, [3]-Gavin DMA, [4]-Always 1, [5]-DAC Hot-Plug, [6]-Exp Port Con, [7]-Always 1
+
+        //// Interrupt Polarity Set
+        //public const int INT_POL_REG0 = 0x00_0144;
+        //public const int INT_POL_REG1 = 0x00_0145;
+        //public const int INT_POL_REG2 = 0x00_0146;
+
+        //// Interrupt Edge Detection Enable
+        //public const int INT_EDGE_REG0 = 0x00_0148;
+        //public const int INT_EDGE_REG1 = 0x00_0149;
+        //public const int INT_EDGE_REG2 = 0x00_014A;
+
+        //// Interrupt Mask
+        //public const int INT_MASK_REG0 = 0x00_014C;
+        //public const int INT_MASK_REG1 = 0x00_014D;
+        //public const int INT_MASK_REG2 = 0x00_014E;
 
         public const int VECTOR_STATE = 0x0001FF; // 1 Byte Interrupt Vector State. See VECTOR_STATE_ENUM
+
+        #endregion GAVIN
 
         public const int CPU_REGISTERS = 0x000200; //  Byte 
         public const int CPUPC = 0x000200; // 2 Bytes Debug registers. When BRK is executed, Interrupt service routine will populate this block with the CPU registers. 

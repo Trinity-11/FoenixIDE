@@ -78,9 +78,11 @@
     <Compile Include="DeviceEnum.cs" />
     <Compile Include="FileFormat\FoenixmlFile.cs" />
     <Compile Include="FileFormat\HexFile.cs" />
+    <Compile Include="Gavin\Interrupt_Controller.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="MemoryBuffer.cs" />
     <Compile Include="MemoryLocations\MathCoproMemoryRAM.cs" />
+    <Compile Include="MemoryLocations\MemoryMap_Gavin.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Blocks.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Other.cs" />

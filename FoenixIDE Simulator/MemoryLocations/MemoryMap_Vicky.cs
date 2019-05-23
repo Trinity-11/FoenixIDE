@@ -30,8 +30,8 @@ namespace FoenixIDE.MemoryLocations
         public const int RTC_CTRL = 0xAF_080E; // Control Register
         public const int RTC_CENTURY = 0xAF_080F; // Century Register
 
-        public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
-        public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
+        //public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
+        //public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
         public const int SDCARD_DATA = 0xAF_E808;
         public const int SDCARD_CMD = 0xAF_E809;
         public const int CODEC_WR_CTRL = 0xAF_E822; // codec write address

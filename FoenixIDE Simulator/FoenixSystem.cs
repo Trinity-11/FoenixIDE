@@ -45,8 +45,10 @@ namespace FoenixIDE
                 MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_END), // 48 bytes
                 CODEC = new MemoryRAM(MemoryMap.CODEC_WR_CTRL, MemoryMap.CODEC_WR_CTRL),  // 1 byte
                 KEYBOARD = new MemoryRAM(MemoryMap.KBD_DATA_BUF, 5),
-                SDCARD = new MemoryRAM(MemoryMap.SDCARD_DATA, 2)
+                SDCARD = new MemoryRAM(MemoryMap.SDCARD_DATA, 2),
+                INTCTRL = new InterruptControllerRAM(MemoryMap.INTCTRL_START, MemoryMap.INTCTRL_END)
             };
+
             // Wire the postWrite functions.
             Memory.CODEC.postWrite = Memory.CODEC.OnCodecWait5SecondsAndWrite00;
             Memory.KEYBOARD.postWrite = Memory.KEYBOARD.OnKeyboardStatusCodeChange;

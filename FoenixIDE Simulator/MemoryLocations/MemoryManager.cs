@@ -27,6 +27,7 @@ namespace FoenixIDE
         public MemoryRAM CODEC = null;
         public MemoryRAM KEYBOARD = null;
         public MemoryRAM SDCARD = null;
+        public InterruptControllerRAM INTCTRL = null;
 
         public bool VectorPull = false;
 
@@ -65,6 +66,12 @@ namespace FoenixIDE
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
         {
+            if (Address >= MemoryMap.INTCTRL_START && Address <= MemoryMap.INTCTRL_END)
+            {
+                Device = INTCTRL;
+                DeviceAddress = Address - INTCTRL.StartAddress;
+                return;
+            }
             if (Address >= MemoryMap.CODEC_WR_CTRL && Address <= MemoryMap.CODEC_WR_CTRL)
             {
                 Device = CODEC;
@@ -118,7 +125,6 @@ namespace FoenixIDE
                 return;
             }
 
-
             // oops, we didn't map this to anything. 
             Device = null;
             DeviceAddress = 0;
@@ -136,6 +142,10 @@ namespace FoenixIDE
             set { WriteByte(Bank * 0xffff + Address & 0xffff, value); }
         }
 
+        /// <summary>
+        /// Finds device mapped to 'Address' and calls it 
+        /// 'Address' is offset by GetDeviceAt to device internal address range
+        /// </summary>
         public virtual byte ReadByte(int Address)
         {
             GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);

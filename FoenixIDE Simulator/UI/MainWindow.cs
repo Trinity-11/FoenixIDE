@@ -30,12 +30,13 @@ namespace FoenixIDE.UI
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();  
         }
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
             kernel = new FoenixSystem(this.gpu);
+            kernel.Memory.INTCTRL.setKernel(kernel);
 
             ShowDebugWindow();
             ShowMemoryWindow();
@@ -138,11 +139,7 @@ namespace FoenixIDE.UI
         {
             kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
             kernel.Memory.KEYBOARD.WriteByte(4, 0);
-            kernel.CPU.Pins.IRQ = true;
-            // Set the Keyboard Interrupt
-            byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
-            IRQ1 |= 1;
-            kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+            kernel.Memory.INTCTRL.setInterrupt(MemoryLocations.InterruptSources.LPC_INT_1_KB);
         }
 
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
