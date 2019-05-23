@@ -12,5 +12,5 @@ namespace FoenixIDE
             this.Modifiers = Modifiers;
         }
     }
-    public delegate void KeyPressEventHandler(Gpu frameBuffer, TerminalKeyEventArgs e);
+    //public delegate void KeyPressEventHandler(Gpu frameBuffer, TerminalKeyEventArgs e);
 }

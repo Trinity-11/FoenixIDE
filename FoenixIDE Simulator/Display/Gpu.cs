@@ -15,7 +15,7 @@ namespace FoenixIDE.Display
 {
     public partial class Gpu : UserControl, IMappable
     {
-        public event KeyPressEventHandler KeyPressed;
+        //public event KeyPressEventHandler KeyPressed;
 
         private const int REGISTER_BLOCK_SIZE = 256;
         const int MAX_TEXT_COLS = 128;
@@ -43,6 +43,8 @@ namespace FoenixIDE.Display
         public int paintCycle = 0;
         private bool tileEditorMode = false;
         public bool MousePointerMode = false;
+        public delegate void StartOfFramEvent();
+        public StartOfFramEvent StartOfFrame;
 
         public int StartAddress
         {
@@ -339,10 +341,14 @@ namespace FoenixIDE.Display
             }
             // Read the Master Control Register
             byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
-            if ((MCRegister & 0x80) == 0x80)
+            if (MCRegister == 0 || (MCRegister & 0x80) == 0x80)
             {
                 e.Graphics.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
                 return;
+            }
+            if (MCRegister != 0 && MCRegister != 0x80)
+            {
+                StartOfFrame?.Invoke();
             }
             Graphics g = Graphics.FromImage(frameBuffer);
 
@@ -887,11 +893,11 @@ namespace FoenixIDE.Display
             timer.Enabled = this.Visible;
         }
 
-        private void FrameBuffer_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            TerminalKeyEventArgs args = new TerminalKeyEventArgs(e.KeyChar);
-            KeyPressed?.Invoke(this, args);
-        }
+        //private void FrameBuffer_KeyPress(object sender, KeyPressEventArgs e)
+        //{
+        //    TerminalKeyEventArgs args = new TerminalKeyEventArgs(e.KeyChar);
+        //    KeyPressed?.Invoke(this, args);
+        //}
 
         public byte ReadByte()
         {

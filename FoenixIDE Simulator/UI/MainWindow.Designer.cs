@@ -340,7 +340,6 @@ namespace FoenixIDE.UI
             this.gpu.TileEditorMode = false;
             this.gpu.X = 0;
             this.gpu.Y = 0;
-            this.gpu.VisibleChanged += new System.EventHandler(this.GPU_VisibleChanged);
             this.gpu.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseClick);
             this.gpu.MouseEnter += new System.EventHandler(this.Gpu_MouseEnter);
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);

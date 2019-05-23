@@ -15,7 +15,7 @@ namespace FoenixIDE.Processor
         public bool accumulatorShort;
         public bool xRegisterShort;
         public bool Decimal;
-        public bool Irqdisable;
+        public bool IrqDisable;
         public bool Zero;
         public bool Carry;
         public bool Emulation;
@@ -46,7 +46,7 @@ namespace FoenixIDE.Processor
                         Break,
                         false,
                         Decimal,
-                        Irqdisable,
+                        IrqDisable,
                         Zero,
                         Carry);
                 else
@@ -56,7 +56,7 @@ namespace FoenixIDE.Processor
                         accumulatorShort,
                         xRegisterShort,
                         Decimal,
-                        Irqdisable,
+                        IrqDisable,
                         Zero,
                         Carry);
             }
@@ -102,7 +102,7 @@ namespace FoenixIDE.Processor
                 Break = (value & 0x20) != 0;
             xRegisterShort = (value & 0x10) != 0;
             Decimal = (value & 8) != 0;
-            Irqdisable = (value & 4) != 0;
+            IrqDisable = (value & 4) != 0;
             Zero = (value & 2) != 0;
             Carry = (value & 1) != 0;
         }
@@ -116,7 +116,7 @@ namespace FoenixIDE.Processor
                     + (Break ? "B" : "-")
                     + "-"
                     + (Decimal ? "D" : "-")
-                    + (Irqdisable ? "I" : "-")
+                    + (IrqDisable ? "I" : "-")
                     + (Zero ? "Z" : "-")
                     + (Carry ? "C" : "-")
                     + " " + (Emulation ? "E" : " ");
@@ -126,7 +126,7 @@ namespace FoenixIDE.Processor
                     + (accumulatorShort ? "M" : "-")
                     + (xRegisterShort ? "X" : "-")
                     + (Decimal ? "D" : "-")
-                    + (Irqdisable ? "I" : "-")
+                    + (IrqDisable ? "I" : "-")
                     + (Zero ? "Z" : "-")
                     + (Carry ? "C" : "-")
                     + " " + (Emulation ? "E" : " ");
@@ -178,7 +178,7 @@ namespace FoenixIDE.Processor
             accumulatorShort = false;
             xRegisterShort = false;
             Decimal = false;
-            Irqdisable = false;
+            IrqDisable = false;
             Zero = false;
             Carry = false;
             Emulation = false;

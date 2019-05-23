@@ -7,7 +7,7 @@ using FoenixIDE.MemoryLocations;
 
 namespace FoenixIDE.Processor
 {
-    class CPUTest : ReadyHandler
+    class CPUTest : IReadyHandler
     {
         FoenixSystem kernel = null;
         Processor.CPU CPU = null;

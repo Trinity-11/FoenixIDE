@@ -15,7 +15,6 @@ namespace FoenixIDE.UI
     public partial class MainWindow : Form
     {
         public FoenixSystem kernel;
-        public Timer BootTimer = new Timer();
         public int CyclesPerTick = 35000;
 
         public UI.CPUWindow debugWindow;
@@ -36,7 +35,6 @@ namespace FoenixIDE.UI
         private void BasicWindow_Load(object sender, EventArgs e)
         {
             kernel = new FoenixSystem(this.gpu);
-
             ShowDebugWindow();
             ShowMemoryWindow();
 
@@ -48,10 +46,8 @@ namespace FoenixIDE.UI
                 this.Width = 1200;
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
-
-            BootTimer.Interval = 100;
-            BootTimer.Tick += BootTimer_Tick;
-            //kernel.READY();
+            gpu.StartOfFrame += SOF;
+            kernel.Reset();
         }
 
         private void ShowDebugWindow()
@@ -128,21 +124,34 @@ namespace FoenixIDE.UI
             loader.ShowDialog(this);
         }
 
-        private void BootTimer_Tick(object sender, EventArgs e)
+        public void SOF()
         {
-            BootTimer.Enabled = false;
-            kernel.Reset();
+            byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!kernel.CPU.Flags.IrqDisable && ((~mask & 1) == 1))
+            {
+                // Set the Keyboard Interrupt
+                byte IRQ0 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= 1;
+                kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                kernel.CPU.Pins.IRQ = true;
+            }
         }
 
         private void WriteKey(ScanCode key)
         {
-            kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
-            kernel.Memory.KEYBOARD.WriteByte(4, 0);
-            kernel.CPU.Pins.IRQ = true;
-            // Set the Keyboard Interrupt
-            byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
-            IRQ1 |= 1;
-            kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+            // Check if the Keyboard interrupt is allowed
+            byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
+            if ((~mask & 1) == 1)
+            {
+                kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
+                kernel.Memory.KEYBOARD.WriteByte(4, 0);
+                // Set the Keyboard Interrupt
+                byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
+                IRQ1 |= 1;
+                kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+                kernel.CPU.Pins.IRQ = true;
+            }
+           
         }
 
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
@@ -212,10 +221,6 @@ namespace FoenixIDE.UI
         private byte BCD(int val)
         {
             return (byte)(val / 10 * 0x10 + val % 10);
-        }
-        private void GPU_VisibleChanged(object sender, EventArgs e)
-        {
-            BootTimer.Enabled = gpu.Visible;
         }
 
         private void CPUToolStripMenuItem_Click(object sender, EventArgs e)

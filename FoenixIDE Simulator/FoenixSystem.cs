@@ -26,7 +26,7 @@ namespace FoenixIDE
         public Basic.Immediate Basic = null;
         public Monitor.Monitor Monitor = null;
 
-        public ReadyHandler ReadyHandler = null;
+        public IReadyHandler ReadyHandler = null;
 
         public DeviceEnum InputDevice = DeviceEnum.Keyboard;
         public DeviceEnum OutputDevice = DeviceEnum.Screen;
@@ -51,6 +51,7 @@ namespace FoenixIDE
             Memory.CODEC.postWrite = Memory.CODEC.OnCodecWait5SecondsAndWrite00;
             Memory.KEYBOARD.postWrite = Memory.KEYBOARD.OnKeyboardStatusCodeChange;
             Memory.SDCARD.postWrite = Memory.SDCARD.OnSDCARDCommand;
+            Memory.RAM.postWrite = Memory.RAM.OnInterruptPending;
 
 
             this.CPU = new CPU(Memory);
@@ -61,13 +62,6 @@ namespace FoenixIDE
             gpu.IO = Memory.IO;
             //gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
-
-            //KeyboardBuffer = new MemoryBuffer(
-            //    Memory.RAM,
-            //    MemoryMap.KEY_BUFFER,
-            //    MemoryMap.KEY_BUFFER_SIZE,
-            //    MemoryMap.KEY_BUFFER_RPOS,
-            //    MemoryMap.KEY_BUFFER_WPOS);
 
             for (int i = MemoryMap.SCREEN_PAGE0; i < MemoryMap.SCREEN_PAGE1; i++)
             {
@@ -139,7 +133,7 @@ namespace FoenixIDE
 
             if (OutputDevice == DeviceEnum.DebugWindow)
             {
-               ////  UI.CPUWindow.PrintChar(c);
+                ////  UI.CPUWindow.PrintChar(c);
             }
         }
 
@@ -172,7 +166,7 @@ namespace FoenixIDE
                     PrintBackspace();
                     break;
                 case '\t':
-                    PrintTab();
+                    PrintTab(1);
                     break;
                 case '\xa':
                     PrintLineFeed();
@@ -224,15 +218,15 @@ namespace FoenixIDE
             Memory[gpu.CursorPos] = 0x20;
         }
 
-        private void PrintTab()
-        {
-            int i = TAB_WIDTH - X % TAB_WIDTH;
-            while (i > 0)
-            {
-                PrintChar(' ');
-                i--;
-            }
-        }
+        //private void PrintTab()
+        //{
+        //    int i = TAB_WIDTH - X % TAB_WIDTH;
+        //    while (i > 0)
+        //    {
+        //        PrintChar(' ');
+        //        i--;
+        //    }
+        //}
 
         ColorCodes _currentForeground = ColorCodes.Green | ColorCodes.LightBlue;
         public ColorCodes CurrentForeground
@@ -455,23 +449,6 @@ namespace FoenixIDE
         public byte Peek(int Address)
         {
             return Memory[Address];
-        }
-
-        public void PrintGreeting()
-        {
-            PrintLine("         FoenixIDE Programming Simulator");
-        }
-
-        public void ShowFlag()
-        {
-            Locate(0, 0);
-            //PrintLine(" \xec\xa0\xa8\xa8\xa0\xed");
-            //PrintLine(" \xa0\xa6\xa6\xa6\xa6\xa0");
-            //PrintLine(" \xdf\xa0\xf9\xf9\xa0\xa9");
-            PrintLine(" \xf2\xee\xee\xee\xee\xf3\xa8");
-            PrintLine(" \xA1FoenixIDE\xef\xa6");
-            PrintLine(" \xf0\xa2\xa2\xa2\xa2\xf1\xa6");
-            PrintLine("  \xf9\xf9\xf9\xf9\xf9\xf9");
         }
 
         public void SetKernel(String value)
