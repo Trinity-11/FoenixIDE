@@ -27,8 +27,8 @@ namespace FoenixIDE.Monitor
 
         public string GetRegisterText()
         {
-            StringBuilder s = new StringBuilder();
             Processor.CPU cpu = kernel.CPU;
+            StringBuilder s = new StringBuilder(47);
             s.Append(';')
              .Append(cpu.GetLongPC().ToString("X6")).Append(' ')
              .Append(cpu.A.Value.ToString("X4")).Append(' ')

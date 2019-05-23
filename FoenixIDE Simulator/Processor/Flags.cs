@@ -110,26 +110,34 @@ namespace FoenixIDE.Processor
         public override string ToString()
         {
             //NVMXDIZC
+            char[] s = new char[10];
             if (Emulation)
-                return (Negative ? "N" : "-")
-                    + (oVerflow ? "V" : "-")
-                    + (Break ? "B" : "-")
-                    + "-"
-                    + (Decimal ? "D" : "-")
-                    + (IrqDisable ? "I" : "-")
-                    + (Zero ? "Z" : "-")
-                    + (Carry ? "C" : "-")
-                    + " " + (Emulation ? "E" : " ");
+            {
+                s[0] = Negative ? 'N' : '-';
+                s[1] = oVerflow ? 'V' : '-';
+                s[2] = Break ? 'B' : '-';
+                s[3] = '-';
+                s[4] = Decimal ? 'D' : '-';
+                s[5] = IrqDisable ? 'I' : '-';
+                s[6] = Zero ? 'Z' : '-';
+                s[7] = Carry ? 'C' : '-';
+                s[8] = ' ';
+                s[9] = 'E';
+            }
             else
-                return (Negative ? "N" : "-")
-                    + (oVerflow ? "V" : "-")
-                    + (accumulatorShort ? "M" : "-")
-                    + (xRegisterShort ? "X" : "-")
-                    + (Decimal ? "D" : "-")
-                    + (IrqDisable ? "I" : "-")
-                    + (Zero ? "Z" : "-")
-                    + (Carry ? "C" : "-")
-                    + " " + (Emulation ? "E" : " ");
+            {
+                s[0] = Negative ? 'N' : '-';
+                s[1] = oVerflow ? 'V' : '-';
+                s[2] = accumulatorShort ? 'M' : '-';
+                s[3] = xRegisterShort ? 'X' : '-';
+                s[4] = Decimal ? 'D' : '-';
+                s[5] = IrqDisable ? 'I' : '-';
+                s[6] = Zero ? 'Z' : '-';
+                s[7] = Carry ? 'C' : '-';
+                s[8] = ' ';
+                s[9] = ' ';
+            }
+            return new string(s);
         }
 
         public void SetZ(int Val)

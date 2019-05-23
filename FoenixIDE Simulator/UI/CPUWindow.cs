@@ -65,12 +65,12 @@ namespace FoenixIDE.UI
 
             override public string ToString()
             {
-                return string.Format("{0}  {1} {2}  {3}", pcString, Command, OpCodes, Status);
+                return string.Format(">{0}  {1} {2}  {3}", pcString, Command, OpCodes, Status);
             }
             public DebugLine(int pc, byte[] command, string opcodes, string status)
             {
                 PC = pc;
-                pcString = ">" + pc.ToString("X6");
+                pcString = pc.ToString("X6");
 
                 StringBuilder c = new StringBuilder();
                 commandLength = command.Length;
