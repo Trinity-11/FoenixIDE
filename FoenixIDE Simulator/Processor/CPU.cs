@@ -83,6 +83,23 @@ namespace FoenixIDE.Processor
             }
         }
 
+        public int[] snapshot
+        {
+            get
+            {
+                int[] snapshot = new int[8];
+                snapshot[0] = GetLongPC();
+                snapshot[1] = A.Value;
+                snapshot[2] = X.Value;
+                snapshot[3] = Y.Value;
+                snapshot[4] = Stack.Value;
+                snapshot[5] = DataBank.Value;
+                snapshot[6] = DirectPage.Value;
+                snapshot[7] = Flags.Value;
+                return snapshot;
+            }
+        }
+
         public CPU(MemoryManager newMemory)
         {
             this.Memory = newMemory;

@@ -13,7 +13,6 @@ namespace FoenixIDE.Monitor
         public FoenixSystem kernel = null;
 
         char commmand = ' ';
-        int[] args = new int[5];
 
         public Monitor(FoenixSystem NewKernel)
         {
@@ -41,6 +40,30 @@ namespace FoenixIDE.Monitor
             return s.ToString();
             //return String.Format("; {0:X6} {1:X4} {2:X4} {3:X4} {4:X4} {5:X2} {6:X4} {7}", new object[] { kernel.CPU.GetLongPC(), kernel.CPU.A.Value, kernel.CPU.X.Value,
             //    kernel.CPU.Y.Value, kernel.CPU.Stack.Value, kernel.CPU.DataBank.Value, kernel.CPU.DirectPage.Value, kernel.CPU.Flags        });
+        }
+
+        public static String Format(int[] cpuSnapshot)
+        {
+            if (cpuSnapshot != null)
+            {
+                StringBuilder s = new StringBuilder(47);
+                s.Append(';')
+                 .Append(cpuSnapshot[0].ToString("X6")).Append(' ')
+                 .Append(cpuSnapshot[1].ToString("X4")).Append(' ')
+                 .Append(cpuSnapshot[2].ToString("X4")).Append(' ')
+                 .Append(cpuSnapshot[3].ToString("X4")).Append(' ')
+                 .Append(cpuSnapshot[4].ToString("X4")).Append(' ')
+                 .Append(cpuSnapshot[5].ToString("X2")).Append(' ').Append(' ')
+                 .Append(cpuSnapshot[6].ToString("X4")).Append(' ');
+                Processor.Flags localFlags = new Processor.Flags();
+                localFlags.SetFlags(cpuSnapshot[7]);
+                s.Append(localFlags);
+                return s.ToString();
+            }
+            else
+            {
+                return "";
+            }
         }
 
         public void PrintRegisters(bool printHeader = true)
