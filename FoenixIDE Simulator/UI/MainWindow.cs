@@ -48,7 +48,6 @@ namespace FoenixIDE.UI
                 this.Width = 1200;
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
-            gpu.StartOfFrame += SOF;
             kernel.Reset();
         }
 
@@ -124,12 +123,6 @@ namespace FoenixIDE.UI
             };
             loader.OnTileLoaded += NewTileLoaded;
             loader.ShowDialog(this);
-        }
-
-        public void SOF()
-        {
-            BootTimer.Enabled = false;
-            kernel.Reset();
         }
 
         private void WriteKey(ScanCode key)

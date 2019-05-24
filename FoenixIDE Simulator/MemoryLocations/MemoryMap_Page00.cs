@@ -77,10 +77,6 @@ namespace FoenixIDE.MemoryLocations
         //public const int INT_MASK_REG1 = 0x00_014D;
         //public const int INT_MASK_REG2 = 0x00_014E;
 
-        public const int INT_MASK_REG0 = 0x00_014C;
-        public const int INT_MASK_REG1 = 0x00_014D;
-        public const int INT_MASK_REG2 = 0x00_014E;
-
         public const int VECTOR_STATE = 0x0001FF; // 1 Byte Interrupt Vector State. See VECTOR_STATE_ENUM
 
         #endregion GAVIN

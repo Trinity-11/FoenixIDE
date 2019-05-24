@@ -18,7 +18,7 @@ namespace FoenixIDE
         private FoenixSystem kernel = null;
 
         // The address sent by MemoryManager is mapped to device address space
-        // so we'll create some locals to precalcualte the global to local address
+        // so we'll create some locals to precalcualte the global to local address conversion
         private int intPendReg0;  // global INT_PENDING_REG0
         private int intPendReg1;  // global INT_PENDING_REG1
         private int intPendReg2;  // global INT_PENDING_REG2
@@ -36,38 +36,38 @@ namespace FoenixIDE
         /// <summary>
         /// GAVIN Interrupt Controller Sources, Register 0
         /// </summary>
-        //public const byte BIT0_ALAWAYS1 = 0x01;
-        //public const byte VICKY_INT0 = 0x02;
-        //public const byte VICKY_INT1 = 0x04;
-        //public const byte TIMER0 = 0x08;
-        //public const byte TIMER1 = 0x10;
-        //public const byte TIMER2 = 0x20;
-        //public const byte RTC = 0x40;
-        //public const byte LPC_INT_6_FDC = 0x80;
+        private const byte bit0Always1 = 0x01;
+        private const byte vickyInt0 = 0x02;
+        private const byte vickyInt1 = 0x04;
+        private const byte timer0 = 0x08;
+        private const byte timer1 = 0x10;
+        private const byte timer2 = 0x20;
+        private const byte rtc = 0x40;
+        private const byte lpcInt6Fdc = 0x80;
 
         /// <summary>
         /// GAVIN Interrupt Controller Sources, Register 1
         /// </summary>
         private const byte lpcInt_1_KB = 0x01;
-        //public const byte VICKY_INT2 = 0x02;
-        //public const byte VICKY_INT3 = 0x04;
-        //public const byte LPC_INT_COM1 = 0x08;
-        //public const byte LPC_INT_COM2 = 0x10;
-        //public const byte LPC_INT_5_MIDI = 0x20;
-        //public const byte LPC_INT_LPT1 = 0x40;
-        //public const byte SDCARD_CNTRL = 0x80;
+        private const byte vickyInt2 = 0x02;
+        private const byte vickyInt3 = 0x04;
+        private const byte lpcIntCom1 = 0x08;
+        private const byte lpcIntCom2 = 0x10;
+        private const byte lpcInt5_MIDI = 0x20;
+        private const byte lpcIntLpt1 = 0x40;
+        private const byte sdCardCntrl = 0x80;
 
         /// <summary>
         /// GAVIN Interrupt Controller Sources, Register 2
         /// </summary>
-        //public const byte OPL2_RIGHT_CH = 0x01;
-        //public const byte OPL2_LEFT_CH = 0x02;
-        //public const byte BEATRIX = 0x04;
-        //public const byte GAVIN_DMA = 0x08;
-        //public const byte B4_ALWAYS1 = 0x10;
-        //public const byte DAC_HOTPLUG = 0x20;
-        //public const byte EXP_PORT_CON = 0x40;
-        //public const byte B7_ALWAYS1 = 0x80;
+        private const byte opl2RightCh = 0x01;
+        private const byte opl2LeftCh = 0x02;
+        private const byte beatrix = 0x04;
+        private const byte gavinDma = 0x08;
+        private const byte b4Always1 = 0x10;
+        private const byte dacHotpluig = 0x20;
+        private const byte expPortCon = 0x40;
+        private const byte b7Always1 = 0x80;
 
         /// <summary>
         /// Creates an instance of the interrupt controller
@@ -138,9 +138,13 @@ namespace FoenixIDE
         public void setInterrupt(MemoryLocations.InterruptSources Source)
         {
             if (Source == MemoryLocations.InterruptSources.LPC_INT_1_KB)
-            {
-                data[intPendReg1] = (byte)(data[intPendReg1] | lpcInt_1_KB);
-                kernel.CPU.Pins.IRQ = true;
+            {   
+                // check to see if this interrupt is masked
+                if ((lpcInt_1_KB & data[intMaskReg1]) == 0)
+                {
+                    data[intPendReg1] = (byte)(data[intPendReg1] | lpcInt_1_KB);
+                    kernel.CPU.Pins.IRQ = true;
+                }
             }
         }
 
