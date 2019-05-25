@@ -64,7 +64,8 @@ namespace FoenixIDE.Simulator.UI
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
-            int[,] graphicsLUT = Display.Gpu.LoadLUT(memory.IO);
+            int[,] graphicsLUT = new int[8, 256];
+            Display.Gpu.LoadLUT(memory.IO, graphicsLUT);
             int lut = Int32.Parse(LUTDomain.Text);
             for (int y = 0; y < 256; y++)
             {

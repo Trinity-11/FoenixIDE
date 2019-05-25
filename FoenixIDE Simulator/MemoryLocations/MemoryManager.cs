@@ -66,6 +66,13 @@ namespace FoenixIDE
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
         {
+            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.MATH_START) ||
+               (Address > MemoryMap.MATH_END && Address <= MemoryMap.RAM_END))
+            {
+                Device = RAM;
+                DeviceAddress = Address - RAM.StartAddress;
+                return;
+            }
             if (Address >= MemoryMap.INTCTRL_START && Address <= MemoryMap.INTCTRL_END)
             {
                 Device = INTCTRL;
@@ -84,14 +91,6 @@ namespace FoenixIDE
                 DeviceAddress = Address - MATH.StartAddress;
                 return;
             }
-            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.MATH_START) ||
-                (Address > MemoryMap.MATH_END && Address <= MemoryMap.RAM_END))
-            {
-                Device = RAM;
-                DeviceAddress = Address - RAM.StartAddress;
-                return;
-            }
-
             if (Address >= MemoryMap.KBD_DATA_BUF && Address <= MemoryMap.KBD_STATUS_PORT)
             {
                 Device = KEYBOARD;

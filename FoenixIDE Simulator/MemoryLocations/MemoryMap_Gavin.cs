@@ -35,6 +35,7 @@ namespace FoenixIDE.MemoryLocations
         public const int INTCTRL_START = 0x00_0140; // Keyboard input, output buffer
         public const int INTCTRL_END = 0x00_015F;  // keyboard status port
         public const int INTCTRL_SIZE = 0x1F; // length of interrutp controller registers
+
         public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
         public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
 
@@ -69,11 +70,11 @@ namespace FoenixIDE.MemoryLocations
         /// GAVIN Interrupt Controller Sources, Register 2
         OPL2_RIGHT_CH,
         OPL2_LEFT_CH,
-        BEATRIX = 0x04,
-        GAVIN_DMA = 0x08,
-        B4_ALWAYS1 = 0x10,
-        DAC_HOTPLUG = 0x20,
-        EXP_PORT_CON = 0x40,
-        B7_ALWAYS1 = 0x80
+        BEATRIX,
+        GAVIN_DMA,
+        B4_ALWAYS1,
+        DAC_HOTPLUG,
+        EXP_PORT_CON,
+        B7_ALWAYS1
     }
 }

@@ -262,9 +262,11 @@ namespace FoenixIDE.Processor
 
         private byte GetNextInstruction()
         {
-            int address = GetLongPC();
-            byte ret = Memory[address];
-            return ret;
+            //int address = GetLongPC();
+            //byte ret = Memory[address];
+            //return ret;
+
+            return Memory[GetLongPC()];
         }
 
         /// <summary>
