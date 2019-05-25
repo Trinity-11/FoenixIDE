@@ -1,6 +1,0 @@
-Okay, there is 2 ways you can use the Interrupts:
-1- Either you let the IRQ being triggered by your Device and you process some code in the IRQ Handler
-2- Or you can Poll the Interrupt from the Pending Register INT_PENDING_REG0/INT_PENDING_REG1/INT_PENDING_REG2 without triggering an actual interrupt
-So, in your code, you can poll the Pending Register and then act on the fact that an Interrupt has been received, the deal is to not forget to Clear the Pending by writting back to it, when you are done. EIther you can do that at the beginning or at the end of the code you are trying to process.
-
-this is a paste of something I explained in the other channel. I will probably be back tomorrow to give more details...
