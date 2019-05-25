@@ -50,10 +50,10 @@
             // BrowseFileButton
             // 
             this.BrowseFileButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BrowseFileButton.Location = new System.Drawing.Point(17, 6);
-            this.BrowseFileButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BrowseFileButton.Location = new System.Drawing.Point(13, 5);
+            this.BrowseFileButton.Margin = new System.Windows.Forms.Padding(2);
             this.BrowseFileButton.Name = "BrowseFileButton";
-            this.BrowseFileButton.Size = new System.Drawing.Size(149, 29);
+            this.BrowseFileButton.Size = new System.Drawing.Size(112, 24);
             this.BrowseFileButton.TabIndex = 2;
             this.BrowseFileButton.Text = "Browse File";
             this.BrowseFileButton.UseVisualStyleBackColor = true;
@@ -61,31 +61,31 @@
             // 
             // FileNameTextBox
             // 
-            this.FileNameTextBox.Location = new System.Drawing.Point(178, 11);
-            this.FileNameTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FileNameTextBox.Location = new System.Drawing.Point(134, 9);
+            this.FileNameTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.FileNameTextBox.Name = "FileNameTextBox";
             this.FileNameTextBox.ReadOnly = true;
-            this.FileNameTextBox.Size = new System.Drawing.Size(433, 22);
+            this.FileNameTextBox.Size = new System.Drawing.Size(326, 20);
             this.FileNameTextBox.TabIndex = 3;
             // 
             // FileSizeLabel
             // 
             this.FileSizeLabel.AutoSize = true;
             this.FileSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FileSizeLabel.Location = new System.Drawing.Point(15, 46);
+            this.FileSizeLabel.Location = new System.Drawing.Point(11, 37);
             this.FileSizeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeLabel.Name = "FileSizeLabel";
-            this.FileSizeLabel.Size = new System.Drawing.Size(75, 17);
+            this.FileSizeLabel.Size = new System.Drawing.Size(73, 13);
             this.FileSizeLabel.TabIndex = 4;
-            this.FileSizeLabel.Text = "File Size:";
+            this.FileSizeLabel.Text = "Image Size:";
             // 
             // FileSizeResultLabel
             // 
             this.FileSizeResultLabel.AutoSize = true;
-            this.FileSizeResultLabel.Location = new System.Drawing.Point(175, 45);
+            this.FileSizeResultLabel.Location = new System.Drawing.Point(131, 37);
             this.FileSizeResultLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeResultLabel.Name = "FileSizeResultLabel";
-            this.FileSizeResultLabel.Size = new System.Drawing.Size(68, 17);
+            this.FileSizeResultLabel.Size = new System.Drawing.Size(52, 13);
             this.FileSizeResultLabel.TabIndex = 5;
             this.FileSizeResultLabel.Text = "$00:0000";
             // 
@@ -93,19 +93,19 @@
             // 
             this.LoadAddressLabel.AutoSize = true;
             this.LoadAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LoadAddressLabel.Location = new System.Drawing.Point(16, 70);
+            this.LoadAddressLabel.Location = new System.Drawing.Point(12, 57);
             this.LoadAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.LoadAddressLabel.Name = "LoadAddressLabel";
-            this.LoadAddressLabel.Size = new System.Drawing.Size(113, 17);
+            this.LoadAddressLabel.Size = new System.Drawing.Size(88, 13);
             this.LoadAddressLabel.TabIndex = 6;
             this.LoadAddressLabel.Text = "Load Address:";
             // 
             // LoadAddressTextBox
             // 
-            this.LoadAddressTextBox.Location = new System.Drawing.Point(189, 65);
-            this.LoadAddressTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.LoadAddressTextBox.Location = new System.Drawing.Point(142, 53);
+            this.LoadAddressTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.LoadAddressTextBox.Name = "LoadAddressTextBox";
-            this.LoadAddressTextBox.Size = new System.Drawing.Size(93, 22);
+            this.LoadAddressTextBox.Size = new System.Drawing.Size(71, 20);
             this.LoadAddressTextBox.TabIndex = 8;
             this.LoadAddressTextBox.Text = "B0:0000";
             this.LoadAddressTextBox.TextChanged += new System.EventHandler(this.LoadAddressTextBox_TextChanged);
@@ -113,10 +113,10 @@
             // DollarSignLabel
             // 
             this.DollarSignLabel.AutoSize = true;
-            this.DollarSignLabel.Location = new System.Drawing.Point(174, 67);
+            this.DollarSignLabel.Location = new System.Drawing.Point(130, 54);
             this.DollarSignLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DollarSignLabel.Name = "DollarSignLabel";
-            this.DollarSignLabel.Size = new System.Drawing.Size(16, 17);
+            this.DollarSignLabel.Size = new System.Drawing.Size(13, 13);
             this.DollarSignLabel.TabIndex = 9;
             this.DollarSignLabel.Text = "$";
             // 
@@ -124,20 +124,20 @@
             // 
             this.BitmapSizeLabel.AutoSize = true;
             this.BitmapSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BitmapSizeLabel.Location = new System.Drawing.Point(306, 46);
+            this.BitmapSizeLabel.Location = new System.Drawing.Point(230, 37);
             this.BitmapSizeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.BitmapSizeLabel.Name = "BitmapSizeLabel";
-            this.BitmapSizeLabel.Size = new System.Drawing.Size(98, 17);
+            this.BitmapSizeLabel.Size = new System.Drawing.Size(77, 13);
             this.BitmapSizeLabel.TabIndex = 10;
             this.BitmapSizeLabel.Text = "Bitmap Size:";
             // 
             // BitmapSizeValueLabel
             // 
             this.BitmapSizeValueLabel.AutoSize = true;
-            this.BitmapSizeValueLabel.Location = new System.Drawing.Point(408, 45);
+            this.BitmapSizeValueLabel.Location = new System.Drawing.Point(306, 37);
             this.BitmapSizeValueLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.BitmapSizeValueLabel.Name = "BitmapSizeValueLabel";
-            this.BitmapSizeValueLabel.Size = new System.Drawing.Size(38, 17);
+            this.BitmapSizeValueLabel.Size = new System.Drawing.Size(30, 13);
             this.BitmapSizeValueLabel.TabIndex = 11;
             this.BitmapSizeValueLabel.Text = "0 x 0";
             // 
@@ -145,10 +145,10 @@
             // 
             this.StoreButton.Enabled = false;
             this.StoreButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StoreButton.Location = new System.Drawing.Point(17, 135);
-            this.StoreButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.StoreButton.Location = new System.Drawing.Point(13, 110);
+            this.StoreButton.Margin = new System.Windows.Forms.Padding(2);
             this.StoreButton.Name = "StoreButton";
-            this.StoreButton.Size = new System.Drawing.Size(149, 29);
+            this.StoreButton.Size = new System.Drawing.Size(112, 24);
             this.StoreButton.TabIndex = 7;
             this.StoreButton.Text = "Store";
             this.StoreButton.UseVisualStyleBackColor = true;
@@ -158,10 +158,10 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(16, 96);
+            this.label3.Location = new System.Drawing.Point(12, 78);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(49, 17);
+            this.label3.Size = new System.Drawing.Size(39, 13);
             this.label3.TabIndex = 12;
             this.label3.Text = "Type:";
             // 
@@ -169,9 +169,10 @@
             // 
             this.BitmapTypesCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.BitmapTypesCombo.FormattingEnabled = true;
-            this.BitmapTypesCombo.Location = new System.Drawing.Point(178, 96);
+            this.BitmapTypesCombo.Location = new System.Drawing.Point(134, 78);
+            this.BitmapTypesCombo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.BitmapTypesCombo.Name = "BitmapTypesCombo";
-            this.BitmapTypesCombo.Size = new System.Drawing.Size(191, 24);
+            this.BitmapTypesCombo.Size = new System.Drawing.Size(144, 21);
             this.BitmapTypesCombo.TabIndex = 13;
             this.BitmapTypesCombo.SelectedIndexChanged += new System.EventHandler(this.BitmapTypesCombo_SelectedIndexChanged);
             // 
@@ -179,20 +180,20 @@
             // 
             this.PixelDepthLabel.AutoSize = true;
             this.PixelDepthLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PixelDepthLabel.Location = new System.Drawing.Point(476, 45);
+            this.PixelDepthLabel.Location = new System.Drawing.Point(357, 37);
             this.PixelDepthLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.PixelDepthLabel.Name = "PixelDepthLabel";
-            this.PixelDepthLabel.Size = new System.Drawing.Size(95, 17);
+            this.PixelDepthLabel.Size = new System.Drawing.Size(76, 13);
             this.PixelDepthLabel.TabIndex = 14;
             this.PixelDepthLabel.Text = "Pixel Depth:";
             // 
             // PixelDepthValueLabel
             // 
             this.PixelDepthValueLabel.AutoSize = true;
-            this.PixelDepthValueLabel.Location = new System.Drawing.Point(573, 45);
+            this.PixelDepthValueLabel.Location = new System.Drawing.Point(430, 37);
             this.PixelDepthValueLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.PixelDepthValueLabel.Name = "PixelDepthValueLabel";
-            this.PixelDepthValueLabel.Size = new System.Drawing.Size(16, 17);
+            this.PixelDepthValueLabel.Size = new System.Drawing.Size(13, 13);
             this.PixelDepthValueLabel.TabIndex = 15;
             this.PixelDepthValueLabel.Text = "0";
             // 
@@ -200,10 +201,10 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(408, 96);
+            this.label1.Location = new System.Drawing.Point(306, 78);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 17);
+            this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 16;
             this.label1.Text = "LUT:";
             // 
@@ -211,16 +212,17 @@
             // 
             this.LUTCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.LUTCombo.FormattingEnabled = true;
-            this.LUTCombo.Location = new System.Drawing.Point(456, 96);
+            this.LUTCombo.Location = new System.Drawing.Point(342, 78);
+            this.LUTCombo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.LUTCombo.Name = "LUTCombo";
-            this.LUTCombo.Size = new System.Drawing.Size(155, 24);
+            this.LUTCombo.Size = new System.Drawing.Size(117, 21);
             this.LUTCombo.TabIndex = 17;
             // 
             // BitmapLoader
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(634, 178);
+            this.ClientSize = new System.Drawing.Size(476, 145);
             this.Controls.Add(this.LUTCombo);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.PixelDepthValueLabel);
@@ -238,7 +240,7 @@
             this.Controls.Add(this.BrowseFileButton);
             this.Controls.Add(this.DollarSignLabel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "BitmapLoader";

@@ -84,6 +84,7 @@
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Blocks.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Other.cs" />
+    <Compile Include="MemoryLocations\ResourceChecker.cs" />
     <Compile Include="Processor\Breakpoints.cs" />
     <Compile Include="Processor\CPUPins.cs" />
     <Compile Include="Processor\InteruptTypes.cs" />

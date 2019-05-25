@@ -62,23 +62,28 @@ namespace FoenixIDE.UI
             private String opcodes;
             readonly int[] cpu;
             public bool StepOver = false;
+            private string evaled = null;
 
             // Only expand when it's going to be displayed
             override public string ToString()
             {
-                StringBuilder c = new StringBuilder();
-                int commandLength = command.Length;
-                for (int i = 0; i < 4; i++)
+                if (evaled == null)
                 {
-                    if (i < command.Length)
-                        c.Append(command[i].ToString("X2")).Append(" ");
-                    else
-                        c.Append("   ");
+                    StringBuilder c = new StringBuilder();
+                    int commandLength = command.Length;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (i < command.Length)
+                            c.Append(command[i].ToString("X2")).Append(" ");
+                        else
+                            c.Append("   ");
+                    }
+                    String OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
+                    String state = Monitor.Monitor.Format(cpu);
+                    StepOver = (opcodes.StartsWith("B") || opcodes.StartsWith("J"));
+                    evaled = string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), OpCodes, state);
                 }
-                String OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
-                String state = Monitor.Monitor.Format(cpu);
-                StepOver = (opcodes.StartsWith("B") || opcodes.StartsWith("J"));
-                return string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), OpCodes, state);
+                return evaled; 
             }
             public DebugLine(int pc, byte[] cmd, String oc, int[] cpuSnapshot)
             {

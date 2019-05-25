@@ -10,6 +10,7 @@ using FoenixIDE.Display;
 using FoenixIDE.Common;
 using System.Threading;
 using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.MemoryLocations;
 
 namespace FoenixIDE
 {
@@ -19,7 +20,7 @@ namespace FoenixIDE
         public MemoryManager Memory = null;
         public Processor.CPU CPU = null;
         public Gpu gpu = null;
-        //public MemoryBuffer KeyboardBuffer = null;
+
         public ColorCodes CurrentColor = ColorCodes.Green;
         public bool ConsoleEcho = false;
 
@@ -34,7 +35,9 @@ namespace FoenixIDE
         public Thread CPUThread = null;
         private String defaultKernel = @"ROMs\kernel.hex";
 
-        public FoenixSystem(Gpu gpu)
+        public ResourceChecker Resources;
+
+        public FoenixSystem(Gpu gpu, ResourceChecker resources)
         {
             Memory = new MemoryManager
             {
@@ -84,7 +87,7 @@ namespace FoenixIDE
             }
         }
 
-        public void Reset()
+        public void ResetCPU()
         {
             CPU.Halt();
 
@@ -98,7 +101,7 @@ namespace FoenixIDE
             this.ReadyHandler = Monitor;
             if (defaultKernel.EndsWith(".fnxml", true, null))
             {
-                FoenixmlFile fnxml = new FoenixmlFile(Memory);
+                FoenixmlFile fnxml = new FoenixmlFile(Memory, Resources);
                 fnxml.Load(defaultKernel);
             }
             else
