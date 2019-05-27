@@ -37,7 +37,7 @@ namespace FoenixIDE.UI
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-            kernel = new FoenixSystem(this.gpu, ResChecker);
+            kernel = new FoenixSystem(this.gpu);
             ShowDebugWindow();
             ShowMemoryWindow();
 
@@ -292,7 +292,7 @@ namespace FoenixIDE.UI
                 memoryWindow.Close();
                 if (ResetMemory)
                 {
-                    kernel = new FoenixSystem(this.gpu, ResChecker);
+                    kernel = new FoenixSystem(this.gpu);
                 }
                 kernel.SetKernel(dialog.FileName);
                 kernel.ResetCPU();
@@ -329,7 +329,9 @@ namespace FoenixIDE.UI
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu, ResChecker);
+                kernel = new FoenixSystem(this.gpu);
+                kernel.Resources = ResChecker;
+                kernel.Breakpoints = CPUWindow.Instance.breakpoints;
                 kernel.SetKernel(dialog.FileName);
                 kernel.ResetCPU();
                 ShowDebugWindow();
@@ -352,7 +354,7 @@ namespace FoenixIDE.UI
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                FoenixmlFile fnxml = new FoenixmlFile(kernel.Memory, ResChecker);
+                FoeniXmlFile fnxml = new FoeniXmlFile(kernel.Memory, ResChecker, CPUWindow.Instance.breakpoints);
                 fnxml.Write(dialog.FileName, true);
             }
         }

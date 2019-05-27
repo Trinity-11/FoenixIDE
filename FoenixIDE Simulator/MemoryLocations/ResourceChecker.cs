@@ -26,7 +26,7 @@ namespace FoenixIDE.Simulator.MemoryLocations
                 int beginRange = res.StartAddress;
                 int endRange = res.StartAddress + res.Length;
 
-                if (resource.StartAddress > beginRange && resource.StartAddress < endRange ||
+                if (resource.StartAddress >= beginRange && resource.StartAddress < endRange ||
                     (resource.StartAddress+ resource.Length) > beginRange && (resource.StartAddress + resource.Length) < endRange)
                 {
                     if (MessageBox.Show(String.Format("This image overlap resource {0} which starts at {1:X6} and ends at {2:X6}.\r\nDo you want to load it anyway?", res.Name, res.StartAddress, res.StartAddress + res.Length),

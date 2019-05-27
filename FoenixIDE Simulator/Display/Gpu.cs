@@ -528,7 +528,7 @@ namespace FoenixIDE.Display
             bool overlayBitSet = (IO.ReadByte(0) & 0x02) == 0x02;
 
             // We're hard-coding this for now.
-            int lines = 52;
+            int lines = LinesVisible;
 
 
             int x;

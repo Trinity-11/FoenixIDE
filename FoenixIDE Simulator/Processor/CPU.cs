@@ -83,7 +83,7 @@ namespace FoenixIDE.Processor
             }
         }
 
-        public int[] snapshot
+        public int[] Snapshot
         {
             get
             {

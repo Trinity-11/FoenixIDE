@@ -18,7 +18,7 @@ namespace FoenixIDE.UI
         private int StepCounter = 0;
         private bool isStepOver = false;
 
-        Processor.Breakpoints breakpoints = new Processor.Breakpoints();
+        public Processor.Breakpoints breakpoints = new Processor.Breakpoints();
 
         public static CPUWindow Instance = null;
         private FoenixSystem kernel = null;
@@ -402,7 +402,7 @@ namespace FoenixIDE.UI
                 }
                 string opcodes = kernel.CPU.Opcode.ToString(kernel.CPU.SignatureBytes);
                 //string status = kernel.Monitor.GetRegisterText();
-                DebugLine line = new DebugLine(currentPC, command, opcodes, kernel.CPU.snapshot);
+                DebugLine line = new DebugLine(currentPC, command, opcodes, kernel.CPU.Snapshot);
                 queue.Enqueue(line);
                 if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
                 {

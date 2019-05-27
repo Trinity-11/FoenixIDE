@@ -11,6 +11,7 @@ using FoenixIDE.Common;
 using System.Threading;
 using FoenixIDE.MemoryLocations;
 using FoenixIDE.Simulator.MemoryLocations;
+using FoenixIDE.UI;
 
 namespace FoenixIDE
 {
@@ -36,8 +37,9 @@ namespace FoenixIDE
         private String defaultKernel = @"ROMs\kernel.hex";
 
         public ResourceChecker Resources;
+        public Processor.Breakpoints Breakpoints;
 
-        public FoenixSystem(Gpu gpu, ResourceChecker resources)
+        public FoenixSystem(Gpu gpu)
         {
             Memory = new MemoryManager
             {
@@ -101,7 +103,7 @@ namespace FoenixIDE
             this.ReadyHandler = Monitor;
             if (defaultKernel.EndsWith(".fnxml", true, null))
             {
-                FoenixmlFile fnxml = new FoenixmlFile(Memory, Resources);
+                FoeniXmlFile fnxml = new FoeniXmlFile(Memory, Resources, CPUWindow.Instance.breakpoints);
                 fnxml.Load(defaultKernel);
             }
             else
