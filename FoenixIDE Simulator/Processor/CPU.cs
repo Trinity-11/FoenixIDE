@@ -224,6 +224,7 @@ namespace FoenixIDE.Processor
 
             PC.Value = Memory.ReadWord(MemoryMap.VECTOR_ERESET);
 
+            Flags.IrqDisable = true;
             Pins.IRQ = false;
             Pins.VectorPull = false;
             Memory.VectorPull = false;

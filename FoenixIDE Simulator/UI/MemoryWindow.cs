@@ -41,7 +41,6 @@ namespace FoenixIDE.UI
             MemoryWindowTooltips.SetToolTip(MCRBit2Button, "Enable Graphics Mode");
             MemoryWindowTooltips.SetToolTip(MCRBit1Button, "Enable Text Overlay");
             MemoryWindowTooltips.SetToolTip(MCRBit0Button, "Enable Text");
-            MemoryWindowTooltips.SetToolTip(ExportButton, "Export Memory to Foenix File");
 
             // Set the MCR
             MCRBit0Button.Tag = 0;
@@ -306,25 +305,6 @@ namespace FoenixIDE.UI
             {
                 btn.Tag = 0;
                 btn.BackColor = Control.DefaultBackColor;
-            }
-        }
-        /*
-         * Export all memory content to an XML file.
-         */
-        private void ExportButton_Click(object sender, EventArgs e)
-        {
-            // Pick the file to create
-            SaveFileDialog dialog = new SaveFileDialog
-            {
-                Title = "Save Memory to Foenix File",
-                CheckPathExists = true,
-                Filter = "Foenix IDE File| *.fnxml"
-            };
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                FoenixmlFile fnxml = new FoenixmlFile(Memory);
-                fnxml.Write(dialog.FileName, CompactCheckbox.Checked);
             }
         }
 

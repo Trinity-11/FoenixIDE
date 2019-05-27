@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoenixIDE.Simulator.MemoryLocations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,6 +18,7 @@ namespace FoenixIDE.UI
     public partial class BitmapLoader : Form
     {
         public Common.IMappable Memory = null;
+        public ResourceChecker ResChecker;
 
         int controlRegisterAddress = 0;
         int pointerAddress = 0;
@@ -85,7 +87,7 @@ namespace FoenixIDE.UI
         }
 
 
-        private String formatAddress(int address)
+        private String FormatAddress(int address)
         {
             String size = (address).ToString("X6");
             return "$" + size.Substring(0, 2) + ":" + size.Substring(2);
@@ -95,12 +97,12 @@ namespace FoenixIDE.UI
          */
         private void BrowseFileButton_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDlg = new OpenFileDialog();
-            openFileDlg.DefaultExt = ".bin";
-            openFileDlg.Filter = "Bitmap Files|*.bmp";
-
-            // Set initial directory    
-            //openFileDlg.InitialDirectory = @"C:\Temp\";
+            OpenFileDialog openFileDlg = new OpenFileDialog
+            {
+                Title = "Load Bitmap",
+                DefaultExt = ".bmp",
+                Filter = "Bitmap Files|*.bmp|Binary Files|*.bin"
+            };
 
             // Load content of file in a TextBlock
             if (openFileDlg.ShowDialog() == DialogResult.OK)
@@ -115,7 +117,7 @@ namespace FoenixIDE.UI
         {
             bitmap = new Bitmap(bmpFilename);
             BitmapSizeValueLabel.Text = bitmap.Width + " x " + bitmap.Height;
-            FileSizeResultLabel.Text = formatAddress(bitmap.Width * bitmap.Height);
+            FileSizeResultLabel.Text = FormatAddress(bitmap.Width * bitmap.Height);
             PixelDepthValueLabel.Text = (((int)bitmap.PixelFormat) >> 8 & 0xFF).ToString();
 
             switch (bitmap.Width)
@@ -136,8 +138,7 @@ namespace FoenixIDE.UI
         private void LoadAddressTextBox_TextChanged(object sender, EventArgs e)
         {
             string item = LoadAddressTextBox.Text.Replace(":","");
-            int n = 0;
-            if (!int.TryParse(item, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out n) &&
+            if (!int.TryParse(item, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out int n) &&
               item != String.Empty)
             {
                 LoadAddressTextBox.Text = item.Remove(item.Length - 1, 1);
@@ -198,18 +199,10 @@ namespace FoenixIDE.UI
                 int.TryParse(strAddress, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out videoAddress);
             }
             int writeVideoAddress = videoAddress;
-
-            // The addresses in Vicky a offset by $B0:0000
-            videoAddress = videoAddress - 0xB0_0000;
-            Memory.WriteByte(pointerAddress, lowByte(videoAddress));
-            Memory.WriteByte(pointerAddress + 1, midByte(videoAddress));
-            Memory.WriteByte(pointerAddress + 2, highByte(videoAddress));
-
-            // Store the strides in the strideX and strideY
-            Memory.WriteByte(strideXAddress, lowByte(strideX));
-            Memory.WriteByte(strideXAddress + 1, midByte(strideX));
-            Memory.WriteByte(strideYAddress, lowByte(strideY));
-            Memory.WriteByte(strideYAddress + 1, midByte(strideY));
+            ResourceChecker.Resource res = new ResourceChecker.Resource();
+            res.StartAddress = videoAddress;
+            res.SourceFile = FileNameTextBox.Text;
+            res.Name = Path.GetFileNameWithoutExtension(FileNameTextBox.Text);
 
             // Store the bitmap at the user's determined address
             // The method below simply takes the file and writes it in memory.
@@ -218,52 +211,74 @@ namespace FoenixIDE.UI
             byte[] data = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
             int startOffset = BitConverter.ToInt32(data, 10);
             int fileLength = BitConverter.ToInt32(data, 2);
-
-            int numberOfColors = BitConverter.ToInt32(data, 46);
-            int lutOffset = 0xAF_2000 + LUTCombo.SelectedIndex * 1024;
-            if (numberOfColors == 0)
+            res.Length = strideX * strideY;
+            if (ResChecker.Add(res))
             {
-                // we need to create a LUT - each LUT only accepts 256 entries - 0 is black
-                TransformBitmap(data, startOffset, Int32.Parse(PixelDepthValueLabel.Text), lutOffset, writeVideoAddress, bitmap.Width, bitmap.Height);
+
+                // The addresses in Vicky a offset by $B0:0000
+                videoAddress = videoAddress - 0xB0_0000;
+                Memory.WriteByte(pointerAddress, LowByte(videoAddress));
+                Memory.WriteByte(pointerAddress + 1, MidByte(videoAddress));
+                Memory.WriteByte(pointerAddress + 2, HighByte(videoAddress));
+
+                // Store the strides in the strideX and strideY
+                Memory.WriteByte(strideXAddress, LowByte(strideX));
+                Memory.WriteByte(strideXAddress + 1, MidByte(strideX));
+                Memory.WriteByte(strideYAddress, LowByte(strideY));
+                Memory.WriteByte(strideYAddress + 1, MidByte(strideY));
+
+
+
+                int numberOfColors = BitConverter.ToInt32(data, 46);
+                int lutOffset = 0xAF_2000 + LUTCombo.SelectedIndex * 1024;
+                if (numberOfColors == 0)
+                {
+                    // we need to create a LUT - each LUT only accepts 256 entries - 0 is black
+                    TransformBitmap(data, startOffset, Int32.Parse(PixelDepthValueLabel.Text), lutOffset, writeVideoAddress, bitmap.Width, bitmap.Height);
+                }
+                else
+                {
+                    for (int offset = 54; offset < 1024 + 54; offset = offset + 4)
+                    {
+                        int color = BitConverter.ToInt32(data, offset);
+                        Memory.WriteByte(lutOffset, LowByte(color));
+                        Memory.WriteByte(lutOffset + 1, MidByte(color));
+                        Memory.WriteByte(lutOffset + 2, HighByte(color));
+                        Memory.WriteByte(lutOffset + 3, 0xFF); // Alpha
+                        lutOffset = lutOffset + 4;
+                    }
+                    for (int line = 0; line < bitmap.Height; line++)
+                    {
+                        for (int i = 0; i < bitmap.Width; i++)
+                        {
+                            Memory.WriteByte(writeVideoAddress + (bitmap.Height - line + 1) * bitmap.Width + i, data[startOffset + line * bitmap.Width + i]);
+                        }
+                    }
+                }
+                if (BitmapTypesCombo.SelectedIndex > 0 && BitmapTypesCombo.SelectedIndex < 5)
+                {
+                    int layer = BitmapTypesCombo.SelectedIndex - 1;
+                    OnTileLoaded?.Invoke(layer);
+                }
+                MessageBox.Show("Transfer successful!", "Bitmap Storage", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Close();
             }
             else
             {
-                for (int offset = 54; offset < 1024 + 54; offset = offset + 4)
-                {
-                    int color = BitConverter.ToInt32(data, offset);
-                    Memory.WriteByte(lutOffset, lowByte(color));
-                    Memory.WriteByte(lutOffset + 1, midByte(color));
-                    Memory.WriteByte(lutOffset + 2, highByte(color));
-                    Memory.WriteByte(lutOffset + 3, 0xFF); // Alpha
-                    lutOffset = lutOffset + 4;
-                }
-                for (int line = 0; line < bitmap.Height; line++)
-                {
-                    for (int i = 0; i < bitmap.Width; i++)
-                    {
-                        Memory.WriteByte(writeVideoAddress + (bitmap.Height - line + 1) * bitmap.Width + i, data[startOffset + line * bitmap.Width + i]);
-                    }
-                }
+                StoreButton.Enabled = true;
             }
-            if (BitmapTypesCombo.SelectedIndex > 0 && BitmapTypesCombo.SelectedIndex < 5)
-            {
-                int layer = BitmapTypesCombo.SelectedIndex - 1;
-                OnTileLoaded?.Invoke(layer);
-            }
-            MessageBox.Show("Transfer successful!", "Bitmap Storage", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            this.Close();
         }
 
-        private byte highByte(int value)
+        private byte HighByte(int value)
         {
             return ((byte)(value >> 16));
         }
 
-        private byte midByte(int value)
+        private byte MidByte(int value)
         {
             return ((byte)((value >> 8) & 0xFF));
         }
-        private byte lowByte(int value)
+        private byte LowByte(int value)
         {
             return ((byte)(value & 0xFF));
         }
@@ -273,10 +288,12 @@ namespace FoenixIDE.UI
          */
         private void TransformBitmap(byte[] data, int startOffset, int pixelDepth, int lutPointer, int videoPointer, int width, int height)
         {
-            List<int> lut = new List<int>(256);
-            // Always add black and white
-            lut.Add(0);
-            lut.Add(0xFFFFFF);
+            List<int> lut = new List<int>(256)
+            {
+                // Always add black and white
+                0,
+                0xFFFFFF
+            };
             // Read every pixel into a color table
             int bytes = 1;
             switch (pixelDepth)

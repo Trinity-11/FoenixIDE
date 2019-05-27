@@ -1,4 +1,6 @@
-﻿using FoenixIDE.Simulator.Basic;
+﻿using FoenixIDE.Common;
+using FoenixIDE.Simulator.Basic;
+using FoenixIDE.Simulator.MemoryLocations;
 using FoenixIDE.Simulator.UI;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,7 @@ namespace FoenixIDE.UI
         private delegate void TileClickEvent(Point tile);
         public delegate void TileLoadedEvent(int layer);
         private TileClickEvent TileClicked;
+        private ResourceChecker ResChecker = new ResourceChecker();
 
         public MainWindow()
         {
@@ -34,7 +37,7 @@ namespace FoenixIDE.UI
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-            kernel = new FoenixSystem(this.gpu);
+            kernel = new FoenixSystem(this.gpu, ResChecker);
             kernel.Memory.INTCTRL.setKernel(kernel);
 
             ShowDebugWindow();
@@ -48,7 +51,7 @@ namespace FoenixIDE.UI
                 this.Width = 1200;
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
-            kernel.Reset();
+            kernel.ResetCPU();
         }
 
         private void ShowDebugWindow()
@@ -108,7 +111,7 @@ namespace FoenixIDE.UI
 
         private void NewTileLoaded(int layer)
         {
-            tileEditor.SelectLayer(layer);
+            tileEditor?.SelectLayer(layer);
         }
         /*
          * Loading image into memory requires the user to specify what kind of image (tile, bitmap, sprite).
@@ -119,7 +122,8 @@ namespace FoenixIDE.UI
             BitmapLoader loader = new BitmapLoader
             {
                 StartPosition = FormStartPosition.CenterParent,
-                Memory = kernel.CPU.Memory
+                Memory = kernel.CPU.Memory,
+                ResChecker = ResChecker
             };
             loader.OnTileLoaded += NewTileLoaded;
             loader.ShowDialog(this);
@@ -224,7 +228,7 @@ namespace FoenixIDE.UI
             debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.Reset();
+            kernel.ResetCPU();
             memoryWindow.UpdateMCRButtons();
             kernel.Run();
             debugWindow.RunButton_Click(null, null);
@@ -238,7 +242,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.Reset();
+            kernel.ResetCPU();
             memoryWindow.UpdateMCRButtons();
         }
 
@@ -266,10 +270,10 @@ namespace FoenixIDE.UI
                 memoryWindow.Close();
                 if (ResetMemory)
                 {
-                    kernel = new FoenixSystem(this.gpu);
+                    kernel = new FoenixSystem(this.gpu, ResChecker);
                 }
                 kernel.SetKernel(dialog.FileName);
-                kernel.Reset();
+                kernel.ResetCPU();
                 ShowDebugWindow();
                 ShowMemoryWindow();
                 if (tileEditor != null && tileEditor.Visible)
@@ -295,18 +299,39 @@ namespace FoenixIDE.UI
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
-                Filter = "Foenix XML File|*.fnxml",
+                Title = "Load Project File",
+                Filter = "Foenix Project File|*.fnxml",
                 CheckFileExists = true
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu);
+                kernel = new FoenixSystem(this.gpu, ResChecker);
                 kernel.SetKernel(dialog.FileName);
-                kernel.Reset();
+                kernel.ResetCPU();
                 ShowDebugWindow();
                 ShowMemoryWindow();
+            }
+        }
+
+        /*
+         * Export all memory content to an XML file.
+         */
+        private void SaveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Pick the file to create
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Title = "Save Project File",
+                CheckPathExists = true,
+                Filter = "Foenix Project File| *.fnxml"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                FoenixmlFile fnxml = new FoenixmlFile(kernel.Memory, ResChecker);
+                fnxml.Write(dialog.FileName, true);
             }
         }
 
@@ -412,13 +437,6 @@ namespace FoenixIDE.UI
             {
                 Cursor.Hide();
             }
-        }
-
-        private void ToggleGammaToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            byte gammaSetting = kernel.Memory.IO.ReadByte(0);
-            gammaSetting ^= 0x40;
-            kernel.Memory.IO.WriteByte(0,gammaSetting);
         }
     }
 }

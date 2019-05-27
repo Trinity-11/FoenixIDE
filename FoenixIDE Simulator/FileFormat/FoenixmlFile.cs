@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoenixIDE.Simulator.MemoryLocations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,12 +11,15 @@ namespace FoenixIDE.Common
     class FoenixmlFile
     {
         private IMappable Memory;
+        private ResourceChecker Resources;
+        private const int PHRASE_LENGTH = 16;
 
         private FoenixmlFile() { }
 
-        public FoenixmlFile(IMappable memory)
+        public FoenixmlFile(IMappable memory, ResourceChecker resources)
         {
             this.Memory = memory;
+            this.Resources = resources;
         }
         public void Write(String filename, bool compact)
         {
@@ -24,6 +28,26 @@ namespace FoenixIDE.Common
             xmlWriter.WriteRaw("\r");
             xmlWriter.WriteComment("Export of FoenixIDE for C256.  All values are in hexadecimal form");
             xmlWriter.WriteRaw("\r");
+
+            xmlWriter.WriteStartElement("project");
+            xmlWriter.WriteRaw("\r");
+            // Write resources
+            xmlWriter.WriteStartElement("resources");
+            xmlWriter.WriteRaw("\r");
+            foreach (ResourceChecker.Resource res in Resources.Items)
+            {
+                xmlWriter.WriteStartElement("resource");
+                xmlWriter.WriteAttributeString("name", res.Name);
+                xmlWriter.WriteAttributeString("source", res.SourceFile);
+                xmlWriter.WriteAttributeString("start-address", res.StartAddress.ToString("X6"));
+                xmlWriter.WriteAttributeString("length", res.Length.ToString("X"));
+                xmlWriter.WriteEndElement();  // end resource
+                xmlWriter.WriteRaw("\r");
+            }
+            xmlWriter.WriteEndElement(); // end resources
+            xmlWriter.WriteRaw("\r");
+
+            // Write pages
             xmlWriter.WriteStartElement("pages");
             if (compact)
             {
@@ -54,7 +78,9 @@ namespace FoenixIDE.Common
                     WriteData(i, xmlWriter, compact);
                 }
             }
-            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndElement(); // end pages
+            xmlWriter.WriteEndElement(); // end project
+
             xmlWriter.WriteEndDocument();
             xmlWriter.Close();
         }
@@ -66,8 +92,8 @@ namespace FoenixIDE.Common
             writer.WriteAttributeString("bank", "$" + startAddress.ToString("X6").Substring(0, 2));
             writer.WriteRaw("\r");
 
-            // Write 8 bytes per data line
-            for (int i = 0; i < 256; i = i + 8)
+            // Write PHRASE_LENGTH bytes per data line
+            for (int i = 0; i < 256; i = i + PHRASE_LENGTH)
             {
                 WritePhrase(startAddress + i, writer, compact);
             }
@@ -82,7 +108,7 @@ namespace FoenixIDE.Common
             {
                 writer.WriteStartElement("data");
                 writer.WriteAttributeString("address", "$" + (startAddress).ToString("X6"));
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < PHRASE_LENGTH; i++)
                 {
                     writer.WriteString(Memory.ReadByte(startAddress + i).ToString("X2") + " ");
                 }
@@ -102,11 +128,11 @@ namespace FoenixIDE.Common
             return sum;
         }
 
-        // Sum 8 bytes
+        // Sum PHRASE_LENGTH bytes
         private int PhraseChecksum(int startAddress)
         {
             int sum = 0;
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < PHRASE_LENGTH; i++)
             {
                 sum += Memory.ReadByte(startAddress + i);
             }
@@ -119,6 +145,14 @@ namespace FoenixIDE.Common
         public void Load(String filename)
         {
             XmlReader reader = XmlReader.Create(filename);
+            if (Resources == null)
+            {
+                Resources = new ResourceChecker();
+            }
+            else
+            {
+                Resources.Clear();
+            }
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.Element)
@@ -127,17 +161,29 @@ namespace FoenixIDE.Common
                     {
                         LoadMemory(reader.GetAttribute("address"), reader.ReadElementContentAsString());
                     }
+                    if (reader.Name.Equals("resource"))
+                    {
+                        ResourceChecker.Resource res = new ResourceChecker.Resource
+                        {
+                            Name = reader.GetAttribute("name"),
+                            SourceFile = reader.GetAttribute("source"),
+                            StartAddress = Convert.ToInt32(reader.GetAttribute("start-address"), 16),
+                            Length = Convert.ToInt32(reader.GetAttribute("length"), 16)
+                        };
+                        Resources.Add(res);
+                    }
                 }
             }
+            reader.Close();
         }
 
         public void LoadMemory(String address, String values)
         {
             int addr = Convert.ToInt32(address.Replace("$",""), 16);
-            //Ensure we have 8 values
-            if (values.Length == 24)
+            //Each byte is written as 3 characters (2 Hex and a space)
+            if (values.Length % 3 == 0)
             {
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < values.Length / 3; i++)
                 {
                     Memory.WriteByte(addr++, Convert.ToByte(values.Substring(i*3,2), 16));
                 }
