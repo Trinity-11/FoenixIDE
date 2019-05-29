@@ -45,19 +45,18 @@ namespace FoenixIDE
                 IO = new MemoryRAM(MemoryMap.IO_START, MemoryMap.IO_SIZE),   // 64K IO space
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
-                MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_END), // 48 bytes
+                MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_SIZE), // 48 bytes
                 CODEC = new MemoryRAM(MemoryMap.CODEC_WR_CTRL, MemoryMap.CODEC_WR_CTRL),  // 1 byte
-                KEYBOARD = new MemoryRAM(MemoryMap.KBD_DATA_BUF, 5),
                 SDCARD = new MemoryRAM(MemoryMap.SDCARD_DATA, 2),
-                INTCTRL = new InterruptControllerRAM(MemoryMap.INTCTRL_START, MemoryMap.INTCTRL_END)
+                INTCTRL = new InterruptControllerRAM(MemoryMap.INTCTRL_START, MemoryMap.INTCTRL_SIZE),
+                SUPERIO = new SuperIO_RAM(MemoryMap.SIO_START, MemoryMap.SIO_SIZE)
             };
 
             // Wire the postWrite functions.
             Memory.CODEC.postWrite = Memory.CODEC.OnCodecWait5SecondsAndWrite00;
-            Memory.KEYBOARD.postWrite = Memory.KEYBOARD.OnKeyboardStatusCodeChange;
+            Memory.SUPERIO.postWrite = Memory.SUPERIO.OnKeyboardStatusCodeChange;
             Memory.SDCARD.postWrite = Memory.SDCARD.OnSDCARDCommand;
-            Memory.RAM.postWrite = Memory.RAM.OnInterruptPending;
-
+            //Memory.RAM.postWrite = Memory.RAM.OnInterruptPending;
 
             this.CPU = new CPU(Memory);
             this.CPU.SimulatorCommand += CPU_SimulatorCommand;
@@ -75,6 +74,17 @@ namespace FoenixIDE
 
             this.Basic = new Basic.Immediate(this);
             this.Monitor = new Monitor.Monitor(this);
+        }
+
+        /// <summary>
+        /// Method that creates FeonixSystem should then call Init to provide 
+        /// a kernel reference to the MemoryManger objects that need it.
+        /// </summary>
+        /// Not sure if this is the best way to do this.
+        public void Init()
+        {
+            Memory.INTCTRL.setKernel(this);
+            Memory.SUPERIO.setKernel(this);
         }
 
         private void CPU_SimulatorCommand(int EventID)

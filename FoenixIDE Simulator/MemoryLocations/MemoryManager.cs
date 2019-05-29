@@ -25,9 +25,9 @@ namespace FoenixIDE
         public MemoryRAM IO = null;
         public MathCoproMemoryRAM MATH = null;
         public MemoryRAM CODEC = null;
-        public MemoryRAM KEYBOARD = null;
         public MemoryRAM SDCARD = null;
         public InterruptControllerRAM INTCTRL = null;
+        public SuperIO_RAM SUPERIO= null;
 
         public bool VectorPull = false;
 
@@ -72,14 +72,14 @@ namespace FoenixIDE
                 DeviceAddress = Address - INTCTRL.StartAddress;
                 return;
             }
-            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.MATH_START) ||
-               (Address > MemoryMap.MATH_END && Address <= MemoryMap.RAM_END))
+            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.GAVIN_LOW_MEM_START) ||
+               (Address > MemoryMap.GAVIN_LOW_MEM_END && Address <= MemoryMap.RAM_END))
             {
                 Device = RAM;
                 DeviceAddress = Address - RAM.StartAddress;
                 return;
             }
-            if (Address >= MemoryMap.CODEC_WR_CTRL && Address <= MemoryMap.CODEC_WR_CTRL)
+            if (Address >= MemoryMap.CODEC_START && Address <= MemoryMap.CODEC_END)
             {
                 Device = CODEC;
                 DeviceAddress = Address - CODEC.StartAddress;
@@ -91,10 +91,10 @@ namespace FoenixIDE
                 DeviceAddress = Address - MATH.StartAddress;
                 return;
             }
-            if (Address >= MemoryMap.KBD_DATA_BUF && Address <= MemoryMap.KBD_STATUS_PORT)
+            if (Address >= MemoryMap.SIO_START && Address <= MemoryMap.SIO_END)
             {
-                Device = KEYBOARD;
-                DeviceAddress = Address - MemoryMap.KBD_DATA_BUF;
+                Device = SUPERIO;
+                DeviceAddress = Address - SUPERIO.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.SDCARD_DATA && Address <= MemoryMap.SDCARD_CMD)

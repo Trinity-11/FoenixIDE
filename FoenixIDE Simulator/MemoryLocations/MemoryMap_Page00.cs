@@ -56,6 +56,7 @@ namespace FoenixIDE.MemoryLocations
         public const int D1_RESULT = 0x000114; // 2 Bytes Signed quotient result of A/B ex: 7/2 = 3 r 1
         public const int D1_REMAINDER = 0x000116; // 2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
         public const int MATH_END = 0x00_012F;
+        public const int MATH_SIZE = 0x0130;
 
         //// Interrupt Pending Source Registers
         //public const int INT_PENDING_REG0 = 0x00_0140; //[0]-Always 1, [1]-VICKY_INT0, [2]-VICKY_INT1, [3]-Timer0, [4]-Timer1, [5]-Timer2, [6]-RTC, [7]-LPC_INT[6] Floppy

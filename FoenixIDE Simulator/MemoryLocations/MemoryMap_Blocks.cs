@@ -16,7 +16,7 @@ namespace FoenixIDE.MemoryLocations
         public const int RAM_SIZE = 0x20_0000; // 2MB RAM
         public const int PAGE_SIZE = 0x1_0000; // 64KB
 
-        // Beginning of Vicky Address Space
+        // Beginning of Vicky IO Register Address Space
         public const int IO_START = 0xAF_0000; // Beginning of I/O Space
         public const int IO_END = 0xAF_FFFF; // End of I/O Space
         public const int IO_SIZE = 0x00_FFFF; // 64KB

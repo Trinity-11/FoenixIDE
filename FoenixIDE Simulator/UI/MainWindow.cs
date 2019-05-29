@@ -38,7 +38,7 @@ namespace FoenixIDE.UI
         private void BasicWindow_Load(object sender, EventArgs e)
         {
             kernel = new FoenixSystem(this.gpu, ResChecker);
-            kernel.Memory.INTCTRL.setKernel(kernel);
+            kernel.Init(); // provides a kernel refernece to MemoryRAM objects
 
             ShowDebugWindow();
             ShowMemoryWindow();
@@ -129,12 +129,14 @@ namespace FoenixIDE.UI
             loader.ShowDialog(this);
         }
 
-        private void WriteKey(ScanCode key)
-        {
-            kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
-            kernel.Memory.KEYBOARD.WriteByte(4, 0);
-            kernel.Memory.INTCTRL.setInterrupt(MemoryLocations.InterruptSources.LPC_INT_1_KB);
-        }
+        // Keyboard controller located in SuperIO chip
+        //private void WriteKey(ScanCode key)
+        //{
+        //    kernel.Memory.SUPERIO.KeyPress(key);
+        //    //kernel.Memory.SUPERIO.WriteByte(0, (byte)key);
+        //    //kernel.Memory.SUPERIO.WriteByte(4, 0);
+        //    //kernel.Memory.INTCTRL.setInterrupt(MemoryLocations.InterruptSources.LPC_INT_1_KB);
+        //}
 
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -142,7 +144,8 @@ namespace FoenixIDE.UI
             if (scanCode != ScanCode.sc_null)
             {
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                WriteKey(scanCode);
+                //WriteKey(scanCode);
+                kernel.Memory.SUPERIO.KeyPress(scanCode);
             }
             else
             {
@@ -157,7 +160,8 @@ namespace FoenixIDE.UI
             {
                 scanCode += 0x80;
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                WriteKey(scanCode);
+                //WriteKey(scanCode);
+                kernel.Memory.SUPERIO.KeyPress(scanCode);
             }
             else
             {

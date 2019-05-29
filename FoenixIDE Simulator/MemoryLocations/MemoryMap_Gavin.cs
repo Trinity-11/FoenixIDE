@@ -4,13 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-// memory map of everythign in GAVIN
+// memory map of everything in GAVIN
 namespace FoenixIDE.MemoryLocations
 {
     public static partial class MemoryMap
     {
-        #region Direct page
         // c# Direct page Addresses, i.e. global memory map addresses
+        #region GAVIN Low memory registers
+
+        public const int GAVIN_LOW_MEM_START = 0x00_0100; // Start of GAVIN's low memory registers
+        public const int GAVIN_LOW_MEM_END = 0x00_019F;   // End of GAVIN's low memory registers
+
+        #endregion GAVIN Low memory registers
+
+        // c# Direct page Addresses, i.e. global memory map addresses
+        #region Interrupt Controller
+
+        // Interrupt Controller Address Space
+        public const int INTCTRL_START = 0x00_0140; // Keyboard input, output buffer
+        public const int INTCTRL_END = 0x00_015F;  // keyboard status port
+        public const int INTCTRL_SIZE = 0x1F; // length of interrutp controller registers
 
         // Interrupt Pending Source Registers
         public const int INT_PENDING_REG0 = 0x00_0140; //[0]-Always 1, [1]-VICKY_INT0, [2]-VICKY_INT1, [3]-Timer0, [4]-Timer1, [5]-Timer2, [6]-RTC, [7]-LPC_INT[6] Floppy
@@ -32,14 +45,43 @@ namespace FoenixIDE.MemoryLocations
         public const int INT_MASK_REG1 = 0x00_014D;
         public const int INT_MASK_REG2 = 0x00_014E;
 
-        public const int INTCTRL_START = 0x00_0140; // Keyboard input, output buffer
-        public const int INTCTRL_END = 0x00_015F;  // keyboard status port
-        public const int INTCTRL_SIZE = 0x1F; // length of interrutp controller registers
+        #endregion Interrupt Controller
 
+        // c# Direct page Addresses, i.e. global memory map addresses
+        #region SuperIO PS2 
+
+        // SuperIO Address Space $AF:1060 - $AF:13FF
+        public const int SIO_START = 0xAF_1060; // Keyboard input, output buffer
+        public const int SIO_END = 0xAF_13FF;  // keyboard status port
+        public const int SIO_SIZE = 0x03A0; // length of interrutp controller registers
+
+        public const int KBD_START = 0xAF_1060;
         public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
         public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
+        public const int KBD_END = 0xAF_1064;
 
-        #endregion
+        public const int PME_START = 0xAF_1100;
+        public const int PME_END = 0xAF_117F;
+
+        public const int GAME_START = 0xAF_1200;
+        public const int GAME_END = 0xAF_1200;
+
+        public const int COM2_START = 0xAF_12F8;
+        public const int COM2_END = 0xAF_12FF;
+
+        public const int MPU401_START = 0xAF_1330;
+        public const int MPU401_END = 0xAF_1331;
+
+        public const int LPT_START = 0xAF_1378;
+        public const int LPT_END = 0xAF_137F;
+
+        public const int FLPY_START = 0xAF_13F0;
+        public const int FLPY_END = 0xAF_13F7;
+
+        public const int COM1_START = 0xAF_13F8;
+        public const int COM1_END = 0xAF_13FF;
+
+        #endregion SuperIO PS2
     }
 
     /// <summary>

@@ -30,11 +30,18 @@ namespace FoenixIDE.MemoryLocations
         public const int RTC_CTRL = 0xAF_080E; // Control Register
         public const int RTC_CENTURY = 0xAF_080F; // Century Register
 
+        // The SuperIO chip is in VICKY address range but wired to GAVIN (code under Gavin folder)
         //public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
         //public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
+
+        public const int SDCARD_START = 0xAF_E808; // Start of SDCARD memory range
+        public const int SDCARD_END = 0xAF_E80F;   // End of SDCARD memory range
         public const int SDCARD_DATA = 0xAF_E808;
         public const int SDCARD_CMD = 0xAF_E809;
+
         public const int CODEC_WR_CTRL = 0xAF_E822; // codec write address
+        public const int CODEC_START = 0xAF_E810;   // Start of CODEC memory range
+        public const int CODEC_END = 0xAF_E823;     // End of CODEC memory range
 
         #endregion
     }

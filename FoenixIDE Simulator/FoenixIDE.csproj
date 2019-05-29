@@ -79,6 +79,7 @@
     <Compile Include="FileFormat\FoenixmlFile.cs" />
     <Compile Include="FileFormat\HexFile.cs" />
     <Compile Include="Gavin\Interrupt_Controller.cs" />
+    <Compile Include="Gavin\SuperIO.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="MemoryBuffer.cs" />
     <Compile Include="MemoryLocations\MathCoproMemoryRAM.cs" />

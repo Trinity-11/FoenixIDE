@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace FoenixIDE.Simulator.Basic
 {
-    enum ScanCode
+    public enum  ScanCode
     {
         sc_null = 0x00,
         sc_escape = 0x01,
