@@ -101,7 +101,7 @@ namespace FoenixIDE.UI
             {
                 Title = "Load Bitmap",
                 DefaultExt = ".bmp",
-                Filter = "Bitmap Files|*.bmp|Binary Files|*.bin"
+                Filter = "Bitmap Files|*.bmp|Binary Files|*.bin|Any File|*.bmp;*.png"
             };
 
             // Load content of file in a TextBlock
@@ -115,23 +115,32 @@ namespace FoenixIDE.UI
 
         private void GetBitmapAttributes(String bmpFilename)
         {
-            bitmap = new Bitmap(bmpFilename);
-            BitmapSizeValueLabel.Text = bitmap.Width + " x " + bitmap.Height;
-            FileSizeResultLabel.Text = FormatAddress(bitmap.Width * bitmap.Height);
-            PixelDepthValueLabel.Text = (((int)bitmap.PixelFormat) >> 8 & 0xFF).ToString();
-
-            switch (bitmap.Width)
+            if (Path.GetExtension(bmpFilename).Equals(".bmp"))
             {
-                case 640:
-                    BitmapTypesCombo.SelectedItem = "Bitmap";
-                    break;
-                case 16:
-                case 256:
-                    BitmapTypesCombo.SelectedItem = "Tile Layer 0";
-                    break;
-                case 32:
-                    BitmapTypesCombo.SelectedItem = "Sprite 0";
-                    break;
+                bitmap = new Bitmap(bmpFilename);
+                BitmapSizeValueLabel.Text = bitmap.Width + " x " + bitmap.Height;
+                FileSizeResultLabel.Text = FormatAddress(bitmap.Width * bitmap.Height);
+                PixelDepthValueLabel.Text = (((int)bitmap.PixelFormat) >> 8 & 0xFF).ToString();
+                switch (bitmap.Width)
+                {
+                    case 640:
+                        BitmapTypesCombo.SelectedItem = "Bitmap";
+                        break;
+                    case 16:
+                    case 256:
+                        BitmapTypesCombo.SelectedItem = "Tile Layer 0";
+                        break;
+                    case 32:
+                        BitmapTypesCombo.SelectedItem = "Sprite 0";
+                        break;
+                }
+            }
+            else
+            {
+                FileInfo info = new FileInfo(bmpFilename);
+                FileSizeResultLabel.Text = FormatAddress((int)info.Length);
+                BitmapSizeValueLabel.Text = "Unspecified";
+                PixelDepthValueLabel.Text = "8";
             }
         }
 
