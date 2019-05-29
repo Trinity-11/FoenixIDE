@@ -13,9 +13,11 @@ namespace FoenixIDE.Common
 
             if (!System.IO.File.Exists(Filename))
             {
-                OpenFileDialog f = new OpenFileDialog();
-                f.Title = "Select a kernel file";
-                f.Filter = "Hex Files|*.hex|All Files|*.*";
+                OpenFileDialog f = new OpenFileDialog
+                {
+                    Title = "Select a kernel file",
+                    Filter = "Hex Files|*.hex|All Files|*.*"
+                };
                 if (f.ShowDialog() == DialogResult.OK)
                 {
                     processedFileName = f.FileName;
@@ -82,7 +84,8 @@ namespace FoenixIDE.Common
             return processedFileName;
         }
 
-        static int GetByte(string data, int startPos, int bytes)
+        // Read a two-character hex string into a byte
+        static public int GetByte(string data, int startPos, int bytes)
         {
             return Convert.ToInt32(data.Substring(startPos, bytes * 2), 16);
         }

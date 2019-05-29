@@ -1,3 +1,7 @@
+Release 0.2.2.12
+----------------
+Added uploading of HEX files.  This includes the handling of the page FF interrupt vectors.
+
 Release 0.2.2.8
 ---------------
 Added the Real-Time Clock.
