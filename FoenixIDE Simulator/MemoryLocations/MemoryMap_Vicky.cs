@@ -11,6 +11,28 @@ namespace FoenixIDE.MemoryLocations
         #region Direct page
         // c# Direct page Addresses
 
+        public const int VICKY_START = 0xAF_0000;
+        public const int VICKY_END = 0xAF_DFFF;
+        public const int VICKY_SIZE = 0xE000;
+        //public const int VICKY_END = 0xAF_FFFF;
+        //public const int VICKY_SIZE = 0x00_FFFF;
+
+        public const int SCREEN_PAGE0 = 0xAF_A000; // 8192 Bytes First page of display RAM. This is used at boot time to display the welcome screen and the BASIC or MONITOR command screens. 
+        public const int SCREEN_PAGE1 = 0xAF_C000; // 8192 Bytes Additional page of display RAM. This can be used for page flipping or to handle multiple edit buffers. 
+
+        public const int FONT_MEMORY_BANK_END = 0xAF_BFFF;
+        public const int FONT0_MEMORY_BANK_START = 0xAF_8000;
+        public const int FONT1_MEMORY_BANK_START = 0xAF_8800;
+
+        public const int COLOR_LUTS_START = 0xAF_1F00;
+        public const int COLOR_LUTS_END = 0xAF_43FF;
+        public const int COLOR_LUTS_SIZE = 0x2500;
+        public const int GRP_LUT_BASE_ADDR = 0xAF_2000;
+        public const int GAMMA_BASE_ADDR = 0xAF_4000;
+        public const int BG_CHAR_LUT_PTR = 0xAF_1F80; // 15 color lookup table
+        public const int FG_CHAR_LUT_PTR = 0xAF_1F40; // 15 color lookup table
+        public const int TEXT_COLOR_LUT = 0xAF_1000;
+
         public const int VKY_TXT_CURSOR_CHAR_REG = 0xAF_0012;
 
         public const int RTC_SEC = 0xAF_0800; // Seconds Register
@@ -34,16 +56,7 @@ namespace FoenixIDE.MemoryLocations
         //public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
         //public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
 
-        public const int SDCARD_START = 0xAF_E808; // Start of SDCARD memory range
-        public const int SDCARD_END = 0xAF_E80F;   // End of SDCARD memory range
-        public const int SDCARD_DATA = 0xAF_E808;
-        public const int SDCARD_CMD = 0xAF_E809;
-
-        public const int CODEC_WR_CTRL = 0xAF_E822; // codec write address
-        public const int CODEC_START = 0xAF_E822;   // Start of CODEC memory range
-        public const int CODEC_END = 0xAF_E822;     // End of CODEC memory range
-        //public const int CODEC_START = 0xAF_E810;   // Start of CODEC memory range
-        //public const int CODEC_END = 0xAF_E823;     // End of CODEC memory range
+        
 
         #endregion
     }

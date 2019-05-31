@@ -65,7 +65,7 @@ namespace FoenixIDE.Simulator.UI
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
             int[,] graphicsLUT = new int[8, 256];
-            Display.Gpu.LoadLUT(memory.IO, graphicsLUT);
+            Display.Gpu.LoadLUT(memory.VICKY, graphicsLUT);
             int lut = Int32.Parse(LUTDomain.Text);
             for (int y = 0; y < 256; y++)
             {
@@ -162,7 +162,7 @@ namespace FoenixIDE.Simulator.UI
             if (selectedX != -1 && selectedY != -1)
             {
                 byte value = (byte)(selectedY * 16 + selectedX);
-                memory.IO.WriteByte(tilemapAddress - memory.IO.StartAddress, value);
+                memory.VICKY.WriteByte(tilemapAddress - memory.VICKY.StartAddress, value);
             }
         }
 

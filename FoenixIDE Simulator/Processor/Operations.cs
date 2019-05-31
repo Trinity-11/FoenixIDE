@@ -952,6 +952,11 @@ namespace FoenixIDE.Processor
 
         public void ExecuteSTA(byte instruction, AddressModes addressMode, int signature)
         {
+            if (instruction == 0x9f)
+            {
+                int i = 0;
+                i++;
+            }
             int addr = GetAddress(addressMode, signature, cpu.DataBank);
             cpu.Memory.Write(addr, cpu.A.Value, cpu.A.Width);
         }

@@ -112,13 +112,6 @@ namespace FoenixIDE
             }
         }
 
-        // When the codec write address is written to, wait 200ms then write a zero to signify that we're finished
-        public async void OnCodecWait5SecondsAndWrite00(int address, byte o, byte n)
-        {
-            await Task.Delay(200);
-            data[0] = 0;
-        }
-
         public void OnSDCARDCommand(int address, byte o, byte n)
         {
             byte command = data[1];

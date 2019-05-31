@@ -70,23 +70,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basic\ScanCodes.cs" />
+    <Compile Include="Beatrix\CODEC_RAM.cs" />
     <Compile Include="Deprecated\Address.cs" />
     <Compile Include="Deprecated\AddressRange.cs" />
     <Compile Include="Basic\Editor.cs" />
     <Compile Include="Basic\Immediate.cs" />
     <Compile Include="Basic\Parser.cs" />
     <Compile Include="DeviceEnum.cs" />
+    <Compile Include="Display\VickyRAM.cs" />
     <Compile Include="FileFormat\FoenixmlFile.cs" />
     <Compile Include="FileFormat\HexFile.cs" />
     <Compile Include="Gavin\Interrupt_Controller.cs" />
     <Compile Include="Gavin\SuperIO.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="MemoryBuffer.cs" />
-    <Compile Include="MemoryLocations\MathCoproMemoryRAM.cs" />
+    <Compile Include="Gavin\MathCoproMemoryRAM.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Gavin.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Blocks.cs" />
-    <Compile Include="MemoryLocations\MemoryMap_Other.cs" />
+    <Compile Include="MemoryLocations\MemoryMap_Beatrix.cs" />
     <Compile Include="MemoryLocations\ResourceChecker.cs" />
     <Compile Include="Processor\Breakpoints.cs" />
     <Compile Include="Processor\CPUPins.cs" />

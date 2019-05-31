@@ -21,9 +21,48 @@ namespace FoenixIDE
 
         #endregion locals
 
-        #region const defs
+        #region const defs KB
 
-        #endregion const defs
+        private const int STATUS_PORT =	0xAF_1064;
+        private const int KBD_OUT_BUF = 0xAF_1060;
+        private const int KBD_INPT_BUF = 0xAF_1060;
+        private const int KBD_CMD_BUF = 0xAF_1064;
+        private const int KBD_DATA_BUF = 0xAF_1060;
+        private const int PORT_A = 0xAF_1060;
+        private const int PORT_B = 0xAF_1061;
+
+        // Status
+        private const byte OUT_BUF_FULL = 0x01;
+        private const byte INPT_BUF_FULL = 0x02;
+        private const byte SYS_FLAG = 0x04;
+        private const byte CMD_DATA = 0x08;
+        private const byte KEYBD_INH = 0x10;
+        private const byte TRANS_TMOUT = 0x20;
+        private const byte RCV_TMOUT = 0x40;
+        private const byte PARITY_EVEN = 0x80;
+        private const byte INH_KEYBOARD = 0x10;
+        private const byte KBD_ENA = 0xAE;
+        private const byte KBD_DIS = 0xAD;
+
+        // Keyboard Commands
+        private const byte KB_MENU = 0xF1;
+        private const byte KB_ENABLE = 0xF4;
+        private const byte KB_MAKEBREAK = 0xF7;
+        private const byte KB_ECHO = 0xFE;
+        private const byte KB_RESET = 0xFF;
+        private const byte KB_LED_CMD = 0xED;
+
+        // Keyboard responses
+        private const byte KB_OK = 0xAA;
+        private const byte KB_ACK = 0xFA;
+        private const byte KB_OVERRUN = 0xFF;
+        private const byte KB_RESEND = 0xFE;
+        private const byte KB_BREAK = 0xF0;
+        private const byte KB_FA = 0x10;
+        private const byte KB_FE = 0x20;
+        private const byte KB_PR_LED = 0x40;
+
+        #endregion const defs KB
 
         /// <summary>
         /// Creates an instance of the SuperIO controller

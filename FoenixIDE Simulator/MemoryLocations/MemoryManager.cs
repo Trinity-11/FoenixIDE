@@ -22,12 +22,13 @@ namespace FoenixIDE
         public MemoryRAM RAM = null;
         public MemoryRAM FLASH = null;
         public MemoryRAM VIDEO = null;
-        public MemoryRAM IO = null;
+        public MemoryRAM BEATRIX = null;
         public MathCoproMemoryRAM MATH = null;
-        public MemoryRAM CODEC = null;
+        public CODEC_RAM CODEC = null;
         public MemoryRAM SDCARD = null;
         public InterruptControllerRAM INTCTRL = null;
-        public SuperIO_RAM SUPERIO= null;
+        public SuperIO_RAM SUPERIO = null;
+        public Vicky_RAM VICKY = null;
 
         public bool VectorPull = false;
 
@@ -66,19 +67,6 @@ namespace FoenixIDE
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
         {
-            if (Address >= MemoryMap.INTCTRL_START && Address <= MemoryMap.INTCTRL_END)
-            {
-                Device = INTCTRL;
-                DeviceAddress = Address - INTCTRL.StartAddress;
-                return;
-            }
-            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.GAVIN_LOW_MEM_START) ||
-               (Address > MemoryMap.GAVIN_LOW_MEM_END && Address <= MemoryMap.RAM_END))
-            {
-                Device = RAM;
-                DeviceAddress = Address - RAM.StartAddress;
-                return;
-            }
             if (Address >= MemoryMap.CODEC_START && Address <= MemoryMap.CODEC_END)
             {
                 Device = CODEC;
@@ -89,6 +77,13 @@ namespace FoenixIDE
             {
                 Device = MATH;
                 DeviceAddress = Address - MATH.StartAddress;
+                return;
+            }
+            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.GAVIN_LOW_MEM_START) ||
+               (Address > MemoryMap.GAVIN_LOW_MEM_END && Address <= MemoryMap.RAM_END))
+            {
+                Device = RAM;
+                DeviceAddress = Address - RAM.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.SIO_START && Address <= MemoryMap.SIO_END)
@@ -103,24 +98,35 @@ namespace FoenixIDE
                 DeviceAddress = Address - MemoryMap.SDCARD_DATA;
                 return;
             }
-            if(Address >= MemoryMap.IO_START && Address <= MemoryMap.IO_END)
+            if (Address >= MemoryMap.VICKY_START && Address <= MemoryMap.VICKY_END)
             {
-                Device = IO;
-                DeviceAddress = Address - IO.StartAddress;
+                Device = VICKY;
+                DeviceAddress = Address - VICKY.StartAddress;
                 return;
             }
-
-            if (Address >= MemoryMap.VIDEO_START && Address < (MemoryMap.VIDEO_START + MemoryMap.VIDEO_SIZE))
+            if (Address >= MemoryMap.VIDEO_START && Address < MemoryMap.VIDEO_END)
             {
                 Device = VIDEO;
                 DeviceAddress = Address - VIDEO.StartAddress;
                 return;
             }
-
+            if ((Address >= MemoryMap.BEATRIX_START && Address < MemoryMap.SDCARD_START) ||
+            (Address > MemoryMap.CODEC_END && Address <= MemoryMap.BEATRIX_END))
+            {
+                Device = RAM;
+                DeviceAddress = Address - RAM.StartAddress;
+                return;
+            }
             if (Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)
             {
                 Device = FLASH;
                 DeviceAddress = Address - FLASH.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.INTCTRL_START && Address <= MemoryMap.INTCTRL_END)
+            {
+                Device = INTCTRL;
+                DeviceAddress = Address - INTCTRL.StartAddress;
                 return;
             }
 

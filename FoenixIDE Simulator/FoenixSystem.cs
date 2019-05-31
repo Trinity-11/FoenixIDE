@@ -42,18 +42,18 @@ namespace FoenixIDE
             Memory = new MemoryManager
             {
                 RAM = new MemoryRAM(MemoryMap.RAM_START, MemoryMap.RAM_SIZE), // 2MB RAM
-                IO = new MemoryRAM(MemoryMap.IO_START, MemoryMap.IO_SIZE),   // 64K IO space
+                BEATRIX = new MemoryRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE),   // 64K IO space
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
                 MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_SIZE), // 48 bytes
-                CODEC = new MemoryRAM(MemoryMap.CODEC_WR_CTRL, MemoryMap.CODEC_WR_CTRL),  // 1 byte
-                SDCARD = new MemoryRAM(MemoryMap.SDCARD_DATA, 2),
+                CODEC = new CODEC_RAM(MemoryMap.CODEC_START, MemoryMap.CODEC_SIZE),  // 1 byte
+                SDCARD = new MemoryRAM(MemoryMap.SDCARD_START, MemoryMap.SDCARD_SIZE),
                 INTCTRL = new InterruptControllerRAM(MemoryMap.INTCTRL_START, MemoryMap.INTCTRL_SIZE),
-                SUPERIO = new SuperIO_RAM(MemoryMap.SIO_START, MemoryMap.SIO_SIZE)
+                SUPERIO = new SuperIO_RAM(MemoryMap.SIO_START, MemoryMap.SIO_SIZE),
+                VICKY = new Vicky_RAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE)
             };
 
             // Wire the postWrite functions.
-            Memory.CODEC.postWrite = Memory.CODEC.OnCodecWait5SecondsAndWrite00;
             Memory.SUPERIO.postWrite = Memory.SUPERIO.OnKeyboardStatusCodeChange;
             Memory.SDCARD.postWrite = Memory.SDCARD.OnSDCARDCommand;
             //Memory.RAM.postWrite = Memory.RAM.OnInterruptPending;
@@ -63,7 +63,8 @@ namespace FoenixIDE
             this.gpu = gpu;
             gpu.VRAM = Memory.VIDEO;
             gpu.RAM = Memory.RAM;
-            gpu.IO = Memory.IO;
+            gpu.VICKY = Memory.VICKY;
+
             //gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
@@ -106,7 +107,7 @@ namespace FoenixIDE
             Cls();
             gpu.Refresh();
             // Clear out Vicky's memory
-            Memory.IO.Zero();
+            Memory.VICKY.Zero();
             //gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
