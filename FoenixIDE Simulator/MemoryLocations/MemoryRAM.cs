@@ -112,6 +112,7 @@ namespace FoenixIDE
             }
         }
 
+        // ***JTB: ToDo move this to a SDCARD_RAM file
         public void OnSDCARDCommand(int address, byte o, byte n)
         {
             byte command = data[1];

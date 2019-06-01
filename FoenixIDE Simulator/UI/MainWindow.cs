@@ -135,7 +135,6 @@ namespace FoenixIDE.UI
             if (scanCode != ScanCode.sc_null)
             {
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                //WriteKey(scanCode);
                 kernel.Memory.SUPERIO.KeyPress(scanCode);
             }
             else
@@ -151,7 +150,6 @@ namespace FoenixIDE.UI
             {
                 scanCode += 0x80;
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                //WriteKey(scanCode);
                 kernel.Memory.SUPERIO.KeyPress(scanCode);
             }
             else
@@ -277,6 +275,7 @@ namespace FoenixIDE.UI
                 }
             }
         }
+
         private void MenuOpenHexFile_Click(object sender, EventArgs e)
         {
             LoadHexFile(true);
@@ -424,7 +423,6 @@ namespace FoenixIDE.UI
                 TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
             }
         }
-
 
         private void Gpu_MouseEnter(object sender, EventArgs e)
         {

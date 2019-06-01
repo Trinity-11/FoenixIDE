@@ -21,12 +21,9 @@ namespace FoenixIDE.Display
         const int MAX_TEXT_COLS = 128;
         const int MAX_TEXT_LINES = 64;
         const int SCREEN_PAGE_SIZE = 128 * 64;
-        //const int IO_BASE_ADDR = 0xAF_0000;
         const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0100;
         const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0140;
         const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
-        //const int GRP_LUT_BASE_ADDR = 0xAF_2000;
-        //const int GAMMA_BASE_ADDR = 0xAF_4000;
         const int charWidth = 8;
         const int charHeight = 8;
         const int tileSize = 16;
@@ -39,8 +36,7 @@ namespace FoenixIDE.Display
 
         public MemoryRAM VRAM = null;
         public MemoryRAM RAM = null;
-        //public MemoryRAM IO = null;
-        public MemoryRAM VICKY = null;
+        public Vicky_RAM VICKY = null;
 
         public int paintCycle = 0;
         private bool tileEditorMode = false;
@@ -243,7 +239,6 @@ namespace FoenixIDE.Display
             }
         }
 
-
         public Gpu()
         {
             InitializeComponent();
@@ -277,14 +272,12 @@ namespace FoenixIDE.Display
                 ParentForm.Width = (int)Math.Ceiling(htarget * 1.6) + sidemargin;
             }
         }
-
-        
+ 
         public void ResetDrawTimer()
         {
             RefreshTimer = 0;
             CursorState = true;
         }
-
 
         public int BufferSize
         {
@@ -361,20 +354,13 @@ namespace FoenixIDE.Display
             int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
             int rowOffset = (60 - LinesVisible) / 2 * charWidth;
 
-            // Load Graphical LUTs
-            //graphicsLUT = LoadLUT(IO);
-            LoadLUT(VICKY, graphicsLUT);
-
-            // Apply gamma correct
-            if ((MCRegister & 0x40) == 0x40)
+            // only load LUTs if one has changed
+            if (VICKY.LUTChanged == true)
             {
-                //gammaCorrection = LoadGammaCorrection(IO);
+                LoadLUT(VICKY, graphicsLUT);
                 LoadGammaCorrection(VICKY, gammaCorrection);
+                VICKY.LUTChanged = false;
             }
-            //else
-            //{
-            //    gammaCorrection = null;
-            //}
 
             // Default background color to border color
             // In Text mode, the border color is stored at $AF:0005.
@@ -417,14 +403,12 @@ namespace FoenixIDE.Display
                 g.FillRectangle(graphBackgroundBrush, colOffset, rowOffset, 640 - 2 * colOffset, 480 - 2 * rowOffset);
             }
        
-
             // Bitmap Mode
             if ((MCRegister & 0x8) == 0x8)
             {
                 DrawBitmap(frameBuffer, displayBorder);
             }
             
-
             for (int layer = 4; layer > 0; --layer)
             {
                 if ((MCRegister & 0x10) == 0x10)
@@ -457,26 +441,26 @@ namespace FoenixIDE.Display
                     DrawBitmapText(frameBuffer);
                 }
             }
+
             // Overlay Mode - no need for this, the Text drawing method takes care of this
             if ((MCRegister & 0x2) == 0x2)
             {
 
             }
+
             byte mouseReg = VICKY.ReadByte(0x700);
             MousePointerMode = (mouseReg & 1) == 1;
             if (MousePointerMode && !TileEditorMode)
             {
                 DrawMouse(frameBuffer);
-
             }
             e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
-        public static void /*byte[,]*/ LoadGammaCorrection(MemoryRAM VKY, byte[,] result)
+        public static void  LoadGammaCorrection(MemoryRAM VKY, byte[,] result)
         {
             // Read the color lookup tables
             int gamAddress = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_START;
-            //byte[,] result = new byte[256,3];
             for (int c = 0; c < 256; c++)
             {
                 byte blue = VKY.ReadByte(gamAddress);
@@ -487,14 +471,12 @@ namespace FoenixIDE.Display
                 result[c, 1] = green;
                 result[c, 2] = red;
             }
-            //return result;
         }
 
-        public static void /*int[,]*/ LoadLUT(MemoryRAM VKY, int[,] result)
+        public static void  LoadLUT(MemoryRAM VKY, int[,] result)
         {
             // Read the color lookup tables
             int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_START;
-            //int[,] result = new int[8,256];
             for (int i = 0; i < 4; i++)
             {
                 for (int c = 0; c < 256; c++)
@@ -506,7 +488,6 @@ namespace FoenixIDE.Display
                     result[i,c] = (255 << 24) + (red << 16) + (green << 8) + blue;
                 }
             }
-            //return result;
         }
         /*
          * Display the text with a colored background. This should make the text more visible against bitmaps.
@@ -567,27 +548,16 @@ namespace FoenixIDE.Display
 
                     // Each character will have foreground and background colors
                     byte character = VICKY.ReadByte(textAddr++);
-                    //character = IO.ReadByte(textAddr++);
                     if (X == col && Y == line && CursorState && CursorEnabled)
                     {
                         character = VICKY.ReadByte(MemoryLocations.MemoryMap.VKY_TXT_CURSOR_CHAR_REG - VICKY.StartAddress);
                     }
-                    byte color = VICKY.ReadByte(colorAddr++);
-                    //byte fgColor = (byte)((color & 0xF0) >> 4);
-                    //byte bgColor = (byte)(color & 0x0F);
 
+                    byte color = VICKY.ReadByte(colorAddr++);
                     int fgColor = ((color & 0xF0) >> 4) * 4;
                     int bgColor = (color & 0x0F) * 4;
 
-                    // In order to reduce the load of applying Gamma correction, load single bytes
-                    //byte fgValueRed = IO.ReadByte(fgLUT + fgColor * 4);
-                    //byte fgValueGreen = IO.ReadByte(fgLUT + fgColor * 4 + 1);
-                    //byte fgValueBlue = IO.ReadByte(fgLUT + fgColor * 4 + 2);
-
-                    //byte bgValueRed = IO.ReadByte(bgLUT + bgColor * 4);
-                    //byte bgValueGreen = IO.ReadByte(bgLUT + bgColor * 4 + 1);
-                    //byte bgValueBlue = IO.ReadByte(bgLUT + bgColor * 4 + 2);
-
+                    // In order to reduce the load of applying Gamma correction, load single byte
                     byte fgValueRed = VICKY.ReadByte(fgLUT + fgColor);
                     byte fgValueGreen = VICKY.ReadByte(fgLUT + fgColor + 1);
                     byte fgValueBlue = VICKY.ReadByte(fgLUT + fgColor + 2);
@@ -693,7 +663,6 @@ namespace FoenixIDE.Display
         private void DrawBitmap(Bitmap bitmap, bool bkgrnd)
         {
             // Bitmap Controller is located at $AF:0140
-            //int reg = IO.ReadByte(BITMAP_CONTROL_REGISTER_ADDR - IO_BASE_ADDR);
             int reg = VICKY.ReadByte(BITMAP_CONTROL_REGISTER_ADDR - MemoryMap.VICKY_START);
             if ((reg & 0x01) == 00)
             {

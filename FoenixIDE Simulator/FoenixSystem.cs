@@ -46,7 +46,7 @@ namespace FoenixIDE
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
                 MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_SIZE), // 48 bytes
-                CODEC = new CODEC_RAM(MemoryMap.CODEC_START, MemoryMap.CODEC_SIZE),  // 1 byte
+                CODEC = new CODEC_RAM(MemoryMap.CODEC_START, MemoryMap.CODEC_SIZE),  // 4 byte
                 SDCARD = new MemoryRAM(MemoryMap.SDCARD_START, MemoryMap.SDCARD_SIZE),
                 INTCTRL = new InterruptControllerRAM(MemoryMap.INTCTRL_START, MemoryMap.INTCTRL_SIZE),
                 SUPERIO = new SuperIO_RAM(MemoryMap.SIO_START, MemoryMap.SIO_SIZE),
@@ -56,7 +56,7 @@ namespace FoenixIDE
             // Wire the postWrite functions.
             Memory.SUPERIO.postWrite = Memory.SUPERIO.OnKeyboardStatusCodeChange;
             Memory.SDCARD.postWrite = Memory.SDCARD.OnSDCARDCommand;
-            //Memory.RAM.postWrite = Memory.RAM.OnInterruptPending;
+            //Memory.RAM.postWrite = Memory.RAM.OnInterruptPending; // need to check this and hookup again
 
             this.CPU = new CPU(Memory);
             this.CPU.SimulatorCommand += CPU_SimulatorCommand;

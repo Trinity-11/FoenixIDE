@@ -67,10 +67,11 @@ namespace FoenixIDE
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
         {
-            if (Address >= MemoryMap.CODEC_START && Address <= MemoryMap.CODEC_END)
+            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.GAVIN_LOW_MEM_START) ||
+            (Address > MemoryMap.GAVIN_LOW_MEM_END && Address <= MemoryMap.RAM_END))
             {
-                Device = CODEC;
-                DeviceAddress = Address - CODEC.StartAddress;
+                Device = RAM;
+                DeviceAddress = Address - RAM.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.MATH_START && Address <= MemoryMap.MATH_END)
@@ -79,35 +80,23 @@ namespace FoenixIDE
                 DeviceAddress = Address - MATH.StartAddress;
                 return;
             }
-            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.GAVIN_LOW_MEM_START) ||
-               (Address > MemoryMap.GAVIN_LOW_MEM_END && Address <= MemoryMap.RAM_END))
+            if (Address >= MemoryMap.INTCTRL_START && Address <= MemoryMap.INTCTRL_END)
             {
-                Device = RAM;
-                DeviceAddress = Address - RAM.StartAddress;
+                Device = INTCTRL;
+                DeviceAddress = Address - INTCTRL.StartAddress;
+                return;
+            }
+            if ((Address >= MemoryMap.VICKY_START && Address < MemoryMap.SIO_START) ||
+                (Address > MemoryMap.SIO_END && Address <= MemoryMap.VICKY_END))
+            {
+                Device = VICKY;
+                DeviceAddress = Address - VICKY.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.SIO_START && Address <= MemoryMap.SIO_END)
             {
                 Device = SUPERIO;
                 DeviceAddress = Address - SUPERIO.StartAddress;
-                return;
-            }
-            if (Address >= MemoryMap.SDCARD_DATA && Address <= MemoryMap.SDCARD_CMD)
-            {
-                Device = SDCARD;
-                DeviceAddress = Address - MemoryMap.SDCARD_DATA;
-                return;
-            }
-            if (Address >= MemoryMap.VICKY_START && Address <= MemoryMap.VICKY_END)
-            {
-                Device = VICKY;
-                DeviceAddress = Address - VICKY.StartAddress;
-                return;
-            }
-            if (Address >= MemoryMap.VIDEO_START && Address < MemoryMap.VIDEO_END)
-            {
-                Device = VIDEO;
-                DeviceAddress = Address - VIDEO.StartAddress;
                 return;
             }
             if ((Address >= MemoryMap.BEATRIX_START && Address < MemoryMap.SDCARD_START) ||
@@ -117,16 +106,28 @@ namespace FoenixIDE
                 DeviceAddress = Address - RAM.StartAddress;
                 return;
             }
+            if (Address >= MemoryMap.SDCARD_DATA && Address <= MemoryMap.SDCARD_CMD)
+            {
+                Device = SDCARD;
+                DeviceAddress = Address - MemoryMap.SDCARD_DATA;
+                return;
+            }
+            if (Address >= MemoryMap.CODEC_START && Address <= MemoryMap.CODEC_END)
+            {
+                Device = CODEC;
+                DeviceAddress = Address - CODEC.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.VIDEO_START && Address < MemoryMap.VIDEO_END)
+            {
+                Device = VIDEO;
+                DeviceAddress = Address - VIDEO.StartAddress;
+                return;
+            }
             if (Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)
             {
                 Device = FLASH;
                 DeviceAddress = Address - FLASH.StartAddress;
-                return;
-            }
-            if (Address >= MemoryMap.INTCTRL_START && Address <= MemoryMap.INTCTRL_END)
-            {
-                Device = INTCTRL;
-                DeviceAddress = Address - INTCTRL.StartAddress;
                 return;
             }
 
