@@ -8,6 +8,8 @@ namespace FoenixIDE.Processor
 {
     public class OpcodeList : List<OpCode>
     {
+        #region constants
+
         public const int PUSH2 = 16;
         public const int ADD1_16BIT = 32;
 
@@ -267,6 +269,8 @@ namespace FoenixIDE.Processor
         public const int SBC_AbsoluteIndexedWithX = 0xFD;
         public const int INC_AbsoluteIndexedWithX = 0xFE;
         public const int SBC_AbsoluteLongIndexedWithX = 0xFF;
+
+        #endregion constants
 
         public OpcodeList(Operations operations, CPU CPU)
         {

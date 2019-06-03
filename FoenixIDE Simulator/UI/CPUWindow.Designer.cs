@@ -56,6 +56,7 @@
             this.StepOverButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
+            this.cbDebug = new System.Windows.Forms.CheckBox();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
@@ -63,6 +64,7 @@
             // 
             // HeaderPanel
             // 
+            this.HeaderPanel.Controls.Add(this.cbDebug);
             this.HeaderPanel.Controls.Add(this.stepsInput);
             this.HeaderPanel.Controls.Add(this.BPLabel);
             this.HeaderPanel.Controls.Add(this.BPCombo);
@@ -74,29 +76,32 @@
             this.HeaderPanel.Controls.Add(this.PauseButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
+            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.HeaderPanel.Name = "HeaderPanel";
-            this.HeaderPanel.Size = new System.Drawing.Size(608, 24);
+            this.HeaderPanel.Size = new System.Drawing.Size(913, 37);
             this.HeaderPanel.TabIndex = 2;
             // 
             // stepsInput
             // 
-            this.stepsInput.Dock = System.Windows.Forms.DockStyle.Left;
+            this.stepsInput.Dock = System.Windows.Forms.DockStyle.Right;
             this.stepsInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stepsInput.Location = new System.Drawing.Point(256, 0);
+            this.stepsInput.Location = new System.Drawing.Point(486, 0);
+            this.stepsInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.stepsInput.Name = "stepsInput";
-            this.stepsInput.Size = new System.Drawing.Size(64, 23);
-            this.stepsInput.TabIndex = 3;
+            this.stepsInput.Size = new System.Drawing.Size(82, 31);
+            this.stepsInput.TabIndex = 5;
             this.stepsInput.Text = "1";
             this.stepsInput.Enter += new System.EventHandler(this.StepsInput_Enter);
             // 
             // BPLabel
             // 
             this.BPLabel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.BPLabel.Location = new System.Drawing.Point(343, 0);
+            this.BPLabel.Location = new System.Drawing.Point(568, 0);
+            this.BPLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.BPLabel.Name = "BPLabel";
-            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.BPLabel.Size = new System.Drawing.Size(96, 24);
-            this.BPLabel.TabIndex = 5;
+            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
+            this.BPLabel.Size = new System.Drawing.Size(93, 37);
+            this.BPLabel.TabIndex = 6;
             this.BPLabel.Text = "Breakpoint";
             this.BPLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
@@ -104,18 +109,20 @@
             // 
             this.BPCombo.Dock = System.Windows.Forms.DockStyle.Right;
             this.BPCombo.FormattingEnabled = true;
-            this.BPCombo.Location = new System.Drawing.Point(439, 0);
+            this.BPCombo.Location = new System.Drawing.Point(661, 0);
+            this.BPCombo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.BPCombo.Name = "BPCombo";
-            this.BPCombo.Size = new System.Drawing.Size(121, 21);
-            this.BPCombo.TabIndex = 6;
+            this.BPCombo.Size = new System.Drawing.Size(180, 28);
+            this.BPCombo.TabIndex = 7;
             // 
             // AddBPButton
             // 
             this.AddBPButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.AddBPButton.Location = new System.Drawing.Point(560, 0);
+            this.AddBPButton.Location = new System.Drawing.Point(841, 0);
+            this.AddBPButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.AddBPButton.Name = "AddBPButton";
-            this.AddBPButton.Size = new System.Drawing.Size(24, 24);
-            this.AddBPButton.TabIndex = 7;
+            this.AddBPButton.Size = new System.Drawing.Size(36, 37);
+            this.AddBPButton.TabIndex = 8;
             this.AddBPButton.Text = "+";
             this.AddBPButton.UseVisualStyleBackColor = true;
             this.AddBPButton.Click += new System.EventHandler(this.AddBPButton_Click);
@@ -123,41 +130,42 @@
             // DeleteBPButton
             // 
             this.DeleteBPButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.DeleteBPButton.Location = new System.Drawing.Point(584, 0);
+            this.DeleteBPButton.Location = new System.Drawing.Point(877, 0);
+            this.DeleteBPButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.DeleteBPButton.Name = "DeleteBPButton";
-            this.DeleteBPButton.Size = new System.Drawing.Size(24, 24);
-            this.DeleteBPButton.TabIndex = 8;
+            this.DeleteBPButton.Size = new System.Drawing.Size(36, 37);
+            this.DeleteBPButton.TabIndex = 9;
             this.DeleteBPButton.Text = "-";
             this.DeleteBPButton.UseVisualStyleBackColor = true;
             this.DeleteBPButton.Click += new System.EventHandler(this.DeleteBPButton_Click);
             // 
             // stepsLabel
             // 
-            this.stepsLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.stepsLabel.Location = new System.Drawing.Point(192, 0);
+            this.stepsLabel.Location = new System.Drawing.Point(389, 0);
+            this.stepsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.stepsLabel.Name = "stepsLabel";
-            this.stepsLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.stepsLabel.Size = new System.Drawing.Size(64, 24);
+            this.stepsLabel.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
+            this.stepsLabel.Size = new System.Drawing.Size(96, 37);
             this.stepsLabel.TabIndex = 4;
             this.stepsLabel.Text = "Steps (dec)";
             // 
             // StepButton
             // 
-            this.StepButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.StepButton.Location = new System.Drawing.Point(128, 0);
+            this.StepButton.Location = new System.Drawing.Point(296, 0);
+            this.StepButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.StepButton.Name = "StepButton";
-            this.StepButton.Size = new System.Drawing.Size(64, 24);
-            this.StepButton.TabIndex = 2;
+            this.StepButton.Size = new System.Drawing.Size(90, 37);
+            this.StepButton.TabIndex = 3;
             this.StepButton.Text = "Step";
             this.StepButton.UseVisualStyleBackColor = true;
             this.StepButton.Click += new System.EventHandler(this.StepButton_Click);
             // 
             // RunButton
             // 
-            this.RunButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.RunButton.Location = new System.Drawing.Point(64, 0);
+            this.RunButton.Location = new System.Drawing.Point(198, 0);
+            this.RunButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.RunButton.Name = "RunButton";
-            this.RunButton.Size = new System.Drawing.Size(64, 24);
+            this.RunButton.Size = new System.Drawing.Size(90, 37);
             this.RunButton.TabIndex = 1;
             this.RunButton.Text = "Run";
             this.RunButton.UseVisualStyleBackColor = true;
@@ -165,10 +173,10 @@
             // 
             // PauseButton
             // 
-            this.PauseButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.PauseButton.Location = new System.Drawing.Point(0, 0);
+            this.PauseButton.Location = new System.Drawing.Point(99, 0);
+            this.PauseButton.Margin = new System.Windows.Forms.Padding(4, 5, 5, 5);
             this.PauseButton.Name = "PauseButton";
-            this.PauseButton.Size = new System.Drawing.Size(64, 24);
+            this.PauseButton.Size = new System.Drawing.Size(90, 37);
             this.PauseButton.TabIndex = 0;
             this.PauseButton.Text = "Pause";
             this.PauseButton.UseVisualStyleBackColor = true;
@@ -177,31 +185,34 @@
             // locationLabel
             // 
             this.locationLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.locationLabel.Location = new System.Drawing.Point(160, 0);
+            this.locationLabel.Location = new System.Drawing.Point(240, 0);
+            this.locationLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.locationLabel.Name = "locationLabel";
-            this.locationLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.locationLabel.Size = new System.Drawing.Size(64, 24);
-            this.locationLabel.TabIndex = 9;
+            this.locationLabel.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
+            this.locationLabel.Size = new System.Drawing.Size(96, 37);
+            this.locationLabel.TabIndex = 10;
             this.locationLabel.Text = "Location $";
             // 
             // locationInput
             // 
             this.locationInput.Dock = System.Windows.Forms.DockStyle.Left;
             this.locationInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.locationInput.Location = new System.Drawing.Point(224, 0);
+            this.locationInput.Location = new System.Drawing.Point(336, 0);
+            this.locationInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.locationInput.Name = "locationInput";
-            this.locationInput.Size = new System.Drawing.Size(64, 23);
-            this.locationInput.TabIndex = 10;
+            this.locationInput.Size = new System.Drawing.Size(94, 31);
+            this.locationInput.TabIndex = 11;
             this.locationInput.Text = "00:0000";
             this.locationInput.Validated += new System.EventHandler(this.LocationInput_Validated);
             // 
             // JumpButton
             // 
             this.JumpButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.JumpButton.Location = new System.Drawing.Point(96, 0);
+            this.JumpButton.Location = new System.Drawing.Point(144, 0);
+            this.JumpButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.JumpButton.Name = "JumpButton";
-            this.JumpButton.Size = new System.Drawing.Size(64, 24);
-            this.JumpButton.TabIndex = 11;
+            this.JumpButton.Size = new System.Drawing.Size(96, 37);
+            this.JumpButton.TabIndex = 13;
             this.JumpButton.Text = "Jump";
             this.JumpButton.UseVisualStyleBackColor = true;
             this.JumpButton.Click += new System.EventHandler(this.JumpButton_Click);
@@ -212,10 +223,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lastLine.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.lastLine.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lastLine.Location = new System.Drawing.Point(0, 493);
+            this.lastLine.Location = new System.Drawing.Point(0, 758);
+            this.lastLine.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.lastLine.Name = "lastLine";
             this.lastLine.ReadOnly = true;
-            this.lastLine.Size = new System.Drawing.Size(605, 23);
+            this.lastLine.Size = new System.Drawing.Size(906, 31);
             this.lastLine.TabIndex = 4;
             this.lastLine.Text = "Click [Step] to execute an instruction";
             this.lastLine.WordWrap = false;
@@ -226,11 +238,12 @@
             this.stackText.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.stackText.Dock = System.Windows.Forms.DockStyle.Right;
             this.stackText.Font = new System.Drawing.Font("Consolas", 10F);
-            this.stackText.Location = new System.Drawing.Point(608, 0);
+            this.stackText.Location = new System.Drawing.Point(913, 0);
+            this.stackText.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.stackText.Multiline = true;
             this.stackText.Name = "stackText";
             this.stackText.ReadOnly = true;
-            this.stackText.Size = new System.Drawing.Size(150, 512);
+            this.stackText.Size = new System.Drawing.Size(223, 782);
             this.stackText.TabIndex = 3;
             // 
             // UpdateTraceTimer
@@ -244,17 +257,19 @@
             this.SecondPanel.Controls.Add(this.JumpButton);
             this.SecondPanel.Controls.Add(this.ClearTraceButton);
             this.SecondPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.SecondPanel.Location = new System.Drawing.Point(0, 24);
+            this.SecondPanel.Location = new System.Drawing.Point(0, 37);
+            this.SecondPanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.SecondPanel.Name = "SecondPanel";
-            this.SecondPanel.Size = new System.Drawing.Size(608, 24);
+            this.SecondPanel.Size = new System.Drawing.Size(913, 37);
             this.SecondPanel.TabIndex = 5;
             // 
             // ClearTraceButton
             // 
             this.ClearTraceButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.ClearTraceButton.Location = new System.Drawing.Point(0, 0);
+            this.ClearTraceButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ClearTraceButton.Name = "ClearTraceButton";
-            this.ClearTraceButton.Size = new System.Drawing.Size(96, 24);
+            this.ClearTraceButton.Size = new System.Drawing.Size(144, 37);
             this.ClearTraceButton.TabIndex = 12;
             this.ClearTraceButton.Text = "Clear Trace";
             this.ClearTraceButton.UseVisualStyleBackColor = true;
@@ -266,10 +281,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.DebugPanel.Location = new System.Drawing.Point(0, 125);
-            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.DebugPanel.Location = new System.Drawing.Point(0, 192);
             this.DebugPanel.Name = "DebugPanel";
-            this.DebugPanel.Size = new System.Drawing.Size(605, 363);
+            this.DebugPanel.Size = new System.Drawing.Size(906, 557);
             this.DebugPanel.TabIndex = 6;
             this.DebugPanel.TabStop = false;
             this.DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DebugPanel_Paint);
@@ -280,10 +294,9 @@
             this.PlusButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.PlusButton.FlatAppearance.BorderSize = 0;
             this.PlusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.PlusButton.Location = new System.Drawing.Point(99, 200);
-            this.PlusButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlusButton.Location = new System.Drawing.Point(148, 308);
             this.PlusButton.Name = "PlusButton";
-            this.PlusButton.Size = new System.Drawing.Size(18, 18);
+            this.PlusButton.Size = new System.Drawing.Size(27, 28);
             this.PlusButton.TabIndex = 7;
             this.PlusButton.TabStop = false;
             this.PlusButton.Text = "+";
@@ -296,10 +309,9 @@
             this.MinusButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.MinusButton.FlatAppearance.BorderSize = 0;
             this.MinusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.MinusButton.Location = new System.Drawing.Point(118, 200);
-            this.MinusButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.MinusButton.Location = new System.Drawing.Point(177, 308);
             this.MinusButton.Name = "MinusButton";
-            this.MinusButton.Size = new System.Drawing.Size(18, 18);
+            this.MinusButton.Size = new System.Drawing.Size(27, 28);
             this.MinusButton.TabIndex = 8;
             this.MinusButton.TabStop = false;
             this.MinusButton.Text = "-";
@@ -312,10 +324,10 @@
             this.InspectButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.InspectButton.FlatAppearance.BorderSize = 0;
             this.InspectButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.InspectButton.Location = new System.Drawing.Point(137, 200);
-            this.InspectButton.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.InspectButton.Location = new System.Drawing.Point(206, 308);
+            this.InspectButton.Margin = new System.Windows.Forms.Padding(2);
             this.InspectButton.Name = "InspectButton";
-            this.InspectButton.Size = new System.Drawing.Size(38, 18);
+            this.InspectButton.Size = new System.Drawing.Size(57, 28);
             this.InspectButton.TabIndex = 9;
             this.InspectButton.TabStop = false;
             this.InspectButton.Text = "Mem";
@@ -329,10 +341,10 @@
             this.StepOverButton.FlatAppearance.BorderSize = 0;
             this.StepOverButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.StepOverButton.Font = new System.Drawing.Font("Arial Narrow", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StepOverButton.Location = new System.Drawing.Point(176, 200);
-            this.StepOverButton.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.StepOverButton.Location = new System.Drawing.Point(264, 308);
+            this.StepOverButton.Margin = new System.Windows.Forms.Padding(2);
             this.StepOverButton.Name = "StepOverButton";
-            this.StepOverButton.Size = new System.Drawing.Size(21, 18);
+            this.StepOverButton.Size = new System.Drawing.Size(32, 28);
             this.StepOverButton.TabIndex = 10;
             this.StepOverButton.TabStop = false;
             this.StepOverButton.Text = "►";
@@ -349,11 +361,11 @@
             this.HeaderTextbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.HeaderTextbox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.HeaderTextbox.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.HeaderTextbox.Location = new System.Drawing.Point(2, 102);
+            this.HeaderTextbox.Location = new System.Drawing.Point(3, 157);
             this.HeaderTextbox.Margin = new System.Windows.Forms.Padding(0);
             this.HeaderTextbox.Name = "HeaderTextbox";
-            this.HeaderTextbox.Padding = new System.Windows.Forms.Padding(2, 3, 2, 2);
-            this.HeaderTextbox.Size = new System.Drawing.Size(603, 21);
+            this.HeaderTextbox.Padding = new System.Windows.Forms.Padding(3, 5, 3, 3);
+            this.HeaderTextbox.Size = new System.Drawing.Size(904, 32);
             this.HeaderTextbox.TabIndex = 11;
             this.HeaderTextbox.UseCompatibleTextRendering = true;
             this.HeaderTextbox.UseMnemonic = false;
@@ -362,18 +374,29 @@
             // 
             this.registerDisplay1.CPU = null;
             this.registerDisplay1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.registerDisplay1.Location = new System.Drawing.Point(0, 48);
-            this.registerDisplay1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.registerDisplay1.Location = new System.Drawing.Point(0, 74);
+            this.registerDisplay1.Margin = new System.Windows.Forms.Padding(9, 8, 9, 8);
             this.registerDisplay1.Name = "registerDisplay1";
-            this.registerDisplay1.Size = new System.Drawing.Size(608, 53);
+            this.registerDisplay1.Size = new System.Drawing.Size(913, 82);
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 
+            // cbDebug
+            // 
+            this.cbDebug.AutoSize = true;
+            this.cbDebug.Location = new System.Drawing.Point(13, 5);
+            this.cbDebug.Name = "cbDebug";
+            this.cbDebug.Size = new System.Drawing.Size(83, 24);
+            this.cbDebug.TabIndex = 10;
+            this.cbDebug.Text = "Debug";
+            this.cbDebug.UseVisualStyleBackColor = true;
+            this.cbDebug.CheckedChanged += new System.EventHandler(this.cbDebug_CheckedChanged);
+            // 
             // CPUWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(758, 512);
+            this.ClientSize = new System.Drawing.Size(1136, 782);
             this.Controls.Add(this.HeaderTextbox);
             this.Controls.Add(this.StepOverButton);
             this.Controls.Add(this.InspectButton);
@@ -388,8 +411,9 @@
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(1280, 0);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(779, 564);
+            this.MaximumSize = new System.Drawing.Size(1158, 838);
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "CPU Window";
@@ -433,5 +457,6 @@
         private System.Windows.Forms.Button InspectButton;
         private System.Windows.Forms.Button StepOverButton;
         private System.Windows.Forms.Label HeaderTextbox;
+        private System.Windows.Forms.CheckBox cbDebug;
     }
 }

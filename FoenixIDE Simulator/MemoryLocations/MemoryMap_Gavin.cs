@@ -69,8 +69,10 @@ namespace FoenixIDE.MemoryLocations
         public const int COM2_START = 0xAF_12F8;
         public const int COM2_END = 0xAF_12FF;
 
-        public const int MPU401_START = 0xAF_1330;
-        public const int MPU401_END = 0xAF_1331;
+        public const int MIDI_MPU401_START = 0xAF_1330;
+        public const int MIDI_MPU401_END = 0xAF_1331;
+        public const int MIDI_DATA = 0xAF_1330;
+        public const int MIDI_STATUS_CONTROL = 0xAD_1331;
 
         public const int LPT_START = 0xAF_1378;
         public const int LPT_END = 0xAF_137F;

@@ -18,7 +18,7 @@ namespace FoenixIDE.Processor
     {
         const int BANKSIZE = 0x10000;
         const int PAGESIZE = 0x100;
-        private OpcodeList opcodes = null;
+        public static OpcodeList opcodes = null;
         private Operations operations = null;
 
         //public DateTime StartTime = DateTime.MinValue;
@@ -107,7 +107,7 @@ namespace FoenixIDE.Processor
             this.clockCyles = 0;
             this.operations = new Operations(this);
             operations.SimulatorCommand += Operations_SimulatorCommand;
-            this.opcodes = new OpcodeList(this.operations, this);
+            /*this.*/opcodes = new OpcodeList(this.operations, this);
             this.Flags.Emulation = true;
         }
 
@@ -149,15 +149,16 @@ namespace FoenixIDE.Processor
         /// </summary>
         public bool ExecuteNext()
         {
-            if (Pins.Ready_)
-                return false;
-            if (Waiting)
-                return false;
-
-            if (this.Pins.getInterruptPinActive)
+            // Check for any 'Control Pin' (reset, IRQ, etc.)
+            if (this.Pins.GetCtrlPins == true)
             {
-                if (ServiceHardwareInterrupt())
+                if (Pins.Ready_ || Pins.Reset)
                 {
+                    return false;
+                }
+                else
+                {
+                    ServiceHardwareInterrupt();
                     return true;
                 }
             }
