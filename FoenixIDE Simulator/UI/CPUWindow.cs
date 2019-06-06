@@ -93,7 +93,7 @@ namespace FoenixIDE.UI
                     StepOver = (opcodes.StartsWith("B") || opcodes.StartsWith("J"));
                     evaled = string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), OpCodes, state);
                 }
-                return evaled; 
+                return evaled;
             }
 
             /// <summary>
@@ -144,6 +144,7 @@ namespace FoenixIDE.UI
                     int col = 12;
                     e.Graphics.FillRectangle(lightBlueBrush, col, row * ROW_HEIGHT, 7 * 6, 14);
                 }
+
                 foreach (DebugLine line in queue)
                 {
                     if (line != null)
@@ -425,9 +426,9 @@ namespace FoenixIDE.UI
         public void ExecuteStep()
         {
             StepCounter++;
+            int currentPC = kernel.CPU.GetLongPC(); // PC before executing next instruction
 
-            int currentPC = kernel.CPU.GetLongPC();
-            if (!kernel.CPU.ExecuteNext() && debugRun)
+            if (!kernel.CPU.ExecuteNext() && debugRun) // now instruction is executed
             {
                 // need to grab the actual command now as it could change
                 // if self-modifying code is being run
@@ -437,6 +438,7 @@ namespace FoenixIDE.UI
                     command[i] = kernel.Memory.RAM.ReadByte(currentPC + i);
                 }
 
+                // the PC in snapshot is for next instruction 
                 DebugLine line = new DebugLine(currentPC, command, kernel.CPU.snapshot);
                 queue.Enqueue(line);
 
@@ -504,7 +506,9 @@ namespace FoenixIDE.UI
             {
                 BPCombo.Items.Add(bp.Value);
             }
+
             BPCombo.EndUpdate();
+
             foreach (DebugLine line in queue)
             {
                 if (line.PC == newDebugLine)
@@ -512,6 +516,7 @@ namespace FoenixIDE.UI
                     line.isBreakpoint = state;
                 }
             }
+
             DebugPanel.Refresh();
         }
 
