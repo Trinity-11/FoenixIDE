@@ -106,7 +106,6 @@ namespace FoenixIDE.UI
                 cpu = cpuSnapshot;
             }
 
-
             /// <summary>
             /// Helper method to let outside functioned access command length
             /// </summary>
@@ -426,10 +425,16 @@ namespace FoenixIDE.UI
         public void ExecuteStep()
         {
             StepCounter++;
-            int currentPC = kernel.CPU.GetLongPC(); // PC before executing next instruction
 
-            if (!kernel.CPU.ExecuteNext() && debugRun) // now instruction is executed
+            if (!debugRun)
             {
+                kernel.CPU.ExecuteNext();
+            }
+            else
+            { 
+                int currentPC = kernel.CPU.GetLongPC(); // PC before executing next instruction
+                kernel.CPU.ExecuteNext();
+
                 // need to grab the actual command now as it could change
                 // if self-modifying code is being run
                 byte[] command = new byte[kernel.CPU.OpcodeLength];
