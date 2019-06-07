@@ -165,7 +165,7 @@ namespace FoenixIDE.Processor
 
             opcodeByte = GetNextInstruction();
             this.Opcode = Decode(opcodeByte);
-            PC.Value += OpcodeLength;
+            PC.Value += this.OpcodeLength;
             Opcode.Execute(SignatureBytes);
             clockCyles += OpcodeCycles;
             return false;
@@ -251,23 +251,24 @@ namespace FoenixIDE.Processor
 
         public int ReadSignature(OpCode oc)
         {
-            int s = 0;
             if (oc.Length == 2)
-                s = GetNextByte(0);
+            {
+                return Memory.ReadByte(GetLongPC() + 1);
+            }
             else if (oc.Length == 3)
-                s = GetNextWord(0);
+            {
+                return Memory.ReadWord(GetLongPC() + 1);
+            }
             else if (oc.Length == 4)
-                s = GetNextLong(0);
+            { 
+                return Memory.ReadLong(GetLongPC() + 1);
+            }
 
-            return s;
+           return 0;
         }
 
         private byte GetNextInstruction()
         {
-            //int address = GetLongPC();
-            //byte ret = Memory[address];
-            //return ret;
-
             return Memory[GetLongPC()];
         }
 
@@ -279,8 +280,7 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         private byte GetNextByte(int offset = 0)
         {
-            int address = GetLongPC();
-            return Memory.ReadByte(address + offset + 1);
+            return Memory.ReadByte(GetLongPC() + offset + 1);
         }
 
         /// <summary>
@@ -297,8 +297,7 @@ namespace FoenixIDE.Processor
 
         private int GetNextLong(int offset)
         {
-            int address = GetLongPC();
-            return Memory.ReadLong(address + offset + 1);
+            return Memory.ReadLong(GetLongPC() + offset + 1);
         }
 
         /// <summary>

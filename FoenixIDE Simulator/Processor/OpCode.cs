@@ -63,6 +63,7 @@ namespace FoenixIDE.Processor
 
                 return Length8Bit;
             }
+
         }
 
         public override string ToString()
