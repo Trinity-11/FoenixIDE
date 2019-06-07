@@ -165,8 +165,16 @@ namespace FoenixIDE.Simulator.Basic
                     return ScanCode.sc_equals;
                 case Keys.Tab:
                     return ScanCode.sc_tab;
-                case Keys.Divide:
+                case Keys.Oem2:
                     return ScanCode.sc_slash;
+                case Keys.Oem5:
+                    return ScanCode.sc_backslash;
+                case Keys.ShiftKey:
+                    return ScanCode.sc_shiftLeft;
+                case Keys.Alt:
+                    return ScanCode.sc_altLeft;
+                case Keys.ControlKey:
+                    return ScanCode.sc_controlLeft;
             }
             return ScanCode.sc_null;
         }
