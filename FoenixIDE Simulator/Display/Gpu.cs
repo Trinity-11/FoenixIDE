@@ -106,8 +106,18 @@ namespace FoenixIDE.Display
         static string MEASURE_STRING = new string('W', 80);
 
         Timer timer = new Timer();
-        bool CursorEnabled = true;
+
         bool CursorState = true;
+        private bool CursorEnabled
+        {
+            get
+            {
+                if (RAM == null)
+                    return false;
+
+                return (IO.ReadByte(MemoryMap.VKY_TXT_CURSOR_CTRL_REG - MemoryMap.IO_START) & 1) == 1;
+            }
+        }
 
         private int GetCharPos(int row, int col)
         {
@@ -356,8 +366,8 @@ namespace FoenixIDE.Display
             int border_register = IO.ReadByte(4);
             bool displayBorder = (border_register & 1) == 1;
 
-            int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
-            int rowOffset = (60 - LinesVisible) / 2 * charWidth;
+            int colOffset = IO.ReadByte(8);
+            int rowOffset = IO.ReadByte(9);
 
             // Load Graphical LUTs
             graphicsLUT = LoadLUT(IO);
@@ -436,13 +446,13 @@ namespace FoenixIDE.Display
             if ((MCRegister & 0x1) == 0x1)
             {
                 int top = 0;
-                if (ColumnsVisible < 1 || ColumnsVisible > 128)
+                if (ColumnsVisible < 1 || ColumnsVisible > MAX_TEXT_COLS)
                 {
                     Graphics graphics = Graphics.FromImage(frameBuffer);
                     DrawTextWithBackground("ColumnsVisible invalid:" + ColumnsVisible.ToString(), graphics, Color.Black, 0, top);
                     top += 12;
                 }
-                if (LinesVisible < 1)
+                if (LinesVisible < 1 || LinesVisible > MAX_TEXT_LINES)
                 {
                     Graphics graphics = Graphics.FromImage(frameBuffer);
                     DrawTextWithBackground("LinesVisible invalid:" + LinesVisible.ToString(), graphics, Color.Black, 0, top);
@@ -450,7 +460,7 @@ namespace FoenixIDE.Display
                 }
                 if (top == 0)
                 {
-                    DrawBitmapText(frameBuffer);
+                    DrawBitmapText(frameBuffer, colOffset, rowOffset);
                 }
             }
             // Overlay Mode - no need for this, the Text drawing method takes care of this
@@ -517,7 +527,7 @@ namespace FoenixIDE.Display
         }
 
         int lastWidth = 0;
-        private void DrawBitmapText(Bitmap bitmap)
+        private void DrawBitmapText(Bitmap bitmap, int colOffset, int rowOffset)
         {
             if (lastWidth != ColumnsVisible
                 && ColumnsVisible > 0
@@ -528,7 +538,7 @@ namespace FoenixIDE.Display
             bool overlayBitSet = (IO.ReadByte(0) & 0x02) == 0x02;
 
             // We're hard-coding this for now.
-            int lines = 52;
+            int lines = LinesVisible;
 
 
             int x;
@@ -542,10 +552,8 @@ namespace FoenixIDE.Display
 
             int col = 0, line = 0;
 
-            int colOffset = (80 - ColumnsVisible) / 2 * charWidth;
             int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
             int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
-            int lineOffset = (60 - lines) / 2 * charHeight;
             int fontBaseAddress = MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START - IO.StartAddress;
             Rectangle rect = new Rectangle(0, 0, 640, 480);
             BitmapData bitmapData = bitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
@@ -559,7 +567,15 @@ namespace FoenixIDE.Display
                 for (col = 0; col < ColumnsVisible; col++)
                 {
                     x = col * charWidth + colOffset;
-                    y = line * charHeight + lineOffset;
+                    y = line * charHeight + rowOffset;
+                    if (x > 639 - colOffset)
+                    {
+                        continue;
+                    }
+                    if (y > 479 - rowOffset)
+                    {
+                        break;
+                    }
 
                     // Each character will have foreground and background colors
                     byte character = IO.ReadByte(textAddr++);
@@ -593,11 +609,10 @@ namespace FoenixIDE.Display
                     int fgValue = (int)((fgValueBlue << 16) + (fgValueGreen << 8) + fgValueRed + 0xFF000000);
                     int bgValue = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
 
-
                     // Each character is defined by 8 bytes
                     for (int i = 0; i < 8; i++)
                     {
-                        int offset = (x + (y + i )* 640 ) * 4;
+                        int offset = (x + (y + i ) * 640 ) * 4;
                         byte value = IO.ReadByte(fontBaseAddress + character * 8 + i);
                         if ((value & 0x80) == 0x80)
                         {

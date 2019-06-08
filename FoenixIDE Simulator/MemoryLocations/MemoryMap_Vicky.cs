@@ -12,6 +12,7 @@ namespace FoenixIDE.MemoryLocations
         // c# Direct page Addresses
 
         public const int VKY_TXT_CURSOR_CHAR_REG = 0xAF_0012;
+        public const int VKY_TXT_CURSOR_CTRL_REG = 0xAF_0010;
 
         public const int RTC_SEC = 0xAF_0800; // Seconds Register
         public const int RTC_SEC_ALARM = 0xAF_0801; // Seconds Alarm Register
