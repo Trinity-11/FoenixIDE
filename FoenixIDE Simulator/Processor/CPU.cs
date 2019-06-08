@@ -291,8 +291,7 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         private int GetNextWord(int offset)
         {
-            int address = GetLongPC();
-            return Memory.ReadWord(address + offset + 1);
+            return Memory.ReadWord(GetLongPC() + offset + 1);
         }
 
         private int GetNextLong(int offset)
@@ -411,8 +410,9 @@ namespace FoenixIDE.Processor
                 throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
 
             Stack.Value -= bytes;
-            int address = Stack.Value + 1;
-            Memory.Write(address, value, bytes);
+            //int address = Stack.Value + 1;
+            //Memory.Write(address, value, bytes);
+            Memory.Write(Stack.Value + 1, value, bytes);
         }
 
         public void Push(Register Reg, int Offset)
@@ -430,8 +430,8 @@ namespace FoenixIDE.Processor
             if (bytes < 1 || bytes > 3)
                 throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
 
-            int address = Stack.Value + 1;
-            int ret = Memory.Read(address, bytes);
+            //int address = Stack.Value + 1;
+            int ret = Memory.Read(Stack.Value + 1, bytes);
             Stack.Value += bytes;
             return ret;
         }
