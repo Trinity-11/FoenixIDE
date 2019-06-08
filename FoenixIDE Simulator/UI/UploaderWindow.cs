@@ -188,7 +188,7 @@ namespace FoenixIDE.UI
             int transmissionSize = GetTransmissionSize();
             EmuSrcSize.Enabled = BlockSendRadio.Checked;
             EmuSrcAddress.Enabled = BlockSendRadio.Checked;
-            if (FileNameTextBox.Text.Length == 0)
+            if (FileNameTextBox.Text.Length == 0 || BlockSendRadio.Checked)
             {
                 C256DestAddress.Enabled = (transmissionSize > 0 || BlockSendRadio.Checked);
             }
@@ -227,14 +227,17 @@ namespace FoenixIDE.UI
                     int FnxAddressPtr = int.Parse(C256DestAddress.Text.Replace(":", ""), System.Globalization.NumberStyles.AllowHexSpecifier);
                     Console.WriteLine("Starting Address: " + FnxAddressPtr);
                     Console.WriteLine("Size of File: " + transmissionSize);
-                    SendData(DataBuffer, FnxAddressPtr, transmissionSize);
+                    SendData(DataBuffer, FnxAddressPtr, transmissionSize, DebugModeCheckbox.Checked);
                 }
                 else
                 {
                     if (serial.IsOpen)
                     {
                         // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
-                        GetFnxInDebugMode();
+                        if (DebugModeCheckbox.Checked)
+                        {
+                            GetFnxInDebugMode();
+                        }
 
                         // If send HEX files, each time we encounter a "bank" change - record 04 - send a new data block
                         string[] lines = System.IO.File.ReadAllLines(FileNameTextBox.Text);
@@ -284,14 +287,16 @@ namespace FoenixIDE.UI
                             }
                         }
 
-                        // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                        if (resetVector)
+                        if (DebugModeCheckbox.Checked)
                         {
-                            PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                            if (resetVector)
+                            {
+                                PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            }
+                            // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
+                            ExitFnxDebugMode();
                         }
-                        // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
-                        ExitFnxDebugMode();
-
                         MessageBox.Show("Transfer Done! System Reset!", "Send Binary Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
@@ -307,13 +312,13 @@ namespace FoenixIDE.UI
                 {
                     DataBuffer[offset++] = Memory.ReadByte(start);
                 }
-                SendData(DataBuffer, FnxAddressPtr, transmissionSize);
+                SendData(DataBuffer, FnxAddressPtr, transmissionSize, DebugModeCheckbox.Checked);
             }
             else
             {
                 int blockAddress = Convert.ToInt32(C256SrcAddress.Text.Replace(":", ""), 16);
                 byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
-                if (FetchData(DataBuffer, blockAddress, transmissionSize))
+                if (FetchData(DataBuffer, blockAddress, transmissionSize, DebugModeCheckbox.Checked))
                 {
                     MemoryRAM mem = new MemoryRAM(blockAddress, transmissionSize);
                     mem.Load(DataBuffer, 0, 0, transmissionSize);
@@ -333,14 +338,17 @@ namespace FoenixIDE.UI
             DisconnectButton.Enabled = true;
         }
 
-        private void SendData(byte[] buffer, int startAddress, int size)
+        private void SendData(byte[] buffer, int startAddress, int size, bool debugMode)
         {
             try
             {
                 if (serial.IsOpen)
                 {
                     // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
-                    GetFnxInDebugMode();
+                    if (debugMode)
+                    {
+                        GetFnxInDebugMode();
+                    }
                     // Now's let's transfer the code
                     if (size <= 2048)
                     {
@@ -370,14 +378,17 @@ namespace FoenixIDE.UI
                         }
                     }
 
-                    // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                    if (startAddress < 0xFF00 && (startAddress + buffer.Length) > 0xFFFF || (startAddress == 0x18_0000 && buffer.Length > 0xFFFF))
+                    if (debugMode)
                     {
-                        PreparePacket2Write(buffer, 0x00FF00, 0x00FF00, 256);
-                    }
+                        // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                        if (startAddress < 0xFF00 && (startAddress + buffer.Length) > 0xFFFF || (startAddress == 0x18_0000 && buffer.Length > 0xFFFF))
+                        {
+                            PreparePacket2Write(buffer, 0x00FF00, 0x00FF00, 256);
+                        }
 
-                    // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
-                    ExitFnxDebugMode();
+                        // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
+                        ExitFnxDebugMode();
+                    }
 
                     MessageBox.Show("Transfer Done! System Reset!", "Send Binary Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -389,14 +400,18 @@ namespace FoenixIDE.UI
             }
         }
 
-        private bool FetchData(byte[] buffer, int startAddress, int size)
+        private bool FetchData(byte[] buffer, int startAddress, int size, bool debugMode)
         {
             bool success = false;
             try
             {
                 if (serial.IsOpen)
                 {
-                    GetFnxInDebugMode();
+                    if (debugMode)
+                    {
+                        GetFnxInDebugMode();
+                    }
+                    
                     if (size < 2048)
                     {
                         PreparePacket2Read(buffer, startAddress, 0, size);
@@ -420,9 +435,11 @@ namespace FoenixIDE.UI
                             UploadProgressBar.Increment(BufferSize);
                         }
                     }
-                    
 
-                    ExitFnxDebugMode();
+                    if (debugMode)
+                    {
+                        ExitFnxDebugMode();
+                    }
                     success = true;
                 }
             }
@@ -520,7 +537,7 @@ namespace FoenixIDE.UI
                 commandBuffer[4] = (byte)(address & 0xFF); //Address Lo
                 commandBuffer[5] = (byte)(size >> 8); //Size HI
                 commandBuffer[6] = (byte)(size & 0xFF); //Size LO
-                commandBuffer[7] = 0x5A;
+                commandBuffer[7] = XorCheck(commandBuffer);
 
                 byte[] partialBuffer = new byte[size];
                 SendMessage(commandBuffer, partialBuffer);
@@ -528,10 +545,18 @@ namespace FoenixIDE.UI
             }
         }
 
+        private byte XorCheck(byte[] buffer)
+        {
+            byte check = buffer[0];
+            for (int i = 1; i < buffer.Length; i++)
+            {
+                check ^= buffer[i];
+            }
+            return check;
+        }
         public void SendMessage(byte[] command, byte[] data)
         {
             //            int dwStartTime = System.Environment.TickCount;
-            int i;
             byte byte_buffer;
 
             serial.Write(command, 0, command.Length);
@@ -553,7 +578,7 @@ namespace FoenixIDE.UI
                 Stat1 = (byte)serial.ReadByte();
                 if (data != null)
                 {
-                    for (i = 0; i < data.Length; i++)
+                    for (int i = 0; i < data.Length; i++)
                     {
                         data[i] = (byte)serial.ReadByte();
                     }
@@ -562,7 +587,7 @@ namespace FoenixIDE.UI
             }
 
             RxProcessLRC(data);
-            Console.WriteLine("Recieve Data LRC:" + RxLRC);
+            Console.WriteLine("Receive Data LRC:" + RxLRC);
         }
 
         public int TxProcessLRC(byte[] buffer)

@@ -56,6 +56,7 @@
             this.C256SrcAddress = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
+            this.DebugModeCheckbox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // ConnectButton
@@ -196,7 +197,7 @@
             this.SendFileRadio.AutoSize = true;
             this.SendFileRadio.Checked = true;
             this.SendFileRadio.Location = new System.Drawing.Point(15, 47);
-            this.SendFileRadio.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SendFileRadio.Margin = new System.Windows.Forms.Padding(2);
             this.SendFileRadio.Name = "SendFileRadio";
             this.SendFileRadio.Size = new System.Drawing.Size(69, 17);
             this.SendFileRadio.TabIndex = 12;
@@ -209,7 +210,7 @@
             // 
             this.BlockSendRadio.AutoSize = true;
             this.BlockSendRadio.Location = new System.Drawing.Point(15, 82);
-            this.BlockSendRadio.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BlockSendRadio.Margin = new System.Windows.Forms.Padding(2);
             this.BlockSendRadio.Name = "BlockSendRadio";
             this.BlockSendRadio.Size = new System.Drawing.Size(120, 17);
             this.BlockSendRadio.TabIndex = 13;
@@ -289,7 +290,7 @@
             // 
             this.FetchRadio.AutoSize = true;
             this.FetchRadio.Location = new System.Drawing.Point(15, 140);
-            this.FetchRadio.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FetchRadio.Margin = new System.Windows.Forms.Padding(2);
             this.FetchRadio.Name = "FetchRadio";
             this.FetchRadio.Size = new System.Drawing.Size(122, 17);
             this.FetchRadio.TabIndex = 20;
@@ -300,7 +301,7 @@
             // C256SrcSize
             // 
             this.C256SrcSize.Enabled = false;
-            this.C256SrcSize.Location = new System.Drawing.Point(394, 140);
+            this.C256SrcSize.Location = new System.Drawing.Point(394, 138);
             this.C256SrcSize.Margin = new System.Windows.Forms.Padding(2);
             this.C256SrcSize.MaxLength = 7;
             this.C256SrcSize.Name = "C256SrcSize";
@@ -333,7 +334,7 @@
             // C256SrcAddress
             // 
             this.C256SrcAddress.Enabled = false;
-            this.C256SrcAddress.Location = new System.Drawing.Point(272, 140);
+            this.C256SrcAddress.Location = new System.Drawing.Point(272, 138);
             this.C256SrcAddress.Margin = new System.Windows.Forms.Padding(2);
             this.C256SrcAddress.MaxLength = 7;
             this.C256SrcAddress.Name = "C256SrcAddress";
@@ -363,12 +364,25 @@
             this.label7.TabIndex = 23;
             this.label7.Text = "$";
             // 
+            // DebugModeCheckbox
+            // 
+            this.DebugModeCheckbox.AutoSize = true;
+            this.DebugModeCheckbox.Checked = true;
+            this.DebugModeCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.DebugModeCheckbox.Location = new System.Drawing.Point(15, 105);
+            this.DebugModeCheckbox.Name = "DebugModeCheckbox";
+            this.DebugModeCheckbox.Size = new System.Drawing.Size(88, 17);
+            this.DebugModeCheckbox.TabIndex = 27;
+            this.DebugModeCheckbox.Text = "Debug Mode";
+            this.DebugModeCheckbox.UseVisualStyleBackColor = true;
+            // 
             // UploaderWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(472, 200);
+            this.Controls.Add(this.DebugModeCheckbox);
             this.Controls.Add(this.C256DestAddress);
             this.Controls.Add(this.C256SrcAddress);
             this.Controls.Add(this.EmuSrcAddress);
@@ -440,5 +454,6 @@
         private System.Windows.Forms.TextBox C256SrcAddress;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.CheckBox DebugModeCheckbox;
     }
 }
