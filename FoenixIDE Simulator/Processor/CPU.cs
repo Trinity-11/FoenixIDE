@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ namespace FoenixIDE.Processor
 {
     /// <summary>
     /// Operations. This class encompasses the CPU operations and the support routines needed to execute
-    /// the operaitons. Execute reads a single opcode from memory, along with its data bytes, then 
+    /// the operations. Execute reads a single opcode from memory, along with its data bytes, then 
     /// executes that single step. The virtual CPU state is retained until Execute is called again. 
     /// </summary>
     public partial class CPU
@@ -19,16 +19,8 @@ namespace FoenixIDE.Processor
         const int BANKSIZE = 0x10000;
         const int PAGESIZE = 0x100;
         private OpcodeList opcodes = null;
-        private Operations operations = null;
 
-        //public DateTime StartTime = DateTime.MinValue;
-        //public DateTime StopTime = DateTime.MinValue;
-
-        /// <summary>
-        /// Currently executing opcode 
-        /// </summary>
-        public byte opcodeByte = 0;
-        public OpCode Opcode = null;
+        public OpCode CurrentOpcode = null;
         public int SignatureBytes = 0;
 
         public CPUPins Pins = new CPUPins();
@@ -83,7 +75,7 @@ namespace FoenixIDE.Processor
             }
         }
 
-        public int[] snapshot
+        public int[] Snapshot
         {
             get
             {
@@ -102,13 +94,13 @@ namespace FoenixIDE.Processor
 
         public CPU(MemoryManager newMemory)
         {
-            this.Memory = newMemory;
-            this.clockSpeed = 14000000;
-            this.clockCyles = 0;
-            this.operations = new Operations(this);
+            Memory = newMemory;
+            clockSpeed = 14000000;
+            clockCyles = 0;
+            Operations operations = new Operations(this);
             operations.SimulatorCommand += Operations_SimulatorCommand;
-            this.opcodes = new OpcodeList(this.operations, this);
-            this.Flags.Emulation = true;
+            opcodes = new OpcodeList(operations, this);
+            Flags.Emulation = true;
         }
 
         private void Operations_SimulatorCommand(int EventID)
@@ -162,10 +154,13 @@ namespace FoenixIDE.Processor
                 }
             }
 
-            opcodeByte = GetNextInstruction();
-            this.Opcode = Decode(opcodeByte);
+            CurrentOpcode = opcodes[GetNextInstruction()];
+            OpcodeLength = CurrentOpcode.Length;
+            OpcodeCycles = 1;
+            SignatureBytes = ReadSignature(CurrentOpcode);
+
             PC.Value += OpcodeLength;
-            Opcode.Execute(SignatureBytes);
+            CurrentOpcode.Execute(SignatureBytes);
             clockCyles += OpcodeCycles;
             return false;
         }
@@ -235,49 +230,30 @@ namespace FoenixIDE.Processor
         /// </summary>
         public OpCode PreFetch()
         {
-            opcodeByte = GetNextInstruction();
-            return opcodes[opcodeByte];
-        }
-
-        public OpCode Decode(byte instruction)
-        {
-            OpCode oc = opcodes[opcodeByte];
-            OpcodeLength = oc.Length;
-            OpcodeCycles = 1;
-            SignatureBytes = ReadSignature(oc);
-            return oc;
+            return opcodes[GetNextInstruction()];
         }
 
         public int ReadSignature(OpCode oc)
         {
-            int s = 0;
             if (oc.Length == 2)
-                s = GetNextByte(0);
+            {
+                return Memory.ReadByte(GetLongPC() + 1);
+            }
             else if (oc.Length == 3)
-                s = GetNextWord(0);
+            {
+                return Memory.ReadWord(GetLongPC() + 1);
+            }
             else if (oc.Length == 4)
-                s = GetNextLong(0);
+            { 
+                return Memory.ReadLong(GetLongPC() + 1);
+            }
 
-            return s;
+           return 0;
         }
 
         private byte GetNextInstruction()
         {
-            int address = GetLongPC();
-            byte ret = Memory[address];
-            return ret;
-        }
-
-        /// <summary>
-        /// Retrieves the next byte from the instruction stream. 
-        /// Set offset=0 for the first byte after the executing opcode.
-        /// </summary>
-        /// <param name="offset"></param>
-        /// <returns></returns>
-        private byte GetNextByte(int offset = 0)
-        {
-            int address = GetLongPC();
-            return Memory.ReadByte(address + offset + 1);
+            return Memory[GetLongPC()];
         }
 
         /// <summary>
@@ -288,14 +264,12 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         private int GetNextWord(int offset)
         {
-            int address = GetLongPC();
-            return Memory.ReadWord(address + offset + 1);
+            return Memory.ReadWord(GetLongPC() + offset + 1);
         }
 
         private int GetNextLong(int offset)
         {
-            int address = GetLongPC();
-            return Memory.ReadLong(address + offset + 1);
+            return Memory.ReadLong(GetLongPC() + offset + 1);
         }
 
         /// <summary>
@@ -409,8 +383,7 @@ namespace FoenixIDE.Processor
                 throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
 
             Stack.Value -= bytes;
-            int address = Stack.Value + 1;
-            Memory.Write(address, value, bytes);
+            Memory.Write(Stack.Value + 1, value, bytes);
         }
 
         public void Push(Register Reg, int Offset)
@@ -428,8 +401,7 @@ namespace FoenixIDE.Processor
             if (bytes < 1 || bytes > 3)
                 throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
 
-            int address = Stack.Value + 1;
-            int ret = Memory.Read(address, bytes);
+            int ret = Memory.Read(Stack.Value + 1, bytes);
             Stack.Value += bytes;
             return ret;
         }

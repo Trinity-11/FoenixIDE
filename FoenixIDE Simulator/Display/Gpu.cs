@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
-using System.Linq;
+
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Text;
@@ -13,20 +13,14 @@ using FoenixIDE.MemoryLocations;
 
 namespace FoenixIDE.Display
 {
-    public partial class Gpu : UserControl, IMappable
+    public partial class Gpu : UserControl
     {
-        //public event KeyPressEventHandler KeyPressed;
 
         private const int REGISTER_BLOCK_SIZE = 256;
         const int MAX_TEXT_COLS = 128;
         const int MAX_TEXT_LINES = 64;
         const int SCREEN_PAGE_SIZE = 128 * 64;
-        const int IO_BASE_ADDR = 0xAF_0000;
-        const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0100;
-        const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0140;
-        const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
-        const int GRP_LUT_BASE_ADDR = 0xAF_2000;
-        const int GAMMA_BASE_ADDR = 0xAF_4000;
+        
         const int charWidth = 8;
         const int charHeight = 8;
         const int tileSize = 16;
@@ -35,57 +29,14 @@ namespace FoenixIDE.Display
         int[,] graphicsLUT = null;
         byte[,] gammaCorrection = null;
 
-        private int length = 128 * 64 * 2; //Text mode uses 16K, 1 page for text, the other for colors.
-
         public MemoryRAM VRAM = null;
         public MemoryRAM RAM = null;
-        public MemoryRAM IO = null;
+        public MemoryRAM VICKY = null;
         public int paintCycle = 0;
         private bool tileEditorMode = false;
         public bool MousePointerMode = false;
         public delegate void StartOfFramEvent();
         public StartOfFramEvent StartOfFrame;
-
-        public int StartAddress
-        {
-            get
-            {
-                return MemoryLocations.MemoryMap.SCREEN_PAGE0;
-            }
-        }
-
-        public int Length
-        {
-            get
-            {
-                return length;
-            }
-        }
-
-        public int EndAddress
-        {
-            get
-            {
-                return StartAddress + length - 1;
-            }
-        }
-
-        public bool TileEditorMode
-        {
-            get
-            {
-                return tileEditorMode;
-            }
-            set
-            {
-                tileEditorMode = value;
-            }
-        }
-
-        //private int colorMatrixStart = 6096;
-        //private int attributeStart = 8096;
-
-        //public List<CharacterSet> CharacterSetSlots = new List<CharacterSet>();
 
         /// <summary>
         /// number of frames to wait to refresh the screen.
@@ -115,7 +66,19 @@ namespace FoenixIDE.Display
                 if (RAM == null)
                     return false;
 
-                return (IO.ReadByte(MemoryMap.VKY_TXT_CURSOR_CTRL_REG - MemoryMap.IO_START) & 1) == 1;
+                return (VICKY.ReadByte(MemoryMap.VKY_TXT_CURSOR_CTRL_REG - MemoryMap.VICKY_START) & 1) == 1;
+            }
+        }
+
+        public bool TileEditorMode
+        {
+            get
+            {
+                return tileEditorMode;
+            }
+            set
+            {
+                tileEditorMode = value;
             }
         }
 
@@ -251,7 +214,6 @@ namespace FoenixIDE.Display
             }
         }
 
-
         public Gpu()
         {
             InitializeComponent();
@@ -263,7 +225,7 @@ namespace FoenixIDE.Display
             this.SetScreenSize(80, 60);
             this.Paint += new PaintEventHandler(Gpu_Paint);
             timer.Tick += new EventHandler(Timer_Tick);
-            timer.Interval = 1000 / 60;
+            timer.Interval = (int)(1000 / 60);
             this.VisibleChanged += new EventHandler(FrameBufferControl_VisibleChanged);
             this.DoubleBuffered = true;
 
@@ -286,13 +248,11 @@ namespace FoenixIDE.Display
             }
         }
 
-        
         public void ResetDrawTimer()
         {
             RefreshTimer = 0;
             CursorState = true;
         }
-
 
         public int BufferSize
         {
@@ -334,7 +294,7 @@ namespace FoenixIDE.Display
         {
             paintCycle++;
 
-            if (IO == null)
+            if (VICKY == null)
             {
                 e.Graphics.DrawString("IO Memory Not Initialized", this.Font, TextBrush, 0, 0);
                 return;
@@ -350,7 +310,7 @@ namespace FoenixIDE.Display
                 return;
             }
             // Read the Master Control Register
-            byte MCRegister = IO.ReadByte(0); // Reading address $AF:0000
+            byte MCRegister = VICKY.ReadByte(0); // Reading address $AF:0000
             if (MCRegister == 0 || (MCRegister & 0x80) == 0x80)
             {
                 e.Graphics.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
@@ -363,19 +323,19 @@ namespace FoenixIDE.Display
             Graphics g = Graphics.FromImage(frameBuffer);
 
             // Determine if we display a border
-            int border_register = IO.ReadByte(4);
+            int border_register = VICKY.ReadByte(4);
             bool displayBorder = (border_register & 1) == 1;
 
-            int colOffset = IO.ReadByte(8);
-            int rowOffset = IO.ReadByte(9);
+            int colOffset = VICKY.ReadByte(8);
+            int rowOffset = VICKY.ReadByte(9);
 
             // Load Graphical LUTs
-            graphicsLUT = LoadLUT(IO);
+            graphicsLUT = LoadLUT(VICKY);
 
             // Apply gamma correct
             if ((MCRegister & 0x40) == 0x40)
             {
-                gammaCorrection = LoadGammaCorrection(IO);
+                gammaCorrection = LoadGammaCorrection(VICKY);
             }
             else
             {
@@ -384,9 +344,9 @@ namespace FoenixIDE.Display
 
             // Default background color to border color
             // In Text mode, the border color is stored at $AF:0005.
-            byte borderRed = IO.ReadByte(5);
-            byte borderGreen = IO.ReadByte(6);
-            byte borderBlue = IO.ReadByte(7);
+            byte borderRed = VICKY.ReadByte(5);
+            byte borderGreen = VICKY.ReadByte(6);
+            byte borderBlue = VICKY.ReadByte(7);
             if (gammaCorrection != null)
             {
                 borderRed = gammaCorrection[borderRed, 2];
@@ -409,9 +369,9 @@ namespace FoenixIDE.Display
             // Graphics Mode
             if ((MCRegister & 0x4) == 0x4)
             {
-                byte backRed = IO.ReadByte(0xD);
-                byte backGreen = IO.ReadByte(0XE);
-                byte backBlue = IO.ReadByte(0xF);
+                byte backRed = VICKY.ReadByte(0xD);
+                byte backGreen = VICKY.ReadByte(0XE);
+                byte backBlue = VICKY.ReadByte(0xF);
                 if (gammaCorrection != null)
                 {
                     backRed = gammaCorrection[backRed, 2];
@@ -423,14 +383,12 @@ namespace FoenixIDE.Display
                 g.FillRectangle(graphBackgroundBrush, colOffset, rowOffset, 640 - 2 * colOffset, 480 - 2 * rowOffset);
             }
        
-
             // Bitmap Mode
             if ((MCRegister & 0x8) == 0x8)
             {
                 DrawBitmap(frameBuffer, displayBorder);
             }
             
-
             for (int layer = 4; layer > 0; --layer)
             {
                 if ((MCRegister & 0x10) == 0x10)
@@ -463,31 +421,25 @@ namespace FoenixIDE.Display
                     DrawBitmapText(frameBuffer, colOffset, rowOffset);
                 }
             }
-            // Overlay Mode - no need for this, the Text drawing method takes care of this
-            if ((MCRegister & 0x2) == 0x2)
-            {
-
-            }
-            byte mouseReg = IO.ReadByte(0x700);
+            byte mouseReg = VICKY.ReadByte(0x700);
             MousePointerMode = (mouseReg & 1) == 1;
             if (MousePointerMode && !TileEditorMode)
             {
                 DrawMouse(frameBuffer);
-
             }
             e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
         }
 
-        public static byte[,] LoadGammaCorrection(MemoryRAM IO)
+        public static byte[,] LoadGammaCorrection(MemoryRAM VKY)
         {
             // Read the color lookup tables
-            int gamAddress = GAMMA_BASE_ADDR - IO_BASE_ADDR;
+            int gamAddress = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
             byte[,] result = new byte[256,3];
             for (int c = 0; c < 256; c++)
             {
-                byte blue = IO.ReadByte(gamAddress);
-                byte green = IO.ReadByte(0x100 + gamAddress);
-                byte red = IO.ReadByte(0x200 + gamAddress);
+                byte blue = VKY.ReadByte(gamAddress);
+                byte green = VKY.ReadByte(0x100 + gamAddress);
+                byte red = VKY.ReadByte(0x200 + gamAddress);
                 gamAddress++;
                 result[c, 0] = blue;
                 result[c, 1] = green;
@@ -496,20 +448,20 @@ namespace FoenixIDE.Display
             return result;
         }
 
-        public static int[,] LoadLUT(MemoryRAM IO)
+        public static int[,] LoadLUT(MemoryRAM VKY)
         {
             // Read the color lookup tables
-            int lutAddress = GRP_LUT_BASE_ADDR - IO_BASE_ADDR;
+            int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
             int[,] result = new int[8,256];
             for (int i = 0; i < 4; i++)
             {
                 for (int c = 0; c < 256; c++)
                 {
-                    byte blue = IO.ReadByte(lutAddress++);
-                    byte green = IO.ReadByte(lutAddress++);
-                    byte red = IO.ReadByte(lutAddress++);
+                    byte blue = VKY.ReadByte(lutAddress++);
+                    byte green = VKY.ReadByte(lutAddress++);
+                    byte red = VKY.ReadByte(lutAddress++);
                     lutAddress++;
-                    result[i,c] = (255 << 24) + (red << 16) + (green << 8) + blue;
+                    result[i,c] = (0xFF << 24) + (red << 16) + (green << 8) + blue;
                 }
             }
             return result;
@@ -535,7 +487,7 @@ namespace FoenixIDE.Display
             {
                 lastWidth = ColumnsVisible;
             }
-            bool overlayBitSet = (IO.ReadByte(0) & 0x02) == 0x02;
+            bool overlayBitSet = (VICKY.ReadByte(0) & 0x02) == 0x02;
 
             // We're hard-coding this for now.
             int lines = LinesVisible;
@@ -547,14 +499,14 @@ namespace FoenixIDE.Display
             Graphics gr = Graphics.FromImage(bitmap);
             
             // Read the color lookup tables
-            int fgLUT = MemoryLocations.MemoryMap.FG_CHAR_LUT_PTR - IO.StartAddress;
-            int bgLUT = MemoryLocations.MemoryMap.BG_CHAR_LUT_PTR - IO.StartAddress;
+            int fgLUT = MemoryLocations.MemoryMap.FG_CHAR_LUT_PTR - VICKY.StartAddress;
+            int bgLUT = MemoryLocations.MemoryMap.BG_CHAR_LUT_PTR - VICKY.StartAddress;
 
             int col = 0, line = 0;
 
-            int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - IO.StartAddress;
-            int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - IO.StartAddress;
-            int fontBaseAddress = MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START - IO.StartAddress;
+            int colorStart = MemoryLocations.MemoryMap.SCREEN_PAGE1 - VICKY.StartAddress;
+            int lineStart = MemoryLocations.MemoryMap.SCREEN_PAGE0 - VICKY.StartAddress;
+            int fontBaseAddress = MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START - VICKY.StartAddress;
             Rectangle rect = new Rectangle(0, 0, 640, 480);
             BitmapData bitmapData = bitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
@@ -578,23 +530,23 @@ namespace FoenixIDE.Display
                     }
 
                     // Each character will have foreground and background colors
-                    byte character = IO.ReadByte(textAddr++);
+                    byte character = VICKY.ReadByte(textAddr++);
                     if (X == col && Y == line && CursorState && CursorEnabled)
                     {
-                        character = IO.ReadByte(MemoryLocations.MemoryMap.VKY_TXT_CURSOR_CHAR_REG - IO.StartAddress);
+                        character = VICKY.ReadByte(MemoryLocations.MemoryMap.VKY_TXT_CURSOR_CHAR_REG - VICKY.StartAddress);
                     }
-                    byte color = IO.ReadByte(colorAddr++);
+                    byte color = VICKY.ReadByte(colorAddr++);
                     byte fgColor = (byte)((color & 0xF0) >> 4);
                     byte bgColor = (byte)(color & 0x0F);
 
                     // In order to reduce the load of applying Gamma correction, load single bytes
-                    byte fgValueRed = IO.ReadByte(fgLUT + fgColor * 4);
-                    byte fgValueGreen = IO.ReadByte(fgLUT + fgColor * 4 + 1);
-                    byte fgValueBlue = IO.ReadByte(fgLUT + fgColor * 4 + 2);
+                    byte fgValueRed = VICKY.ReadByte(fgLUT + fgColor * 4);
+                    byte fgValueGreen = VICKY.ReadByte(fgLUT + fgColor * 4 + 1);
+                    byte fgValueBlue = VICKY.ReadByte(fgLUT + fgColor * 4 + 2);
 
-                    byte bgValueRed = IO.ReadByte(bgLUT + bgColor * 4);
-                    byte bgValueGreen = IO.ReadByte(bgLUT + bgColor * 4 + 1);
-                    byte bgValueBlue = IO.ReadByte(bgLUT + bgColor * 4 + 2);
+                    byte bgValueRed = VICKY.ReadByte(bgLUT + bgColor * 4);
+                    byte bgValueGreen = VICKY.ReadByte(bgLUT + bgColor * 4 + 1);
+                    byte bgValueBlue = VICKY.ReadByte(bgLUT + bgColor * 4 + 2);
 
                     if (gammaCorrection != null)
                     {
@@ -613,7 +565,7 @@ namespace FoenixIDE.Display
                     for (int i = 0; i < 8; i++)
                     {
                         int offset = (x + (y + i ) * 640 ) * 4;
-                        byte value = IO.ReadByte(fontBaseAddress + character * 8 + i);
+                        byte value = VICKY.ReadByte(fontBaseAddress + character * 8 + i);
                         if ((value & 0x80) == 0x80)
                         {
                             System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
@@ -692,16 +644,16 @@ namespace FoenixIDE.Display
         private void DrawBitmap(Bitmap bitmap, bool bkgrnd)
         {
             // Bitmap Controller is located at $AF:0140
-            int reg = IO.ReadByte(BITMAP_CONTROL_REGISTER_ADDR - IO_BASE_ADDR);
+            int reg = VICKY.ReadByte(MemoryMap.BITMAP_CONTROL_REGISTER_ADDR - MemoryMap.VICKY_BASE_ADDR);
             if ((reg & 0x01) == 00)
             {
                 return;
             }
             int lutIndex = (reg & 14) >> 1;  // 8 possible LUTs
 
-            int bitmapAddress = IO.ReadLong(0xAF_0141 - IO_BASE_ADDR);
-            int width = IO.ReadWord(0xAF_0144 - IO_BASE_ADDR);
-            int height = IO.ReadWord(0xAF_0146 - IO_BASE_ADDR);
+            int bitmapAddress = VICKY.ReadLong(0xAF_0141 - MemoryMap.VICKY_BASE_ADDR);
+            int width = VICKY.ReadWord(0xAF_0144 - MemoryMap.VICKY_BASE_ADDR);
+            int height = VICKY.ReadWord(0xAF_0146 - MemoryMap.VICKY_BASE_ADDR);
 
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0,0,640, 480), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
@@ -729,8 +681,8 @@ namespace FoenixIDE.Display
         private void DrawTiles(Bitmap bitmap, int layer, bool bkgrnd)
         {
             // There are four possible tilesets to choose from
-            int addrTileset = TILE_CONTROL_REGISTER_ADDR + layer * 8;
-            int reg = IO.ReadByte(addrTileset - IO_BASE_ADDR);
+            int addrTileset = MemoryMap.TILE_CONTROL_REGISTER_ADDR + layer * 8;
+            int reg = VICKY.ReadByte(addrTileset - MemoryMap.VICKY_BASE_ADDR);
             // if the set is not enabled, we're done.
             if ((reg & 0x01) == 00)
             {
@@ -741,9 +693,9 @@ namespace FoenixIDE.Display
             int lutIndex = (reg & 14) >> 1;  // 8 possible LUTs
             bool striding = (reg & 0x80) == 0x80;
 
-            int tilesetAddress = IO.ReadLong(addrTileset + 1 - IO_BASE_ADDR);
-            int strideX = IO.ReadWord(addrTileset + 4 - IO_BASE_ADDR);
-            int strideY = IO.ReadWord(addrTileset + 6 - IO_BASE_ADDR);
+            int tilesetAddress = VICKY.ReadLong(addrTileset + 1 - MemoryMap.VICKY_BASE_ADDR);
+            int strideX = VICKY.ReadWord(addrTileset + 4 - MemoryMap.VICKY_BASE_ADDR);
+            int strideY = VICKY.ReadWord(addrTileset + 6 - MemoryMap.VICKY_BASE_ADDR);
 
             // Now read the tilemap
             int tilemapAddress = 0xAF5000 + 0x800 * layer;
@@ -757,7 +709,7 @@ namespace FoenixIDE.Display
             {
                 for (int tileCol = colOffset; tileCol < (40 - colOffset); tileCol++)
                 {
-                    int tile = IO.ReadByte(tilemapAddress + tileCol + tileRow * 64 - IO_BASE_ADDR);
+                    int tile = VICKY.ReadByte(tilemapAddress + tileCol + tileRow * 64 - MemoryMap.VICKY_BASE_ADDR);
                     int pixelIndex = 0;
                     int value = 0;
 
@@ -796,8 +748,8 @@ namespace FoenixIDE.Display
             // There are 32 possible sprites to choose from.
             for (int s = 0; s < 32; s++)
             {
-                int addrSprite = SPRITE_CONTROL_REGISTER_ADDR + s * 8;
-                int reg = IO.ReadByte(addrSprite - IO_BASE_ADDR);
+                int addrSprite = MemoryMap.SPRITE_CONTROL_REGISTER_ADDR + s * 8;
+                int reg = VICKY.ReadByte(addrSprite - MemoryMap.VICKY_BASE_ADDR);
                 // if the set is not enabled, we're done.
                 int spriteLayer = (reg & 0x70) >> 4;
                 if ((reg & 1) == 1 && layer == spriteLayer)
@@ -805,9 +757,9 @@ namespace FoenixIDE.Display
                     int lutIndex = (reg & 14) >> 1;  // 8 possible LUTs
                     bool striding = (reg & 0x80) == 0x80;
 
-                    int spriteAddress = IO.ReadLong(addrSprite + 1 - IO_BASE_ADDR);
-                    int posX = IO.ReadWord(addrSprite + 4 - IO_BASE_ADDR);
-                    int posY = IO.ReadWord(addrSprite + 6 - IO_BASE_ADDR);
+                    int spriteAddress = VICKY.ReadLong(addrSprite + 1 - MemoryMap.VICKY_BASE_ADDR);
+                    int posX = VICKY.ReadWord(addrSprite + 4 - MemoryMap.VICKY_BASE_ADDR);
+                    int posY = VICKY.ReadWord(addrSprite + 6 - MemoryMap.VICKY_BASE_ADDR);
 
                     BitmapData bitmapData = bitmap.LockBits(new Rectangle(posX, posY, 32, 32), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     IntPtr p = bitmapData.Scan0;
@@ -845,11 +797,11 @@ namespace FoenixIDE.Display
 
         private void DrawMouse(Bitmap bitmap)
         {
-            int X = IO.ReadWord(0x702);
-            int Y = IO.ReadWord(0x704);
+            int X = VICKY.ReadWord(0x702);
+            int Y = VICKY.ReadWord(0x704);
 
-            byte mouseReg = IO.ReadByte(0x700);
-            int pointerAddress = 0xAF_0500  - IO.StartAddress;
+            byte mouseReg = VICKY.ReadByte(0x700);
+            int pointerAddress = 0xAF_0500  - VICKY.StartAddress;
             if ((mouseReg & 2) == 2)
             {
                 pointerAddress += 0x100;
@@ -864,7 +816,7 @@ namespace FoenixIDE.Display
                 for (int col = 0; col < colsToDraw; col++)
                 {
                     // Values are 0: transparent, 1:black, 255: white (gray scales)
-                    byte pixelIndexR = IO.ReadByte(pointerAddress+line *  16 + col);
+                    byte pixelIndexR = VICKY.ReadByte(pointerAddress+line *  16 + col);
                     byte pixelIndexG = pixelIndexR;
                     byte pixelIndexB = pixelIndexR;
                     if (pixelIndexR != 0)
@@ -944,9 +896,9 @@ namespace FoenixIDE.Display
 
         public void WriteByte(int Address, byte Data)
         {
-            if (IO == null)
+            if (VICKY == null)
                 return;
-            IO.WriteByte(Address - VRAM.StartAddress, Data);
+            VICKY.WriteByte(Address - VRAM.StartAddress, Data);
             //else if (Address >= characterMatrixStart && Address < (characterMatrixStart + CharacterData.Length))
             //{
             //    CharacterData[Address - characterMatrixStart] = (char)Data;
@@ -966,7 +918,7 @@ namespace FoenixIDE.Display
         {
             CharacterSet cs = new CharacterSet();
             // Load the data from the file into the  IO buffer - starting at address $AF8000
-            cs.Load(Filename, Offset, IO, MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START & 0xffff, CharSize);
+            cs.Load(Filename, Offset, VICKY, MemoryLocations.MemoryMap.FONT0_MEMORY_BANK_START & 0xffff, CharSize);
         }
 
         protected override bool IsInputKey(Keys keyData)

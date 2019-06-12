@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
+
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,6 +53,9 @@ namespace FoenixIDE.UI
             }
         }
 
+        /// <summary>
+        /// Container to hold one line of 65C816 code debugging data
+        /// </summary>
         private class DebugLine
         {
             public bool isBreakpoint = false;
@@ -85,6 +88,10 @@ namespace FoenixIDE.UI
                 }
                 return evaled; 
             }
+
+            /// <summary>
+            /// One and only constructor 
+            /// </summary>
             public DebugLine(int pc, byte[] cmd, String oc, int[] cpuSnapshot)
             {
                 PC = pc;
@@ -94,7 +101,6 @@ namespace FoenixIDE.UI
                 cpu = cpuSnapshot;
             }
         }
-        private List<string> lines = new List<string>();
 
         private void CPUWindow_Load(object sender, EventArgs e)
         {
@@ -122,6 +128,7 @@ namespace FoenixIDE.UI
                     int col = 12;
                     e.Graphics.FillRectangle(lightBlueBrush, col, row * ROW_HEIGHT, 7 * 6, 14);
                 }
+
                 foreach (DebugLine line in queue)
                 {
                     if (line != null)
@@ -215,7 +222,6 @@ namespace FoenixIDE.UI
             }
         }
 
-
         private void MinusButton_Click(object sender, EventArgs e)
         {
             if (position.X > 0 && position.Y > 0)
@@ -268,6 +274,7 @@ namespace FoenixIDE.UI
                 MemoryWindow.Instance.BringToFront();
             }
         }
+
         private void StepOverButton_Click(object sender, EventArgs e)
         {
             if (position.X > 0 && position.Y > 0)
@@ -385,6 +392,11 @@ namespace FoenixIDE.UI
             
         }
         private delegate void nullParamMethod();
+
+        /// <summary>
+        /// Executes next step of 65C816 code, logs dubeugging data
+        /// if debugging check box is set on CPU Window
+        /// </summary>
         public void ExecuteStep()
         {
             StepCounter++;
@@ -392,26 +404,28 @@ namespace FoenixIDE.UI
             int currentPC = kernel.CPU.GetLongPC();
             if (!kernel.CPU.ExecuteNext())
             {
-                int cmdLength = kernel.CPU.OpcodeLength;
+                if (!UpdateTraceTimer.Enabled)
+                {
+                    int cmdLength = kernel.CPU.OpcodeLength;
 
-                int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
-                byte[] command = new byte[cmdLength];
-                for (int i = 0; i < cmdLength; i++)
-                {
-                    command[i] = kernel.Memory.RAM.ReadByte(currentPC + i);
-                }
-                string opcodes = kernel.CPU.Opcode.ToString(kernel.CPU.SignatureBytes);
-                //string status = kernel.Monitor.GetRegisterText();
-                DebugLine line = new DebugLine(currentPC, command, opcodes, kernel.CPU.snapshot);
-                queue.Enqueue(line);
-                if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
-                {
-                    queue.Dequeue();
+                    int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
+                    byte[] command = new byte[cmdLength];
+                    for (int i = 0; i < cmdLength; i++)
+                    {
+                        command[i] = kernel.Memory.RAM.ReadByte(currentPC + i);
+                    }
+                    string opcode = kernel.CPU.CurrentOpcode.ToString(kernel.CPU.SignatureBytes);
+                    DebugLine line = new DebugLine(currentPC, command, opcode, kernel.CPU.Snapshot);
+                    queue.Enqueue(line);
+                    if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
+                    {
+                        queue.Dequeue();
+                    }
                 }
                 if (breakpoints.ContainsKey(currentPC))
                 {
                     kernel.CPU.DebugPause = true;
-                    line.isBreakpoint = true;
+                    //line.isBreakpoint = true;
                     UpdateTraceTimer.Enabled = false;
 
                     Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
@@ -424,11 +438,13 @@ namespace FoenixIDE.UI
                 PrintNextInstruction(kernel.CPU.GetLongPC());
             }
         }
+
         private delegate void lastLineDelegate(string line);
         private void ShowLastLine(string line)
         {
             lastLine.Text = line;
         }
+
         private void PrintNextInstruction(int pc)
         {
             OpCode oc = kernel.CPU.PreFetch();
@@ -456,7 +472,8 @@ namespace FoenixIDE.UI
             }
             
         }
-        public void UpdateDebugLines(int newDebugLine, bool state)
+
+        private void UpdateDebugLines(int newDebugLine, bool state)
         {
             BPCombo.BeginUpdate();
             BPCombo.Items.Clear();

@@ -1,4 +1,4 @@
-﻿using FoenixIDE.Simulator.MemoryLocations;
+﻿using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +7,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -208,10 +207,12 @@ namespace FoenixIDE.UI
                 int.TryParse(strAddress, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out videoAddress);
             }
             int writeVideoAddress = videoAddress;
-            ResourceChecker.Resource res = new ResourceChecker.Resource();
-            res.StartAddress = videoAddress;
-            res.SourceFile = FileNameTextBox.Text;
-            res.Name = Path.GetFileNameWithoutExtension(FileNameTextBox.Text);
+            ResourceChecker.Resource res = new ResourceChecker.Resource
+            {
+                StartAddress = videoAddress,
+                SourceFile = FileNameTextBox.Text,
+                Name = Path.GetFileNameWithoutExtension(FileNameTextBox.Text)
+            };
 
             // Store the bitmap at the user's determined address
             // The method below simply takes the file and writes it in memory.

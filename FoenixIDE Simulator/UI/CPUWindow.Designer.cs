@@ -82,9 +82,9 @@
             // 
             this.stepsInput.Dock = System.Windows.Forms.DockStyle.Left;
             this.stepsInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stepsInput.Location = new System.Drawing.Point(256, 0);
+            this.stepsInput.Location = new System.Drawing.Point(271, 0);
             this.stepsInput.Name = "stepsInput";
-            this.stepsInput.Size = new System.Drawing.Size(64, 23);
+            this.stepsInput.Size = new System.Drawing.Size(47, 23);
             this.stepsInput.TabIndex = 3;
             this.stepsInput.Text = "1";
             this.stepsInput.Enter += new System.EventHandler(this.StepsInput_Enter);
@@ -136,8 +136,8 @@
             this.stepsLabel.Dock = System.Windows.Forms.DockStyle.Left;
             this.stepsLabel.Location = new System.Drawing.Point(192, 0);
             this.stepsLabel.Name = "stepsLabel";
-            this.stepsLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.stepsLabel.Size = new System.Drawing.Size(64, 24);
+            this.stepsLabel.Padding = new System.Windows.Forms.Padding(10, 4, 0, 0);
+            this.stepsLabel.Size = new System.Drawing.Size(79, 24);
             this.stepsLabel.TabIndex = 4;
             this.stepsLabel.Text = "Steps (dec)";
             // 
@@ -267,7 +267,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.DebugPanel.Location = new System.Drawing.Point(0, 125);
-            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
             this.DebugPanel.Name = "DebugPanel";
             this.DebugPanel.Size = new System.Drawing.Size(605, 363);
             this.DebugPanel.TabIndex = 6;
@@ -281,7 +281,7 @@
             this.PlusButton.FlatAppearance.BorderSize = 0;
             this.PlusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.PlusButton.Location = new System.Drawing.Point(99, 200);
-            this.PlusButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlusButton.Margin = new System.Windows.Forms.Padding(2);
             this.PlusButton.Name = "PlusButton";
             this.PlusButton.Size = new System.Drawing.Size(18, 18);
             this.PlusButton.TabIndex = 7;
@@ -297,7 +297,7 @@
             this.MinusButton.FlatAppearance.BorderSize = 0;
             this.MinusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.MinusButton.Location = new System.Drawing.Point(118, 200);
-            this.MinusButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.MinusButton.Margin = new System.Windows.Forms.Padding(2);
             this.MinusButton.Name = "MinusButton";
             this.MinusButton.Size = new System.Drawing.Size(18, 18);
             this.MinusButton.TabIndex = 8;
@@ -313,7 +313,7 @@
             this.InspectButton.FlatAppearance.BorderSize = 0;
             this.InspectButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.InspectButton.Location = new System.Drawing.Point(137, 200);
-            this.InspectButton.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.InspectButton.Margin = new System.Windows.Forms.Padding(1);
             this.InspectButton.Name = "InspectButton";
             this.InspectButton.Size = new System.Drawing.Size(38, 18);
             this.InspectButton.TabIndex = 9;
@@ -330,7 +330,7 @@
             this.StepOverButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.StepOverButton.Font = new System.Drawing.Font("Arial Narrow", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StepOverButton.Location = new System.Drawing.Point(176, 200);
-            this.StepOverButton.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.StepOverButton.Margin = new System.Windows.Forms.Padding(1);
             this.StepOverButton.Name = "StepOverButton";
             this.StepOverButton.Size = new System.Drawing.Size(21, 18);
             this.StepOverButton.TabIndex = 10;

@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FoenixIDE.Processor
 {
+    /// <summary>
+    /// Class to encapsulte the state of the CPU 'Control Pins'. This is a made
+    /// up term for those pins that control the CPU execution, Reset, IRQ, etc.
+    /// We treat them as a singel register which makes checking to see if any
+    /// one set much faster than if they were individual bool objects.
+    /// </summary>
     public class CPUPins
     {
         // Pins

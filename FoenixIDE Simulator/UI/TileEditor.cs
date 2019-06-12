@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
+
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -64,7 +64,7 @@ namespace FoenixIDE.Simulator.UI
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
-            int[,] graphicsLUT = Display.Gpu.LoadLUT(memory.IO);
+            int[,] graphicsLUT = Display.Gpu.LoadLUT(memory.VICKY);
             int lut = Int32.Parse(LUTDomain.Text);
             for (int y = 0; y < 256; y++)
             {
@@ -161,7 +161,7 @@ namespace FoenixIDE.Simulator.UI
             if (selectedX != -1 && selectedY != -1)
             {
                 byte value = (byte)(selectedY * 16 + selectedX);
-                memory.IO.WriteByte(tilemapAddress - memory.IO.StartAddress, value);
+                memory.VICKY.WriteByte(tilemapAddress - memory.VICKY.StartAddress, value);
             }
         }
 

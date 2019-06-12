@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,6 +32,7 @@ namespace FoenixIDE.MemoryLocations
         public const int USER_TEMP = 0x0000E0; // 32 Bytes Temp space for user programs
         public const int PAGE0_END_ = 0x000100; //  Byte 
 
+        #region GAVIN
         public const int GAVIN_BLOCK = 0x000100; // 256 Bytes Gavin reserved, overlaps debugging registers at $1F0
 
         // Math co-processor
@@ -65,6 +66,8 @@ namespace FoenixIDE.MemoryLocations
         public const int INT_MASK_REG2 = 0x00_014E;
 
         public const int VECTOR_STATE = 0x0001FF; // 1 Byte Interrupt Vector State. See VECTOR_STATE_ENUM
+
+        #endregion GAVIN
 
         public const int CPU_REGISTERS = 0x000200; //  Byte 
         public const int CPUPC = 0x000200; // 2 Bytes Debug registers. When BRK is executed, Interrupt service routine will populate this block with the CPU registers. 

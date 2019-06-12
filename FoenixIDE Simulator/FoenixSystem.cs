@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FoenixIDE.Basic;
@@ -10,7 +9,8 @@ using FoenixIDE.Display;
 using FoenixIDE.Common;
 using System.Threading;
 using FoenixIDE.MemoryLocations;
-using FoenixIDE.Simulator.MemoryLocations;
+using FoenixIDE.Simulator.Devices;
+using FoenixIDE.Simulator.FileFormat;
 
 namespace FoenixIDE
 {
@@ -42,27 +42,25 @@ namespace FoenixIDE
             Memory = new MemoryManager
             {
                 RAM = new MemoryRAM(MemoryMap.RAM_START, MemoryMap.RAM_SIZE), // 2MB RAM
-                IO = new MemoryRAM(MemoryMap.IO_START, MemoryMap.IO_SIZE),   // 64K IO space
+                VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),   // 64K IO space
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
-                MATH = new MathCoproMemoryRAM(MemoryMap.MATH_START, MemoryMap.MATH_END), // 48 bytes
-                CODEC = new MemoryRAM(MemoryMap.CODEC_WR_CTRL, MemoryMap.CODEC_WR_CTRL),  // 1 byte
-                KEYBOARD = new MemoryRAM(MemoryMap.KBD_DATA_BUF, 5),
-                SDCARD = new MemoryRAM(MemoryMap.SDCARD_DATA, 2)
-            };
-            // Wire the postWrite functions.
-            Memory.CODEC.postWrite = Memory.CODEC.OnCodecWait5SecondsAndWrite00;
-            Memory.KEYBOARD.postWrite = Memory.KEYBOARD.OnKeyboardStatusCodeChange;
-            Memory.SDCARD.postWrite = Memory.SDCARD.OnSDCARDCommand;
-            Memory.RAM.postWrite = Memory.RAM.OnInterruptPending;
+                BEATRIX = new MemoryRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE),
 
+                // Special devices
+                MATH = new MathCoproRegisters(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
+                CODEC = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 2),  // This register is only a single byte but we allow writing a word
+                KEYBOARD = new KeyboardRegister(MemoryMap.KBD_DATA_BUF, 5),
+                SDCARD = new SuperIORegister(MemoryMap.SDCARD_DATA, 2),
+                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 3)
+            };
 
             this.CPU = new CPU(Memory);
             this.CPU.SimulatorCommand += CPU_SimulatorCommand;
             this.gpu = gpu;
             gpu.VRAM = Memory.VIDEO;
             gpu.RAM = Memory.RAM;
-            gpu.IO = Memory.IO;
+            gpu.VICKY = Memory.VICKY;
             //gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
@@ -94,7 +92,7 @@ namespace FoenixIDE
             Cls();
             gpu.Refresh();
             // Clear out Vicky's memory
-            Memory.IO.Zero();
+            Memory.VICKY.Zero();
             //gpu.LoadFontSet("ASCII-PET", @"Resources\FOENIX-CHARACTER-ASCII.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
