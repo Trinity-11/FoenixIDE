@@ -166,7 +166,7 @@ namespace FoenixIDE
         public int ReadWord(int Address)
         {
             GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
-            return device.ReadByte(deviceAddress) + (device.ReadByte(deviceAddress + 1) << 8);
+            return device.ReadByte(deviceAddress) | (device.ReadByte(deviceAddress + 1) << 8);
         }
 
         /// <summary>
@@ -178,8 +178,8 @@ namespace FoenixIDE
         {
             GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
             return device.ReadByte(deviceAddress)
-                + (device.ReadByte(deviceAddress + 1) << 8)
-                + (device.ReadByte(deviceAddress + 2) << 16);
+                | (device.ReadByte(deviceAddress + 1) << 8)
+                | (device.ReadByte(deviceAddress + 2) << 16);
         }
 
         public virtual void WriteByte(int Address, byte Value)

@@ -37,11 +37,11 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(131, 288);
+            this.label1.Location = new System.Drawing.Point(11, 222);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(157, 17);
+            this.label1.Size = new System.Drawing.Size(278, 25);
             this.label1.TabIndex = 0;
             this.label1.Text = "Foenix IDE Version x";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -50,9 +50,10 @@
             // 
             this.CloseButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.CloseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CloseButton.Location = new System.Drawing.Point(162, 317);
+            this.CloseButton.Location = new System.Drawing.Point(122, 258);
+            this.CloseButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.CloseButton.Name = "CloseButton";
-            this.CloseButton.Size = new System.Drawing.Size(94, 34);
+            this.CloseButton.Size = new System.Drawing.Size(70, 28);
             this.CloseButton.TabIndex = 1;
             this.CloseButton.Text = "&Close";
             this.CloseButton.UseVisualStyleBackColor = true;
@@ -61,9 +62,10 @@
             // FoenixLogo
             // 
             this.FoenixLogo.Image = ((System.Drawing.Image)(resources.GetObject("FoenixLogo.Image")));
-            this.FoenixLogo.Location = new System.Drawing.Point(3, -57);
+            this.FoenixLogo.Location = new System.Drawing.Point(2, -46);
+            this.FoenixLogo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.FoenixLogo.Name = "FoenixLogo";
-            this.FoenixLogo.Size = new System.Drawing.Size(395, 393);
+            this.FoenixLogo.Size = new System.Drawing.Size(296, 319);
             this.FoenixLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.FoenixLogo.TabIndex = 2;
             this.FoenixLogo.TabStop = false;
@@ -71,17 +73,18 @@
             // AboutFrom
             // 
             this.AcceptButton = this.CloseButton;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.CancelButton = this.CloseButton;
-            this.ClientSize = new System.Drawing.Size(400, 400);
+            this.ClientSize = new System.Drawing.Size(300, 325);
             this.ControlBox = false;
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.FoenixLogo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutFrom";
@@ -93,7 +96,6 @@
             this.Load += new System.EventHandler(this.AboutFrom_Load);
             ((System.ComponentModel.ISupportInitialize)(this.FoenixLogo)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

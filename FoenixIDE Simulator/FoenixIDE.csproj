@@ -50,6 +50,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -58,21 +60,16 @@
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basic\ScanCodes.cs" />
-    <Compile Include="Basic\Editor.cs" />
-    <Compile Include="Basic\Immediate.cs" />
-    <Compile Include="Basic\Parser.cs" />
     <Compile Include="DeviceEnum.cs" />
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
@@ -94,7 +91,6 @@
     <Compile Include="Processor\OpcodeList.cs" />
     <Compile Include="Processor\SimulatorCommands.cs" />
     <Compile Include="Basic\ColorCodes.cs" />
-    <Compile Include="Processor\CPUTest.cs" />
     <Compile Include="Processor\CPU.cs" />
     <Compile Include="Processor\CPU_Registers.cs" />
     <Compile Include="Processor\CPU_Support.cs" />
@@ -141,12 +137,9 @@
     <Compile Include="MemoryLocations\MemoryRAM.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Page00.cs" />
     <Compile Include="MemoryLocations\MemoryManager.cs" />
-    <Compile Include="Monitor\Monitor.cs" />
     <Compile Include="Processor\Operations.cs" />
-    <Compile Include="ROMs\PETSCIICommandCodes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ROMs\ReadyHandler.cs" />
     <Compile Include="Processor\Register.cs" />
     <Compile Include="UI\MemoryWindow.cs">
       <SubType>Form</SubType>
@@ -253,9 +246,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
-    <Content Include="Monitor\Monitor Help.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Resources\foenix-96x96.png" />
     <Content Include="Resources\PET-ASCII.png" />
   </ItemGroup>

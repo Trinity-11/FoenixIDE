@@ -109,10 +109,7 @@ namespace FoenixIDE
 
         internal void Copy(int SourceAddress, MemoryRAM Destination, int DestAddress, int Length)
         {
-            for(int i=0; i<Length; ++i)
-            {
-                Destination.data[DestAddress + i] = data[SourceAddress + i];
-            }
+            System.Array.Copy(data, SourceAddress, Destination.data, DestAddress, Length);
         }
     }
 }

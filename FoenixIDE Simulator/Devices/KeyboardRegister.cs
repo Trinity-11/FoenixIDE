@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoenixIDE.Simulator.Basic;
+using System;
 using System.Collections.Generic;
 
 using System.Text;
@@ -67,6 +68,22 @@ namespace FoenixIDE.Simulator.Devices
                             break;
                     }
                     break;
+            }
+        }
+
+        public void WriteKey(FoenixSystem kernel, ScanCode key)
+        {
+            // Check if the Keyboard interrupt is allowed
+            byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
+            if ((~mask & 1) == 1)
+            {
+                kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
+                kernel.Memory.KEYBOARD.WriteByte(4, 0);
+                // Set the Keyboard Interrupt
+                byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
+                IRQ1 |= 1;
+                kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+                kernel.CPU.Pins.IRQ = true;
             }
         }
     }

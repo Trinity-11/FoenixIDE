@@ -153,11 +153,11 @@ namespace FoenixIDE.Processor
                     return true;
                 }
             }
-
-            CurrentOpcode = opcodes[GetNextInstruction()];
+            int pc = GetLongPC();
+            CurrentOpcode = opcodes[Memory.RAM.ReadByte(pc)];
             OpcodeLength = CurrentOpcode.Length;
             OpcodeCycles = 1;
-            SignatureBytes = ReadSignature(CurrentOpcode);
+            SignatureBytes = ReadSignature(CurrentOpcode, pc);
 
             PC.Value += OpcodeLength;
             CurrentOpcode.Execute(SignatureBytes);
@@ -230,30 +230,25 @@ namespace FoenixIDE.Processor
         /// </summary>
         public OpCode PreFetch()
         {
-            return opcodes[GetNextInstruction()];
+            return opcodes[Memory[GetLongPC()]];
         }
 
-        public int ReadSignature(OpCode oc)
+        public int ReadSignature(OpCode oc, int pc)
         {
             if (oc.Length == 2)
             {
-                return Memory.ReadByte(GetLongPC() + 1);
+                return Memory.RAM.ReadByte(pc + 1);
             }
             else if (oc.Length == 3)
             {
-                return Memory.ReadWord(GetLongPC() + 1);
+                return Memory.RAM.ReadWord(pc + 1);
             }
             else if (oc.Length == 4)
             { 
-                return Memory.ReadLong(GetLongPC() + 1);
+                return Memory.RAM.ReadLong(pc + 1);
             }
 
-           return 0;
-        }
-
-        private byte GetNextInstruction()
-        {
-            return Memory[GetLongPC()];
+            return 0;
         }
 
         /// <summary>

@@ -82,7 +82,7 @@ namespace FoenixIDE.UI
                             c.Append("   ");
                     }
                     String OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
-                    String state = Monitor.Monitor.Format(cpu);
+                    String state = FormatSnapshot();
                     StepOver = (opcodes.StartsWith("B") || opcodes.StartsWith("J"));
                     evaled = string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), OpCodes, state);
                 }
@@ -100,12 +100,36 @@ namespace FoenixIDE.UI
                 opcodes = oc;
                 cpu = cpuSnapshot;
             }
+
+            private String FormatSnapshot()
+            {
+                if (cpu != null)
+                {
+                    StringBuilder s = new StringBuilder(47);
+                    s.Append(';')
+                     .Append(cpu[0].ToString("X6")).Append(' ')
+                     .Append(cpu[1].ToString("X4")).Append(' ')
+                     .Append(cpu[2].ToString("X4")).Append(' ')
+                     .Append(cpu[3].ToString("X4")).Append(' ')
+                     .Append(cpu[4].ToString("X4")).Append(' ')
+                     .Append(cpu[5].ToString("X2")).Append(' ').Append(' ')
+                     .Append(cpu[6].ToString("X4")).Append(' ');
+                    Processor.Flags localFlags = new Processor.Flags();
+                    localFlags.SetFlags(cpu[7]);
+                    s.Append(localFlags);
+                    return s.ToString();
+                }
+                else
+                {
+                    return "";
+                }
+            }
         }
 
         private void CPUWindow_Load(object sender, EventArgs e)
         {
             queue = new Queue<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
-            HeaderTextbox.Text = " PC      OPCODES      INSTRUCTION     " + kernel.Monitor.GetRegisterHeader();
+            HeaderTextbox.Text = " PC      OPCODES      INSTRUCTION      PC     A    X    Y    SP   DBR DP   NVMXDIZC";
             ClearTrace();
             RefreshStatus();
             Tooltip.SetToolTip(PlusButton, "Add Breakpoint");
@@ -113,6 +137,7 @@ namespace FoenixIDE.UI
             Tooltip.SetToolTip(InspectButton, "Browse Memory");
             Tooltip.SetToolTip(StepOverButton, "Step Over");
         }
+
 
         private void DebugPanel_Paint(object sender, PaintEventArgs e)
         {
@@ -454,7 +479,7 @@ namespace FoenixIDE.UI
             {
                 command[i] = kernel.Memory.RAM.ReadByte(pc + i);
             }
-            string opcodes = oc.ToString(kernel.CPU.ReadSignature(oc));
+            string opcodes = oc.ToString(kernel.CPU.ReadSignature(oc, pc));
             //string status = "";
             DebugLine line = new DebugLine(pc, command, opcodes, null);
             if (!lastLine.InvokeRequired)

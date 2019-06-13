@@ -16,7 +16,6 @@ namespace FoenixIDE.UI
     public partial class MainWindow : Form
     {
         public FoenixSystem kernel;
-        public int CyclesPerTick = 35000;
 
         public UI.CPUWindow debugWindow;
         public MemoryWindow memoryWindow;
@@ -140,30 +139,13 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void WriteKey(ScanCode key)
-        {
-            // Check if the Keyboard interrupt is allowed
-            byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
-            if ((~mask & 1) == 1)
-            {
-                kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
-                kernel.Memory.KEYBOARD.WriteByte(4, 0);
-                // Set the Keyboard Interrupt
-                byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
-                IRQ1 |= 1;
-                kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
-                kernel.CPU.Pins.IRQ = true;
-            }
-           
-        }
-
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
         {
             ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
             if (scanCode != ScanCode.sc_null)
             {
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                WriteKey(scanCode);
+                kernel.Memory.KEYBOARD.WriteKey(kernel, scanCode);
             }
             else
             {
@@ -178,7 +160,7 @@ namespace FoenixIDE.UI
             {
                 scanCode += 0x80;
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                WriteKey(scanCode);
+                kernel.Memory.KEYBOARD.WriteKey(kernel, scanCode);
             }
             else
             {
@@ -251,7 +233,7 @@ namespace FoenixIDE.UI
             previousCounter = 0;
             kernel.ResetCPU();
             memoryWindow.UpdateMCRButtons();
-            kernel.Run();
+            kernel.CPU.Run();
             debugWindow.RunButton_Click(null, null);
         }
         

@@ -54,9 +54,11 @@ namespace FoenixIDE.Display
         Brush InvertedBrush = new SolidBrush(Color.Blue);
         Brush CursorBrush = new SolidBrush(Color.LightBlue);
 
-        static string MEASURE_STRING = new string('W', 80);
-
-        Timer timer = new Timer();
+        Timer gpuRefreshTimer = new Timer
+        {
+            Interval = (int)(1000 / 60),
+            Enabled = true
+        };
 
         bool CursorState = true;
         private bool CursorEnabled
@@ -224,8 +226,8 @@ namespace FoenixIDE.Display
         {
             this.SetScreenSize(80, 60);
             this.Paint += new PaintEventHandler(Gpu_Paint);
-            timer.Tick += new EventHandler(Timer_Tick);
-            timer.Interval = (int)(1000 / 60);
+            gpuRefreshTimer.Tick += new EventHandler(GpuRefreshTimer_Tick);
+            
             this.VisibleChanged += new EventHandler(FrameBufferControl_VisibleChanged);
             this.DoubleBuffered = true;
 
@@ -234,7 +236,7 @@ namespace FoenixIDE.Display
 
             if (DesignMode)
             {
-                timer.Enabled = false;
+                gpuRefreshTimer.Enabled = false;
             }
             else
             {
@@ -434,6 +436,7 @@ namespace FoenixIDE.Display
         {
             // Read the color lookup tables
             int gamAddress = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
+            
             byte[,] result = new byte[256,3];
             for (int c = 0; c < 256; c++)
             {
@@ -453,6 +456,7 @@ namespace FoenixIDE.Display
             // Read the color lookup tables
             int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
             int[,] result = new int[8,256];
+
             for (int i = 0; i < 4; i++)
             {
                 for (int c = 0; c < 256; c++)
@@ -461,7 +465,7 @@ namespace FoenixIDE.Display
                     byte green = VKY.ReadByte(lutAddress++);
                     byte red = VKY.ReadByte(lutAddress++);
                     lutAddress++;
-                    result[i,c] = (0xFF << 24) + (red << 16) + (green << 8) + blue;
+                    result[i, c] = (0xFF << 24) + (red << 16) + (green << 8) + blue;
                 }
             }
             return result;
@@ -836,12 +840,7 @@ namespace FoenixIDE.Display
             bitmap.UnlockBits(bitmapData);
         }
 
-        private SizeF MeasureFont(Font font, Graphics g)
-        {
-            return g.MeasureString(MEASURE_STRING, font, int.MaxValue, StringFormat.GenericTypographic);
-        }
-
-        void Timer_Tick(object sender, EventArgs e)
+        void GpuRefreshTimer_Tick(object sender, EventArgs e)
         {
             if (RefreshTimer-- > 0)
             {
@@ -857,14 +856,8 @@ namespace FoenixIDE.Display
 
         void FrameBufferControl_VisibleChanged(object sender, EventArgs e)
         {
-            timer.Enabled = this.Visible;
+            gpuRefreshTimer.Enabled = this.Visible;
         }
-
-        //private void FrameBuffer_KeyPress(object sender, KeyPressEventArgs e)
-        //{
-        //    TerminalKeyEventArgs args = new TerminalKeyEventArgs(e.KeyChar);
-        //    KeyPressed?.Invoke(this, args);
-        //}
 
         public byte ReadByte()
         {
