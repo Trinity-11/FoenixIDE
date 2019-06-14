@@ -27,7 +27,7 @@ namespace FoenixIDE.Display
         const int tileSize = 16;
         const int spriteSize = 32;
 
-        int[,] graphicsLUT = null;
+        int[] graphicsLUT = null;
         byte[] gammaCorrection = null;
 
         public MemoryRAM VRAM = null;
@@ -264,31 +264,24 @@ namespace FoenixIDE.Display
             // 
             byte[] result = new byte[3*256];
             VKY.Copy(gamAddress, result, 0, 3 * 256);
-            //for (int c = 0; c < 256; c++)
-            //{
-            //    result[c] = VKY.ReadByte(gamAddress + c);
-            //    result[0x100 + c] = VKY.ReadByte(0x100 + gamAddress + c);
-            //    result[0x200 + c] = VKY.ReadByte(0x200 + gamAddress + c);
-            //}
             return result;
         }
 
-        public static int[,] LoadLUT(MemoryRAM VKY)
+        public static int[] LoadLUT(MemoryRAM VKY)
         {
             // Read the color lookup tables
             int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
-            int[,] result = new int[8,256];
+            int lookupTables = 4;
+            int[] result = new int[lookupTables * 256];
 
-            for (int i = 0; i < 4; i++)
+
+            for (int c = 0; c < lookupTables * 256; c++)
             {
-                for (int c = 0; c < 256; c++)
-                {
-                    byte blue = VKY.ReadByte(lutAddress++);
-                    byte green = VKY.ReadByte(lutAddress++);
-                    byte red = VKY.ReadByte(lutAddress++);
-                    lutAddress++;
-                    result[i, c] = (0xFF << 24) + (red << 16) + (green << 8) + blue;
-                }
+                byte blue = VKY.ReadByte(lutAddress++);
+                byte green = VKY.ReadByte(lutAddress++);
+                byte red = VKY.ReadByte(lutAddress++);
+                lutAddress++;
+                result[c] = (0xFF << 24) + (red << 16) + (green << 8) + blue;
             }
             return result;
         }
@@ -489,10 +482,9 @@ namespace FoenixIDE.Display
             {
                 for (int col = 0; col < width; col++)
                 {
-                    value = (int)graphicsLUT[lutIndex, VRAM.ReadByte(bitmapAddress++)];
+                    value = graphicsLUT[lutIndex * 256 + VRAM.ReadByte(bitmapAddress++)];
                     if (gammaCorrection != null )
                     {
-                        //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
                         value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10] << 0x10) +
                                       (gammaCorrection[0x100 + ((value & 0x0000FF00) >> 0x08)] << 0x08) +
                                       (gammaCorrection[0x200 + (value & 0x000000FF)]) + 0xFF000000);
@@ -548,7 +540,7 @@ namespace FoenixIDE.Display
                             pixelIndex = VRAM.ReadByte(tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + col + line * strideX);
                             if (pixelIndex != 0)
                             {
-                                value = (int)graphicsLUT[lutIndex, pixelIndex];
+                                value = (int)graphicsLUT[lutIndex * 256 + pixelIndex];
                                 if (gammaCorrection != null)
                                 {
                                     //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
@@ -602,7 +594,7 @@ namespace FoenixIDE.Display
                             pixelIndex = VRAM.ReadByte(spriteAddress++);
                             if (pixelIndex != 0)
                             {
-                                value = (int)graphicsLUT[lutIndex, pixelIndex];
+                                value = (int)graphicsLUT[lutIndex * 256 + pixelIndex];
                                 if (gammaCorrection != null)
                                 {
                                     //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
