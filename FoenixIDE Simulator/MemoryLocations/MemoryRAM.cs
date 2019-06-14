@@ -111,5 +111,9 @@ namespace FoenixIDE
         {
             System.Array.Copy(data, SourceAddress, Destination.data, DestAddress, Length);
         }
+        internal void Copy(int SourceAddress, byte[] buffer, int DestAddress, int Length)
+        {
+            System.Array.Copy(data, SourceAddress, buffer, DestAddress, Length);
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace FoenixIDE.Display
         const int spriteSize = 32;
 
         int[,] graphicsLUT = null;
-        byte[,] gammaCorrection = null;
+        byte[] gammaCorrection = null;
 
         public MemoryRAM VRAM = null;
         public MemoryRAM RAM = null;
@@ -92,13 +92,13 @@ namespace FoenixIDE.Display
         {
             if (RefreshTimer-- > 0)
             {
-                Refresh();
+                Invalidate();
                 return;
             }
 
             CursorState = !CursorState;
             RefreshTimer = BLINK_RATE;
-            this.Refresh();
+            Invalidate();
         }
 
         /// <summary>
@@ -107,9 +107,12 @@ namespace FoenixIDE.Display
         /// <param name="sender"></param>
         /// <param name="e"></param>
         Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
+        private volatile bool drawing = false;
         void Gpu_Paint(object sender, PaintEventArgs e)
         {
             paintCycle++;
+            
+
             if (VICKY == null)
             {
                 e.Graphics.DrawString("IO Memory Not Initialized", this.Font, TextBrush, 0, 0);
@@ -132,6 +135,13 @@ namespace FoenixIDE.Display
                 e.Graphics.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
                 return;
             }
+            
+            if (drawing)
+            {
+                return;
+            }
+            drawing = true;
+            
             if (MCRegister != 0 && MCRegister != 0x80)
             {
                 StartOfFrame?.Invoke();
@@ -147,7 +157,7 @@ namespace FoenixIDE.Display
 
             // Load Graphical LUTs
             graphicsLUT = LoadLUT(VICKY);
-            
+
             // Apply gamma correct
             if ((MCRegister & 0x40) == 0x40)
             {
@@ -165,9 +175,9 @@ namespace FoenixIDE.Display
             byte borderBlue = VICKY.ReadByte(7);
             if (gammaCorrection != null)
             {
-                borderRed = gammaCorrection[borderRed, 2];
-                borderGreen = gammaCorrection[ borderGreen, 1];
-                borderBlue = gammaCorrection[borderBlue, 0];
+                borderRed = gammaCorrection[0x200 + borderRed];
+                borderGreen = gammaCorrection[0x100 + borderGreen];
+                borderBlue = gammaCorrection[borderBlue];
             }
             int borderColor = (int)(0xFF000000 + (borderBlue << 16) + (borderGreen << 8) + borderRed);
 
@@ -190,9 +200,9 @@ namespace FoenixIDE.Display
                 byte backBlue = VICKY.ReadByte(0xF);
                 if (gammaCorrection != null)
                 {
-                    backRed = gammaCorrection[backRed, 2];
-                    backGreen = gammaCorrection[backGreen, 1];
-                    backBlue = gammaCorrection[backBlue, 0];
+                    backRed = gammaCorrection[0x200 + backRed];
+                    backGreen = gammaCorrection[0x100 + backGreen];
+                    backBlue = gammaCorrection[backBlue];
                 }
                 int backgroundColor = (int)(0xFF000000 + (backBlue << 16) + (backGreen << 8) + backRed);
                 Brush graphBackgroundBrush = new SolidBrush(Color.FromArgb(backgroundColor));
@@ -243,25 +253,23 @@ namespace FoenixIDE.Display
             {
                 DrawMouse(frameBuffer);
             }
-            e.Graphics.DrawImage(frameBuffer, 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height);
+            e.Graphics.DrawImage(frameBuffer, ClientRectangle);
+            drawing = false;
         }
 
-        public static byte[,] LoadGammaCorrection(MemoryRAM VKY)
+        public static byte[] LoadGammaCorrection(MemoryRAM VKY)
         {
             // Read the color lookup tables
             int gamAddress = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
-            
-            byte[,] result = new byte[256,3];
-            for (int c = 0; c < 256; c++)
-            {
-                byte blue = VKY.ReadByte(gamAddress);
-                byte green = VKY.ReadByte(0x100 + gamAddress);
-                byte red = VKY.ReadByte(0x200 + gamAddress);
-                gamAddress++;
-                result[c, 0] = blue;
-                result[c, 1] = green;
-                result[c, 2] = red;
-            }
+            // 
+            byte[] result = new byte[3*256];
+            VKY.Copy(gamAddress, result, 0, 3 * 256);
+            //for (int c = 0; c < 256; c++)
+            //{
+            //    result[c] = VKY.ReadByte(gamAddress + c);
+            //    result[0x100 + c] = VKY.ReadByte(0x100 + gamAddress + c);
+            //    result[0x200 + c] = VKY.ReadByte(0x200 + gamAddress + c);
+            //}
             return result;
         }
 
@@ -368,13 +376,13 @@ namespace FoenixIDE.Display
 
                     if (gammaCorrection != null)
                     {
-                        fgValueBlue = gammaCorrection[fgValueBlue, 0];
-                        fgValueGreen = gammaCorrection[fgValueGreen, 1];
-                        fgValueRed = gammaCorrection[fgValueRed, 2];
+                        fgValueBlue = gammaCorrection[fgValueBlue];
+                        fgValueGreen = gammaCorrection[0x100 + fgValueGreen];
+                        fgValueRed = gammaCorrection[0x200 + fgValueRed];
 
-                        bgValueBlue = gammaCorrection[bgValueBlue, 0];
-                        bgValueGreen = gammaCorrection[bgValueGreen, 1];
-                        bgValueRed = gammaCorrection[bgValueRed, 2];
+                        bgValueBlue = gammaCorrection[bgValueBlue];
+                        bgValueGreen = gammaCorrection[0x100 + bgValueGreen];
+                        bgValueRed = gammaCorrection[0x200 + bgValueRed];
                     }
                     int fgValue = (int)((fgValueBlue << 16) + (fgValueGreen << 8) + fgValueRed + 0xFF000000);
                     int bgValue = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
@@ -485,9 +493,9 @@ namespace FoenixIDE.Display
                     if (gammaCorrection != null )
                     {
                         //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
-                        value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10, 0] << 0x10) +
-                                      (gammaCorrection[(value & 0x0000FF00) >> 0x08, 1] << 0x08) +
-                                      (gammaCorrection[(value & 0x000000FF), 2]) + 0xFF000000);
+                        value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10] << 0x10) +
+                                      (gammaCorrection[0x100 + ((value & 0x0000FF00) >> 0x08)] << 0x08) +
+                                      (gammaCorrection[0x200 + (value & 0x000000FF)]) + 0xFF000000);
                     }
 
                     System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
@@ -544,9 +552,9 @@ namespace FoenixIDE.Display
                                 if (gammaCorrection != null)
                                 {
                                     //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
-                                    value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10, 0] << 0x10) +
-                                                  (gammaCorrection[(value & 0x0000FF00) >> 0x08, 1] << 0x08) +
-                                                  (gammaCorrection[(value & 0x000000FF), 2]) + 0xFF000000);
+                                    value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10] << 0x10) +
+                                                  (gammaCorrection[0x100 + ((value & 0x0000FF00) >> 0x08)] << 0x08) +
+                                                  (gammaCorrection[0x200 + (value & 0x000000FF)]) + 0xFF000000);
                                 }
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
                             }
@@ -598,9 +606,9 @@ namespace FoenixIDE.Display
                                 if (gammaCorrection != null)
                                 {
                                     //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
-                                    value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10, 0] << 0x10) +
-                                                  (gammaCorrection[(value & 0x0000FF00) >> 0x08, 1] << 0x08) +
-                                                  (gammaCorrection[(value & 0x000000FF), 2]) + 0xFF000000);
+                                    value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10] << 0x10) +
+                                                  (gammaCorrection[0x100 + ((value & 0x0000FF00) >> 0x08)] << 0x08) +
+                                                  (gammaCorrection[0x200 + (value & 0x000000FF)]) + 0xFF000000);
                                 }
 
                                 System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
@@ -641,9 +649,9 @@ namespace FoenixIDE.Display
                     {
                         if (gammaCorrection != null)
                         {
-                            pixelIndexB = gammaCorrection[pixelIndexR, 0];
-                            pixelIndexG = gammaCorrection[pixelIndexR, 1];
-                            pixelIndexR = gammaCorrection[pixelIndexR, 2];
+                            pixelIndexB = gammaCorrection[pixelIndexR];
+                            pixelIndexG = gammaCorrection[0x100 + pixelIndexR];
+                            pixelIndexR = gammaCorrection[0x200 + pixelIndexR];
                         }
                         int value = (int)((pixelIndexB << 16) + (pixelIndexG << 8) + pixelIndexR + 0xFF000000);
                         System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
