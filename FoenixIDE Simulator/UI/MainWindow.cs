@@ -361,8 +361,6 @@ namespace FoenixIDE.UI
                 tileEditor = new TileEditor();
                 tileEditor.SetMemory(kernel.Memory);
                 gpu.TileEditorMode = true;
-                gpu.ColumnsVisible = 72;
-                gpu.LinesVisible = 52;
                 // Set Vicky into Tile mode
                 previousGraphicMode = kernel.Memory.VICKY.ReadByte(0);
                 kernel.Memory.VICKY.WriteByte(0, 0x10);

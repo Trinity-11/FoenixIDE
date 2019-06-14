@@ -25,7 +25,7 @@ namespace FoenixIDE.Common
                 else
                 {
                     processedFileName = null;
-                    throw new System.IO.FileNotFoundException("Could not find Hex file \"" + Filename + "\"");
+                    Application.Exit();
                 }
             }
                 

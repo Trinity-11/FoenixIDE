@@ -10,6 +10,7 @@ using System.Drawing.Text;
 using System.Drawing.Imaging;
 using FoenixIDE.Common;
 using FoenixIDE.MemoryLocations;
+using System.Diagnostics;
 
 namespace FoenixIDE.Display
 {
@@ -43,7 +44,7 @@ namespace FoenixIDE.Display
         /// One frame = 1/60 second.
         /// </summary>
         public int RefreshTimer = 0;
-        public int BlinkRate = 10;
+        private const int BLINK_RATE = 15;
 
         public ColorCodes CurrentColor = ColorCodes.White;
 
@@ -56,165 +57,8 @@ namespace FoenixIDE.Display
 
         Timer gpuRefreshTimer = new Timer
         {
-            Interval = (int)(1000 / 60),
-            Enabled = true
+            Interval = 15
         };
-
-        bool CursorState = true;
-        private bool CursorEnabled
-        {
-            get
-            {
-                if (RAM == null)
-                    return false;
-
-                return (VICKY.ReadByte(MemoryMap.VKY_TXT_CURSOR_CTRL_REG - MemoryMap.VICKY_START) & 1) == 1;
-            }
-        }
-
-        public bool TileEditorMode
-        {
-            get
-            {
-                return tileEditorMode;
-            }
-            set
-            {
-                tileEditorMode = value;
-            }
-        }
-
-        private int GetCharPos(int row, int col)
-        {
-            if (RAM == null)
-                return 0;
-            int baseAddress = RAM.ReadLong(MemoryMap.SCREENBEGIN);
-            return baseAddress + row * COLS_PER_LINE + col;
-        }
-
-        /// <summary>
-        /// Column of the cursor position. 0 is left edge
-        /// </summary>
-        [Browsable(false)]
-        public int X
-        {
-            get
-            {
-                if (RAM == null)
-                    return 0;
-
-                return RAM.ReadByte(MemoryMap.CURSORX);
-            }
-            set
-            {
-                int x = value;
-                if (x < 0)
-                    x = 0;
-                if (x >= ColumnsVisible)
-                    x = ColumnsVisible - 1;
-                if (RAM != null)
-                    RAM.WriteByte(MemoryMap.CURSORX, (byte)x);
-                ResetDrawTimer();
-                CursorPos = GetCharPos(Y, x);
-            }
-        }
-
-        /// <summary>
-        /// Row of cursor position. 0 is top of the screen
-        /// </summary>
-        [Browsable(false)]
-        public int Y
-        {
-            get
-            {
-                if (RAM == null)
-                    return 0;
-
-                return RAM.ReadByte(MemoryMap.CURSORY);
-            }
-            set
-            {
-                int y = value;
-                if (y < 0)
-                    y = 0;
-                if (y >= LinesVisible)
-                    y = LinesVisible - 1;
-                if (RAM != null)
-                    RAM.WriteByte(MemoryMap.CURSORY, (byte)y);
-                ResetDrawTimer();
-                CursorPos = GetCharPos(y, X);
-            }
-        }
-
-        [Browsable(false)]
-        public int ColumnsVisible
-        {
-            get
-            {
-                if (RAM == null)
-                    return 0;
-
-                return RAM.ReadByte(MemoryMap.COLS_VISIBLE);
-            }
-            set
-            {
-                if (RAM == null)
-                    return;
-
-                int i = value;
-                if (i < 0)
-                    i = 0;
-                if (i > MAX_TEXT_COLS)
-                    i = MAX_TEXT_COLS;
-                RAM.WriteWord(MemoryMap.COLS_VISIBLE, i);
-            }
-        }
-
-        [Browsable(false)]
-        public int LinesVisible
-        {
-            get
-            {
-                if (RAM == null)
-                    return 0;
-                return RAM.ReadByte(MemoryMap.LINES_VISIBLE);
-            }
-            set
-            {
-                if (RAM == null)
-                    return;
-
-                int i = value;
-                if (i < 0)
-                    i = 0;
-                if (i > MAX_TEXT_LINES)
-                    i = MAX_TEXT_LINES;
-                RAM.WriteWord(MemoryMap.LINES_VISIBLE, i);
-            }
-        }
-
-        public int COLS_PER_LINE
-        {
-            get
-            {
-                if (RAM == null)
-                    return 0;
-
-                return RAM.ReadByte(MemoryMap.COLS_PER_LINE);
-            }
-            set
-            {
-                if (RAM == null)
-                    return;
-
-                int i = value;
-                if (i < 0)
-                    i = 0;
-                if (i > MAX_TEXT_COLS)
-                    i = MAX_TEXT_COLS;
-                RAM.WriteWord(MemoryMap.COLS_PER_LINE, i);
-            }
-        }
 
         public Gpu()
         {
@@ -224,15 +68,8 @@ namespace FoenixIDE.Display
 
         void Gpu_Load(object sender, EventArgs e)
         {
-            this.SetScreenSize(80, 60);
             this.Paint += new PaintEventHandler(Gpu_Paint);
             gpuRefreshTimer.Tick += new EventHandler(GpuRefreshTimer_Tick);
-            
-            this.VisibleChanged += new EventHandler(FrameBufferControl_VisibleChanged);
-            this.DoubleBuffered = true;
-
-            X = 0;
-            Y = 0;
 
             if (DesignMode)
             {
@@ -247,43 +84,21 @@ namespace FoenixIDE.Display
                 int sidemargin = ParentForm.Width - ClientRectangle.Width;
                 ParentForm.Height = htarget + topmargin;
                 ParentForm.Width = (int)Math.Ceiling(htarget * 1.6) + sidemargin;
+                gpuRefreshTimer.Enabled = true;
             }
         }
 
-        public void ResetDrawTimer()
+        void GpuRefreshTimer_Tick(object sender, EventArgs e)
         {
-            RefreshTimer = 0;
-            CursorState = true;
-        }
-
-        public int BufferSize
-        {
-            get
+            if (RefreshTimer-- > 0)
             {
-                return MAX_TEXT_COLS * MAX_TEXT_LINES;
-            }
-        }
-
-        /// <summary>
-        /// Memory offset of the cursor position on the screen. The top-left corner is the first memory location
-        /// of the screen. 
-        /// </summary>
-        [Browsable(false)]
-        public int CursorPos
-        {
-            get
-            {
-                if (RAM == null)
-                    return 0;
-                return RAM.ReadWord(MemoryMap.CURSORPOS);
+                Refresh();
+                return;
             }
 
-            set
-            {
-                if (RAM == null)
-                    return;
-                RAM.WriteWord(MemoryMap.CURSORPOS, value);
-            }
+            CursorState = !CursorState;
+            RefreshTimer = BLINK_RATE;
+            this.Refresh();
         }
 
         /// <summary>
@@ -295,7 +110,6 @@ namespace FoenixIDE.Display
         void Gpu_Paint(object sender, PaintEventArgs e)
         {
             paintCycle++;
-
             if (VICKY == null)
             {
                 e.Graphics.DrawString("IO Memory Not Initialized", this.Font, TextBrush, 0, 0);
@@ -306,7 +120,7 @@ namespace FoenixIDE.Display
                 e.Graphics.DrawString("VRAM Not Initialized", this.Font, TextBrush, 0, 0);
                 return;
             }
-            if (RAM == null)
+            if (RAM == null || DesignMode)
             {
                 e.Graphics.DrawString("RAM Not Initialized", this.Font, TextBrush, 0, 0);
                 return;
@@ -333,7 +147,7 @@ namespace FoenixIDE.Display
 
             // Load Graphical LUTs
             graphicsLUT = LoadLUT(VICKY);
-
+            
             // Apply gamma correct
             if ((MCRegister & 0x40) == 0x40)
             {
@@ -840,68 +654,6 @@ namespace FoenixIDE.Display
             bitmap.UnlockBits(bitmapData);
         }
 
-        void GpuRefreshTimer_Tick(object sender, EventArgs e)
-        {
-            if (RefreshTimer-- > 0)
-            {
-                if (this.Visible)
-                    Refresh();
-                return;
-            }
-
-            this.Refresh();
-            CursorState = !CursorState;
-            RefreshTimer = BlinkRate;
-        }
-
-        void FrameBufferControl_VisibleChanged(object sender, EventArgs e)
-        {
-            gpuRefreshTimer.Enabled = this.Visible;
-        }
-
-        public byte ReadByte()
-        {
-            return 0;
-        }
-
-        public virtual void SetScreenSize(int Columns, int Lines)
-        {
-            this.ColumnsVisible = Columns;
-            this.LinesVisible = Lines;
-        }
-
-        public byte ReadByte(int Address)
-        {
-            if (VRAM == null)
-                return 0;
-            return VRAM.ReadByte(Address - VRAM.StartAddress);
-        }
-
-        /// return the GPU registers: start of text page, start of color page, start of character data, 
-        /// number of columns, number of LINES, graphics mode, etc. 
-        /// </summary>
-        /// <param name="Address">Address to read</param>
-        /// <returns></returns>
-        public byte ReadGPURegister(int Address)
-        {
-            return 0;
-        }
-
-        public void WriteByte(int Address, byte Data)
-        {
-            if (VICKY == null)
-                return;
-            VICKY.WriteByte(Address - VRAM.StartAddress, Data);
-            //else if (Address >= characterMatrixStart && Address < (characterMatrixStart + CharacterData.Length))
-            //{
-            //    CharacterData[Address - characterMatrixStart] = (char)Data;
-            //}
-            //else if (Address >= colorMatrixStart && Address < (colorMatrixStart + ColorData.Length))
-            //{
-            //    ColorData[Address - colorMatrixStart] = (ColorCodes)Data;
-            //}
-        }
-
         /// <summary>
         /// Loads a font set into RAM and adds it to the character set table.
         /// </summary>
@@ -917,6 +669,117 @@ namespace FoenixIDE.Display
         protected override bool IsInputKey(Keys keyData)
         {
             return true;
+        }
+
+        bool CursorState = true;
+        private bool CursorEnabled
+        {
+            get
+            {
+                if (RAM == null)
+                    return false;
+
+                return (VICKY.ReadByte(MemoryMap.VKY_TXT_CURSOR_CTRL_REG - MemoryMap.VICKY_START) & 1) == 1;
+            }
+        }
+
+        public bool TileEditorMode
+        {
+            get
+            {
+                return tileEditorMode;
+            }
+            set
+            {
+                tileEditorMode = value;
+            }
+        }
+
+        private int GetCharPos(int row, int col)
+        {
+            if (RAM == null)
+                return 0;
+            int baseAddress = RAM.ReadLong(MemoryMap.SCREENBEGIN);
+            return baseAddress + row * COLS_PER_LINE + col;
+        }
+
+        /// <summary>
+        /// Column of the cursor position. 0 is left edge
+        /// </summary>
+        [Browsable(false)]
+        public int X
+        {
+            get
+            {
+                if (RAM == null)
+                    return 0;
+
+                return RAM.ReadByte(MemoryMap.CURSORX);
+            }
+        }
+
+        /// <summary>
+        /// Row of cursor position. 0 is top of the screen
+        /// </summary>
+        [Browsable(false)]
+        public int Y
+        {
+            get
+            {
+                if (RAM == null)
+                    return 0;
+
+                return RAM.ReadByte(MemoryMap.CURSORY);
+            }
+        }
+
+        [Browsable(false)]
+        public int ColumnsVisible
+        {
+            get
+            {
+                if (RAM == null)
+                    return 0;
+
+                return RAM.ReadByte(MemoryMap.COLS_VISIBLE);
+            }
+        }
+
+        [Browsable(false)]
+        public int LinesVisible
+        {
+            get
+            {
+                if (RAM == null)
+                    return 0;
+                return RAM.ReadByte(MemoryMap.LINES_VISIBLE);
+            }
+        }
+
+        public int COLS_PER_LINE
+        {
+            get
+            {
+                if (RAM == null)
+                    return 0;
+
+                return RAM.ReadByte(MemoryMap.COLS_PER_LINE);
+            }
+        }
+
+        /// <summary>
+        /// Memory offset of the cursor position on the screen. The top-left corner is the first memory location
+        /// of the screen. 
+        /// </summary>
+        [Browsable(false)]
+        public int CursorPos
+        {
+            get
+            {
+                if (RAM == null)
+                    return 0;
+                return RAM.ReadWord(MemoryMap.CURSORPOS);
+            }
         }
     }
 }

@@ -322,13 +322,9 @@ namespace FoenixIDE.UI
             // gpu
             // 
             this.gpu.BackColor = System.Drawing.Color.Blue;
-            this.gpu.COLS_PER_LINE = 0;
-            this.gpu.ColumnsVisible = 0;
-            this.gpu.CursorPos = 0;
             this.gpu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gpu.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gpu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.gpu.LinesVisible = 0;
             this.gpu.Location = new System.Drawing.Point(16, 40);
             this.gpu.Margin = new System.Windows.Forms.Padding(4);
             this.gpu.MinimumSize = new System.Drawing.Size(349, 260);
@@ -336,8 +332,6 @@ namespace FoenixIDE.UI
             this.gpu.Size = new System.Drawing.Size(480, 365);
             this.gpu.TabIndex = 0;
             this.gpu.TileEditorMode = false;
-            this.gpu.X = 0;
-            this.gpu.Y = 0;
             this.gpu.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseClick);
             this.gpu.MouseEnter += new System.EventHandler(this.Gpu_MouseEnter);
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
