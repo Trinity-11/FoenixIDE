@@ -39,11 +39,11 @@
             this.BitmapSizeLabel = new System.Windows.Forms.Label();
             this.BitmapSizeValueLabel = new System.Windows.Forms.Label();
             this.StoreButton = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
+            this.TypeLabel = new System.Windows.Forms.Label();
             this.BitmapTypesCombo = new System.Windows.Forms.ComboBox();
             this.PixelDepthLabel = new System.Windows.Forms.Label();
             this.PixelDepthValueLabel = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
+            this.LabelLUT = new System.Windows.Forms.Label();
             this.LUTCombo = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
@@ -156,14 +156,14 @@
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(12, 78);
-            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(39, 13);
-            this.label3.TabIndex = 12;
-            this.label3.Text = "Type:";
+            this.TypeLabel.AutoSize = true;
+            this.TypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TypeLabel.Location = new System.Drawing.Point(12, 78);
+            this.TypeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.TypeLabel.Name = "TypeLabel";
+            this.TypeLabel.Size = new System.Drawing.Size(39, 13);
+            this.TypeLabel.TabIndex = 12;
+            this.TypeLabel.Text = "Type:";
             // 
             // BitmapTypesCombo
             // 
@@ -199,14 +199,14 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(306, 78);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 16;
-            this.label1.Text = "LUT:";
+            this.LabelLUT.AutoSize = true;
+            this.LabelLUT.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LabelLUT.Location = new System.Drawing.Point(306, 78);
+            this.LabelLUT.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.LabelLUT.Name = "LabelLUT";
+            this.LabelLUT.Size = new System.Drawing.Size(35, 13);
+            this.LabelLUT.TabIndex = 16;
+            this.LabelLUT.Text = "LUT:";
             // 
             // LUTCombo
             // 
@@ -224,11 +224,11 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(476, 145);
             this.Controls.Add(this.LUTCombo);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.LabelLUT);
             this.Controls.Add(this.PixelDepthValueLabel);
             this.Controls.Add(this.PixelDepthLabel);
             this.Controls.Add(this.BitmapTypesCombo);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.TypeLabel);
             this.Controls.Add(this.BitmapSizeValueLabel);
             this.Controls.Add(this.BitmapSizeLabel);
             this.Controls.Add(this.LoadAddressTextBox);
@@ -262,11 +262,11 @@
         private System.Windows.Forms.Label BitmapSizeLabel;
         private System.Windows.Forms.Label BitmapSizeValueLabel;
         private System.Windows.Forms.Button StoreButton;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label TypeLabel;
         private System.Windows.Forms.ComboBox BitmapTypesCombo;
         private System.Windows.Forms.Label PixelDepthLabel;
         private System.Windows.Forms.Label PixelDepthValueLabel;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label LabelLUT;
         private System.Windows.Forms.ComboBox LUTCombo;
     }
 }

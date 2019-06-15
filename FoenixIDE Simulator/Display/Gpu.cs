@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Text;
@@ -111,7 +109,6 @@ namespace FoenixIDE.Display
         void Gpu_Paint(object sender, PaintEventArgs e)
         {
             paintCycle++;
-            
 
             if (VICKY == null)
             {
@@ -141,7 +138,12 @@ namespace FoenixIDE.Display
                 return;
             }
             drawing = true;
-            
+
+            e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+
             if (MCRegister != 0 && MCRegister != 0x80)
             {
                 StartOfFrame?.Invoke();
@@ -490,7 +492,7 @@ namespace FoenixIDE.Display
                                       (gammaCorrection[0x200 + (value & 0x000000FF)]) + 0xFF000000);
                     }
 
-                    System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
+                    System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * width + col) * 4, value);
                 }
             }
             bitmap.UnlockBits(bitmapData);
