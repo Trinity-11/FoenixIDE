@@ -367,7 +367,7 @@ namespace FoenixIDE.UI
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.Load += new System.EventHandler(this.BasicWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyDown);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyUp);
+            //this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyUp);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);

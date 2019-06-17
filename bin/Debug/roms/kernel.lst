@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.53.1515 listing file
 ; 64tass.exe --long-address -x --intel-hex -o kernel.hex --list kernel.lst kernel.asm
-; Thu Jun 06 21:26:11 2019
+; Sat Jun 15 17:55:04 2019
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -171,6 +171,7 @@
 =$0006ff				SDOS_BLK_END     = $0006FF ;
 =$000f00				KEY_BUFFER       = $000F00 ;64 Bytes keyboard buffer
 =$0080					KEY_BUFFER_SIZE  = $0080 ;128 Bytes (constant) keyboard buffer length
+=$000f00				MOUSE_BUTTONS_REG= $000F00 ; bit 2=middle, bit 1=right, bit 0=left
 =$000f7f				KEY_BUFFER_END   = $000F7F ;1 Byte  Last byte of keyboard buffer
 =$000f83				KEY_BUFFER_CMD   = $000F83 ;1 Byte  Indicates the Command Process Status
 =$000f84				COMMAND_SIZE_STR = $000F84 ; 1 Byte

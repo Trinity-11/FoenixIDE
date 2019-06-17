@@ -375,7 +375,7 @@ namespace FoenixIDE.Processor
         public void Push(int value, int bytes)
         {
             if (bytes < 1 || bytes > 3)
-                throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
+                throw new Exception("bytes must be between 1 and 3. Got " + bytes.ToString());
 
             Stack.Value -= bytes;
             Memory.Write(Stack.Value + 1, value, bytes);

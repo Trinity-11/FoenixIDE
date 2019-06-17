@@ -196,7 +196,10 @@ namespace FoenixIDE.Processor
 
             // This effective address can overflow into the next bank.
             int ptr = cpu.Memory.ReadLong(addr) + Y.Value;
-            return cpu.Memory.ReadWord(ptr);
+            if (cpu.A.Width == 1)
+                return cpu.Memory.ReadByte(ptr);
+            else
+                return cpu.Memory.ReadWord(ptr);
         }
 
         /// <summary>
