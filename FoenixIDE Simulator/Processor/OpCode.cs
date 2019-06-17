@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Threading.Tasks;
 using FoenixIDE;
@@ -52,10 +52,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (ActionRegister == null)
-                    return Length8Bit;
-
-                if (ActionRegister.Width == 2)
+                if (ActionRegister != null && ActionRegister.Width == 2)
                     return Length8Bit + 1;
 
                 return Length8Bit;

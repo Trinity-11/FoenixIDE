@@ -2,11 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -83,7 +81,6 @@ namespace FoenixIDE.UI
                 serial.Open();
                 // Enable all the button if the serial Port turns out to be the good one.
                 BrowseFileButton.Enabled = SendFileRadio.Checked;
-                C256DestAddress.Enabled = true;
 
                 SendBinaryButton.Enabled = GetTransmissionSize() > 0;
                 COMPortComboBox.Enabled = false;
@@ -118,11 +115,37 @@ namespace FoenixIDE.UI
             // Display the file length in hex
             if (filename != null && filename.Length > 0)
             {
-                FileInfo f = new FileInfo(filename);
-                flen = f.Length;
-                String hexSize = flen.ToString("X6");
-                FileSizeResultLabel.Text = "$" + hexSize.Substring(0, 2) + ":" + hexSize.Substring(2);
+                if (Path.GetExtension(filename).ToUpper().Equals(".BIN"))
+                {
+
+
+                    FileInfo f = new FileInfo(filename);
+                    flen = f.Length;
+                    
+                }
+                else
+                {
+                    // We're loading a HEX file, so only consider the lines that are record type 00
+                    string[] lines = System.IO.File.ReadAllLines(filename);
+                    foreach (string l in lines)
+                    {
+                        if (l.StartsWith(":"))
+                        {
+                            string mark = l.Substring(0, 1);
+                            string reclen = l.Substring(1, 2);
+                            string offset = l.Substring(3, 4);
+                            string rectype = l.Substring(7, 2);
+
+                            if (rectype.Equals("00"))
+                            {
+                                flen += Convert.ToInt32(reclen, 16);
+                            }
+                        }
+                    }
+                }
             }
+            String hexSize = flen.ToString("X6");
+            FileSizeResultLabel.Text = "$" + hexSize.Substring(0, 2) + ":" + hexSize.Substring(2);
             return flen;
         }
 
@@ -134,22 +157,20 @@ namespace FoenixIDE.UI
             OpenFileDialog openFileDlg = new OpenFileDialog
             {
                 DefaultExt = ".bin",
-                Filter = "Binary documents|*.bin"
+                Filter = "Binary documents|*.bin|Hex documents|*.hex",
+                Title = "Upload to the C256 Foenix"
             };
-
-            // Set initial directory    
-            //openFileDlg.InitialDirectory = @"C:\Temp\";
 
             // Load content of file in a TextBlock
             if (openFileDlg.ShowDialog() == DialogResult.OK)
             {
-                // Display the file length
-                long flen = GetFileLength(openFileDlg.FileName);
-
+                string extension = Path.GetExtension(openFileDlg.FileName);
                 // Display the file name
                 FileNameTextBox.Text = openFileDlg.FileName;
-
-                C256DestAddress.Enabled = true;
+                C256DestAddress.Enabled = extension.ToUpper().Equals(".BIN");
+                // Display the file length
+                long flen = GetFileLength(openFileDlg.FileName);
+                    
                 SendBinaryButton.Enabled = (flen != -1) && !ConnectButton.Visible;
             }
         }
@@ -165,7 +186,16 @@ namespace FoenixIDE.UI
             int transmissionSize = GetTransmissionSize();
             EmuSrcSize.Enabled = BlockSendRadio.Checked;
             EmuSrcAddress.Enabled = BlockSendRadio.Checked;
-            C256DestAddress.Enabled = (transmissionSize > 0 || BlockSendRadio.Checked);
+            if (FileNameTextBox.Text.Length == 0 || BlockSendRadio.Checked)
+            {
+                C256DestAddress.Enabled = (transmissionSize > 0 || BlockSendRadio.Checked);
+            }
+            else
+            {
+                string extension = Path.GetExtension(FileNameTextBox.Text).ToUpper();
+                C256DestAddress.Enabled = (transmissionSize > 0 || BlockSendRadio.Checked) && extension.Equals(".BIN");
+            }
+            
 
             C256SrcSize.Enabled = FetchRadio.Checked;
             C256SrcAddress.Enabled = FetchRadio.Checked;
@@ -184,33 +214,109 @@ namespace FoenixIDE.UI
             UploadProgressBar.Maximum = transmissionSize;
             UploadProgressBar.Value = 0;
             UploadProgressBar.Visible = true;
-
-            int FnxAddressPtr = int.Parse(C256DestAddress.Text.Replace(":", ""), System.Globalization.NumberStyles.AllowHexSpecifier);
-            Console.WriteLine("Starting Address: " + FnxAddressPtr);
-            Console.WriteLine("Size of File: " + transmissionSize);
-
-            byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
+            
             if (SendFileRadio.Checked)
             {
-                // Read the bytes and put them in the buffer
-                DataBuffer = System.IO.File.ReadAllBytes(FileNameTextBox.Text);
-                SendData(DataBuffer, FnxAddressPtr, transmissionSize);
+                if (Path.GetExtension(FileNameTextBox.Text).ToUpper().Equals(".BIN"))
+                {
+                    //byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
+                    // Read the bytes and put them in the buffer
+                    byte[] DataBuffer = System.IO.File.ReadAllBytes(FileNameTextBox.Text);
+                    int FnxAddressPtr = int.Parse(C256DestAddress.Text.Replace(":", ""), System.Globalization.NumberStyles.AllowHexSpecifier);
+                    Console.WriteLine("Starting Address: " + FnxAddressPtr);
+                    Console.WriteLine("Size of File: " + transmissionSize);
+                    SendData(DataBuffer, FnxAddressPtr, transmissionSize, DebugModeCheckbox.Checked);
+                }
+                else
+                {
+                    if (serial.IsOpen)
+                    {
+                        // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
+                        if (DebugModeCheckbox.Checked)
+                        {
+                            GetFnxInDebugMode();
+                        }
+
+                        // If send HEX files, each time we encounter a "bank" change - record 04 - send a new data block
+                        string[] lines = System.IO.File.ReadAllLines(FileNameTextBox.Text);
+                        int bank = 0;
+                        int address = 0;
+                        byte[] pageFF = new byte[256];
+                        bool resetVector = false;
+                        foreach (string l in lines)
+                        {
+                            if (l.StartsWith(":"))
+                            {
+                                string mark = l.Substring(0, 1);
+                                string reclen = l.Substring(1, 2);
+                                string offset = l.Substring(3, 4);
+                                string rectype = l.Substring(7, 2);
+                                string data = l.Substring(9, l.Length - 11);
+                                string checksum = l.Substring(l.Length - 2);
+
+                                switch (rectype)
+                                {
+                                    case "00":
+                                        int length = Convert.ToInt32(reclen, 16);
+                                        byte[] DataBuffer = new byte[length];
+                                        address = HexFile.GetByte(offset, 0, 2);
+                                        for (int i = 0; i < data.Length; i += 2)
+                                        {
+                                            DataBuffer[i/2] = (byte)HexFile.GetByte(data, i, 1);
+                                        }
+                                        PreparePacket2Write(DataBuffer, bank + address, 0, length);
+                                        if (bank + address >= 0xFF00 && (bank + address) < 0xFFFF)
+                                        {
+                                            Array.Copy(DataBuffer, 0, pageFF, bank+address - 0xFF00, length);
+                                            resetVector = true;
+                                        } else if (bank + address >= 0x18_FF00 && (bank + address) < 0x18_FFFF)
+                                        {
+                                            Array.Copy(DataBuffer, 0, pageFF, bank + address - 0x18_FF00, length);
+                                            resetVector = true;
+                                        }
+                                        UploadProgressBar.Increment(length);
+
+                                        break;
+
+                                    case "04":
+                                        bank = HexFile.GetByte(data, 0, 2) << 16;
+                                        break;
+                                }
+                            }
+                        }
+
+                        if (DebugModeCheckbox.Checked)
+                        {
+                            // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                            if (resetVector)
+                            {
+                                PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            }
+                            // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
+                            ExitFnxDebugMode();
+                        }
+                        MessageBox.Show("Transfer Done! System Reset!", "Send Binary Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
             }
             else if (BlockSendRadio.Checked)
             {
                 int blockAddress = Convert.ToInt32(EmuSrcAddress.Text.Replace(":",""), 16);
                 // Read the data directly from emulator memory
                 int offset = 0;
+                int FnxAddressPtr = int.Parse(C256DestAddress.Text.Replace(":", ""), System.Globalization.NumberStyles.AllowHexSpecifier);
+                byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
                 for (int start = blockAddress; start < blockAddress + transmissionSize; start++)
                 {
                     DataBuffer[offset++] = Memory.ReadByte(start);
                 }
-                SendData(DataBuffer, FnxAddressPtr, transmissionSize);
+                SendData(DataBuffer, FnxAddressPtr, transmissionSize, DebugModeCheckbox.Checked);
             }
             else
             {
                 int blockAddress = Convert.ToInt32(C256SrcAddress.Text.Replace(":", ""), 16);
-                if (FetchData(DataBuffer, blockAddress, transmissionSize))
+                byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
+                if (FetchData(DataBuffer, blockAddress, transmissionSize, DebugModeCheckbox.Checked))
                 {
                     MemoryRAM mem = new MemoryRAM(blockAddress, transmissionSize);
                     mem.Load(DataBuffer, 0, 0, transmissionSize);
@@ -218,7 +324,7 @@ namespace FoenixIDE.UI
                     {
                         Memory = mem,
                         Text = "C256 Memory from " + blockAddress.ToString("X6") + 
-                            " to " + (blockAddress + transmissionSize -1).ToString("X6")
+                            " to " + (blockAddress + transmissionSize - 1).ToString("X6")
                     };
                     tempMem.GotoAddress(blockAddress);
                     tempMem.Show();
@@ -230,14 +336,17 @@ namespace FoenixIDE.UI
             DisconnectButton.Enabled = true;
         }
 
-        private void SendData(byte[] buffer, int startAddress, int size)
+        private void SendData(byte[] buffer, int startAddress, int size, bool debugMode)
         {
             try
             {
                 if (serial.IsOpen)
                 {
                     // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
-                    GetFnxInDebugMode();
+                    if (debugMode)
+                    {
+                        GetFnxInDebugMode();
+                    }
                     // Now's let's transfer the code
                     if (size <= 2048)
                     {
@@ -267,14 +376,17 @@ namespace FoenixIDE.UI
                         }
                     }
 
-                    // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                    if (startAddress < 0xFF00 && (startAddress + buffer.Length) > 0xFFFF || (startAddress == 0x18_0000 && buffer.Length > 0xFFFF))
+                    if (debugMode)
                     {
-                        PreparePacket2Write(buffer, 0x00FF00, 0x00FF00, 256);
-                    }
+                        // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                        if (startAddress < 0xFF00 && (startAddress + buffer.Length) > 0xFFFF || (startAddress == 0x18_0000 && buffer.Length > 0xFFFF))
+                        {
+                            PreparePacket2Write(buffer, 0x00FF00, 0x00FF00, 256);
+                        }
 
-                    // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
-                    ExitFnxDebugMode();
+                        // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
+                        ExitFnxDebugMode();
+                    }
 
                     MessageBox.Show("Transfer Done! System Reset!", "Send Binary Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -286,14 +398,18 @@ namespace FoenixIDE.UI
             }
         }
 
-        private bool FetchData(byte[] buffer, int startAddress, int size)
+        private bool FetchData(byte[] buffer, int startAddress, int size, bool debugMode)
         {
             bool success = false;
             try
             {
                 if (serial.IsOpen)
                 {
-                    GetFnxInDebugMode();
+                    if (debugMode)
+                    {
+                        GetFnxInDebugMode();
+                    }
+                    
                     if (size < 2048)
                     {
                         PreparePacket2Read(buffer, startAddress, 0, size);
@@ -317,9 +433,11 @@ namespace FoenixIDE.UI
                             UploadProgressBar.Increment(BufferSize);
                         }
                     }
-                    
 
-                    ExitFnxDebugMode();
+                    if (debugMode)
+                    {
+                        ExitFnxDebugMode();
+                    }
                     success = true;
                 }
             }
@@ -417,7 +535,7 @@ namespace FoenixIDE.UI
                 commandBuffer[4] = (byte)(address & 0xFF); //Address Lo
                 commandBuffer[5] = (byte)(size >> 8); //Size HI
                 commandBuffer[6] = (byte)(size & 0xFF); //Size LO
-                commandBuffer[7] = 0x5A;
+                commandBuffer[7] = XorCheck(commandBuffer);
 
                 byte[] partialBuffer = new byte[size];
                 SendMessage(commandBuffer, partialBuffer);
@@ -425,10 +543,18 @@ namespace FoenixIDE.UI
             }
         }
 
+        private byte XorCheck(byte[] buffer)
+        {
+            byte check = buffer[0];
+            for (int i = 1; i < buffer.Length; i++)
+            {
+                check ^= buffer[i];
+            }
+            return check;
+        }
         public void SendMessage(byte[] command, byte[] data)
         {
             //            int dwStartTime = System.Environment.TickCount;
-            int i;
             byte byte_buffer;
 
             serial.Write(command, 0, command.Length);
@@ -450,7 +576,7 @@ namespace FoenixIDE.UI
                 Stat1 = (byte)serial.ReadByte();
                 if (data != null)
                 {
-                    for (i = 0; i < data.Length; i++)
+                    for (int i = 0; i < data.Length; i++)
                     {
                         data[i] = (byte)serial.ReadByte();
                     }
@@ -459,7 +585,7 @@ namespace FoenixIDE.UI
             }
 
             RxProcessLRC(data);
-            Console.WriteLine("Recieve Data LRC:" + RxLRC);
+            Console.WriteLine("Receive Data LRC:" + RxLRC);
         }
 
         public int TxProcessLRC(byte[] buffer)

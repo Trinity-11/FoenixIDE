@@ -1,3 +1,13 @@
+Release 0.2.3.1
+---------------
+Made some optimizations to the code to get to 12 Mhz in code execution.
+Made some optimizations to the GPU code to get to more than 60 frames per second.
+Created devices folder to help make the code clearer.
+
+Release 0.2.2.12
+----------------
+Added uploading of HEX files.  This includes the handling of the page FF interrupt vectors.
+
 Release 0.2.2.8
 ---------------
 Added the Real-Time Clock.

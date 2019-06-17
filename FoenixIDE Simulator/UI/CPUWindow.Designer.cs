@@ -82,9 +82,9 @@
             // 
             this.stepsInput.Dock = System.Windows.Forms.DockStyle.Left;
             this.stepsInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stepsInput.Location = new System.Drawing.Point(256, 0);
+            this.stepsInput.Location = new System.Drawing.Point(271, 0);
             this.stepsInput.Name = "stepsInput";
-            this.stepsInput.Size = new System.Drawing.Size(64, 23);
+            this.stepsInput.Size = new System.Drawing.Size(47, 23);
             this.stepsInput.TabIndex = 3;
             this.stepsInput.Text = "1";
             this.stepsInput.Enter += new System.EventHandler(this.StepsInput_Enter);
@@ -136,8 +136,8 @@
             this.stepsLabel.Dock = System.Windows.Forms.DockStyle.Left;
             this.stepsLabel.Location = new System.Drawing.Point(192, 0);
             this.stepsLabel.Name = "stepsLabel";
-            this.stepsLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.stepsLabel.Size = new System.Drawing.Size(64, 24);
+            this.stepsLabel.Padding = new System.Windows.Forms.Padding(10, 4, 0, 0);
+            this.stepsLabel.Size = new System.Drawing.Size(79, 24);
             this.stepsLabel.TabIndex = 4;
             this.stepsLabel.Text = "Steps (dec)";
             // 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Threading.Tasks;
 
@@ -154,9 +154,9 @@ namespace FoenixIDE.Processor
         public virtual int GetLongAddress(int Address)
         {
             if (this.byteLength == 2)
-                return (this.Value << 8) + Address;
+                return (this.Value << 8) | Address;
             else if (this.byteLength == 1)
-                return (this.Value << 16) + Address;
+                return (this.Value << 16) | Address;
             else
                 return this.Value;
         }
@@ -169,9 +169,9 @@ namespace FoenixIDE.Processor
         public virtual int GetLongAddress(Register Address)
         {
             if (this.byteLength == 2)
-                return (this.Value << 8) + Address.Value;
+                return (this.Value << 8) | Address.Value;
             else if (this.byteLength == 1)
-                return (this.Value << 16) + Address.Value;
+                return (this.Value << 16) | Address.Value;
             else
                 return this.Value;
         }
@@ -209,7 +209,7 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         public int GetLongAdddress(int address)
         {
-            return (this.Value << 8) + address;
+            return (this.Value << 8) | address;
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         public int GetLongAdddress(Register index)
         {
-            return (this.Value << 8) + index.Value;
+            return (this.Value << 8) | index.Value;
         }
     }
 
@@ -250,6 +250,7 @@ namespace FoenixIDE.Processor
 
     public class RegisterBankNumber : Register8
     {
+        private int _LV = 0;
         /// <summary>
         /// Adds the 16-bit address in the register to this bank to get a 24-bit address
         /// </summary>
@@ -257,7 +258,7 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         public virtual int GetLongAddress(Register16 Address)
         {
-            return (this.Value << 16) + Address.Value;
+            return _LV | Address.Value;
         }
 
         /// <summary>
@@ -267,7 +268,16 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         public override int GetLongAddress(int Address)
         {
-            return (this.Value << 16) + Address;
+            return _LV | Address;
+        }
+
+        public override int Value {
+            get => base.Value;
+            set
+            {
+                _value = value;
+                _LV = value << 16;
+            }
         }
     }
 
@@ -297,7 +307,7 @@ namespace FoenixIDE.Processor
         /// <returns></returns>
         public override int GetLongAddress(int address)
         {
-            return (this.Value) + (address & 0Xff);
+            return this.Value | (address & 0Xff);
         }
 
     }

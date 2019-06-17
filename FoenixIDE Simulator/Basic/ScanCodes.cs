@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FoenixIDE.Simulator.Basic
 {
-    enum ScanCode
+    public enum ScanCode
     {
         sc_null = 0x00,
         sc_escape = 0x01,
@@ -165,8 +164,16 @@ namespace FoenixIDE.Simulator.Basic
                     return ScanCode.sc_equals;
                 case Keys.Tab:
                     return ScanCode.sc_tab;
-                case Keys.Divide:
+                case Keys.Oem2:
                     return ScanCode.sc_slash;
+                case Keys.Oem5:
+                    return ScanCode.sc_backslash;
+                case Keys.ShiftKey:
+                    return ScanCode.sc_shiftLeft;
+                case Keys.Alt:
+                    return ScanCode.sc_altLeft;
+                case Keys.ControlKey:
+                    return ScanCode.sc_controlLeft;
             }
             return ScanCode.sc_null;
         }

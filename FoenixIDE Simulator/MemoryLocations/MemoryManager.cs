@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FoenixIDE.Processor;
 using FoenixIDE.Display;
 using FoenixIDE.MemoryLocations;
 using FoenixIDE.Common;
+using FoenixIDE.Simulator.Devices;
 
 namespace FoenixIDE
 {
@@ -22,11 +22,13 @@ namespace FoenixIDE
         public MemoryRAM RAM = null;
         public MemoryRAM FLASH = null;
         public MemoryRAM VIDEO = null;
-        public MemoryRAM IO = null;
-        public MathCoproMemoryRAM MATH = null;
-        public MemoryRAM CODEC = null;
-        public MemoryRAM KEYBOARD = null;
-        public MemoryRAM SDCARD = null;
+        public MemoryRAM VICKY = null;
+        public MemoryRAM BEATRIX = null;
+        public MathCoproRegisters MATH = null;
+        public CodecRAM CODEC = null;
+        public KeyboardRegister KEYBOARD = null;
+        public SuperIORegister SDCARD = null;
+        public InterruptController INTERRUPT = null;
 
         public bool VectorPull = false;
 
@@ -65,10 +67,10 @@ namespace FoenixIDE
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
         {
-            if (Address >= MemoryMap.CODEC_WR_CTRL && Address <= MemoryMap.CODEC_WR_CTRL)
+            if (Address == MemoryMap.CODEC_WR_CTRL)
             {
                 Device = CODEC;
-                DeviceAddress = Address - CODEC.StartAddress;
+                DeviceAddress = 0;
                 return;
             }
             if (Address >= MemoryMap.MATH_START && Address <= MemoryMap.MATH_END)
@@ -77,14 +79,19 @@ namespace FoenixIDE
                 DeviceAddress = Address - MATH.StartAddress;
                 return;
             }
-            if ((Address >= MemoryMap.RAM_START && Address < MemoryMap.MATH_START) ||
-                (Address > MemoryMap.MATH_END && Address <= MemoryMap.RAM_END))
+            if (Address >= MemoryMap.INT_PENDING_REG0 && Address <= MemoryMap.INT_PENDING_REG2)
+            {
+                Device = INTERRUPT;
+                DeviceAddress = Address - INTERRUPT.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.RAM_START && Address <= MemoryMap.RAM_END)
             {
                 Device = RAM;
                 DeviceAddress = Address - RAM.StartAddress;
                 return;
             }
-
+            
             if (Address >= MemoryMap.KBD_DATA_BUF && Address <= MemoryMap.KBD_STATUS_PORT)
             {
                 Device = KEYBOARD;
@@ -97,27 +104,30 @@ namespace FoenixIDE
                 DeviceAddress = Address - MemoryMap.SDCARD_DATA;
                 return;
             }
-            if(Address >= MemoryMap.IO_START && Address <= MemoryMap.IO_END)
+            if (Address >= MemoryMap.VICKY_START && Address <= MemoryMap.VICKY_END)
             {
-                Device = IO;
-                DeviceAddress = Address - IO.StartAddress;
+                Device = VICKY;
+                DeviceAddress = Address - VICKY.StartAddress;
                 return;
             }
-
+            if (Address >= MemoryMap.BEATRIX_START && Address <= MemoryMap.BEATRIX_END)
+            {
+                Device = BEATRIX;
+                DeviceAddress = Address - BEATRIX.StartAddress;
+                return;
+            }
             if (Address >= MemoryMap.VIDEO_START && Address < (MemoryMap.VIDEO_START + MemoryMap.VIDEO_SIZE))
             {
                 Device = VIDEO;
                 DeviceAddress = Address - VIDEO.StartAddress;
                 return;
             }
-
             if (Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)
             {
                 Device = FLASH;
                 DeviceAddress = Address - FLASH.StartAddress;
                 return;
             }
-
 
             // oops, we didn't map this to anything. 
             Device = null;
@@ -136,6 +146,10 @@ namespace FoenixIDE
             set { WriteByte(Bank * 0xffff + Address & 0xffff, value); }
         }
 
+        /// <summary>
+        /// Finds device mapped to 'Address' and calls it 
+        /// 'Address' is offset by GetDeviceAt to device internal address range
+        /// </summary>
         public virtual byte ReadByte(int Address)
         {
             GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
@@ -152,7 +166,7 @@ namespace FoenixIDE
         public int ReadWord(int Address)
         {
             GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
-            return device.ReadByte(deviceAddress) + (device.ReadByte(deviceAddress + 1) << 8);
+            return device.ReadByte(deviceAddress) | (device.ReadByte(deviceAddress + 1) << 8);
         }
 
         /// <summary>
@@ -164,8 +178,8 @@ namespace FoenixIDE
         {
             GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
             return device.ReadByte(deviceAddress)
-                + (device.ReadByte(deviceAddress + 1) << 8)
-                + (device.ReadByte(deviceAddress + 2) << 16);
+                | (device.ReadByte(deviceAddress + 1) << 8)
+                | (device.ReadByte(deviceAddress + 2) << 16);
         }
 
         public virtual void WriteByte(int Address, byte Value)

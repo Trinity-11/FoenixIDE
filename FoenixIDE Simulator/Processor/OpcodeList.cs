@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,6 +8,8 @@ namespace FoenixIDE.Processor
 {
     public class OpcodeList : List<OpCode>
     {
+        #region constants
+
         public const int PUSH2 = 16;
         public const int ADD1_16BIT = 32;
 
@@ -268,6 +270,9 @@ namespace FoenixIDE.Processor
         public const int INC_AbsoluteIndexedWithX = 0xFE;
         public const int SBC_AbsoluteLongIndexedWithX = 0xFF;
 
+        #endregion constants
+
+        
         public OpcodeList(Operations operations, CPU CPU)
         {
             Add(new OpCode(0x00, "BRK", 2, AddressModes.Interrupt, new OpCode.ExecuteDelegate(operations.ExecuteInterrupt)));

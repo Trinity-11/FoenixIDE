@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
@@ -44,7 +44,7 @@ namespace FoenixIDE.Display
         public int StartAddress;
         public int Length;
         public MemoryRAM CharacterData;
-        private int charWidth = 8;
+        //private int charWidth = 8;
         private int charHeight = 8;
 
         /// <summary>

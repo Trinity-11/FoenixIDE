@@ -1,13 +1,11 @@
-﻿using FoenixIDE.Simulator.MemoryLocations;
+﻿using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -101,7 +99,7 @@ namespace FoenixIDE.UI
             {
                 Title = "Load Bitmap",
                 DefaultExt = ".bmp",
-                Filter = "Bitmap Files|*.bmp|Binary Files|*.bin"
+                Filter = "Bitmap Files|*.bmp|Binary Files|*.bin|Any File|*.bmp;*.png"
             };
 
             // Load content of file in a TextBlock
@@ -115,23 +113,32 @@ namespace FoenixIDE.UI
 
         private void GetBitmapAttributes(String bmpFilename)
         {
-            bitmap = new Bitmap(bmpFilename);
-            BitmapSizeValueLabel.Text = bitmap.Width + " x " + bitmap.Height;
-            FileSizeResultLabel.Text = FormatAddress(bitmap.Width * bitmap.Height);
-            PixelDepthValueLabel.Text = (((int)bitmap.PixelFormat) >> 8 & 0xFF).ToString();
-
-            switch (bitmap.Width)
+            if (Path.GetExtension(bmpFilename).Equals(".bmp"))
             {
-                case 640:
-                    BitmapTypesCombo.SelectedItem = "Bitmap";
-                    break;
-                case 16:
-                case 256:
-                    BitmapTypesCombo.SelectedItem = "Tile Layer 0";
-                    break;
-                case 32:
-                    BitmapTypesCombo.SelectedItem = "Sprite 0";
-                    break;
+                bitmap = new Bitmap(bmpFilename);
+                BitmapSizeValueLabel.Text = bitmap.Width + " x " + bitmap.Height;
+                FileSizeResultLabel.Text = FormatAddress(bitmap.Width * bitmap.Height);
+                PixelDepthValueLabel.Text = (((int)bitmap.PixelFormat) >> 8 & 0xFF).ToString();
+                switch (bitmap.Width)
+                {
+                    case 640:
+                        BitmapTypesCombo.SelectedItem = "Bitmap";
+                        break;
+                    case 16:
+                    case 256:
+                        BitmapTypesCombo.SelectedItem = "Tile Layer 0";
+                        break;
+                    case 32:
+                        BitmapTypesCombo.SelectedItem = "Sprite 0";
+                        break;
+                }
+            }
+            else
+            {
+                FileInfo info = new FileInfo(bmpFilename);
+                FileSizeResultLabel.Text = FormatAddress((int)info.Length);
+                BitmapSizeValueLabel.Text = "Unspecified";
+                PixelDepthValueLabel.Text = "8";
             }
         }
 
@@ -199,10 +206,12 @@ namespace FoenixIDE.UI
                 int.TryParse(strAddress, System.Globalization.NumberStyles.HexNumber, System.Globalization.NumberFormatInfo.CurrentInfo, out videoAddress);
             }
             int writeVideoAddress = videoAddress;
-            ResourceChecker.Resource res = new ResourceChecker.Resource();
-            res.StartAddress = videoAddress;
-            res.SourceFile = FileNameTextBox.Text;
-            res.Name = Path.GetFileNameWithoutExtension(FileNameTextBox.Text);
+            ResourceChecker.Resource res = new ResourceChecker.Resource
+            {
+                StartAddress = videoAddress,
+                SourceFile = FileNameTextBox.Text,
+                Name = Path.GetFileNameWithoutExtension(FileNameTextBox.Text)
+            };
 
             // Store the bitmap at the user's determined address
             // The method below simply takes the file and writes it in memory.

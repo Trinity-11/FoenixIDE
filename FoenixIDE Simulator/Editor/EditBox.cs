@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,7 +11,7 @@ namespace FoenixIDE.Simulator.Editor
     public partial class EditBox : UserControl
     {
         List<string> Lines = new List<string>();
-        List<char> CurrentLine = null;
+        //List<char> CurrentLine = null;
 
         Point CursorPos = new Point(0, 0);
         Point SelStart = new Point(0, 0);

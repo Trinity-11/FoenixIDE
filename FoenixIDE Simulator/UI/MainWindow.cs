@@ -1,13 +1,11 @@
 ﻿using FoenixIDE.Common;
 using FoenixIDE.Simulator.Basic;
-using FoenixIDE.Simulator.MemoryLocations;
+using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,7 +15,6 @@ namespace FoenixIDE.UI
     public partial class MainWindow : Form
     {
         public FoenixSystem kernel;
-        public int CyclesPerTick = 35000;
 
         public UI.CPUWindow debugWindow;
         public MemoryWindow memoryWindow;
@@ -141,30 +138,13 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void WriteKey(ScanCode key)
-        {
-            // Check if the Keyboard interrupt is allowed
-            byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
-            if ((~mask & 1) == 1)
-            {
-                kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
-                kernel.Memory.KEYBOARD.WriteByte(4, 0);
-                // Set the Keyboard Interrupt
-                byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
-                IRQ1 |= 1;
-                kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
-                kernel.CPU.Pins.IRQ = true;
-            }
-           
-        }
-
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
         {
             ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
             if (scanCode != ScanCode.sc_null)
             {
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                WriteKey(scanCode);
+                kernel.Memory.KEYBOARD.WriteKey(kernel, scanCode);
             }
             else
             {
@@ -179,7 +159,7 @@ namespace FoenixIDE.UI
             {
                 scanCode += 0x80;
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                WriteKey(scanCode);
+                kernel.Memory.KEYBOARD.WriteKey(kernel, scanCode);
             }
             else
             {
@@ -212,14 +192,14 @@ namespace FoenixIDE.UI
             cpsPerf.Text = "CPS: " + cps.ToString("N0");
             fpsPerf.Text = "FPS: " + fps.ToString("N0");
             // write the time to memory - values are BCD
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.Memory.IO.StartAddress, BCD(currentTime.Second));
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.Memory.IO.StartAddress, BCD(currentTime.Minute));
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_HRS - kernel.Memory.IO.StartAddress, BCD(currentTime.Hour));
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_DAY - kernel.Memory.IO.StartAddress, BCD(currentTime.Day));
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_MONTH - kernel.Memory.IO.StartAddress, BCD(currentTime.Month));
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_YEAR - kernel.Memory.IO.StartAddress, BCD(currentTime.Year % 100));
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_CENTURY - kernel.Memory.IO.StartAddress, BCD(currentTime.Year / 100));
-            kernel.Memory.IO.WriteByte(MemoryLocations.MemoryMap.RTC_DOW - kernel.Memory.IO.StartAddress, (byte)(currentTime.DayOfWeek+1));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.Memory.VICKY.StartAddress, BCD(currentTime.Second));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.Memory.VICKY.StartAddress, BCD(currentTime.Minute));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_HRS - kernel.Memory.VICKY.StartAddress, BCD(currentTime.Hour));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DAY - kernel.Memory.VICKY.StartAddress, BCD(currentTime.Day));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MONTH - kernel.Memory.VICKY.StartAddress, BCD(currentTime.Month));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_YEAR - kernel.Memory.VICKY.StartAddress, BCD(currentTime.Year % 100));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_CENTURY - kernel.Memory.VICKY.StartAddress, BCD(currentTime.Year / 100));
+            kernel.Memory.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DOW - kernel.Memory.VICKY.StartAddress, (byte)(currentTime.DayOfWeek+1));
         }
 
         private byte BCD(int val)
@@ -252,7 +232,7 @@ namespace FoenixIDE.UI
             previousCounter = 0;
             kernel.ResetCPU();
             memoryWindow.UpdateMCRButtons();
-            kernel.Run();
+            kernel.CPU.Run();
             debugWindow.RunButton_Click(null, null);
         }
         
@@ -370,7 +350,7 @@ namespace FoenixIDE.UI
         {
             gpu.TileEditorMode = false;
             // Restore the previous graphics mode
-            kernel.Memory.IO.WriteByte(0, previousGraphicMode);
+            kernel.Memory.VICKY.WriteByte(0, previousGraphicMode);
             tileEditor.Dispose();
             tileEditor = null;
         }
@@ -382,13 +362,11 @@ namespace FoenixIDE.UI
                 tileEditor = new TileEditor();
                 tileEditor.SetMemory(kernel.Memory);
                 gpu.TileEditorMode = true;
-                gpu.ColumnsVisible = 72;
-                gpu.LinesVisible = 52;
                 // Set Vicky into Tile mode
-                previousGraphicMode = kernel.Memory.IO.ReadByte(0);
-                kernel.Memory.IO.WriteByte(0, 0x10);
+                previousGraphicMode = kernel.Memory.VICKY.ReadByte(0);
+                kernel.Memory.VICKY.WriteByte(0, 0x10);
                 // Enable borders
-                kernel.Memory.IO.WriteByte(4, 1);
+                kernel.Memory.VICKY.WriteByte(4, 1);
                 tileEditor.Show();
                 tileEditor.FormClosed += new FormClosedEventHandler(EditorWindowClosed);
 
@@ -419,13 +397,13 @@ namespace FoenixIDE.UI
             else
             {
                 // Read the mouse pointer register
-                byte mouseReg = kernel.Memory.IO.ReadByte(0x700);
+                byte mouseReg = kernel.Memory.VICKY.ReadByte(0x700);
                 if ((mouseReg & 1) == 1)
                 {
                     int X = (int)(e.X / ratioW);
                     int Y = (int)(e.Y / ratioH);
-                    kernel.Memory.IO.WriteWord(0x702, X);
-                    kernel.Memory.IO.WriteWord(0x704, Y);
+                    kernel.Memory.VICKY.WriteWord(0x702, X);
+                    kernel.Memory.VICKY.WriteWord(0x704, Y);
                     
                 }
                 else

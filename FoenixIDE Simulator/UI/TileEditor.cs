@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -64,7 +62,7 @@ namespace FoenixIDE.Simulator.UI
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
-            int[,] graphicsLUT = Display.Gpu.LoadLUT(memory.IO);
+            int[] graphicsLUT = Display.Gpu.LoadLUT(memory.VICKY);
             int lut = Int32.Parse(LUTDomain.Text);
             for (int y = 0; y < 256; y++)
             {
@@ -73,7 +71,7 @@ namespace FoenixIDE.Simulator.UI
                     byte pixel = memory.VIDEO.ReadByte(LayersetAddress + y * 256 + x);
                     if (pixel != 0)
                     {
-                        int color = graphicsLUT[lut, pixel];
+                        int color = graphicsLUT[lut * 256 + pixel];
                         int destX = x / 16 * TILE_WIDTH + x % 16 + 1;
                         int destY = y / 16 * TILE_WIDTH + y % 16 + 1;
                         System.Runtime.InteropServices.Marshal.WriteInt32(p, (destY * stride + destX * 4), color);
@@ -161,7 +159,7 @@ namespace FoenixIDE.Simulator.UI
             if (selectedX != -1 && selectedY != -1)
             {
                 byte value = (byte)(selectedY * 16 + selectedX);
-                memory.IO.WriteByte(tilemapAddress - memory.IO.StartAddress, value);
+                memory.VICKY.WriteByte(tilemapAddress - memory.VICKY.StartAddress, value);
             }
         }
 
