@@ -71,6 +71,15 @@ namespace FoenixIDE.Simulator.Devices
             }
         }
 
+        public override byte ReadByte(int Address)
+        {
+            // Whenever the buffer is read, set the buffer to empty.
+            if (Address == 0)
+            {
+                data[4] = 0;
+            }
+            return base.ReadByte(Address);
+        }
         public void WriteKey(FoenixSystem kernel, ScanCode key)
         {
             // Check if the Keyboard interrupt is allowed

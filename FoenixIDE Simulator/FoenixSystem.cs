@@ -9,6 +9,7 @@ using System.Threading;
 using FoenixIDE.MemoryLocations;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
+using FoenixIDE.UI;
 
 namespace FoenixIDE
 {
@@ -25,8 +26,9 @@ namespace FoenixIDE
         private String defaultKernel = @"ROMs\kernel.hex";
 
         public ResourceChecker Resources;
+        public Processor.Breakpoints Breakpoints;
 
-        public FoenixSystem(Gpu gpu, ResourceChecker resources)
+        public FoenixSystem(Gpu gpu)
         {
             Memory = new MemoryManager
             {
@@ -40,8 +42,10 @@ namespace FoenixIDE
                 MATH = new MathCoproRegisters(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
                 CODEC = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 2),  // This register is only a single byte but we allow writing a word
                 KEYBOARD = new KeyboardRegister(MemoryMap.KBD_DATA_BUF, 5),
-                SDCARD = new SuperIORegister(MemoryMap.SDCARD_DATA, 2),
-                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 3)
+                SDCARD = new SDCardRegister(MemoryMap.SDCARD_DATA, 2),
+                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 3),
+                UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
+                UART2 = new UART(MemoryMap.UART2_REGISTERS, 8)
             };
 
             this.CPU = new CPU(Memory);
@@ -71,14 +75,13 @@ namespace FoenixIDE
             CPU.Halt();
 
             gpu.Refresh();
-            // Clear out Vicky's memory
-            Memory.VICKY.Zero();
+
             // This fontset is loaded just in case the kernel doesn't provide one.
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
             if (defaultKernel.EndsWith(".fnxml", true, null))
             {
-                FoenixmlFile fnxml = new FoenixmlFile(Memory, Resources);
+                FoeniXmlFile fnxml = new FoeniXmlFile(Memory, Resources, CPUWindow.Instance.breakpoints);
                 fnxml.Load(defaultKernel);
             }
             else

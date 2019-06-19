@@ -1,5 +1,6 @@
 ﻿using FoenixIDE.Common;
 using FoenixIDE.Simulator.Basic;
+using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
 using System;
@@ -20,12 +21,15 @@ namespace FoenixIDE.UI
         public MemoryWindow memoryWindow;
         public UploaderWindow uploaderWindow;
         private TileEditor tileEditor;
+        public SerialTerminal terminal;
 
         private byte previousGraphicMode;
         private delegate void TileClickEvent(Point tile);
         public delegate void TileLoadedEvent(int layer);
         private TileClickEvent TileClicked;
         private ResourceChecker ResChecker = new ResourceChecker();
+        private delegate void TransmitByteFunction(byte Value);
+        private delegate void ShowFormFunction();
 
         public MainWindow()
         {
@@ -34,9 +38,13 @@ namespace FoenixIDE.UI
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-            kernel = new FoenixSystem(this.gpu, ResChecker);
+            kernel = new FoenixSystem(this.gpu);
             ShowDebugWindow();
             ShowMemoryWindow();
+            terminal = new SerialTerminal();
+            kernel.Memory.UART1.TransmitByte += SerialTransmitByte;
+            kernel.Memory.UART2.TransmitByte += SerialTransmitByte;
+            terminal.Show();
 
             this.Top = 0;
             this.Left = 0;
@@ -88,6 +96,33 @@ namespace FoenixIDE.UI
             memoryWindow.UpdateMCRButtons();
         }
 
+        public void ShowTerminal()
+        {
+            if (terminal.InvokeRequired)
+            {
+                Invoke(new ShowFormFunction(ShowTerminal));
+            }
+            else
+            {
+                terminal.Show();
+            }
+        }
+
+        public void SerialTransmitByte(byte Value)
+        {
+            if (terminal.textBox1.InvokeRequired)
+            {
+                Invoke(new TransmitByteFunction(SerialTransmitByte), Value);
+            }
+            else
+            {
+                terminal.textBox1.Text += Convert.ToChar(Value);
+                if (!terminal.Visible)
+                {
+                   // ShowTerminal();
+                }
+            }
+        }
         void ShowUploaderWindow()
         {
             if (uploaderWindow == null || uploaderWindow.IsDisposed)
@@ -272,7 +307,7 @@ namespace FoenixIDE.UI
                 memoryWindow.Close();
                 if (ResetMemory)
                 {
-                    kernel = new FoenixSystem(this.gpu, ResChecker);
+                    kernel = new FoenixSystem(this.gpu);
                 }
                 kernel.SetKernel(dialog.FileName);
                 kernel.ResetCPU();
@@ -309,7 +344,9 @@ namespace FoenixIDE.UI
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu, ResChecker);
+                kernel = new FoenixSystem(this.gpu);
+                kernel.Resources = ResChecker;
+                kernel.Breakpoints = CPUWindow.Instance.breakpoints;
                 kernel.SetKernel(dialog.FileName);
                 kernel.ResetCPU();
                 ShowDebugWindow();
@@ -332,7 +369,7 @@ namespace FoenixIDE.UI
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                FoenixmlFile fnxml = new FoenixmlFile(kernel.Memory, ResChecker);
+                FoeniXmlFile fnxml = new FoeniXmlFile(kernel.Memory, ResChecker, CPUWindow.Instance.breakpoints);
                 fnxml.Write(dialog.FileName, true);
             }
         }
@@ -437,6 +474,11 @@ namespace FoenixIDE.UI
             {
                 Cursor.Hide();
             }
+        }
+
+        private void terminalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowTerminal();
         }
     }
 }

@@ -27,8 +27,10 @@ namespace FoenixIDE
         public MathCoproRegisters MATH = null;
         public CodecRAM CODEC = null;
         public KeyboardRegister KEYBOARD = null;
-        public SuperIORegister SDCARD = null;
+        public SDCardRegister SDCARD = null;
         public InterruptController INTERRUPT = null;
+        public UART UART1 = null;
+        public UART UART2 = null;
 
         public bool VectorPull = false;
 
@@ -96,6 +98,18 @@ namespace FoenixIDE
             {
                 Device = KEYBOARD;
                 DeviceAddress = Address - MemoryMap.KBD_DATA_BUF;
+                return;
+            }
+            if (Address >= MemoryMap.UART1_REGISTERS && Address < MemoryMap.UART1_REGISTERS + 8)
+            {
+                Device = UART1;
+                DeviceAddress = Address - MemoryMap.UART1_REGISTERS;
+                return;
+            }
+            if (Address >= MemoryMap.UART2_REGISTERS && Address < MemoryMap.UART2_REGISTERS + 8)
+            {
+                Device = UART2;
+                DeviceAddress = Address - MemoryMap.UART2_REGISTERS;
                 return;
             }
             if (Address >= MemoryMap.SDCARD_DATA && Address <= MemoryMap.SDCARD_CMD)

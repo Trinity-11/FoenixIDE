@@ -8,18 +8,20 @@ using System.Xml;
 
 namespace FoenixIDE.Common
 {
-    class FoenixmlFile
+    class FoeniXmlFile
     {
         private IMappable Memory;
         private ResourceChecker Resources;
         private const int PHRASE_LENGTH = 16;
+        private Processor.Breakpoints BreakPoints;
 
-        private FoenixmlFile() { }
+        private FoeniXmlFile() { }
 
-        public FoenixmlFile(IMappable memory, ResourceChecker resources)
+        public FoeniXmlFile(IMappable memory, ResourceChecker resources, Processor.Breakpoints breakpoints)
         {
             this.Memory = memory;
             this.Resources = resources;
+            this.BreakPoints = breakpoints;
         }
         public void Write(String filename, bool compact)
         {
@@ -31,6 +33,7 @@ namespace FoenixIDE.Common
 
             xmlWriter.WriteStartElement("project");
             xmlWriter.WriteRaw("\r");
+
             // Write resources
             xmlWriter.WriteStartElement("resources");
             xmlWriter.WriteRaw("\r");
@@ -45,6 +48,19 @@ namespace FoenixIDE.Common
                 xmlWriter.WriteRaw("\r");
             }
             xmlWriter.WriteEndElement(); // end resources
+            xmlWriter.WriteRaw("\r");
+
+            // Write breakpoints
+            xmlWriter.WriteStartElement("breakpoints");
+            xmlWriter.WriteRaw("\r");
+            foreach (string bp in BreakPoints.Values)
+            {
+                xmlWriter.WriteStartElement("breakpoint");
+                xmlWriter.WriteAttributeString("address", bp);
+                xmlWriter.WriteEndElement();  // end resource
+                xmlWriter.WriteRaw("\r");
+            }
+            xmlWriter.WriteEndElement(); // end breakpoints
             xmlWriter.WriteRaw("\r");
 
             // Write pages

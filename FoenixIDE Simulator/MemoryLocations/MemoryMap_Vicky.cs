@@ -36,8 +36,18 @@ namespace FoenixIDE.MemoryLocations
         public const int RTC_CTRL = 0xAF_080E; // Control Register
         public const int RTC_CENTURY = 0xAF_080F; // Century Register
 
+        public const int SUPERIO_START = 0xAF_1000;
+        public const int SUPERIO_END = 0xAF_13FF;
         public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
         public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
+
+        // FDC  - $AF:13F0
+        // LPT1 - $AF:1378
+        public const int UART1_REGISTERS = 0xAF_13F8;
+        public const int UART2_REGISTERS = 0xAF_12F8;
+        // KBD  - $AF:1060
+        // GAME - $AF:1200 - Not Connected
+        // MPU  - $AF:1330
 
         public const int FG_CHAR_LUT_PTR = 0xAF_1F40; // 15 color lookup table
         public const int BG_CHAR_LUT_PTR = 0xAF_1F80; // 15 color lookup table

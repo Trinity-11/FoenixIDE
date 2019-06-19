@@ -220,7 +220,7 @@ namespace FoenixIDE.UI
             byte[] data = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
             int startOffset = BitConverter.ToInt32(data, 10);
             int fileLength = BitConverter.ToInt32(data, 2);
-            res.Length = strideX * strideY;
+            res.Length = bitmap.Height * bitmap.Width;
             if (ResChecker.Add(res))
             {
 

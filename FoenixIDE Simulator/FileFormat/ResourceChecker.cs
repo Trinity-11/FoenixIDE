@@ -26,7 +26,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 int beginRange = res.StartAddress;
                 int endRange = res.StartAddress + res.Length;
 
-                if (resource.StartAddress > beginRange && resource.StartAddress < endRange ||
+                if (resource.StartAddress >= beginRange && resource.StartAddress < endRange ||
                     (resource.StartAddress+ resource.Length) > beginRange && (resource.StartAddress + resource.Length) < endRange)
                 {
                     if (MessageBox.Show(

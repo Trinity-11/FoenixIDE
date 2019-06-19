@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class SuperIORegister: MemoryRAM
+    public class SDCardRegister: MemoryRAM
     {
-        public SuperIORegister(int StartAddress, int Length): base(StartAddress, Length)
+        public SDCardRegister(int StartAddress, int Length): base(StartAddress, Length)
         {
         }
 
