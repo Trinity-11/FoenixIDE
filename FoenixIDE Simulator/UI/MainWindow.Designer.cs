@@ -32,7 +32,6 @@ namespace FoenixIDE.UI
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
-            this.DoubleBuffered = true;
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ModeText = new System.Windows.Forms.ToolStripStatusLabel();
             this.lastKeyPressed = new System.Windows.Forms.ToolStripStatusLabel();
@@ -63,6 +62,7 @@ namespace FoenixIDE.UI
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.gpu = new FoenixIDE.Display.Gpu();
+            this.terminalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -71,14 +71,13 @@ namespace FoenixIDE.UI
             // 
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(28, 28);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.ModeText,
-                this.lastKeyPressed,
-                this.cpsPerf,
-                this.fpsPerf
-            });
-            this.statusStrip1.Location = new System.Drawing.Point(0, 443);
+            this.ModeText,
+            this.lastKeyPressed,
+            this.cpsPerf,
+            this.fpsPerf});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 582);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(660, 28);
+            this.statusStrip1.Size = new System.Drawing.Size(686, 28);
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -97,11 +96,9 @@ namespace FoenixIDE.UI
             // 
             // cpsPerf
             // 
-            this.cpsPerf.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)(
-                (((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left 
-                | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-                | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-                | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.cpsPerf.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.cpsPerf.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
             this.cpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cpsPerf.Name = "cpsPerf";
@@ -132,7 +129,7 @@ namespace FoenixIDE.UI
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(660, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(686, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -218,7 +215,8 @@ namespace FoenixIDE.UI
             // 
             this.windowsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cPUToolStripMenuItem,
-            this.memoryToolStripMenuItem});
+            this.memoryToolStripMenuItem,
+            this.terminalToolStripMenuItem});
             this.windowsToolStripMenuItem.Name = "windowsToolStripMenuItem";
             this.windowsToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
             this.windowsToolStripMenuItem.Text = "&Windows";
@@ -226,14 +224,14 @@ namespace FoenixIDE.UI
             // cPUToolStripMenuItem
             // 
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.CPUToolStripMenuItem_Click);
             // 
             // memoryToolStripMenuItem
             // 
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.MemoryToolStripMenuItem_Click);
             // 
@@ -243,8 +241,7 @@ namespace FoenixIDE.UI
             this.RestartMenuItem,
             this.debugToolStripMenuItem});
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((
-                (System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.R)));
             this.resetToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.resetToolStripMenuItem.Text = "&Reset";
@@ -291,27 +288,27 @@ namespace FoenixIDE.UI
             this.panel1.Location = new System.Drawing.Point(0, 40);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(16, 403);
+            this.panel1.Size = new System.Drawing.Size(16, 542);
             this.panel1.TabIndex = 3;
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(644, 40);
+            this.panel2.Location = new System.Drawing.Point(670, 40);
             this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(16, 403);
+            this.panel2.Size = new System.Drawing.Size(16, 542);
             this.panel2.TabIndex = 4;
             // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.LightBlue;
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(16, 427);
+            this.panel3.Location = new System.Drawing.Point(16, 566);
             this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(628, 16);
+            this.panel3.Size = new System.Drawing.Size(654, 16);
             this.panel3.TabIndex = 5;
             // 
             // panel4
@@ -321,7 +318,7 @@ namespace FoenixIDE.UI
             this.panel4.Location = new System.Drawing.Point(0, 24);
             this.panel4.Margin = new System.Windows.Forms.Padding(4);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(660, 16);
+            this.panel4.Size = new System.Drawing.Size(686, 16);
             this.panel4.TabIndex = 6;
             // 
             // gpu
@@ -334,7 +331,7 @@ namespace FoenixIDE.UI
             this.gpu.Margin = new System.Windows.Forms.Padding(4);
             this.gpu.MinimumSize = new System.Drawing.Size(640, 480);
             this.gpu.Name = "gpu";
-            this.gpu.Size = new System.Drawing.Size(640, 480);
+            this.gpu.Size = new System.Drawing.Size(654, 526);
             this.gpu.TabIndex = 0;
             this.gpu.TabStop = false;
             this.gpu.TileEditorMode = false;
@@ -342,6 +339,13 @@ namespace FoenixIDE.UI
             this.gpu.MouseEnter += new System.EventHandler(this.Gpu_MouseEnter);
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
+            // 
+            // terminalToolStripMenuItem
+            // 
+            this.terminalToolStripMenuItem.Name = "terminalToolStripMenuItem";
+            this.terminalToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.terminalToolStripMenuItem.Text = "&Terminal";
+            this.terminalToolStripMenuItem.Click += new System.EventHandler(this.terminalToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -355,6 +359,7 @@ namespace FoenixIDE.UI
             this.Controls.Add(this.panel4);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
+            this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(300, 300);
@@ -367,7 +372,7 @@ namespace FoenixIDE.UI
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.Load += new System.EventHandler(this.BasicWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyDown);
-            //this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyUp);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyUp);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -409,6 +414,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tileEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveProjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem terminalToolStripMenuItem;
     }
 }
 

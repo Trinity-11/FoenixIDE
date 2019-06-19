@@ -61,6 +61,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -164,6 +165,12 @@
     <Compile Include="UI\BitmapLoader.Designer.cs">
       <DependentUpon>BitmapLoader.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\SerialTerminal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\SerialTerminal.Designer.cs">
+      <DependentUpon>SerialTerminal.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\TileEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -215,6 +222,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\BitmapLoader.resx">
       <DependentUpon>BitmapLoader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SerialTerminal.resx">
+      <DependentUpon>SerialTerminal.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\TileEditor.resx">
       <DependentUpon>TileEditor.cs</DependentUpon>

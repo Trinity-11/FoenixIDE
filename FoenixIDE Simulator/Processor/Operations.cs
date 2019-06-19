@@ -936,7 +936,7 @@ namespace FoenixIDE.Processor
             int val = GetValue(addressMode, signature, cpu.A.Width);
 
             if (cpu.Flags.Decimal)
-                throw new NotImplementedException("Decimal mode addition not implemented.");
+                val = HexVal(BCDVal(val) + BCDVal(cpu.A.Value) + cpu.Flags.CarryBit);
             else
                 val = val + cpu.A.Value + cpu.Flags.CarryBit;
 
@@ -947,6 +947,21 @@ namespace FoenixIDE.Processor
             cpu.A.Value = val;
         }
 
+        private int BCDVal(int value)
+        {
+            if (value < 256)
+            {
+                return (((value & 0xF0) >> 4 ) * 10) + (value & 0xF);
+            }
+            else
+            {
+                return (((value & 0xF000) >> 12) * 1000) + (((value & 0xF00) >> 8 ) * 100) + (((value & 0xF0) >> 4 ) * 10 )  + ( value & 0xF );
+            }
+        }
+        private int HexVal(int bcd)
+        {
+            return bcd / 10 * 16 + bcd % 10;
+        }
         public void ExecuteSTZ(byte instruction, AddressModes addressMode, int signature)
         {
             int addr = GetAddress(addressMode, signature, cpu.DataBank);

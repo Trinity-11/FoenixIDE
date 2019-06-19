@@ -36,6 +36,9 @@ namespace FoenixIDE.Simulator.Devices
         public int TxCounter = 0;
         public int RxCounter = 0;
 
+        public delegate void TransmitByteFunction(byte value);
+        public TransmitByteFunction TransmitByte;
+
         public UART(int StartAddress, int Length) : base(StartAddress, Length)
         {
         }
@@ -47,6 +50,7 @@ namespace FoenixIDE.Simulator.Devices
             {
                 case RxTxBuffer:
                     TxCounter++;
+                    TransmitByte?.Invoke(Value);
                     break;
                 case InterruptEnable:
                     // bit 0 - Received Data Available IRQ

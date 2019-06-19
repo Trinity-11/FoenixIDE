@@ -75,8 +75,7 @@ namespace FoenixIDE
             CPU.Halt();
 
             gpu.Refresh();
-            // Clear out Vicky's memory
-            Memory.VICKY.Zero();
+
             // This fontset is loaded just in case the kernel doesn't provide one.
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 

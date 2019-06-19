@@ -43,8 +43,8 @@ namespace FoenixIDE.MemoryLocations
 
         // FDC  - $AF:13F0
         // LPT1 - $AF:1378
-        public const int UART1_REGISTERS = 0xAF_12F8;
-        public const int UART2_REGISTERS = 0xAF_13F8;
+        public const int UART1_REGISTERS = 0xAF_13F8;
+        public const int UART2_REGISTERS = 0xAF_12F8;
         // KBD  - $AF:1060
         // GAME - $AF:1200 - Not Connected
         // MPU  - $AF:1330

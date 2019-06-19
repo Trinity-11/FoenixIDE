@@ -1,3 +1,9 @@
+Release 0.2.3.2
+---------------
+Added the UART device.
+Added the Serial Terminal window.
+Added BCD handling of additions.
+
 Release 0.2.3.1
 ---------------
 Made some optimizations to the code to get to 12 Mhz in code execution.

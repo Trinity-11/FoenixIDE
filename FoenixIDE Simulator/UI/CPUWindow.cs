@@ -25,6 +25,7 @@ namespace FoenixIDE.UI
         Queue<DebugLine> queue = null;
         private Brush debugBrush = new SolidBrush(Color.Black);
         private Brush yellowBrush = new SolidBrush(Color.Yellow);
+        private Brush orangeBrush = new SolidBrush(Color.Orange);
         private Brush lightBlueBrush = new SolidBrush(Color.LightBlue);
 
         const int ROW_HEIGHT = 13;
@@ -58,6 +59,7 @@ namespace FoenixIDE.UI
         private class DebugLine
         {
             public bool isBreakpoint = false;
+            public bool isInterrupt = false;
             public readonly int PC;
             byte[] command;
             public int commandLength;
@@ -160,6 +162,10 @@ namespace FoenixIDE.UI
                         if (line.isBreakpoint)
                         {
                             e.Graphics.FillRectangle(yellowBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                        }
+                        if (line.isInterrupt)
+                        {
+                            e.Graphics.FillRectangle(orangeBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                         }
                         e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, i * ROW_HEIGHT);
                     }
@@ -428,30 +434,32 @@ namespace FoenixIDE.UI
             int currentPC = kernel.CPU.GetLongPC();
             if (!kernel.CPU.ExecuteNext())
             {
+                DebugLine line = null;
                 if (!UpdateTraceTimer.Enabled)
                 {
-                    int cmdLength = kernel.CPU.OpcodeLength;
-
-                    int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
-                    byte[] command = new byte[cmdLength];
-                    for (int i = 0; i < cmdLength; i++)
-                    {
-                        command[i] = kernel.Memory.RAM.ReadByte(currentPC + i);
-                    }
-                    string opcode = kernel.CPU.CurrentOpcode.ToString(kernel.CPU.SignatureBytes);
-                    DebugLine line = new DebugLine(currentPC, command, opcode, kernel.CPU.Snapshot);
-                    queue.Enqueue(line);
-                    if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
-                    {
-                        queue.Dequeue();
-                    }
+                    line = getExecutionInstruction(currentPC);
                 }
-                if (breakpoints.ContainsKey(currentPC))
+                if (breakpoints.ContainsKey(currentPC) || (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.getInterruptPinActive || kernel.CPU.CurrentOpcode.Value == 0)))
                 {
-                    kernel.CPU.DebugPause = true;
-                    //line.isBreakpoint = true;
-                    UpdateTraceTimer.Enabled = false;
-
+                    if (UpdateTraceTimer.Enabled)
+                    {
+                        UpdateTraceTimer.Enabled = false;
+                        kernel.CPU.DebugPause = true;
+                        queue.Clear();
+                    }
+                    
+                    if (line == null)
+                    {
+                        line = getExecutionInstruction(currentPC);
+                    }
+                    if (breakpoints.ContainsKey(currentPC))
+                    {
+                        line.isBreakpoint = true;
+                    }
+                    else
+                    {
+                        line.isInterrupt = true;
+                    }
                     Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
                 }
             }
@@ -469,6 +477,25 @@ namespace FoenixIDE.UI
             lastLine.Text = line;
         }
 
+        private DebugLine getExecutionInstruction(int PC)
+        {
+            
+            int cmdLength = kernel.CPU.OpcodeLength;
+            int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
+            byte[] command = new byte[cmdLength];
+            for (int i = 0; i < cmdLength; i++)
+            {
+                command[i] = kernel.Memory.RAM.ReadByte(PC + i);
+            }
+            string opcode = kernel.CPU.CurrentOpcode.ToString(kernel.CPU.SignatureBytes);
+            DebugLine line = new DebugLine(PC, command, opcode, kernel.CPU.Snapshot);
+            queue.Enqueue(line);
+            if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
+            {
+                queue.Dequeue();
+            }
+            return line;
+        }
         private void PrintNextInstruction(int pc)
         {
             OpCode oc = kernel.CPU.PreFetch();
