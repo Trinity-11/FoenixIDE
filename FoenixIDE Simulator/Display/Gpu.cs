@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Text;
 using System.Drawing.Imaging;
-using FoenixIDE.Common;
+using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.MemoryLocations;
 using System.Diagnostics;
 

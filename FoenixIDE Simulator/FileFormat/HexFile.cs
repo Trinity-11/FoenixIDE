@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace FoenixIDE.Common
+namespace FoenixIDE.Simulator.FileFormat
 {
     public class HexFile
     {

@@ -1,5 +1,4 @@
-﻿using FoenixIDE.Common;
-using FoenixIDE.Simulator.Basic;
+﻿using FoenixIDE.Simulator.Basic;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
@@ -39,11 +38,16 @@ namespace FoenixIDE.UI
         private void BasicWindow_Load(object sender, EventArgs e)
         {
             kernel = new FoenixSystem(this.gpu);
-            ShowDebugWindow();
-            ShowMemoryWindow();
+            
             terminal = new SerialTerminal();
             kernel.Memory.UART1.TransmitByte += SerialTransmitByte;
             kernel.Memory.UART2.TransmitByte += SerialTransmitByte;
+
+            gpu.StartOfFrame += SOF;
+            kernel.ResetCPU();
+            ShowDebugWindow();
+            ShowMemoryWindow();
+
             terminal.Show();
 
             this.Top = 0;
@@ -54,8 +58,7 @@ namespace FoenixIDE.UI
                 this.Width = 1200;
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
-            gpu.StartOfFrame += SOF;
-            kernel.ResetCPU();
+            
         }
 
         private void ShowDebugWindow()
@@ -344,9 +347,11 @@ namespace FoenixIDE.UI
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu);
-                kernel.Resources = ResChecker;
-                kernel.Breakpoints = CPUWindow.Instance.breakpoints;
+                kernel = new FoenixSystem(this.gpu)
+                {
+                    Resources = ResChecker,
+                    Breakpoints = CPUWindow.Instance.breakpoints
+                };
                 kernel.SetKernel(dialog.FileName);
                 kernel.ResetCPU();
                 ShowDebugWindow();
@@ -476,7 +481,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void terminalToolStripMenuItem_Click(object sender, EventArgs e)
+        private void TerminalToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowTerminal();
         }

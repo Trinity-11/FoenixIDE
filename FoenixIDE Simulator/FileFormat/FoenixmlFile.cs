@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace FoenixIDE.Common
+namespace FoenixIDE.Simulator.FileFormat
 {
     class FoeniXmlFile
     {

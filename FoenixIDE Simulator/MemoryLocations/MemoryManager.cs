@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FoenixIDE.Processor;
 using FoenixIDE.Display;
 using FoenixIDE.MemoryLocations;
-using FoenixIDE.Common;
+using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.Devices;
 
 namespace FoenixIDE
@@ -14,7 +14,7 @@ namespace FoenixIDE
     /// Maps an address on the bus to a device or memory. GPU, RAM, and ROM are hard coded. Other I/O devices will be added 
     /// later.
     /// </summary>
-    public class MemoryManager : FoenixIDE.Common.IMappable
+    public class MemoryManager : FoenixIDE.Simulator.FileFormat.IMappable
     {
         public const int MinAddress = 0x00_0000;
         public const int MaxAddress = 0xff_ffff;
@@ -67,7 +67,7 @@ namespace FoenixIDE
         /// <param name="Address"></param>
         /// <param name="Device"></param>
         /// <param name="DeviceAddress"></param>
-        public void GetDeviceAt(int Address, out FoenixIDE.Common.IMappable Device, out int DeviceAddress)
+        public void GetDeviceAt(int Address, out FoenixIDE.Simulator.FileFormat.IMappable Device, out int DeviceAddress)
         {
             if (Address == MemoryMap.CODEC_WR_CTRL)
             {
@@ -166,7 +166,7 @@ namespace FoenixIDE
         /// </summary>
         public virtual byte ReadByte(int Address)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             if (device == null)
                 return 0xff;
             return device.ReadByte(deviceAddress);
@@ -179,7 +179,7 @@ namespace FoenixIDE
         /// <returns></returns>
         public int ReadWord(int Address)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             return device.ReadByte(deviceAddress) | (device.ReadByte(deviceAddress + 1) << 8);
         }
 
@@ -190,7 +190,7 @@ namespace FoenixIDE
         /// <returns></returns>
         public int ReadLong(int Address)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             return device.ReadByte(deviceAddress)
                 | (device.ReadByte(deviceAddress + 1) << 8)
                 | (device.ReadByte(deviceAddress + 2) << 16);
@@ -198,20 +198,20 @@ namespace FoenixIDE
 
         public virtual void WriteByte(int Address, byte Value)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             device.WriteByte(deviceAddress, Value);
         }
 
         public void WriteWord(int Address, int Value)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             device.WriteByte(Address, (byte)(Value & 0xff));
             device.WriteByte(Address + 1, (byte)(Value >> 8 & 0xff));
         }
 
         public void WriteLong(int Address, int Value)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             device.WriteByte(deviceAddress, (byte)(Value & 0xff));
             device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
             device.WriteByte(deviceAddress + 2, (byte)(Value >> 16 & 0xff));
@@ -219,7 +219,7 @@ namespace FoenixIDE
 
         public int Read(int Address, int Length)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             int addr = deviceAddress;
             int ret = device.ReadByte(addr);
             if (Length >= 2)
@@ -231,7 +231,7 @@ namespace FoenixIDE
 
         internal void Write(int Address, int Value, int Length)
         {
-            GetDeviceAt(Address, out FoenixIDE.Common.IMappable device, out int deviceAddress);
+            GetDeviceAt(Address, out FoenixIDE.Simulator.FileFormat.IMappable device, out int deviceAddress);
             if (device == null)
                 throw new Exception("No device at " + Address.ToString("X6"));
             device.WriteByte(deviceAddress, (byte)(Value & 0xff));

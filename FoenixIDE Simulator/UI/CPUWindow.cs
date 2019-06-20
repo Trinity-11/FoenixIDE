@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Processor;
+using FoenixIDE.Simulator.FileFormat;
 
 namespace FoenixIDE.UI
 {
@@ -22,13 +22,14 @@ namespace FoenixIDE.UI
         public static CPUWindow Instance = null;
         private FoenixSystem kernel = null;
 
-        Queue<DebugLine> queue = null;
+        List<DebugLine> queue = null;
         private Brush debugBrush = new SolidBrush(Color.Black);
         private Brush yellowBrush = new SolidBrush(Color.Yellow);
         private Brush orangeBrush = new SolidBrush(Color.Orange);
         private Brush lightBlueBrush = new SolidBrush(Color.LightBlue);
 
         const int ROW_HEIGHT = 13;
+        private int IRQPC = 0; // we only keep track of a single interrupt
 
         Thread t;
         Point position = new Point();
@@ -43,6 +44,10 @@ namespace FoenixIDE.UI
         {
             this.kernel = kernel;
             registerDisplay1.CPU = kernel.CPU;
+            if (kernel.lstFile.Lines.Count > 0)
+            {
+                queue = kernel.lstFile.Lines;
+            }
         }
 
         private void ThreadProc()
@@ -53,83 +58,9 @@ namespace FoenixIDE.UI
             }
         }
 
-        /// <summary>
-        /// Container to hold one line of 65C816 code debugging data
-        /// </summary>
-        private class DebugLine
-        {
-            public bool isBreakpoint = false;
-            public bool isInterrupt = false;
-            public readonly int PC;
-            byte[] command;
-            public int commandLength;
-            private String opcodes;
-            readonly int[] cpu;
-            public bool StepOver = false;
-            private string evaled = null;
-
-            // Only expand when it's going to be displayed
-            override public string ToString()
-            {
-                if (evaled == null)
-                {
-                    StringBuilder c = new StringBuilder();
-                    int commandLength = command.Length;
-                    for (int i = 0; i < 4; i++)
-                    {
-                        if (i < command.Length)
-                            c.Append(command[i].ToString("X2")).Append(" ");
-                        else
-                            c.Append("   ");
-                    }
-                    String OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
-                    String state = FormatSnapshot();
-                    StepOver = (opcodes.StartsWith("B") || opcodes.StartsWith("J"));
-                    evaled = string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), OpCodes, state);
-                }
-                return evaled; 
-            }
-
-            /// <summary>
-            /// One and only constructor 
-            /// </summary>
-            public DebugLine(int pc, byte[] cmd, String oc, int[] cpuSnapshot)
-            {
-                PC = pc;
-                command = cmd;
-                commandLength = cmd.Length;
-                opcodes = oc;
-                cpu = cpuSnapshot;
-            }
-
-            private String FormatSnapshot()
-            {
-                if (cpu != null)
-                {
-                    StringBuilder s = new StringBuilder(47);
-                    s.Append(';')
-                     .Append(cpu[0].ToString("X6")).Append(' ')
-                     .Append(cpu[1].ToString("X4")).Append(' ')
-                     .Append(cpu[2].ToString("X4")).Append(' ')
-                     .Append(cpu[3].ToString("X4")).Append(' ')
-                     .Append(cpu[4].ToString("X4")).Append(' ')
-                     .Append(cpu[5].ToString("X2")).Append(' ').Append(' ')
-                     .Append(cpu[6].ToString("X4")).Append(' ');
-                    Processor.Flags localFlags = new Processor.Flags();
-                    localFlags.SetFlags(cpu[7]);
-                    s.Append(localFlags);
-                    return s.ToString();
-                }
-                else
-                {
-                    return "";
-                }
-            }
-        }
-
         private void CPUWindow_Load(object sender, EventArgs e)
         {
-            queue = new Queue<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
+            //queue = new Queue<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
             HeaderTextbox.Text = " PC      OPCODES      INSTRUCTION      PC     A    X    Y    SP   DBR DP   NVMXDIZC";
             ClearTrace();
             RefreshStatus();
@@ -142,10 +73,13 @@ namespace FoenixIDE.UI
 
         private void DebugPanel_Paint(object sender, PaintEventArgs e)
         {
-            if (kernel.CPU.DebugPause)
-            {
+            bool paint = false;
+            int currentPC = kernel.CPU.GetLongPC();
+            //if (kernel.CPU.DebugPause)
+            //{
                 int queueLength = queue.Count;
-                int i = 0;
+                int painted = 0;
+                int index = 0;
 
                 // Draw the position box
                 if (position.X > 0 && position.Y > 0)
@@ -155,28 +89,60 @@ namespace FoenixIDE.UI
                     e.Graphics.FillRectangle(lightBlueBrush, col, row * ROW_HEIGHT, 7 * 6, 14);
                 }
 
+                bool offsetPrinted = false;
                 foreach (DebugLine line in queue)
                 {
                     if (line != null)
                     {
-                        if (line.isBreakpoint)
+                        if (line.PC == currentPC)
                         {
-                            e.Graphics.FillRectangle(yellowBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            paint = true;
+                            if (!offsetPrinted)
+                            {
+                                if (index > 4)
+                                {
+                                    for (int c = 5; c > 0; c--)
+                                    {
+                                        DebugLine q0 = queue[index - c];
+                                        if (q0.PC == IRQPC)
+                                        {
+                                            e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                        }
+                                        e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                                        painted++;
+                                    }
+                                }
+                                offsetPrinted = true;
+                            }
+                            e.Graphics.FillRectangle(line.PC == IRQPC ? orangeBrush : lightBlueBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                         }
-                        if (line.isInterrupt)
+                        if (painted > 26)
                         {
-                            e.Graphics.FillRectangle(orangeBrush, 0, i * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            paint = false;
+                            break;
                         }
-                        e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, i * ROW_HEIGHT);
+                        if (paint)
+                        {
+                            if (line.isBreakpoint)
+                            {
+                                e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            }
+                            if (line.PC == IRQPC)
+                            {
+                                e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            }
+                            e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                            painted++;
+                        }
                     }
-                    i++;
+                    index++;
                 }
-            }
-            else
-            {
-                e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
-                e.Graphics.DrawString("Running code real fast ... no time to write!", HeaderTextbox.Font, debugBrush, 8, DebugPanel.Height / 2);
-            }
+            //}
+            //else
+            //{
+            //    e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
+            //    e.Graphics.DrawString("Running code real fast ... no time to write!", HeaderTextbox.Font, debugBrush, 8, DebugPanel.Height / 2);
+            //}
         }
 
         private void DebugPanel_MouseMove(object sender, MouseEventArgs e)
@@ -435,30 +401,32 @@ namespace FoenixIDE.UI
             if (!kernel.CPU.ExecuteNext())
             {
                 DebugLine line = null;
-                if (!UpdateTraceTimer.Enabled)
-                {
-                    line = getExecutionInstruction(currentPC);
-                }
+                //if (!UpdateTraceTimer.Enabled)
+                //{
+                //    line = getExecutionInstruction(currentPC);
+                //}
                 if (breakpoints.ContainsKey(currentPC) || (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.getInterruptPinActive || kernel.CPU.CurrentOpcode.Value == 0)))
                 {
                     if (UpdateTraceTimer.Enabled)
                     {
                         UpdateTraceTimer.Enabled = false;
                         kernel.CPU.DebugPause = true;
-                        queue.Clear();
+                        //queue.Clear();
                     }
-                    
+                    if (kernel.CPU.Pins.getInterruptPinActive)
+                    {
+                        IRQPC = kernel.CPU.GetLongPC();
+                    }
                     if (line == null)
                     {
                         line = getExecutionInstruction(currentPC);
                     }
-                    if (breakpoints.ContainsKey(currentPC))
+                    if (line != null)
                     {
-                        line.isBreakpoint = true;
-                    }
-                    else
-                    {
-                        line.isInterrupt = true;
+                        if (breakpoints.ContainsKey(currentPC))
+                        {
+                            line.isBreakpoint = true;
+                        }
                     }
                     Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
                 }
@@ -467,7 +435,7 @@ namespace FoenixIDE.UI
             // Print the next instruction on lastLine
             if (!UpdateTraceTimer.Enabled)
             {
-                PrintNextInstruction(kernel.CPU.GetLongPC());
+                //PrintNextInstruction(kernel.CPU.GetLongPC());
             }
         }
 
@@ -479,22 +447,28 @@ namespace FoenixIDE.UI
 
         private DebugLine getExecutionInstruction(int PC)
         {
-            
-            int cmdLength = kernel.CPU.OpcodeLength;
-            int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
-            byte[] command = new byte[cmdLength];
-            for (int i = 0; i < cmdLength; i++)
+            foreach (DebugLine l in queue)
             {
-                command[i] = kernel.Memory.RAM.ReadByte(PC + i);
+                if (l.PC == PC)
+                {
+                    return l;
+                }
             }
-            string opcode = kernel.CPU.CurrentOpcode.ToString(kernel.CPU.SignatureBytes);
-            DebugLine line = new DebugLine(PC, command, opcode, kernel.CPU.Snapshot);
-            queue.Enqueue(line);
-            if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
-            {
-                queue.Dequeue();
-            }
-            return line;
+            //int cmdLength = kernel.CPU.OpcodeLength;
+            //int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
+            //byte[] command = new byte[cmdLength];
+            //for (int i = 0; i < cmdLength; i++)
+            //{
+            //    command[i] = kernel.Memory.RAM.ReadByte(PC + i);
+            //}
+            //string opcode = kernel.CPU.CurrentOpcode.ToString(kernel.CPU.SignatureBytes);
+            //DebugLine line = new DebugLine(PC, command, opcode, kernel.CPU.Snapshot);
+            //queue.Enqueue(line);
+            //if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
+            //{
+            //    queue.Dequeue();
+            //}
+            return null;
         }
         private void PrintNextInstruction(int pc)
         {
@@ -559,7 +533,7 @@ namespace FoenixIDE.UI
         public void ClearTrace()
         {
             StepCounter = 0;
-            queue.Clear();
+            //queue.Clear();
             kernel.CPU.Stack.Reset();
             stackText.Clear();
             DebugPanel.Refresh();

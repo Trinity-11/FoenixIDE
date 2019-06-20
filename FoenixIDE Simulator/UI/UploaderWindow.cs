@@ -1,4 +1,4 @@
-﻿using FoenixIDE.Common;
+﻿using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

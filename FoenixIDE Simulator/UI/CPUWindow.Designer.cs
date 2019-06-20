@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CPUWindow));
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.BPLabel = new System.Windows.Forms.Label();
             this.stepsInput = new System.Windows.Forms.TextBox();
             this.BPCombo = new System.Windows.Forms.ComboBox();
             this.AddBPButton = new System.Windows.Forms.Button();
@@ -46,6 +47,7 @@
             this.stackText = new System.Windows.Forms.TextBox();
             this.UpdateTraceTimer = new System.Windows.Forms.Timer(this.components);
             this.SecondPanel = new System.Windows.Forms.Panel();
+            this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.ClearTraceButton = new System.Windows.Forms.Button();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.DebugPanel = new System.Windows.Forms.PictureBox();
@@ -55,8 +57,6 @@
             this.StepOverButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
-            this.BPLabel = new System.Windows.Forms.Label();
-            this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
@@ -78,6 +78,18 @@
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(608, 24);
             this.HeaderPanel.TabIndex = 2;
+            // 
+            // BPLabel
+            // 
+            this.BPLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.BPLabel.AutoSize = true;
+            this.BPLabel.Location = new System.Drawing.Point(375, 3);
+            this.BPLabel.Name = "BPLabel";
+            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
+            this.BPLabel.Size = new System.Drawing.Size(58, 17);
+            this.BPLabel.TabIndex = 9;
+            this.BPLabel.Text = "Breakpoint";
+            this.BPLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // stepsInput
             // 
@@ -240,6 +252,18 @@
             this.SecondPanel.Size = new System.Drawing.Size(608, 24);
             this.SecondPanel.TabIndex = 5;
             // 
+            // BreakOnIRQCheckBox
+            // 
+            this.BreakOnIRQCheckBox.AutoSize = true;
+            this.BreakOnIRQCheckBox.Checked = true;
+            this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(318, 4);
+            this.BreakOnIRQCheckBox.Name = "BreakOnIRQCheckBox";
+            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.BreakOnIRQCheckBox.TabIndex = 13;
+            this.BreakOnIRQCheckBox.Text = "Break on IRQ";
+            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = true;
+            // 
             // ClearTraceButton
             // 
             this.ClearTraceButton.Dock = System.Windows.Forms.DockStyle.Left;
@@ -359,30 +383,6 @@
             this.registerDisplay1.Size = new System.Drawing.Size(608, 53);
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
-            // 
-            // BPLabel
-            // 
-            this.BPLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BPLabel.AutoSize = true;
-            this.BPLabel.Location = new System.Drawing.Point(375, 3);
-            this.BPLabel.Name = "BPLabel";
-            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.BPLabel.Size = new System.Drawing.Size(58, 17);
-            this.BPLabel.TabIndex = 9;
-            this.BPLabel.Text = "Breakpoint";
-            this.BPLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // BreakOnIRQCheckBox
-            // 
-            this.BreakOnIRQCheckBox.AutoSize = true;
-            this.BreakOnIRQCheckBox.Checked = true;
-            this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(318, 4);
-            this.BreakOnIRQCheckBox.Name = "BreakOnIRQCheckBox";
-            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
-            this.BreakOnIRQCheckBox.TabIndex = 13;
-            this.BreakOnIRQCheckBox.Text = "Break on IRQ";
-            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = true;
             // 
             // CPUWindow
             // 
