@@ -82,8 +82,7 @@
             // BPLabel
             // 
             this.BPLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BPLabel.AutoSize = true;
-            this.BPLabel.Location = new System.Drawing.Point(375, 3);
+            this.BPLabel.Location = new System.Drawing.Point(375, 1);
             this.BPLabel.Name = "BPLabel";
             this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.BPLabel.Size = new System.Drawing.Size(58, 17);

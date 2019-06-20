@@ -26,7 +26,6 @@ namespace FoenixIDE.Simulator.FileFormat
             if (System.IO.File.Exists(Filename))
             {
                 string[] lines = System.IO.File.ReadAllLines(Filename);
-                string label = "";
                 int pc = 0;
                 DbgLines.Clear();
                 foreach (string line in lines)
