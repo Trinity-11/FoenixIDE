@@ -41,7 +41,6 @@ namespace FoenixIDE.Simulator.FileFormat
                             if (commands[0].Length == 0)
                             {
                                 DbgLines.Add(new DebugLine(pc, null, tokens[tokens.Length - 1], null));
-
                             }
                             else
                             {

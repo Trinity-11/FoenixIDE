@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FoenixIDE.Processor;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,15 +9,27 @@ namespace FoenixIDE.Simulator.FileFormat
     /// <summary>
     /// Container to hold one line of 65C816 code debugging data
     /// </summary>
-    class DebugLine
+    class DebugLine: ICloneable
     {
-        public bool isBreakpoint = false;
+        //public bool isBreakpoint = false;
         byte[] command;
         public int commandLength;
         private String opcodes;
         readonly int[] cpu;
         public bool StepOver = false;
+        public bool isLabel = false;
         private string evaled = null;
+        private static byte[] BranchJmpOpcodes = { OpcodeList.BCC_ProgramCounterRelative,
+            OpcodeList.BCS_ProgramCounterRelative,
+            OpcodeList.BEQ_ProgramCounterRelative, OpcodeList.BMI_ProgramCounterRelative,
+            OpcodeList.BNE_ProgramCounterRelative, OpcodeList.BPL_ProgramCounterRelative,
+            OpcodeList.BRA_ProgramCounterRelative, OpcodeList.BRL_ProgramCounterRelativeLong,
+            OpcodeList.BVC_ProgramCounterRelative,
+            OpcodeList.BVS_ProgramCounterRelative,
+            OpcodeList.JMP_Absolute, OpcodeList.JMP_AbsoluteIndexedIndirectWithX,
+            OpcodeList.JMP_AbsoluteIndirect, OpcodeList.JMP_AbsoluteIndirectLong, OpcodeList.JMP_AbsoluteLong,
+            OpcodeList.JSR_Absolute, OpcodeList.JSR_AbsoluteIndexedIndirectWithX, OpcodeList.JSR_AbsoluteLong
+        };
 
         public int PC;
         // Only expand when it's going to be displayed
@@ -35,7 +47,6 @@ namespace FoenixIDE.Simulator.FileFormat
                 }
                 //String OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
                 //String state = FormatSnapshot();
-                StepOver = (opcodes.StartsWith("B") || opcodes.StartsWith("J"));
                 evaled = string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), opcodes, null);
             }
             return evaled;
@@ -51,10 +62,22 @@ namespace FoenixIDE.Simulator.FileFormat
             if (cmd != null)
             {
                 commandLength = cmd.Length;
+                StepOver = (Array.Exists(BranchJmpOpcodes, element => element == command[0]));
             }
             else
             {
                 commandLength = 0;
+                isLabel = true;
+            }
+            oc = oc.Trim(new char[] { ' ' });
+            // Detect if the lines contains a label
+            if (!isLabel)
+            {
+                string[] tokens = oc.Split();
+                if (tokens.Length > 0)
+                {
+                    isLabel = (tokens[0].Length > 3);
+                }
             }
             opcodes = oc;
             cpu = cpuSnapshot;
@@ -82,6 +105,22 @@ namespace FoenixIDE.Simulator.FileFormat
             {
                 return "";
             }
+        }
+        public bool CheckOpcodes(MemoryRAM ram)
+        {
+            for (int i=0;i<commandLength;i++)
+            {
+                if (ram.ReadByte(PC + i) != command[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
     }
 }

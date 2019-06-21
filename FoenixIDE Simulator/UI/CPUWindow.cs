@@ -23,13 +23,16 @@ namespace FoenixIDE.UI
         private FoenixSystem kernel = null;
 
         List<DebugLine> queue = null;
+        private Brush labelBrush = new SolidBrush(Color.White);
         private Brush debugBrush = new SolidBrush(Color.Black);
         private Brush yellowBrush = new SolidBrush(Color.Yellow);
         private Brush orangeBrush = new SolidBrush(Color.Orange);
+        private Brush redBrush = new SolidBrush(Color.Red);
         private Brush lightBlueBrush = new SolidBrush(Color.LightBlue);
 
         const int ROW_HEIGHT = 13;
         private int IRQPC = 0; // we only keep track of a single interrupt
+        private int TopLineIndex = 0; // this is to help us track which line is the current one being executed
 
         Thread t;
         Point position = new Point();
@@ -75,8 +78,8 @@ namespace FoenixIDE.UI
         {
             bool paint = false;
             int currentPC = kernel.CPU.GetLongPC();
-            //if (kernel.CPU.DebugPause)
-            //{
+            if ((kernel.CPU.DebugPause))
+            {
                 int queueLength = queue.Count;
                 int painted = 0;
                 int index = 0;
@@ -97,10 +100,13 @@ namespace FoenixIDE.UI
                         if (line.PC == currentPC)
                         {
                             paint = true;
+                            TopLineIndex = index;
                             if (!offsetPrinted)
                             {
+                                
                                 if (index > 4)
                                 {
+                                    TopLineIndex -= 5;
                                     for (int c = 5; c > 0; c--)
                                     {
                                         DebugLine q0 = queue[index - c];
@@ -108,7 +114,25 @@ namespace FoenixIDE.UI
                                         {
                                             e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
-                                        e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                                        if (breakpoints.ContainsKey(q0.PC))
+                                        {
+                                            e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                        }
+                                        // Check if the memory still matches the opcodes
+                                        if (!q0.CheckOpcodes(kernel.Memory.RAM))
+                                        {
+                                            e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                        }
+                                        if (!q0.isLabel)
+                                        {
+                                            e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                                        }
+                                        else
+                                        {
+                                            e.Graphics.FillRectangle(debugBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                            e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, labelBrush, 2, painted * ROW_HEIGHT);
+                                        }
+                                        
                                         painted++;
                                     }
                                 }
@@ -123,7 +147,7 @@ namespace FoenixIDE.UI
                         }
                         if (paint)
                         {
-                            if (line.isBreakpoint)
+                            if (breakpoints.ContainsKey(line.PC))
                             {
                                 e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
@@ -131,25 +155,38 @@ namespace FoenixIDE.UI
                             {
                                 e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                            // Check if the memory still matches the opcodes
+                            if (!line.CheckOpcodes(kernel.Memory.RAM))
+                            {
+                                e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            }
+                            if (!line.isLabel)
+                            {
+                                e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                            }
+                            else
+                            {
+                                e.Graphics.FillRectangle(debugBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, labelBrush, 2, painted * ROW_HEIGHT);
+                            }
                             painted++;
                         }
                     }
                     index++;
                 }
-            //}
-            //else
-            //{
-            //    e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
-            //    e.Graphics.DrawString("Running code real fast ... no time to write!", HeaderTextbox.Font, debugBrush, 8, DebugPanel.Height / 2);
-            //}
+            }
+            else
+            {
+                e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
+                e.Graphics.DrawString("Running code real fast ... no time to write!", HeaderTextbox.Font, debugBrush, 8, DebugPanel.Height / 2);
+            }
         }
 
         private void DebugPanel_MouseMove(object sender, MouseEventArgs e)
         {
             if (kernel.CPU.DebugPause)
             {
-                if (e.X > 12 && e.X < 12 + 7 * 6 && e.Y / ROW_HEIGHT < queue.Count)
+                if (e.X > 12 && e.X < 12 + 7 * 6)
                 {
                     int top = e.Y / ROW_HEIGHT * ROW_HEIGHT;
                     if ( (e.Y / ROW_HEIGHT != position.Y / ROW_HEIGHT || position.Y == -1) )
@@ -157,10 +194,10 @@ namespace FoenixIDE.UI
                         position.X = e.X;
                         position.Y = e.Y;
 
-                        PlusButton.Top = DebugPanel.Top + top - 2;
-                        MinusButton.Top = DebugPanel.Top + top - 2;
-                        InspectButton.Top = DebugPanel.Top + top - 2;
-                        StepOverButton.Top = DebugPanel.Top + top - 2;
+                        PlusButton.Top = DebugPanel.Top + top - 1;
+                        MinusButton.Top = DebugPanel.Top + top - 1;
+                        InspectButton.Top = DebugPanel.Top + top - 1;
+                        StepOverButton.Top = DebugPanel.Top + top - 1;
 
                         PlusButton.Left = 13;
                         MinusButton.Left = PlusButton.Left + PlusButton.Width;
@@ -172,9 +209,9 @@ namespace FoenixIDE.UI
                         InspectButton.Visible = true;
                         int row = position.Y / ROW_HEIGHT;
                         // Only show the Step Over button for Jump and Branch commands
-                        if (queue.Count > row)
+                        if (queue.Count > TopLineIndex + row)
                         {
-                            DebugLine line = queue.ToArray()[row];
+                            DebugLine line = queue[TopLineIndex + row];
                             StepOverButton.Visible = line.StepOver;
                         }
                     }
@@ -208,9 +245,9 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                if (queue.Count > row)
+                if (queue.Count > TopLineIndex + row)
                 {
-                    DebugLine line = queue.ToArray()[row];
+                    DebugLine line = queue[TopLineIndex + row];
                     string value = line.PC.ToString("X6");
                     BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     AddBPButton_Click(null, null);
@@ -223,11 +260,13 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                DebugLine line = queue.ToArray()[row];
-                line.isBreakpoint = false;
-                string value = line.PC.ToString("X6");
-                BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
-                DeleteBPButton_Click(null, null);
+                if (queue.Count > TopLineIndex + row)
+                {
+                    DebugLine line = queue[TopLineIndex + row];
+                    string value = line.PC.ToString("X6");
+                    BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
+                    DeleteBPButton_Click(null, null);
+                }
             }
         }
 
@@ -265,7 +304,7 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                DebugLine line = queue.ToArray()[row];
+                DebugLine line = queue[TopLineIndex + row];
                 MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
                 MemoryWindow.Instance.BringToFront();
             }
@@ -276,7 +315,7 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                DebugLine line = queue.ToArray()[row];
+                DebugLine line = queue[TopLineIndex + row];
                 // Set a breakpoint to the next address
                 int nextAddress = line.PC + line.commandLength;
                 int newValue = breakpoints.Add(nextAddress.ToString("X"));
@@ -401,11 +440,8 @@ namespace FoenixIDE.UI
             if (!kernel.CPU.ExecuteNext())
             {
                 DebugLine line = null;
-                //if (!UpdateTraceTimer.Enabled)
-                //{
-                //    line = getExecutionInstruction(currentPC);
-                //}
-                if (breakpoints.ContainsKey(currentPC) || (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.getInterruptPinActive || kernel.CPU.CurrentOpcode.Value == 0)))
+                int nextPC = kernel.CPU.GetLongPC();
+                if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.getInterruptPinActive || kernel.CPU.CurrentOpcode.Value == 0)))
                 {
                     if (UpdateTraceTimer.Enabled)
                     {
@@ -419,14 +455,7 @@ namespace FoenixIDE.UI
                     }
                     if (line == null)
                     {
-                        line = getExecutionInstruction(currentPC);
-                    }
-                    if (line != null)
-                    {
-                        if (breakpoints.ContainsKey(currentPC))
-                        {
-                            line.isBreakpoint = true;
-                        }
+                        line = GetExecutionInstruction(currentPC);
                     }
                     Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
                 }
@@ -445,7 +474,7 @@ namespace FoenixIDE.UI
             lastLine.Text = line;
         }
 
-        private DebugLine getExecutionInstruction(int PC)
+        private DebugLine GetExecutionInstruction(int PC)
         {
             foreach (DebugLine l in queue)
             {
@@ -454,20 +483,6 @@ namespace FoenixIDE.UI
                     return l;
                 }
             }
-            //int cmdLength = kernel.CPU.OpcodeLength;
-            //int nextPC = kernel.CPU.GetLongPC();  // is this a duplicate of currentPC?
-            //byte[] command = new byte[cmdLength];
-            //for (int i = 0; i < cmdLength; i++)
-            //{
-            //    command[i] = kernel.Memory.RAM.ReadByte(PC + i);
-            //}
-            //string opcode = kernel.CPU.CurrentOpcode.ToString(kernel.CPU.SignatureBytes);
-            //DebugLine line = new DebugLine(PC, command, opcode, kernel.CPU.Snapshot);
-            //queue.Enqueue(line);
-            //if (queue.Count > (DebugPanel.Height / ROW_HEIGHT))
-            //{
-            //    queue.Dequeue();
-            //}
             return null;
         }
         private void PrintNextInstruction(int pc)
@@ -507,13 +522,6 @@ namespace FoenixIDE.UI
                 BPCombo.Items.Add(bp.Value);
             }
             BPCombo.EndUpdate();
-            foreach (DebugLine line in queue)
-            {
-                if (line.PC == newDebugLine)
-                {
-                    line.isBreakpoint = state;
-                }
-            }
             DebugPanel.Refresh();
         }
 
@@ -533,6 +541,7 @@ namespace FoenixIDE.UI
         public void ClearTrace()
         {
             StepCounter = 0;
+            IRQPC = 0;
             //queue.Clear();
             kernel.CPU.Stack.Reset();
             stackText.Clear();

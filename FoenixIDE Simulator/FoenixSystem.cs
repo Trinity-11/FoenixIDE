@@ -95,6 +95,7 @@ namespace FoenixIDE
             {
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
                 // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block
+                List<DebugLine> copiedLines = new List<DebugLine>();
                 if (lstFile.Lines.Count > 0)
                 {
                     List<DebugLine> tempLines = new List<DebugLine>();
@@ -102,9 +103,15 @@ namespace FoenixIDE
                     {
                         if (line.PC >= 0x18_0000 && line.PC < 0x19_0000)
                         {
-                            line.PC -= 0x18_0000;
+                            DebugLine dl = (DebugLine)line.Clone();
+                            dl.PC -= 0x18_0000;
+                            copiedLines.Add(dl);
                         }
                     }
+                }
+                if (copiedLines.Count > 0)
+                {
+                    lstFile.Lines.InsertRange(0, copiedLines);
                 }
             }
             CPU.Reset();
