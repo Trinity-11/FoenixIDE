@@ -78,7 +78,8 @@ namespace FoenixIDE.UI
         {
             bool paint = false;
             int currentPC = kernel.CPU.GetLongPC();
-            if ((kernel.CPU.DebugPause))
+            //if ((kernel.CPU.DebugPause))
+            if (true)
             {
                 int queueLength = queue.Count;
                 int painted = 0;
@@ -160,7 +161,7 @@ namespace FoenixIDE.UI
                             {
                                 e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            if (!line.isLabel)
+                            if (line.PC == currentPC || !line.isLabel)
                             {
                                 e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
                             }

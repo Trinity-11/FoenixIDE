@@ -44,7 +44,7 @@ namespace FoenixIDE.UI
             kernel.Memory.UART2.TransmitByte += SerialTransmitByte;
 
             gpu.StartOfFrame += SOF;
-            kernel.ResetCPU();
+            kernel.ResetCPU(true);
             ShowDebugWindow();
             ShowMemoryWindow();
 
@@ -268,7 +268,7 @@ namespace FoenixIDE.UI
             debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.ResetCPU();
+            kernel.ResetCPU(true);
             memoryWindow.UpdateMCRButtons();
             kernel.CPU.Run();
             debugWindow.RunButton_Click(null, null);
@@ -282,7 +282,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.ResetCPU();
+            kernel.ResetCPU(true);
             memoryWindow.UpdateMCRButtons();
         }
 
@@ -313,7 +313,7 @@ namespace FoenixIDE.UI
                     kernel = new FoenixSystem(this.gpu);
                 }
                 kernel.SetKernel(dialog.FileName);
-                kernel.ResetCPU();
+                kernel.ResetCPU(ResetMemory);
                 ShowDebugWindow();
                 ShowMemoryWindow();
                 if (tileEditor != null && tileEditor.Visible)
@@ -353,7 +353,7 @@ namespace FoenixIDE.UI
                     Breakpoints = CPUWindow.Instance.breakpoints
                 };
                 kernel.SetKernel(dialog.FileName);
-                kernel.ResetCPU();
+                kernel.ResetCPU(true);
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }

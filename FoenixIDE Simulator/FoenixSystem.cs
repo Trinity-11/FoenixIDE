@@ -70,7 +70,7 @@ namespace FoenixIDE
             }
         }
 
-        public void ResetCPU()
+        public void ResetCPU(bool ResetMemory)
         {
             CPU.Halt();
 
@@ -87,7 +87,16 @@ namespace FoenixIDE
             else
             {
                 defaultKernel = HexFile.Load(Memory, defaultKernel);
-                lstFile = new ListFile(defaultKernel);
+                if (ResetMemory)
+                {
+                    lstFile = new ListFile(defaultKernel);
+                }
+                else
+                {
+                    // TODO: We should really ensure that there are no duplicated PC in the list
+                    ListFile tempList = new ListFile(defaultKernel);
+                    lstFile.Lines.InsertRange(0, tempList.Lines);
+                }
             }
 
             // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
