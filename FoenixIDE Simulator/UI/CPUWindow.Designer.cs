@@ -149,7 +149,7 @@
             this.StepButton.Name = "StepButton";
             this.StepButton.Size = new System.Drawing.Size(64, 24);
             this.StepButton.TabIndex = 2;
-            this.StepButton.Text = "Step";
+            this.StepButton.Text = "Step (F6)";
             this.StepButton.UseVisualStyleBackColor = true;
             this.StepButton.Click += new System.EventHandler(this.StepButton_Click);
             // 
@@ -160,7 +160,7 @@
             this.RunButton.Name = "RunButton";
             this.RunButton.Size = new System.Drawing.Size(64, 24);
             this.RunButton.TabIndex = 1;
-            this.RunButton.Text = "Run";
+            this.RunButton.Text = "Run (F5)";
             this.RunButton.UseVisualStyleBackColor = true;
             this.RunButton.Click += new System.EventHandler(this.RunButton_Click);
             // 
@@ -231,7 +231,7 @@
             this.stackText.Multiline = true;
             this.stackText.Name = "stackText";
             this.stackText.ReadOnly = true;
-            this.stackText.Size = new System.Drawing.Size(150, 512);
+            this.stackText.Size = new System.Drawing.Size(150, 517);
             this.stackText.TabIndex = 3;
             // 
             // UpdateTraceTimer
@@ -280,7 +280,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.DebugPanel.Location = new System.Drawing.Point(0, 125);
+            this.DebugPanel.Location = new System.Drawing.Point(0, 130);
             this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
             this.DebugPanel.Name = "DebugPanel";
             this.DebugPanel.Size = new System.Drawing.Size(605, 363);
@@ -367,7 +367,7 @@
             this.HeaderTextbox.Margin = new System.Windows.Forms.Padding(0);
             this.HeaderTextbox.Name = "HeaderTextbox";
             this.HeaderTextbox.Padding = new System.Windows.Forms.Padding(2, 3, 2, 2);
-            this.HeaderTextbox.Size = new System.Drawing.Size(603, 21);
+            this.HeaderTextbox.Size = new System.Drawing.Size(603, 26);
             this.HeaderTextbox.TabIndex = 11;
             this.HeaderTextbox.UseCompatibleTextRendering = true;
             this.HeaderTextbox.UseMnemonic = false;
@@ -387,7 +387,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(758, 512);
+            this.ClientSize = new System.Drawing.Size(758, 517);
             this.Controls.Add(this.HeaderTextbox);
             this.Controls.Add(this.StepOverButton);
             this.Controls.Add(this.InspectButton);
@@ -400,15 +400,20 @@
             this.Controls.Add(this.lastLine);
             this.Controls.Add(this.stackText);
             this.DoubleBuffered = true;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Location = new System.Drawing.Point(1280, 0);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(779, 564);
+            this.MaximumSize = new System.Drawing.Size(774, 556);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(774, 556);
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "CPU Window";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.CPUWindow_FormClosed);
             this.Load += new System.EventHandler(this.CPUWindow_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CPUWindow_KeyDown);
             this.HeaderPanel.ResumeLayout(false);
             this.HeaderPanel.PerformLayout();
             this.SecondPanel.ResumeLayout(false);

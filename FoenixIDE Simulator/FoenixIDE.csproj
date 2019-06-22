@@ -91,24 +91,11 @@
     <Compile Include="Processor\OpCode.cs" />
     <Compile Include="Processor\OpcodeList.cs" />
     <Compile Include="Processor\SimulatorCommands.cs" />
-    <Compile Include="Basic\ColorCodes.cs" />
     <Compile Include="Processor\CPU.cs" />
     <Compile Include="Processor\CPU_Registers.cs" />
     <Compile Include="Processor\CPU_Support.cs" />
     <Compile Include="Processor\Flags.cs" />
     <Compile Include="Display\CharacterSet.cs" />
-    <Compile Include="Editor\EditBox.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Editor\EditBox.Designer.cs">
-      <DependentUpon>EditBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editor\EditWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editor\EditWindow.Designer.cs">
-      <DependentUpon>EditWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Display\Gpu.cs">
       <SubType>UserControl</SubType>
@@ -185,12 +172,6 @@
     <Compile Include="UI\UploaderWindow.Designer.cs">
       <DependentUpon>UploaderWindow.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Editor\EditBox.resx">
-      <DependentUpon>EditBox.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editor\EditWindow.resx">
-      <DependentUpon>EditWindow.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Display\Gpu.resx">
       <DependentUpon>Gpu.cs</DependentUpon>
     </EmbeddedResource>

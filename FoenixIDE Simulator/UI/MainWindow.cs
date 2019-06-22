@@ -1,4 +1,4 @@
-﻿using FoenixIDE.Simulator.Basic;
+﻿using FoenixIDE.Basic;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
@@ -47,8 +47,6 @@ namespace FoenixIDE.UI
             kernel.ResetCPU(true);
             ShowDebugWindow();
             ShowMemoryWindow();
-
-            terminal.Show();
 
             this.Top = 0;
             this.Left = 0;
@@ -99,18 +97,6 @@ namespace FoenixIDE.UI
             memoryWindow.UpdateMCRButtons();
         }
 
-        public void ShowTerminal()
-        {
-            if (terminal.InvokeRequired)
-            {
-                Invoke(new ShowFormFunction(ShowTerminal));
-            }
-            else
-            {
-                terminal.Show();
-            }
-        }
-
         public void SerialTransmitByte(byte Value)
         {
             if (terminal.textBox1.InvokeRequired)
@@ -120,10 +106,6 @@ namespace FoenixIDE.UI
             else
             {
                 terminal.textBox1.Text += Convert.ToChar(Value);
-                if (!terminal.Visible)
-                {
-                   // ShowTerminal();
-                }
             }
         }
         void ShowUploaderWindow()
@@ -483,7 +465,7 @@ namespace FoenixIDE.UI
 
         private void TerminalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowTerminal();
+            terminal.Show();
         }
     }
 }

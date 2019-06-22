@@ -106,7 +106,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 return "";
             }
         }
-        public bool CheckOpcodes(MemoryRAM ram)
+        public bool CheckOpcodes(MemoryLocations.MemoryRAM ram)
         {
             for (int i=0;i<commandLength;i++)
             {

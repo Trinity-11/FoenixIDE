@@ -1,4 +1,5 @@
-﻿using FoenixIDE.UI;
+﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -442,7 +442,7 @@ namespace FoenixIDE.UI
             {
                 DebugLine line = null;
                 int nextPC = kernel.CPU.GetLongPC();
-                if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.getInterruptPinActive || kernel.CPU.CurrentOpcode.Value == 0)))
+                if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive || kernel.CPU.CurrentOpcode.Value == 0)))
                 {
                     if (UpdateTraceTimer.Enabled)
                     {
@@ -450,7 +450,7 @@ namespace FoenixIDE.UI
                         kernel.CPU.DebugPause = true;
                         //queue.Clear();
                     }
-                    if (kernel.CPU.Pins.getInterruptPinActive)
+                    if (kernel.CPU.Pins.GetInterruptPinActive)
                     {
                         IRQPC = kernel.CPU.GetLongPC();
                     }
@@ -568,6 +568,18 @@ namespace FoenixIDE.UI
             // Kill the thread
             kernel.CPU.DebugPause = true;
             t?.Join();
+        }
+
+        private void CPUWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                RunButton_Click(sender, null);
+            }
+            else if (e.KeyCode == Keys.F6)
+            {
+                StepButton_Click(sender, null);
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FoenixIDE
+namespace FoenixIDE.MemoryLocations
 {
     public class MemoryRAM : IMappable
     {

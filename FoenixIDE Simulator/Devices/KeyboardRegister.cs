@@ -1,13 +1,12 @@
-﻿using FoenixIDE.Simulator.Basic;
+﻿using FoenixIDE.Basic;
 using System;
 using System.Collections.Generic;
-
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class KeyboardRegister: MemoryRAM
+    public class KeyboardRegister: MemoryLocations.MemoryRAM
     {
         public KeyboardRegister(int StartAddress, int Length) : base(StartAddress, Length)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class CodecRAM: MemoryRAM
+    public class CodecRAM: MemoryLocations.MemoryRAM
     {
         public CodecRAM(int StartAddress, int Length) : base(StartAddress, Length)
         {

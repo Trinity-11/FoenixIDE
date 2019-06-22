@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,7 +52,7 @@ namespace FoenixIDE.Processor
         /// <summary>
         /// Helper method to let CPU class know an interrutp pin is high
         /// </summary>
-        public bool getInterruptPinActive
+        public bool GetInterruptPinActive
         {
             get { return Reset || NMI || IRQ || Abort; }
         }

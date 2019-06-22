@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FoenixIDE.Simulator.Basic
+namespace FoenixIDE.Basic
 {
     public enum ScanCode
     {

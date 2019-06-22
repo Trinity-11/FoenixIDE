@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class SDCardRegister: MemoryRAM
+    public class SDCardRegister: MemoryLocations.MemoryRAM
     {
         public SDCardRegister(int StartAddress, int Length): base(StartAddress, Length)
         {
