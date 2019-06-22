@@ -107,14 +107,14 @@ namespace FoenixIDE.Processor
         /// <param name="isCode">Assume the address is code and uses the Program Bank Register. 
         /// Otherwise uses the Data Bank Register, if appropriate.</param>
         /// <returns></returns>
-        public int GetValue(AddressModes mode, int signatureBytes, int bytes = 2)
+        public int GetValue(AddressModes mode, int signatureBytes, int bytes)
         {
             switch (mode)
             {
                 case AddressModes.Accumulator:
                     return cpu.A.Value;
                 case AddressModes.Absolute:
-                    return GetAbsolute(signatureBytes, cpu.DataBank);
+                    return GetAbsolute(signatureBytes, cpu.DataBank, bytes);
                 case AddressModes.AbsoluteLong:
                     return GetAbsoluteLong(signatureBytes);
                 case AddressModes.JmpAbsoluteIndirect:
@@ -137,7 +137,7 @@ namespace FoenixIDE.Processor
                 case AddressModes.AbsoluteLongIndexedWithY:
                     return GetAbsoluteLongIndexed(signatureBytes, cpu.Y);
                 case AddressModes.DirectPage:
-                    return GetAbsolute(signatureBytes, cpu.DirectPage);
+                    return GetAbsolute(signatureBytes, cpu.DirectPage, bytes);
                 case AddressModes.DirectPageIndexedWithX:
                     return GetIndexed(signatureBytes, cpu.DirectPage, cpu.X);
                 case AddressModes.DirectPageIndexedWithY:
@@ -249,9 +249,9 @@ namespace FoenixIDE.Processor
         /// <param name="Address"></param>
         /// <param name="bank"></param>
         /// <returns></returns>
-        private int GetAbsolute(int Address, Register bank, int Bytes = 2)
+        private int GetAbsolute(int Address, Register bank, int bytes)
         {
-            return cpu.Memory.ReadWord(bank.GetLongAddress(Address));
+            return (bytes == 1) ? cpu.Memory.ReadByte(bank.GetLongAddress(Address)) : cpu.Memory.ReadWord(bank.GetLongAddress(Address));
         }
 
         /// <summary>
@@ -430,9 +430,9 @@ namespace FoenixIDE.Processor
                 case OpcodeList.ROR_AbsoluteIndexedWithX:
                     if (cpu.Flags.Carry)
                     {
-                        if (cpu.A.Width == 8)
+                        if (cpu.A.Width == 1)
                             val += 0x100;
-                        else if (cpu.A.Width == 16)
+                        else if (cpu.A.Width == 2)
                             val += 0x10000;
                     }
                     cpu.Flags.Carry = (val & 1) == 1;
@@ -604,7 +604,7 @@ namespace FoenixIDE.Processor
 
         public void ExecuteINCDEC(byte instruction, AddressModes addressMode, int signature)
         {
-            byte bval = (byte)GetValue(addressMode, signature);
+            byte bval = (byte)GetValue(addressMode, signature, cpu.A.Width);
             int addr = GetAddress(addressMode, signature, cpu.DataBank);
 
             switch (instruction)
@@ -842,14 +842,14 @@ namespace FoenixIDE.Processor
 
         public void ExecuteAND(byte instruction, AddressModes addressMode, int signature)
         {
-            int data = GetValue(addressMode, signature);
+            int data = GetValue(addressMode, signature, cpu.A.Width);
             cpu.A.Value = cpu.A.Value & data;
             cpu.Flags.SetNZ(cpu.A);
         }
 
         public void ExecuteBIT(byte instruction, AddressModes addressMode, int signature)
         {
-            int data = GetValue(addressMode, signature);
+            int data = GetValue(addressMode, signature, cpu.A.Width);
             int result = cpu.A.Value & data;
             if (addressMode != AddressModes.Immediate)
             {
@@ -988,7 +988,7 @@ namespace FoenixIDE.Processor
 
         public void ExecuteLDA(byte instruction, AddressModes addressMode, int signature)
         {
-            int val = GetValue(addressMode, signature);
+            int val = GetValue(addressMode, signature, cpu.A.Width);
             if (addressMode == AddressModes.AbsoluteIndexedWithX && (val & 0xff) == 0)
                 global::System.Diagnostics.Debug.WriteLine("LDA break " + instruction + "," + signature);
             cpu.A.Value = val;
@@ -997,14 +997,14 @@ namespace FoenixIDE.Processor
 
         public void ExecuteLDX(byte instruction, AddressModes addressMode, int signature)
         {
-            int val = GetValue(addressMode, signature);
+            int val = GetValue(addressMode, signature, cpu.X.Width);
             cpu.X.Value = val;
             cpu.Flags.SetNZ(cpu.A);
         }
 
         public void ExecuteLDY(byte instruction, AddressModes addressMode, int signature)
         {
-            int val = GetValue(addressMode, signature);
+            int val = GetValue(addressMode, signature, cpu.Y.Width);
             cpu.Y.Value = val;
             cpu.Flags.SetNZ(cpu.A);
         }

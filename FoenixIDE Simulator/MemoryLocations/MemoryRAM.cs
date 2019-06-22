@@ -1,11 +1,11 @@
-﻿using FoenixIDE.Common;
+﻿using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.MemoryLocations;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FoenixIDE
+namespace FoenixIDE.MemoryLocations
 {
     public class MemoryRAM : IMappable
     {

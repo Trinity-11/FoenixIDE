@@ -1,5 +1,4 @@
-﻿using FoenixIDE.Common;
-using FoenixIDE.Simulator.Basic;
+﻿using FoenixIDE.Basic;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
@@ -39,12 +38,15 @@ namespace FoenixIDE.UI
         private void BasicWindow_Load(object sender, EventArgs e)
         {
             kernel = new FoenixSystem(this.gpu);
-            ShowDebugWindow();
-            ShowMemoryWindow();
+            
             terminal = new SerialTerminal();
             kernel.Memory.UART1.TransmitByte += SerialTransmitByte;
             kernel.Memory.UART2.TransmitByte += SerialTransmitByte;
-            terminal.Show();
+
+            gpu.StartOfFrame += SOF;
+            kernel.ResetCPU(true);
+            ShowDebugWindow();
+            ShowMemoryWindow();
 
             this.Top = 0;
             this.Left = 0;
@@ -54,8 +56,7 @@ namespace FoenixIDE.UI
                 this.Width = 1200;
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
-            gpu.StartOfFrame += SOF;
-            kernel.ResetCPU();
+            
         }
 
         private void ShowDebugWindow()
@@ -96,18 +97,6 @@ namespace FoenixIDE.UI
             memoryWindow.UpdateMCRButtons();
         }
 
-        public void ShowTerminal()
-        {
-            if (terminal.InvokeRequired)
-            {
-                Invoke(new ShowFormFunction(ShowTerminal));
-            }
-            else
-            {
-                terminal.Show();
-            }
-        }
-
         public void SerialTransmitByte(byte Value)
         {
             if (terminal.textBox1.InvokeRequired)
@@ -117,10 +106,6 @@ namespace FoenixIDE.UI
             else
             {
                 terminal.textBox1.Text += Convert.ToChar(Value);
-                if (!terminal.Visible)
-                {
-                   // ShowTerminal();
-                }
             }
         }
         void ShowUploaderWindow()
@@ -265,7 +250,7 @@ namespace FoenixIDE.UI
             debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.ResetCPU();
+            kernel.ResetCPU(true);
             memoryWindow.UpdateMCRButtons();
             kernel.CPU.Run();
             debugWindow.RunButton_Click(null, null);
@@ -279,7 +264,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.ResetCPU();
+            kernel.ResetCPU(true);
             memoryWindow.UpdateMCRButtons();
         }
 
@@ -310,7 +295,7 @@ namespace FoenixIDE.UI
                     kernel = new FoenixSystem(this.gpu);
                 }
                 kernel.SetKernel(dialog.FileName);
-                kernel.ResetCPU();
+                kernel.ResetCPU(ResetMemory);
                 ShowDebugWindow();
                 ShowMemoryWindow();
                 if (tileEditor != null && tileEditor.Visible)
@@ -344,11 +329,13 @@ namespace FoenixIDE.UI
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu);
-                kernel.Resources = ResChecker;
-                kernel.Breakpoints = CPUWindow.Instance.breakpoints;
+                kernel = new FoenixSystem(this.gpu)
+                {
+                    Resources = ResChecker,
+                    Breakpoints = CPUWindow.Instance.breakpoints
+                };
                 kernel.SetKernel(dialog.FileName);
-                kernel.ResetCPU();
+                kernel.ResetCPU(true);
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }
@@ -476,9 +463,9 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void terminalToolStripMenuItem_Click(object sender, EventArgs e)
+        private void TerminalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowTerminal();
+            terminal.Show();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FoenixIDE.Simulator.FileFormat;
+﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,7 +16,7 @@ namespace FoenixIDE.UI
 {
     public partial class BitmapLoader : Form
     {
-        public Common.IMappable Memory = null;
+        public IMappable Memory = null;
         public ResourceChecker ResChecker;
 
         int controlRegisterAddress = 0;

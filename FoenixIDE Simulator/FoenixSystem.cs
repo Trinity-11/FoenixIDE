@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using FoenixIDE.Processor;
 using FoenixIDE.Display;
-using FoenixIDE.Common;
 using System.Threading;
 using FoenixIDE.MemoryLocations;
 using FoenixIDE.Simulator.Devices;
@@ -27,6 +26,7 @@ namespace FoenixIDE
 
         public ResourceChecker Resources;
         public Processor.Breakpoints Breakpoints;
+        public ListFile lstFile;
 
         public FoenixSystem(Gpu gpu)
         {
@@ -70,7 +70,7 @@ namespace FoenixIDE
             }
         }
 
-        public void ResetCPU()
+        public void ResetCPU(bool ResetMemory)
         {
             CPU.Halt();
 
@@ -87,12 +87,41 @@ namespace FoenixIDE
             else
             {
                 defaultKernel = HexFile.Load(Memory, defaultKernel);
+                if (ResetMemory)
+                {
+                    lstFile = new ListFile(defaultKernel);
+                }
+                else
+                {
+                    // TODO: We should really ensure that there are no duplicated PC in the list
+                    ListFile tempList = new ListFile(defaultKernel);
+                    lstFile.Lines.InsertRange(0, tempList.Lines);
+                }
             }
 
             // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
             if (Memory.ReadLong(0xFFE0) == 0 && Memory.ReadLong(0x18_FFE0) != 0)
             {
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
+                // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block
+                List<DebugLine> copiedLines = new List<DebugLine>();
+                if (lstFile.Lines.Count > 0)
+                {
+                    List<DebugLine> tempLines = new List<DebugLine>();
+                    foreach (DebugLine line in lstFile.Lines)
+                    {
+                        if (line.PC >= 0x18_0000 && line.PC < 0x19_0000)
+                        {
+                            DebugLine dl = (DebugLine)line.Clone();
+                            dl.PC -= 0x18_0000;
+                            copiedLines.Add(dl);
+                        }
+                    }
+                }
+                if (copiedLines.Count > 0)
+                {
+                    lstFile.Lines.InsertRange(0, copiedLines);
+                }
             }
             CPU.Reset();
         }

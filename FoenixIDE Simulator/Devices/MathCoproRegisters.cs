@@ -9,7 +9,7 @@ namespace FoenixIDE.Simulator.Devices
     /**
      * This class will automatically call other methods immediately after writes
      */
-    public class MathCoproRegisters : MemoryRAM
+    public class MathCoproRegisters : MemoryLocations.MemoryRAM
     {
 
         public MathCoproRegisters(int StartAddress, int Length) : base(StartAddress, Length)

@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Text;
 using System.Drawing.Imaging;
-using FoenixIDE.Common;
+using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.MemoryLocations;
 using System.Diagnostics;
 
@@ -42,9 +42,7 @@ namespace FoenixIDE.Display
         /// One frame = 1/60 second.
         /// </summary>
         public int RefreshTimer = 0;
-        private const int BLINK_RATE = 15;
-
-        public ColorCodes CurrentColor = ColorCodes.White;
+        private const int BLINK_RATE = 30;
 
         // To provide a better contrast when writing on top of bitmaps
         Brush BackgroundTextBrush = new SolidBrush(Color.Black);

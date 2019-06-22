@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CPUWindow));
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.BPLabel = new System.Windows.Forms.Label();
             this.stepsInput = new System.Windows.Forms.TextBox();
             this.BPCombo = new System.Windows.Forms.ComboBox();
             this.AddBPButton = new System.Windows.Forms.Button();
@@ -46,6 +47,7 @@
             this.stackText = new System.Windows.Forms.TextBox();
             this.UpdateTraceTimer = new System.Windows.Forms.Timer(this.components);
             this.SecondPanel = new System.Windows.Forms.Panel();
+            this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.ClearTraceButton = new System.Windows.Forms.Button();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.DebugPanel = new System.Windows.Forms.PictureBox();
@@ -55,8 +57,6 @@
             this.StepOverButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
-            this.BPLabel = new System.Windows.Forms.Label();
-            this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
@@ -78,6 +78,17 @@
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(608, 24);
             this.HeaderPanel.TabIndex = 2;
+            // 
+            // BPLabel
+            // 
+            this.BPLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.BPLabel.Location = new System.Drawing.Point(375, 1);
+            this.BPLabel.Name = "BPLabel";
+            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
+            this.BPLabel.Size = new System.Drawing.Size(58, 17);
+            this.BPLabel.TabIndex = 9;
+            this.BPLabel.Text = "Breakpoint";
+            this.BPLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // stepsInput
             // 
@@ -138,7 +149,7 @@
             this.StepButton.Name = "StepButton";
             this.StepButton.Size = new System.Drawing.Size(64, 24);
             this.StepButton.TabIndex = 2;
-            this.StepButton.Text = "Step";
+            this.StepButton.Text = "Step (F6)";
             this.StepButton.UseVisualStyleBackColor = true;
             this.StepButton.Click += new System.EventHandler(this.StepButton_Click);
             // 
@@ -149,7 +160,7 @@
             this.RunButton.Name = "RunButton";
             this.RunButton.Size = new System.Drawing.Size(64, 24);
             this.RunButton.TabIndex = 1;
-            this.RunButton.Text = "Run";
+            this.RunButton.Text = "Run (F5)";
             this.RunButton.UseVisualStyleBackColor = true;
             this.RunButton.Click += new System.EventHandler(this.RunButton_Click);
             // 
@@ -220,7 +231,7 @@
             this.stackText.Multiline = true;
             this.stackText.Name = "stackText";
             this.stackText.ReadOnly = true;
-            this.stackText.Size = new System.Drawing.Size(150, 512);
+            this.stackText.Size = new System.Drawing.Size(150, 517);
             this.stackText.TabIndex = 3;
             // 
             // UpdateTraceTimer
@@ -240,6 +251,18 @@
             this.SecondPanel.Size = new System.Drawing.Size(608, 24);
             this.SecondPanel.TabIndex = 5;
             // 
+            // BreakOnIRQCheckBox
+            // 
+            this.BreakOnIRQCheckBox.AutoSize = true;
+            this.BreakOnIRQCheckBox.Checked = true;
+            this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(318, 4);
+            this.BreakOnIRQCheckBox.Name = "BreakOnIRQCheckBox";
+            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.BreakOnIRQCheckBox.TabIndex = 13;
+            this.BreakOnIRQCheckBox.Text = "Break on IRQ";
+            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = true;
+            // 
             // ClearTraceButton
             // 
             this.ClearTraceButton.Dock = System.Windows.Forms.DockStyle.Left;
@@ -257,7 +280,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.DebugPanel.Location = new System.Drawing.Point(0, 125);
+            this.DebugPanel.Location = new System.Drawing.Point(0, 130);
             this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
             this.DebugPanel.Name = "DebugPanel";
             this.DebugPanel.Size = new System.Drawing.Size(605, 363);
@@ -344,7 +367,7 @@
             this.HeaderTextbox.Margin = new System.Windows.Forms.Padding(0);
             this.HeaderTextbox.Name = "HeaderTextbox";
             this.HeaderTextbox.Padding = new System.Windows.Forms.Padding(2, 3, 2, 2);
-            this.HeaderTextbox.Size = new System.Drawing.Size(603, 21);
+            this.HeaderTextbox.Size = new System.Drawing.Size(603, 26);
             this.HeaderTextbox.TabIndex = 11;
             this.HeaderTextbox.UseCompatibleTextRendering = true;
             this.HeaderTextbox.UseMnemonic = false;
@@ -360,35 +383,11 @@
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 
-            // BPLabel
-            // 
-            this.BPLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BPLabel.AutoSize = true;
-            this.BPLabel.Location = new System.Drawing.Point(375, 3);
-            this.BPLabel.Name = "BPLabel";
-            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.BPLabel.Size = new System.Drawing.Size(58, 17);
-            this.BPLabel.TabIndex = 9;
-            this.BPLabel.Text = "Breakpoint";
-            this.BPLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // BreakOnIRQCheckBox
-            // 
-            this.BreakOnIRQCheckBox.AutoSize = true;
-            this.BreakOnIRQCheckBox.Checked = true;
-            this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(318, 4);
-            this.BreakOnIRQCheckBox.Name = "BreakOnIRQCheckBox";
-            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
-            this.BreakOnIRQCheckBox.TabIndex = 13;
-            this.BreakOnIRQCheckBox.Text = "Break on IRQ";
-            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = true;
-            // 
             // CPUWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(758, 512);
+            this.ClientSize = new System.Drawing.Size(758, 517);
             this.Controls.Add(this.HeaderTextbox);
             this.Controls.Add(this.StepOverButton);
             this.Controls.Add(this.InspectButton);
@@ -401,15 +400,20 @@
             this.Controls.Add(this.lastLine);
             this.Controls.Add(this.stackText);
             this.DoubleBuffered = true;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Location = new System.Drawing.Point(1280, 0);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(779, 564);
+            this.MaximumSize = new System.Drawing.Size(774, 556);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(774, 556);
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "CPU Window";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.CPUWindow_FormClosed);
             this.Load += new System.EventHandler(this.CPUWindow_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CPUWindow_KeyDown);
             this.HeaderPanel.ResumeLayout(false);
             this.HeaderPanel.PerformLayout();
             this.SecondPanel.ResumeLayout(false);

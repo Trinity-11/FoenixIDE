@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class UART: MemoryRAM
+    public class UART: MemoryLocations.MemoryRAM
     {
         private const int RxTxBuffer = 0;
         private const int InterruptEnable = 1;

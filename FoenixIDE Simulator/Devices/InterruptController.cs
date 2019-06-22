@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class InterruptController: MemoryRAM
+    public class InterruptController: MemoryLocations.MemoryRAM
     {
         public InterruptController(int StartAddress, int Length): base(StartAddress, Length)
         {

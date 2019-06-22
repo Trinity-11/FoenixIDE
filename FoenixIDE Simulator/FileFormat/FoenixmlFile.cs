@@ -1,12 +1,12 @@
-﻿using FoenixIDE.Simulator.FileFormat;
+﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
-
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace FoenixIDE.Common
+namespace FoenixIDE.Simulator.FileFormat
 {
     class FoeniXmlFile
     {

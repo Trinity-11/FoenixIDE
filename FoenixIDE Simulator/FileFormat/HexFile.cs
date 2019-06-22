@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace FoenixIDE.Common
+namespace FoenixIDE.Simulator.FileFormat
 {
     public class HexFile
     {
-        public static String Load(IMappable memory, string Filename)
+        public static String Load(MemoryLocations.IMappable memory, string Filename)
         {
             int bank = 0;
             int address = 0;
