@@ -71,10 +71,10 @@ namespace FoenixIDE.Simulator.Devices
             uint acc2 = (uint)((data[baseAddr + 3] << 8) + data[baseAddr + 2]);
             uint result = 0;
             uint remainder = 0;
-            if (acc2 != 0)
+            if (acc1 != 0)
             {
-                result = acc1 / acc2;
-                remainder = acc1 % acc2;
+                result = acc2 / acc1;
+                remainder = acc2 % acc1;
             }
             data[baseAddr + 4] = (byte)(result & 0xFF);
             data[baseAddr + 5] = (byte)(result >> 8 & 0xFF);
@@ -88,10 +88,10 @@ namespace FoenixIDE.Simulator.Devices
             int acc2 = (data[baseAddr + 3] << 8) + data[baseAddr + 2];
             int result = 0;
             int remainder = 0;
-            if (acc2 != 0)
+            if (acc1 != 0)
             {
-                result = acc1 / acc2;
-                remainder = acc1 % acc2;
+                result = acc2 / acc1;
+                remainder = acc2 % acc1;
             }
             data[baseAddr + 4] = (byte)(result & 0xFF);
             data[baseAddr + 5] = (byte)(result >> 8 & 0xFF);

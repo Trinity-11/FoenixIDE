@@ -32,11 +32,11 @@ namespace FoenixIDE
         {
             Memory = new MemoryManager
             {
-                RAM = new MemoryRAM(MemoryMap.RAM_START, MemoryMap.RAM_SIZE), // 2MB RAM
-                VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),   // 64K IO space
+                RAM = new MemoryRAM(MemoryMap.RAM_START, MemoryMap.RAM_SIZE), // 2MB RAM - extensible to 4MB
+                VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),   // 60K
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE), // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE), // 8MB RAM
-                BEATRIX = new MemoryRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE),
+                BEATRIX = new MemoryRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE), // 4K 
 
                 // Special devices
                 MATH = new MathCoproRegisters(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
@@ -45,7 +45,9 @@ namespace FoenixIDE
                 SDCARD = new SDCardRegister(MemoryMap.SDCARD_DATA, 2),
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 3),
                 UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
-                UART2 = new UART(MemoryMap.UART2_REGISTERS, 8)
+                UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),
+                OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
+                MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2)
             };
 
             this.CPU = new CPU(Memory);

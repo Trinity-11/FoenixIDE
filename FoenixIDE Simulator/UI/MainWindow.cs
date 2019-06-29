@@ -253,6 +253,7 @@ namespace FoenixIDE.UI
             kernel.ResetCPU(true);
             memoryWindow.UpdateMCRButtons();
             kernel.CPU.Run();
+            debugWindow.UpdateQueue();
             debugWindow.RunButton_Click(null, null);
         }
         

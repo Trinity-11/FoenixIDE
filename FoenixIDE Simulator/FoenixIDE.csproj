@@ -41,6 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -71,6 +72,8 @@
     <Compile Include="DeviceEnum.cs" />
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
+    <Compile Include="Devices\MPU401.cs" />
+    <Compile Include="Devices\OPL2.cs" />
     <Compile Include="Devices\SDCardRegister.cs" />
     <Compile Include="Devices\UART.cs" />
     <Compile Include="FileFormat\DebugLine.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="FileFormat\ListFile.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="Devices\MathCoproRegisters.cs" />
+    <Compile Include="MemoryLocations\MemoryMap_Beatrix.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Blocks.cs" />
     <Compile Include="FileFormat\ResourceChecker.cs" />

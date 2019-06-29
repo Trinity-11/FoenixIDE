@@ -47,6 +47,11 @@ namespace FoenixIDE.UI
         {
             this.kernel = kernel;
             registerDisplay1.CPU = kernel.CPU;
+            UpdateQueue();
+        }
+
+        public void UpdateQueue()
+        {
             if (kernel.lstFile.Lines.Count > 0)
             {
                 queue = kernel.lstFile.Lines;
@@ -71,6 +76,25 @@ namespace FoenixIDE.UI
             Tooltip.SetToolTip(MinusButton, "Remove Breakpoint");
             Tooltip.SetToolTip(InspectButton, "Browse Memory");
             Tooltip.SetToolTip(StepOverButton, "Step Over");
+            // Register 0
+            Tooltip.SetToolTip(SOFCheckbox, "Break on SOF Interrupts");
+            Tooltip.SetToolTip(SOLCheckbox, "Break on SOL Interrupts");
+            Tooltip.SetToolTip(TMR0Checkbox, "Break on TMR0 Interrupts");
+            Tooltip.SetToolTip(TMR1Checkbox, "Break on TMR1 Interrupts");
+            Tooltip.SetToolTip(TMR2Checkbox, "Break on TMR2 Interrupts");
+            Tooltip.SetToolTip(RTCCheckbox, "Break on RTC Interrupts");
+            Tooltip.SetToolTip(FDCCheckbox, "Break on FDC Interrupts");
+            Tooltip.SetToolTip(MouseCheckbox, "Break on Mouse Interrupts");
+
+            // Register 1
+            Tooltip.SetToolTip(KeyboardCheckBox, "Break on Keyboard Interrupts");
+            Tooltip.SetToolTip(COM2Checkbox, "Break on COM2 Interrupts");
+            Tooltip.SetToolTip(COM1Checkbox, "Break on COM1 Interrupts");
+            Tooltip.SetToolTip(MPU401Checkbox, "Break on MPU401 Interrupts");
+
+            // Register 2
+            Tooltip.SetToolTip(OPL2RCheckbox, "Break on OPL2 Right Interrupts");
+            Tooltip.SetToolTip(OPL2LCheckbox, "Break on OPL2 Left Interrupts");
         }
 
 
@@ -334,6 +358,8 @@ namespace FoenixIDE.UI
 
         public void RunButton_Click(object sender, EventArgs e)
         {
+            // Clear the interrupt
+            IRQPC = -1;
             DebugPanel_Leave(sender, e);
             kernel.CPU.DebugPause = false;
             RunButton.Enabled = false;
@@ -442,7 +468,7 @@ namespace FoenixIDE.UI
             {
                 DebugLine line = null;
                 int nextPC = kernel.CPU.GetLongPC();
-                if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive || kernel.CPU.CurrentOpcode.Value == 0)))
+                if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && ((kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes())|| kernel.CPU.CurrentOpcode.Value == 0)))
                 {
                     if (UpdateTraceTimer.Enabled)
                     {
@@ -450,7 +476,7 @@ namespace FoenixIDE.UI
                         kernel.CPU.DebugPause = true;
                         //queue.Clear();
                     }
-                    if (kernel.CPU.Pins.GetInterruptPinActive)
+                    if (kernel.CPU.Pins.GetInterruptPinActive && !kernel.CPU.Flags.IrqDisable)
                     {
                         IRQPC = kernel.CPU.GetLongPC();
                     }
@@ -580,6 +606,55 @@ namespace FoenixIDE.UI
             {
                 StepButton_Click(sender, null);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// When checked, we receive interrupts.  When unchecked, all interrupt boxes are hidden and disabled.
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BreakOnIRQCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            bool visible = BreakOnIRQCheckBox.Checked;
+            SOFCheckbox.Visible = visible;
+            SOLCheckbox.Visible = visible;
+            TMR0Checkbox.Visible = visible;
+            TMR1Checkbox.Visible = visible;
+            TMR2Checkbox.Visible = visible;
+            RTCCheckbox.Visible = visible;
+            FDCCheckbox.Visible = visible;
+            MouseCheckbox.Visible = visible;
+
+            KeyboardCheckBox.Visible = visible;
+            COM2Checkbox.Visible = visible;
+            COM1Checkbox.Visible = visible;
+            MPU401Checkbox.Visible = visible;
+
+            OPL2LCheckbox.Visible = visible;
+            OPL2RCheckbox.Visible = visible;
+        }
+
+        /// <summary>
+        /// Determine if the objects in IRQ Registers match on of the checkboxes.
+        /// </summary>
+        /// <returns></returns>
+        private bool InterruptMatchesCheckboxes()
+        {
+            // Read registers
+            byte reg0 = kernel.Memory.INTERRUPT.ReadByte(0);
+            if ((reg0 & 1) == 1 && SOFCheckbox.Checked)
+            {
+                return true;
+            }
+            byte reg1 = kernel.Memory.INTERRUPT.ReadByte(1);
+            byte reg2 = kernel.Memory.INTERRUPT.ReadByte(2);
+            if ((reg1 & 1) == 1 && KeyboardCheckBox.Checked)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -32,6 +32,8 @@ namespace FoenixIDE.MemoryLocations
         public InterruptController INTERRUPT = null;
         public UART UART1 = null;
         public UART UART2 = null;
+        public OPL2 OPL2 = null;
+        public MPU401 MPU401 = null;
 
         public bool VectorPull = false;
 
@@ -120,6 +122,12 @@ namespace FoenixIDE.MemoryLocations
                 DeviceAddress = Address - MemoryMap.UART2_REGISTERS;
                 return;
             }
+            if (Address >= MemoryMap.MPU401_DATA_REG && Address <= MemoryMap.MPU401_STATUS_REG)
+            {
+                Device = MPU401;
+                DeviceAddress = Address - MPU401.StartAddress;
+                return;
+            }
             if (Address >= MemoryMap.SDCARD_DATA && Address <= MemoryMap.SDCARD_CMD)
             {
                 Device = SDCARD;
@@ -130,6 +138,12 @@ namespace FoenixIDE.MemoryLocations
             {
                 Device = VICKY;
                 DeviceAddress = Address - VICKY.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.OPL2_S_BASE && Address <= MemoryMap.OPL2_S_BASE + 255)
+            {
+                Device = OPL2;
+                DeviceAddress = Address - OPL2.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.BEATRIX_START && Address <= MemoryMap.BEATRIX_END)
