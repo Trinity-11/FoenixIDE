@@ -65,7 +65,11 @@ namespace FoenixIDE.Basic
         sc_shiftRight = 0x36,
         sc_numpad_multiply = 0x37,
         sc_altLeft = 0x38,
-        sc_space = 0x39
+        sc_space = 0x39,
+        sc_up_arrow = 0x48,    // also maps to num keypad 8
+        sc_left_arrow = 0x4B,  // also maps to num keypad 4
+        sc_right_arrow = 0x4D, // also maps to num keypad 6
+        sc_down_arrow = 0x50   // also maps to num keypad 2
     }
     class ScanCodes
     {
@@ -174,6 +178,14 @@ namespace FoenixIDE.Basic
                     return ScanCode.sc_altLeft;
                 case Keys.ControlKey:
                     return ScanCode.sc_controlLeft;
+                case Keys.Up:
+                    return ScanCode.sc_up_arrow;
+                case Keys.Down:
+                    return ScanCode.sc_down_arrow;
+                case Keys.Left:
+                    return ScanCode.sc_left_arrow;
+                case Keys.Right:
+                    return ScanCode.sc_right_arrow;
             }
             return ScanCode.sc_null;
         }

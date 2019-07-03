@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.53.1515 listing file
 ; 64tass.exe --long-address -x --intel-hex -o kernel.hex --list kernel.lst kernel.asm
-; Fri Jun 28 21:31:07 2019
+; Tue Jul 02 22:47:15 2019
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -652,21 +652,35 @@
 =$af028e				SP17_Y_POS_L            = $AF028E
 =$af028f				SP17_Y_POS_H            = $AF028F
 =$af0400				VDMA_CONTROL_REG        = $AF0400
-=$af0401				VDMA_COUNT_REG_L        = $AF0401
-=$af0402				VDMA_COUNT_REG_M        = $AF0402
-=$af0403				VDMA_COUNT_REG_H        = $AF0403
-=$af0404				VDMA_DATA_2_WRITE_L     = $AF0404
-=$af0405				VDMA_DATA_2_WRITE_H     = $AF0405
-=$af0406				VDMA_STRIDE_L           = $AF0406
-=$af0407				VDMA_STRIDE_H           = $AF0407
-=$af0408				VDMA_SRC_ADDY_L         = $AF0408
-=$af0409				VDMA_SRC_ADDY_M         = $AF0409
-=$af040a				VDMA_SRC_ADDY_H         = $AF040A
-=$af040b				VDMA_RESERVED_0         = $AF040B
-=$af040c				VDMA_DST_ADDY_L         = $AF040C
-=$af040d				VDMA_DST_ADDY_M         = $AF040D
-=$af040e				VDMA_DST_ADDY_H         = $AF040E
-=$af040f				VDMA_RESERVED_1         = $AF040F
+=$01					VDMA_CTRL_Enable        = $01
+=$02					VDMA_CTRL_1D_2D         = $02     ; 0 - 1D (Linear) Transfer , 1 - 2D (Block) Transfer
+=$04					VDMA_CTRL_TRF_Fill      = $04     ; 0 - Transfer Src -> Dst, 1 - Fill Destination with "Byte2Write"
+=$08					VDMA_CTRL_Int_Enable    = $08     ; Set to 1 to Enable the Generation of Interrupt when the Transfer is over.
+=$80					VDMA_CTRL_Start_TRF     = $80     ; Set to 1 To Begin Process, Need to Cleared before, you can start another
+=$af0401				VDMA_BYTE_2_WRITE       = $AF0401 ; Write Only - Byte to Write in the Fill Function
+=$af0401				VDMA_STATUS_REG         = $AF0401 ; Read only
+=$01					VDMA_STAT_Size_Err      = $01     ; If Set to 1, Overall Size is Invalid
+=$02					VDMA_STAT_Dst_Add_Err   = $02     ; If Set to 1, Destination Address Invalid
+=$04					VDMA_STAT_Src_Add_Err   = $04     ; If Set to 1, Source Address Invalid
+=$80					VDMA_STAT_VDMA_IPS      = $80     ; If Set to 1, VDMA Transfer in Progress (this Inhibit CPU Access to Mem)
+=$af0402				VDMA_SRC_ADDY_L         = $AF0402 ; Pointer to the Source of the Data to be stransfered
+=$af0403				VDMA_SRC_ADDY_M         = $AF0403 ; This needs to be within Vicky's Range ($00_0000 - $3F_0000)
+=$af0404				VDMA_SRC_ADDY_H         = $AF0404
+=$af0405				VDMA_DST_ADDY_L         = $AF0405 ; Destination Pointer within Vicky's video memory Range
+=$af0406				VDMA_DST_ADDY_M        = $AF0406 ; ($00_0000 - $3F_0000)
+=$af0407				VDMA_DST_ADDY_H         = $AF0407
+=$af0408				VDMA_SIZE_L             = $AF0408 ; Maximum Value: $40:0000 (4Megs)
+=$af0409				VDMA_SIZE_M             = $AF0409
+=$af040a				VDMA_SIZE_H             = $AF040A
+=$af040b				VDMA_IGNORED            = $AF040B
+=$af0408				VDMA_X_SIZE_L           = $AF0408 ; Maximum Value: 65535
+=$af0409				VDMA_X_SIZE_H           = $AF0409
+=$af040a				VDMA_Y_SIZE_L           = $AF040A ; Maximum Value: 65535
+=$af040b				VDMA_Y_SIZE_H           = $AF040B
+=$af040c				VDMA_SRC_STRIDE_L       = $AF040C ; Always use an Even Number ( The Engine uses Even Ver of that value)
+=$af040d				VDMA_SRC_STRIDE_H       = $AF040D ;
+=$af040e				VDMA_DST_STRIDE_L       = $AF040E ; Always use an Even Number ( The Engine uses Even Ver of that value)
+=$af040f				VDMA_DST_STRIDE_H       = $AF040F ;
 =$af0500				MOUSE_PTR_GRAP0_START    = $AF0500 ; 16 x 16 = 256 Pixels (Grey Scale) 0 = Transparent, 1 = Black , 255 = White
 =$af05ff				MOUSE_PTR_GRAP0_END      = $AF05FF ; Pointer 0
 =$af0600				MOUSE_PTR_GRAP1_START    = $AF0600 ;
