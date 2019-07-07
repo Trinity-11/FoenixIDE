@@ -679,7 +679,7 @@ namespace FoenixIDE.Processor
                 case AddressModes.AbsoluteLongIndexedWithX:
                     return SignatureBytes + cpu.X.Value;
                 case AddressModes.AbsoluteIndexedWithY:
-                    return SignatureBytes + cpu.Y.Value;
+                    return Bank.GetLongAddress(SignatureBytes + cpu.Y.Value);
                 case AddressModes.AbsoluteLongIndexedWithY:
                     return Bank.GetLongAddress(SignatureBytes + cpu.X.Value);
                 case AddressModes.DirectPage:

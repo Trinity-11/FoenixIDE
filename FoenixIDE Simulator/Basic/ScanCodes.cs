@@ -66,6 +66,19 @@ namespace FoenixIDE.Basic
         sc_numpad_multiply = 0x37,
         sc_altLeft = 0x38,
         sc_space = 0x39,
+        sc_capslock = 0x3A,
+        sc_F1 = 0x3B,
+        sc_F2 = 0x3C,
+        sc_F3 = 0x3D,
+        sc_F4 = 0x3E,
+        sc_F5 = 0x3F,
+        sc_F6 = 0x40,
+        sc_F7 = 0x41,
+        sc_F8 = 0x42,
+        sc_F9 = 0x43,
+        sc_F10 = 0x44,
+        sc_F11 = 0x57,
+        sc_F12 = 0x58,
         sc_up_arrow = 0x48,    // also maps to num keypad 8
         sc_left_arrow = 0x4B,  // also maps to num keypad 4
         sc_right_arrow = 0x4D, // also maps to num keypad 6
@@ -186,6 +199,20 @@ namespace FoenixIDE.Basic
                     return ScanCode.sc_left_arrow;
                 case Keys.Right:
                     return ScanCode.sc_right_arrow;
+                case Keys.F1:
+                case Keys.F2:
+                case Keys.F3:
+                case Keys.F4:
+                case Keys.F5:
+                case Keys.F6:
+                case Keys.F7:
+                case Keys.F8:
+                case Keys.F9:
+                case Keys.F10:
+                    return ScanCode.sc_F1 + (key - Keys.F1);
+                case Keys.F11:
+                case Keys.F12:
+                    return ScanCode.sc_F11 + (key - Keys.F11);
             }
             return ScanCode.sc_null;
         }
