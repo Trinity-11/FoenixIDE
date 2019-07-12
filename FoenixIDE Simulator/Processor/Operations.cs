@@ -884,6 +884,11 @@ namespace FoenixIDE.Processor
                 case OpcodeList.STP_Implied: //stop
                     cpu.Halt();
                     break;
+                case OpcodeList.XBA_Implied: // transfer B into A
+                    cpu.A.Swap();
+                    cpu.Flags.Zero = (cpu.A.Low == 0);
+                    cpu.Flags.Negative = ((cpu.A.Low & 0x80b) == 0x80b);
+                    break;
                 default:
                     throw new NotImplementedException("ExecuteMisc() opcode not implemented: " + instruction.ToString("X2"));
             }
