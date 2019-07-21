@@ -1,3 +1,7 @@
+Release 0.2.3.8
+---------------
+Added the back-tick (or grave) key scancode.
+
 Release 0.2.3.7
 ---------------
 Fixed the Negative flag not being assigned by LDA, LDX and LDY.

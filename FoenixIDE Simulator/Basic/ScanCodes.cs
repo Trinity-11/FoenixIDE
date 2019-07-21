@@ -169,6 +169,8 @@ namespace FoenixIDE.Basic
                     return ScanCode.sc_semicolon;
                 case Keys.Escape:
                     return ScanCode.sc_escape;
+                case Keys.Oem3: // back tick
+                    return ScanCode.sc_grave;
                 case Keys.OemQuotes:
                     return ScanCode.sc_apostrophe;
                 case Keys.OemOpenBrackets:
