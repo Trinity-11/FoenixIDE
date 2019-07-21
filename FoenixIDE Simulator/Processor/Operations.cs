@@ -1054,7 +1054,7 @@ namespace FoenixIDE.Processor
             int val = GetValue(addressMode, signature, cpu.A.Width);
 
             if (cpu.Flags.Decimal)
-                throw new NotImplementedException("Decimal mode subtraction not implemented.");
+                val = HexVal(BCDVal(cpu.A.Value) - BCDVal(val+1) + cpu.Flags.CarryBit);
             else
                 val = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;
 

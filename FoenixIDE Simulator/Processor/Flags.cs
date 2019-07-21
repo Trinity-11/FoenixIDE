@@ -149,12 +149,12 @@ namespace FoenixIDE.Processor
             Zero = X.Value == 0;
         }
 
-        public void SetN(Register X)
+        public void SetN(Register Reg)
         {
-            if (X.Width == 2)
-                Negative = ((int)this.Value & 0x8000) == 0x8000;
+            if (Reg.Width == 2)
+                Negative = ((int)Reg.Value & 0x8000) == 0x8000;
             else
-                Negative = (X.Value & 0x80) == 0x80;
+                Negative = (Reg.Value & 0x80) == 0x80;
         }
 
         public void SetN(int Value, int Width)

@@ -588,7 +588,7 @@
             this.registerDisplay1.Location = new System.Drawing.Point(0, 48);
             this.registerDisplay1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.registerDisplay1.Name = "registerDisplay1";
-            this.registerDisplay1.Size = new System.Drawing.Size(346, 49);
+            this.registerDisplay1.Size = new System.Drawing.Size(366, 49);
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 

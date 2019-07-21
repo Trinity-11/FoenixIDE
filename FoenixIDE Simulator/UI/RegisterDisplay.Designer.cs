@@ -84,7 +84,7 @@
             this.Flags.Location = new System.Drawing.Point(277, 16);
             this.Flags.Name = "Flags";
             this.Flags.Register = null;
-            this.Flags.Size = new System.Drawing.Size(57, 34);
+            this.Flags.Size = new System.Drawing.Size(76, 34);
             this.Flags.TabIndex = 14;
             this.Flags.Value = "XXXXXXXX";
             // 
