@@ -136,7 +136,8 @@ namespace FoenixIDE.Processor
         }
 
         /// <summary>
-        /// Execute a single instruction
+        /// Execute a single 
+        /// return true if an interrupt is present
         /// </summary>
         public bool ExecuteNext()
         {

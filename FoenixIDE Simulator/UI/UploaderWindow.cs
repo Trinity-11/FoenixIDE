@@ -268,10 +268,12 @@ namespace FoenixIDE.UI
                                         PreparePacket2Write(DataBuffer, bank + address, 0, length);
                                         if (bank + address >= 0xFF00 && (bank + address) < 0xFFFF)
                                         {
-                                            Array.Copy(DataBuffer, 0, pageFF, bank+address - 0xFF00, length);
+                                            int pageFFLen = length - ((bank + address + length) - 0x1_0000);
+                                            Array.Copy(DataBuffer, 0, pageFF, bank+address - 0xFF00, pageFFLen);
                                             resetVector = true;
                                         } else if (bank + address >= 0x18_FF00 && (bank + address) < 0x18_FFFF)
                                         {
+                                            int pageFFLen = length - ((bank + address + length) - 0x19_0000);
                                             Array.Copy(DataBuffer, 0, pageFF, bank + address - 0x18_FF00, length);
                                             resetVector = true;
                                         }

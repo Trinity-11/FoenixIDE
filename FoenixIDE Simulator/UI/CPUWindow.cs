@@ -56,6 +56,11 @@ namespace FoenixIDE.UI
             {
                 queue = kernel.lstFile.Lines;
             }
+                else
+            {
+                queue = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
+                GenerateNextInstruction(kernel.CPU.GetLongPC());
+            }
         }
 
         private void ThreadProc()
@@ -68,7 +73,7 @@ namespace FoenixIDE.UI
 
         private void CPUWindow_Load(object sender, EventArgs e)
         {
-            //queue = new Queue<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
+            
             HeaderTextbox.Text = " PC      OPCODES      INSTRUCTION      PC     A    X    Y    SP   DBR DP   NVMXDIZC";
             ClearTrace();
             RefreshStatus();
@@ -103,7 +108,7 @@ namespace FoenixIDE.UI
             bool paint = false;
             int currentPC = kernel.CPU.GetLongPC();
             //if ((kernel.CPU.DebugPause))
-            if (true)
+            if (true && queue !=null)
             {
                 int queueLength = queue.Count;
                 int painted = 0;
@@ -234,7 +239,7 @@ namespace FoenixIDE.UI
                         InspectButton.Visible = true;
                         int row = position.Y / ROW_HEIGHT;
                         // Only show the Step Over button for Jump and Branch commands
-                        if (queue.Count > TopLineIndex + row)
+                        if (queue != null && queue.Count > TopLineIndex + row)
                         {
                             DebugLine line = queue[TopLineIndex + row];
                             StepOverButton.Visible = line.StepOver;
@@ -464,9 +469,10 @@ namespace FoenixIDE.UI
             StepCounter++;
 
             int currentPC = kernel.CPU.GetLongPC();
+            DebugLine line = null;
             if (!kernel.CPU.ExecuteNext())
             {
-                DebugLine line = null;
+                
                 int nextPC = kernel.CPU.GetLongPC();
                 if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && ((kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes())|| kernel.CPU.CurrentOpcode.Value == 0)))
                 {
@@ -483,15 +489,23 @@ namespace FoenixIDE.UI
                     if (line == null)
                     {
                         line = GetExecutionInstruction(currentPC);
+                        if (line == null)
+                        {
+                            GenerateNextInstruction(currentPC);
+                        }
                     }
                     Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
                 }
             }
 
             // Print the next instruction on lastLine
-            if (!UpdateTraceTimer.Enabled)
+            if (!UpdateTraceTimer.Enabled && line == null)
             {
-                //PrintNextInstruction(kernel.CPU.GetLongPC());
+                line = GetExecutionInstruction(kernel.CPU.GetLongPC());
+                if (line == null)
+                {
+                    GenerateNextInstruction(kernel.CPU.GetLongPC());
+                }
             }
         }
 
@@ -512,7 +526,7 @@ namespace FoenixIDE.UI
             }
             return null;
         }
-        private void PrintNextInstruction(int pc)
+        private void GenerateNextInstruction(int pc)
         {
             OpCode oc = kernel.CPU.PreFetch();
             int cmdLength = oc.Length;
@@ -537,7 +551,7 @@ namespace FoenixIDE.UI
                 finally
                 { }
             }
-            
+            queue.Add(line);
         }
 
         private void UpdateDebugLines(int newDebugLine, bool state)
@@ -569,7 +583,6 @@ namespace FoenixIDE.UI
         {
             StepCounter = 0;
             IRQPC = 0;
-            //queue.Clear();
             kernel.CPU.Stack.Reset();
             stackText.Clear();
             DebugPanel.Refresh();
