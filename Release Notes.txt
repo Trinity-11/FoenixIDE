@@ -1,3 +1,7 @@
+Release 0.2.4.1
+---------------
+Fixed an issue with the INC absolute opcode: when the accumulator is 16 bits, the two memory locations are updated (when an overflow occurs).
+
 Release 0.2.4.0
 ---------------
 Fixed a problem with loading hex files without corresponding lst file.

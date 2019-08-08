@@ -604,7 +604,7 @@ namespace FoenixIDE.Processor
 
         public void ExecuteINCDEC(byte instruction, AddressModes addressMode, int signature)
         {
-            byte bval = (byte)GetValue(addressMode, signature, cpu.A.Width);
+            int bval = GetValue(addressMode, signature, cpu.A.Width);
             int addr = GetAddress(addressMode, signature, cpu.DataBank);
 
             switch (instruction)
@@ -618,7 +618,14 @@ namespace FoenixIDE.Processor
                 case OpcodeList.DEC_DirectPageIndexedWithX:
                 case OpcodeList.DEC_AbsoluteIndexedWithX:
                     bval--;
-                    cpu.Memory.WriteByte(addr, bval);
+                    if (cpu.A.Width == 1)
+                    {
+                        cpu.Memory.WriteByte(addr, (byte)bval);
+                    }
+                    else
+                    {
+                        cpu.Memory.WriteWord(addr, bval);
+                    }
                     cpu.Flags.SetNZ(bval, 1);
                     break;
 
@@ -632,7 +639,15 @@ namespace FoenixIDE.Processor
                 case OpcodeList.INC_AbsoluteIndexedWithX:
                     addr = cpu.DirectPage.GetLongAddress(addr);
                     bval++;
-                    cpu.Memory.WriteByte(addr, bval);
+                    if (cpu.A.Width == 1)
+                    {
+                        cpu.Memory.WriteByte(addr, (byte)bval);
+                    }
+                    else
+                    {
+                        cpu.Memory.WriteWord(addr, bval);
+                    }
+                    
                     cpu.Flags.SetNZ(bval, 1);
                     break;
 
