@@ -89,15 +89,18 @@ namespace FoenixIDE
             else
             {
                 defaultKernel = HexFile.Load(Memory, defaultKernel);
-                if (ResetMemory)
+                if (defaultKernel != null)
                 {
-                    lstFile = new ListFile(defaultKernel);
-                }
-                else
-                {
-                    // TODO: We should really ensure that there are no duplicated PC in the list
-                    ListFile tempList = new ListFile(defaultKernel);
-                    lstFile.Lines.InsertRange(0, tempList.Lines);
+                    if (ResetMemory)
+                    {
+                        lstFile = new ListFile(defaultKernel);
+                    }
+                    else
+                    {
+                        // TODO: We should really ensure that there are no duplicated PC in the list
+                        ListFile tempList = new ListFile(defaultKernel);
+                        lstFile.Lines.InsertRange(0, tempList.Lines);
+                    }
                 }
             }
 

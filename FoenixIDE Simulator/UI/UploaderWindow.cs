@@ -269,11 +269,19 @@ namespace FoenixIDE.UI
                                         if (bank + address >= 0xFF00 && (bank + address) < 0xFFFF)
                                         {
                                             int pageFFLen = length - ((bank + address + length) - 0x1_0000);
+                                            if (pageFFLen > length)
+                                            {
+                                                pageFFLen = length;
+                                            }
                                             Array.Copy(DataBuffer, 0, pageFF, bank+address - 0xFF00, pageFFLen);
                                             resetVector = true;
                                         } else if (bank + address >= 0x18_FF00 && (bank + address) < 0x18_FFFF)
                                         {
                                             int pageFFLen = length - ((bank + address + length) - 0x19_0000);
+                                            if (pageFFLen > length)
+                                            {
+                                                pageFFLen = length;
+                                            }
                                             Array.Copy(DataBuffer, 0, pageFF, bank + address - 0x18_FF00, length);
                                             resetVector = true;
                                         }

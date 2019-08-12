@@ -26,6 +26,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 {
                     processedFileName = null;
                     Application.Exit();
+                    return null;
                 }
             }
                 

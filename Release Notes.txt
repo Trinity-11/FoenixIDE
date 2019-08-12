@@ -1,3 +1,7 @@
+Release 0.2.4.3
+---------------
+Fixed another problem with SendBinaryButton_Click, where the PageFF length was longer than the number of bytes in the buffer to write
+
 Release 0.2.4.2
 ---------------
 Fixed the Z and N flags in the LDX and LDY opcodes.
