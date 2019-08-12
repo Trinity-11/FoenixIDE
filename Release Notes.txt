@@ -1,3 +1,8 @@
+Release 0.2.4.2
+---------------
+Fixed the Z and N flags in the LDX and LDY opcodes.
+Fixed the XBA operation.  The High and Low bytes were not getting swapped properly.
+
 Release 0.2.4.1
 ---------------
 Fixed an issue with the INC absolute opcode: when the accumulator is 16 bits, the two memory locations are updated (when an overflow occurs).

@@ -1019,14 +1019,14 @@ namespace FoenixIDE.Processor
         {
             int val = GetValue(addressMode, signature, cpu.X.Width);
             cpu.X.Value = val;
-            cpu.Flags.SetNZ(cpu.A);
+            cpu.Flags.SetNZ(cpu.X);
         }
 
         public void ExecuteLDY(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.Y.Width);
             cpu.Y.Value = val;
-            cpu.Flags.SetNZ(cpu.A);
+            cpu.Flags.SetNZ(cpu.Y);
         }
 
         public void ExecuteCPX(byte instruction, AddressModes addressMode, int signature)

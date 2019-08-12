@@ -53,20 +53,22 @@ namespace FoenixIDE.Processor
         public virtual int Low
         {
             get { return (int)(this._value & 0xff); }
-            set { this.Value = (int)((this.Value & 0xff00) | (value & 0xff)); }
+            //set { this.Value = (int)((this.Value & 0xff00) | (value & 0xff)); }
         }
 
+        /*
         public virtual int High
         {
             get { return (int)((this._value & 0xff00) >> 8); }
             set { this.Value = (int)((this.Value & 0xff) | ((value & 0xff) << 8)); }
-        }
+        }*/
 
         public virtual void Swap()
         {
-            int l = Low;
-            Low = High;
-            High = l;
+            int v = _value;
+            int low = (v & 0xFF) << 8;
+            int high = (v & 0xFF00) >> 8;
+            _value = high + low;
         }
 
         /// <summary>
