@@ -1,3 +1,7 @@
+Release 0.2.4.4
+---------------
+Fixed the INC direct page opcode.
+
 Release 0.2.4.3
 ---------------
 Fixed another problem with SendBinaryButton_Click, where the PageFF length was longer than the number of bytes in the buffer to write

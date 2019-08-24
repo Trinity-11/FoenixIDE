@@ -637,7 +637,7 @@ namespace FoenixIDE.Processor
                 case OpcodeList.INC_Absolute:
                 case OpcodeList.INC_DirectPageIndexedWithX:
                 case OpcodeList.INC_AbsoluteIndexedWithX:
-                    addr = cpu.DirectPage.GetLongAddress(addr);
+                    //addr = cpu.DirectPage.GetLongAddress(addr);
                     bval++;
                     if (cpu.A.Width == 1)
                     {
