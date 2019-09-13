@@ -5,4 +5,6 @@ CharSet Manager/.vs/CharSet Manager/v15/.suo
 *.pdb
 *.suo
 .vs
-
+Tests/*.hex
+Tests/*.lst
+bin/Debug

@@ -189,6 +189,7 @@ namespace FoenixIDE.Basic
                     return ScanCode.sc_backslash;
                 case Keys.ShiftKey:
                     return ScanCode.sc_shiftLeft;
+                case Keys.Menu:
                 case Keys.Alt:
                     return ScanCode.sc_altLeft;
                 case Keys.ControlKey:

@@ -163,6 +163,7 @@ namespace FoenixIDE.UI
             ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
             if (scanCode != ScanCode.sc_null)
             {
+                e.Handled = true;
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
                 kernel.Memory.KEYBOARD.WriteKey(kernel, scanCode);
             }

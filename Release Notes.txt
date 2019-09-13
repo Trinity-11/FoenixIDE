@@ -1,3 +1,7 @@
+Release 0.2.4.5
+---------------
+Handling of ALT keys
+
 Release 0.2.4.4
 ---------------
 Fixed the INC direct page opcode.

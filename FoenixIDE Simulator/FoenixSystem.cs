@@ -43,7 +43,7 @@ namespace FoenixIDE
                 CODEC = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 2),  // This register is only a single byte but we allow writing a word
                 KEYBOARD = new KeyboardRegister(MemoryMap.KBD_DATA_BUF, 5),
                 SDCARD = new SDCardRegister(MemoryMap.SDCARD_DATA, 2),
-                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 3),
+                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
                 UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
                 UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),
                 OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
