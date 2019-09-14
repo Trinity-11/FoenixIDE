@@ -227,8 +227,8 @@ namespace FoenixIDE.MemoryLocations
         public void WriteWord(int Address, int Value)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
-            device.WriteByte(Address, (byte)(Value & 0xff));
-            device.WriteByte(Address + 1, (byte)(Value >> 8 & 0xff));
+            device.WriteByte(deviceAddress, (byte)(Value & 0xff));
+            device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
         }
 
         public void WriteLong(int Address, int Value)

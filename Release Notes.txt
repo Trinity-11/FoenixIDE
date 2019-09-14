@@ -1,3 +1,7 @@
+Release 0.2.4.6
+---------------
+Added fake joystick at rest ($9F).
+
 Release 0.2.4.5
 ---------------
 Handling of ALT keys
