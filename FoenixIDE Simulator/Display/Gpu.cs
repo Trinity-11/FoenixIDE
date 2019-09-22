@@ -524,11 +524,15 @@ namespace FoenixIDE.Display
 
             int colOffset = bkgrnd ? (80 - ColumnsVisible) / 2 * charWidth / tileSize: 0;
             int lineOffset = bkgrnd ? (60 - lines) / 2 * charHeight / tileSize : 0;
+            int borderXSize = VICKY.ReadByte(0xAF_0008 - MemoryMap.VICKY_BASE_ADDR);
+            int borderYSize = VICKY.ReadByte(0xAF_0009 - MemoryMap.VICKY_BASE_ADDR);
 
             for (int tileRow = lineOffset; tileRow < (30 - lineOffset); tileRow++)
             {
+                if (tileRow * 16 < borderYSize || tileRow * 16 > (480 - borderYSize)) continue;
                 for (int tileCol = colOffset; tileCol < (40 - colOffset); tileCol++)
                 {
+                    if (tileCol * 16 < borderXSize || (tileCol + 1) * 16 > (640 - borderXSize)) continue;
                     int tile = VICKY.ReadByte(tilemapAddress + tileCol + tileRow * 64 - MemoryMap.VICKY_BASE_ADDR);
                     int pixelIndex = 0;
                     int value = 0;
