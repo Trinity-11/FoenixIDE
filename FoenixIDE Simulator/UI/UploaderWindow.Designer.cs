@@ -412,6 +412,7 @@
             this.Controls.Add(this.ConnectButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -420,6 +421,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Uploader Window";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.UploaderWindow_FormClosed);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.UploaderWindow_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

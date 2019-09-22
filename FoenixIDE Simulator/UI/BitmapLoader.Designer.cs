@@ -154,7 +154,7 @@
             this.StoreButton.UseVisualStyleBackColor = true;
             this.StoreButton.Click += new System.EventHandler(this.StoreButton_Click);
             // 
-            // label3
+            // TypeLabel
             // 
             this.TypeLabel.AutoSize = true;
             this.TypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -170,7 +170,7 @@
             this.BitmapTypesCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.BitmapTypesCombo.FormattingEnabled = true;
             this.BitmapTypesCombo.Location = new System.Drawing.Point(134, 78);
-            this.BitmapTypesCombo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BitmapTypesCombo.Margin = new System.Windows.Forms.Padding(2);
             this.BitmapTypesCombo.Name = "BitmapTypesCombo";
             this.BitmapTypesCombo.Size = new System.Drawing.Size(144, 21);
             this.BitmapTypesCombo.TabIndex = 13;
@@ -197,7 +197,7 @@
             this.PixelDepthValueLabel.TabIndex = 15;
             this.PixelDepthValueLabel.Text = "0";
             // 
-            // label1
+            // LabelLUT
             // 
             this.LabelLUT.AutoSize = true;
             this.LabelLUT.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -213,7 +213,7 @@
             this.LUTCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.LUTCombo.FormattingEnabled = true;
             this.LUTCombo.Location = new System.Drawing.Point(342, 78);
-            this.LUTCombo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.LUTCombo.Margin = new System.Windows.Forms.Padding(2);
             this.LUTCombo.Name = "LUTCombo";
             this.LUTCombo.Size = new System.Drawing.Size(117, 21);
             this.LUTCombo.TabIndex = 17;
@@ -240,12 +240,14 @@
             this.Controls.Add(this.BrowseFileButton);
             this.Controls.Add(this.DollarSignLabel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "BitmapLoader";
             this.Text = "Bitmap Loader Window";
             this.Load += new System.EventHandler(this.BitmapLoader_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BitmapLoader_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

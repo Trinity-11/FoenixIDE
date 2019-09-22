@@ -622,5 +622,13 @@ namespace FoenixIDE.UI
             RxLRC = (byte)(RxLRC ^ LRC);
             return RxLRC;
         }
+
+        private void UploaderWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.Close();
+            }
+        }
     }
 }

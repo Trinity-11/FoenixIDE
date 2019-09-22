@@ -62,18 +62,16 @@
             this.HeaderPanel.Controls.Add(this.Layer1Button);
             this.HeaderPanel.Controls.Add(this.Layer0Button);
             this.HeaderPanel.Location = new System.Drawing.Point(1, -2);
-            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4);
             this.HeaderPanel.Name = "HeaderPanel";
-            this.HeaderPanel.Size = new System.Drawing.Size(435, 36);
+            this.HeaderPanel.Size = new System.Drawing.Size(326, 29);
             this.HeaderPanel.TabIndex = 0;
             // 
             // Layer3Button
             // 
             this.Layer3Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Layer3Button.Location = new System.Drawing.Point(328, 4);
-            this.Layer3Button.Margin = new System.Windows.Forms.Padding(4);
+            this.Layer3Button.Location = new System.Drawing.Point(246, 3);
             this.Layer3Button.Name = "Layer3Button";
-            this.Layer3Button.Size = new System.Drawing.Size(100, 28);
+            this.Layer3Button.Size = new System.Drawing.Size(75, 23);
             this.Layer3Button.TabIndex = 3;
             this.Layer3Button.Tag = "3";
             this.Layer3Button.Text = "Layer 3";
@@ -83,10 +81,9 @@
             // Layer2Button
             // 
             this.Layer2Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Layer2Button.Location = new System.Drawing.Point(220, 4);
-            this.Layer2Button.Margin = new System.Windows.Forms.Padding(4);
+            this.Layer2Button.Location = new System.Drawing.Point(165, 3);
             this.Layer2Button.Name = "Layer2Button";
-            this.Layer2Button.Size = new System.Drawing.Size(100, 28);
+            this.Layer2Button.Size = new System.Drawing.Size(75, 23);
             this.Layer2Button.TabIndex = 2;
             this.Layer2Button.Tag = "2";
             this.Layer2Button.Text = "Layer 2";
@@ -96,10 +93,9 @@
             // Layer1Button
             // 
             this.Layer1Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Layer1Button.Location = new System.Drawing.Point(112, 4);
-            this.Layer1Button.Margin = new System.Windows.Forms.Padding(4);
+            this.Layer1Button.Location = new System.Drawing.Point(84, 3);
             this.Layer1Button.Name = "Layer1Button";
-            this.Layer1Button.Size = new System.Drawing.Size(100, 28);
+            this.Layer1Button.Size = new System.Drawing.Size(75, 23);
             this.Layer1Button.TabIndex = 1;
             this.Layer1Button.Tag = "1";
             this.Layer1Button.Text = "Layer 1";
@@ -111,10 +107,9 @@
             this.Layer0Button.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.Layer0Button.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.Layer0Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Layer0Button.Location = new System.Drawing.Point(4, 4);
-            this.Layer0Button.Margin = new System.Windows.Forms.Padding(4);
+            this.Layer0Button.Location = new System.Drawing.Point(3, 3);
             this.Layer0Button.Name = "Layer0Button";
-            this.Layer0Button.Size = new System.Drawing.Size(100, 28);
+            this.Layer0Button.Size = new System.Drawing.Size(75, 23);
             this.Layer0Button.TabIndex = 0;
             this.Layer0Button.Tag = "0";
             this.Layer0Button.Text = "Layer 0";
@@ -124,10 +119,9 @@
             // LayerEnabledCheckbox
             // 
             this.LayerEnabledCheckbox.AutoSize = true;
-            this.LayerEnabledCheckbox.Location = new System.Drawing.Point(13, 37);
-            this.LayerEnabledCheckbox.Margin = new System.Windows.Forms.Padding(4);
+            this.LayerEnabledCheckbox.Location = new System.Drawing.Point(10, 30);
             this.LayerEnabledCheckbox.Name = "LayerEnabledCheckbox";
-            this.LayerEnabledCheckbox.Size = new System.Drawing.Size(122, 21);
+            this.LayerEnabledCheckbox.Size = new System.Drawing.Size(94, 17);
             this.LayerEnabledCheckbox.TabIndex = 1;
             this.LayerEnabledCheckbox.Text = "Layer Enabled";
             this.LayerEnabledCheckbox.UseVisualStyleBackColor = true;
@@ -136,20 +130,18 @@
             // TilesetAddressLabel
             // 
             this.TilesetAddressLabel.AutoSize = true;
-            this.TilesetAddressLabel.Location = new System.Drawing.Point(9, 65);
-            this.TilesetAddressLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.TilesetAddressLabel.Location = new System.Drawing.Point(7, 53);
             this.TilesetAddressLabel.Name = "TilesetAddressLabel";
-            this.TilesetAddressLabel.Size = new System.Drawing.Size(122, 17);
+            this.TilesetAddressLabel.Size = new System.Drawing.Size(91, 13);
             this.TilesetAddressLabel.TabIndex = 2;
             this.TilesetAddressLabel.Text = "Tileset Address: $";
             // 
             // TilesetAddressText
             // 
-            this.TilesetAddressText.Location = new System.Drawing.Point(131, 62);
-            this.TilesetAddressText.Margin = new System.Windows.Forms.Padding(4);
+            this.TilesetAddressText.Location = new System.Drawing.Point(98, 50);
             this.TilesetAddressText.MaxLength = 6;
             this.TilesetAddressText.Name = "TilesetAddressText";
-            this.TilesetAddressText.Size = new System.Drawing.Size(132, 22);
+            this.TilesetAddressText.Size = new System.Drawing.Size(100, 20);
             this.TilesetAddressText.TabIndex = 3;
             this.TilesetAddressText.TextChanged += new System.EventHandler(this.TilesetAddressText_TextChanged);
             // 
@@ -158,10 +150,9 @@
             this.TilesetViewer.BackColor = System.Drawing.Color.Black;
             this.TilesetViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TilesetViewer.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.TilesetViewer.Location = new System.Drawing.Point(33, 91);
-            this.TilesetViewer.Margin = new System.Windows.Forms.Padding(4);
+            this.TilesetViewer.Location = new System.Drawing.Point(25, 74);
             this.TilesetViewer.Name = "TilesetViewer";
-            this.TilesetViewer.Size = new System.Drawing.Size(367, 339);
+            this.TilesetViewer.Size = new System.Drawing.Size(276, 276);
             this.TilesetViewer.TabIndex = 4;
             this.TilesetViewer.TabStop = false;
             this.TilesetViewer.Paint += new System.Windows.Forms.PaintEventHandler(this.TilesetViewer_Paint);
@@ -171,19 +162,19 @@
             // TileSelectedLabel
             // 
             this.TileSelectedLabel.AutoSize = true;
-            this.TileSelectedLabel.Location = new System.Drawing.Point(9, 438);
-            this.TileSelectedLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.TileSelectedLabel.Location = new System.Drawing.Point(7, 356);
             this.TileSelectedLabel.Name = "TileSelectedLabel";
-            this.TileSelectedLabel.Size = new System.Drawing.Size(106, 17);
+            this.TileSelectedLabel.Size = new System.Drawing.Size(81, 13);
             this.TileSelectedLabel.TabIndex = 5;
             this.TileSelectedLabel.Text = "Tile Selected: $";
             // 
             // LUTLabel
             // 
             this.LUTLabel.AutoSize = true;
-            this.LUTLabel.Location = new System.Drawing.Point(167, 38);
+            this.LUTLabel.Location = new System.Drawing.Point(125, 31);
+            this.LUTLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.LUTLabel.Name = "LUTLabel";
-            this.LUTLabel.Size = new System.Drawing.Size(39, 17);
+            this.LUTLabel.Size = new System.Drawing.Size(31, 13);
             this.LUTLabel.TabIndex = 6;
             this.LUTLabel.Text = "LUT:";
             // 
@@ -193,9 +184,10 @@
             this.LUTDomain.Items.Add("1");
             this.LUTDomain.Items.Add("2");
             this.LUTDomain.Items.Add("3");
-            this.LUTDomain.Location = new System.Drawing.Point(206, 36);
+            this.LUTDomain.Location = new System.Drawing.Point(154, 29);
+            this.LUTDomain.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.LUTDomain.Name = "LUTDomain";
-            this.LUTDomain.Size = new System.Drawing.Size(38, 22);
+            this.LUTDomain.Size = new System.Drawing.Size(28, 20);
             this.LUTDomain.TabIndex = 7;
             this.LUTDomain.Text = "0";
             this.LUTDomain.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -205,48 +197,48 @@
             // XLabel
             // 
             this.XLabel.AutoSize = true;
-            this.XLabel.Location = new System.Drawing.Point(280, 38);
+            this.XLabel.Location = new System.Drawing.Point(210, 31);
+            this.XLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.XLabel.Name = "XLabel";
-            this.XLabel.Size = new System.Drawing.Size(62, 17);
+            this.XLabel.Size = new System.Drawing.Size(47, 13);
             this.XLabel.TabIndex = 8;
             this.XLabel.Text = "Stride X:";
             // 
             // YLabel
             // 
             this.YLabel.AutoSize = true;
-            this.YLabel.Location = new System.Drawing.Point(280, 65);
+            this.YLabel.Location = new System.Drawing.Point(210, 53);
+            this.YLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.YLabel.Name = "YLabel";
-            this.YLabel.Size = new System.Drawing.Size(62, 17);
+            this.YLabel.Size = new System.Drawing.Size(47, 13);
             this.YLabel.TabIndex = 9;
             this.YLabel.Text = "Stride Y:";
             // 
             // StrideXText
             // 
-            this.StrideXText.Location = new System.Drawing.Point(351, 36);
-            this.StrideXText.Margin = new System.Windows.Forms.Padding(4);
+            this.StrideXText.Location = new System.Drawing.Point(263, 29);
             this.StrideXText.MaxLength = 4;
             this.StrideXText.Name = "StrideXText";
-            this.StrideXText.Size = new System.Drawing.Size(49, 22);
+            this.StrideXText.Size = new System.Drawing.Size(38, 20);
             this.StrideXText.TabIndex = 10;
             this.StrideXText.Text = "0";
             this.StrideXText.TextChanged += new System.EventHandler(this.StrideXText_TextChanged);
             // 
             // StrideYText
             // 
-            this.StrideYText.Location = new System.Drawing.Point(351, 62);
-            this.StrideYText.Margin = new System.Windows.Forms.Padding(4);
+            this.StrideYText.Location = new System.Drawing.Point(263, 50);
             this.StrideYText.MaxLength = 4;
             this.StrideYText.Name = "StrideYText";
-            this.StrideYText.Size = new System.Drawing.Size(49, 22);
+            this.StrideYText.Size = new System.Drawing.Size(38, 20);
             this.StrideYText.TabIndex = 11;
             this.StrideYText.Text = "0";
             this.StrideYText.TextChanged += new System.EventHandler(this.StrideYText_TextChanged);
             // 
             // TileEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(437, 462);
+            this.ClientSize = new System.Drawing.Size(328, 375);
             this.Controls.Add(this.StrideYText);
             this.Controls.Add(this.StrideXText);
             this.Controls.Add(this.YLabel);
@@ -262,11 +254,12 @@
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "TileEditor";
             this.Text = "Tile Editor";
             this.Load += new System.EventHandler(this.TileEditor_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TileEditor_KeyDown);
             this.HeaderPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TilesetViewer)).EndInit();
             this.ResumeLayout(false);

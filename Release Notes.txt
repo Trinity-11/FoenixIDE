@@ -1,3 +1,7 @@
+Release 0.2.4.9
+---------------
+Closing dialog boxes with ESC key.
+
 Release 0.2.4.8
 ---------------
 Added correction of tiles displaying in the border.
