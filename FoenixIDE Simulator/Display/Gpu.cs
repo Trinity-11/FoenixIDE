@@ -473,14 +473,16 @@ namespace FoenixIDE.Display
             int bitmapAddress = VICKY.ReadLong(0xAF_0141 - MemoryMap.VICKY_BASE_ADDR);
             int width = VICKY.ReadWord(0xAF_0144 - MemoryMap.VICKY_BASE_ADDR);
             int height = VICKY.ReadWord(0xAF_0146 - MemoryMap.VICKY_BASE_ADDR);
+            int borderXSize = VICKY.ReadByte(0xAF_0008 - MemoryMap.VICKY_BASE_ADDR);
+            int borderYSize = VICKY.ReadByte(0xAF_0009 - MemoryMap.VICKY_BASE_ADDR);
 
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0,0,640, 480), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             int value = 0;
 
-            for (int line = 0; line < height; line++)
+            for (int line = borderYSize; line < (height - borderYSize); line++)
             {
-                for (int col = 0; col < width; col++)
+                for (int col = borderXSize; col < (width - borderXSize); col++)
                 {
                     value = graphicsLUT[lutIndex * 256 + VRAM.ReadByte(bitmapAddress++)];
                     if (gammaCorrection != null )
@@ -512,7 +514,7 @@ namespace FoenixIDE.Display
             bool striding = (reg & 0x80) == 0x80;
 
             int tilesetAddress = VICKY.ReadLong(addrTileset + 1 - MemoryMap.VICKY_BASE_ADDR);
-            int strideX = VICKY.ReadWord(addrTileset + 4 - MemoryMap.VICKY_BASE_ADDR);
+            int strideX = ((reg & 0x80) == 0 ) ? VICKY.ReadWord(addrTileset + 4 - MemoryMap.VICKY_BASE_ADDR) : 256;
             int strideY = VICKY.ReadWord(addrTileset + 6 - MemoryMap.VICKY_BASE_ADDR);
 
             // Now read the tilemap
@@ -559,10 +561,8 @@ namespace FoenixIDE.Display
 
         private void DrawSprites(Bitmap bitmap, int layer, bool bkgrnd)
         {
-            int lines = 52;
-            int colOffset = bkgrnd ? (80 - ColumnsVisible) / 2 * charWidth / spriteSize : 0;
-            int lineOffset = bkgrnd ? (60 - lines) / 2 * charHeight / spriteSize : 0;
-
+            int borderXSize = VICKY.ReadByte(0xAF_0008 - MemoryMap.VICKY_BASE_ADDR);
+            int borderYSize = VICKY.ReadByte(0xAF_0009 - MemoryMap.VICKY_BASE_ADDR);
             // There are 32 possible sprites to choose from.
             for (int s = 0; s < 32; s++)
             {
@@ -578,20 +578,67 @@ namespace FoenixIDE.Display
                     int spriteAddress = VICKY.ReadLong(addrSprite + 1 - MemoryMap.VICKY_BASE_ADDR);
                     int posX = VICKY.ReadWord(addrSprite + 4 - MemoryMap.VICKY_BASE_ADDR);
                     int posY = VICKY.ReadWord(addrSprite + 6 - MemoryMap.VICKY_BASE_ADDR);
+                    
+                    if (posX >= (640 - borderXSize) || posY >= (480 - borderYSize) || posX < 0 || posY < 0)
+                    {
+                        continue;
+                    }
+                    int spriteWidth = 32;
+                    int spriteHeight = 32;
+                    int xOffset = 0;
+                    int yOffset = 0;
+                    // Check for sprite bleeding on the left-hand-side
+                    if (posX < borderXSize)
+                    {
+                        xOffset = borderXSize - posX;
+                        posX = borderXSize;
+                        spriteWidth = 32 - xOffset;
+                        if (spriteWidth == 0)
+                        {
+                            continue;
+                        }
+                    }
+                    if (posY < borderYSize)
+                    {
+                        yOffset = borderYSize = posY;
+                        posY = borderYSize;
+                        spriteHeight = 32 - yOffset;
+                        if (spriteHeight == 0)
+                        {
+                            continue;
+                        }
+                    }
+                    // Check for sprite bleeding on the right-hand side
+                    if (posX + 32 > 640 - borderXSize)
+                    {
+                        spriteWidth = 640 - borderXSize - posX;
+                        if (spriteWidth == 0)
+                        {
+                            continue;
+                        }
+                    }
+                    if (posY + 32 > 480 - borderYSize)
+                    {
+                        spriteHeight = 480 - borderYSize - posX;
+                        if (spriteHeight == 0)
+                        {
+                            continue;
+                        }
+                    }
 
-                    BitmapData bitmapData = bitmap.LockBits(new Rectangle(posX, posY, 32, 32), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    BitmapData bitmapData = bitmap.LockBits(new Rectangle(posX, posY, spriteWidth, spriteHeight), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     IntPtr p = bitmapData.Scan0;
 
                     int value = 0;
                     int pixelIndex = 0;
 
                     // Sprites are 32 x 32
-                    for (int line = 0; line < 32; line++)
+                    for (int line = yOffset; line < 32; line++)
                     {
-                        for (int col = 0; col < 32; col++)
+                        for (int col = xOffset; col < xOffset + spriteWidth; col++)
                         {
                             // Lookup the pixel in the tileset
-                            pixelIndex = VRAM.ReadByte(spriteAddress++);
+                            pixelIndex = VRAM.ReadByte(spriteAddress + col + line * 32);
                             if (pixelIndex != 0)
                             {
                                 value = (int)graphicsLUT[lutIndex * 256 + pixelIndex];
@@ -603,7 +650,7 @@ namespace FoenixIDE.Display
                                                   (gammaCorrection[0x200 + (value & 0x000000FF)]) + 0xFF000000);
                                 }
 
-                                System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col) * 4, value);
+                                System.Runtime.InteropServices.Marshal.WriteInt32(p, ((line) * bitmap.Width + (col-xOffset)) * 4, value);
                             }
                         }
                     }
