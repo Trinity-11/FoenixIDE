@@ -817,12 +817,12 @@ namespace FoenixIDE.Processor
             {
                 case OpcodeList.JSR_Absolute:
                 case OpcodeList.JSR_AbsoluteIndexedIndirectWithX:
-                    cpu.Push(cpu.PC);
+                    cpu.Push(cpu.PC, -1);
                     cpu.JumpShort(addr);
                     return;
                 case OpcodeList.JSR_AbsoluteLong:
                     cpu.Push(cpu.ProgramBank);
-                    cpu.Push(cpu.PC);
+                    cpu.Push(cpu.PC, -1);
                     cpu.JumpLong(addr);
                     return;
                 case OpcodeList.JMP_Absolute:
@@ -833,7 +833,7 @@ namespace FoenixIDE.Processor
                     cpu.JumpLong(addr);
                     return;
                 case OpcodeList.RTS_StackImplied:
-                    cpu.JumpShort(cpu.Pull(2));
+                    cpu.JumpShort(cpu.Pull(2) + 1);
                     return;
                 case OpcodeList.RTI_StackImplied:
                     cpu.Flags.SetFlags(cpu.Pull(1));
@@ -848,7 +848,7 @@ namespace FoenixIDE.Processor
                     return;
                 case OpcodeList.RTL_StackImplied:
                     addr = cpu.Pull(3);
-                    cpu.JumpLong(addr);
+                    cpu.JumpLong(addr + 1);
                     return;
                 default:
                     throw new NotImplementedException("ExecuteJumpReturn() opcode not implemented: " + instruction.ToString("X2"));
