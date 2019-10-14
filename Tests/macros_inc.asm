@@ -40,12 +40,12 @@ setxl           .macro
 ; Note: This uses the accumulator and leaves A set to 16 bits. 
 setdp           .macro                
                 PHA             ; begin setdp macro 
-	PHP
+                PHP
                 setal
                 LDA #\1         ; set DP to page 0
                 TCD             
                 .dpage \1
-	PLP
+                PLP
                 PLA             ; end setdp macro 
                 .endm 
 
@@ -53,7 +53,7 @@ setdbr          .macro          ; Set the B (Data bank) register
                 PHA             ; begin setdbr macro 
                 PHP
                 setas
-	LDA #\1         
+                LDA #\1         
                 PHA
                 PLB
                 .databank \1

@@ -173,7 +173,7 @@ namespace FoenixIDE.Processor
 
         public void SetNZ(int Value, int Width)
         {
-            Zero = Value == 0;
+            Zero = (Width == 1 ? Value & 0xFF : Value & 0xFFFF) == 0;
             SetN(Value, Width);
         }
 
