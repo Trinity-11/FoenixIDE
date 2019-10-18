@@ -108,7 +108,10 @@ namespace FoenixIDE
             }
 
             // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
-            if (Memory.ReadLong(0xFFE0) == 0 && Memory.ReadLong(0x18_FFE0) != 0)
+            if (Memory.ReadLong(MemoryMap.VECTORS_BEGIN) == 0 && Memory.ReadLong(0x18_FFE0) != 0 
+                ||
+                Memory.ReadLong(MemoryMap.VECTOR_ERESET) == 0 && Memory.ReadLong(0x18_FFFC) != 0
+                )
             {
                 Memory.RAM.Copy(0x180000, Memory.RAM, 0, MemoryMap.PAGE_SIZE);
                 // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block

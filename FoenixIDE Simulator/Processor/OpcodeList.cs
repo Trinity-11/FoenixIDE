@@ -284,7 +284,7 @@ namespace FoenixIDE.Processor
             Add(new OpCode(0x06, "ASL", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ExecuteShift)));
             Add(new OpCode(0x07, "ORA", 2, AddressModes.DirectPageIndirectLong, new OpCode.ExecuteDelegate(operations.ExecuteORA)));
             Add(new OpCode(0x08, "PHP", 1, AddressModes.StackImplied, new OpCode.ExecuteDelegate(operations.ExecuteStack)));
-            Add(new OpCode(0x09, "ORA", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteORA)));
+            Add(new OpCode(0x09, "ORA", 2, CPU.A, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteORA)));
             Add(new OpCode(0x0A, "ASL", 1, AddressModes.Accumulator, new OpCode.ExecuteDelegate(operations.ExecuteShift)));
             Add(new OpCode(0x0B, "PHD", 1, AddressModes.StackImplied, new OpCode.ExecuteDelegate(operations.ExecuteStack)));
             Add(new OpCode(0x0C, "TSB", 3, AddressModes.Absolute, new OpCode.ExecuteDelegate(operations.ExecuteTSBTRB)));
@@ -348,7 +348,7 @@ namespace FoenixIDE.Processor
             Add(new OpCode(0x46, "LSR", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ExecuteShift)));
             Add(new OpCode(0x47, "EOR", 2, AddressModes.DirectPageIndirectLong, new OpCode.ExecuteDelegate(operations.ExecuteEOR)));
             Add(new OpCode(0x48, "PHA", 1, AddressModes.StackImplied, new OpCode.ExecuteDelegate(operations.ExecuteStack)));
-            Add(new OpCode(0x49, "EOR", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteEOR)));
+            Add(new OpCode(0x49, "EOR", 2, CPU.A, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteEOR)));
             Add(new OpCode(0x4A, "LSR", 1, AddressModes.Accumulator, new OpCode.ExecuteDelegate(operations.ExecuteShift)));
             Add(new OpCode(0x4B, "PHK", 1, AddressModes.StackImplied, new OpCode.ExecuteDelegate(operations.ExecuteStack)));
             Add(new OpCode(0x4C, "JMP", 3, AddressModes.Absolute, new OpCode.ExecuteDelegate(operations.ExecuteJumpReturn)));
