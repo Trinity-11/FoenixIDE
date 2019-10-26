@@ -29,15 +29,70 @@ namespace FoenixIDE.UI
         private ResourceChecker ResChecker = new ResourceChecker();
         private delegate void TransmitByteFunction(byte Value);
         private delegate void ShowFormFunction();
+        private string kernelFileName;
+        private int jumpStartAddress;
+        private bool disabledIRQs = false;
+        private bool autoRun = false;
 
-        public MainWindow()
+        public MainWindow(string[] programArgs)
         {
+            if (programArgs.Length >0)
+            {
+                DecodeProgramArguments(programArgs);
+            }
             InitializeComponent();
         }
 
+        private void DecodeProgramArguments(string[] args)
+        {
+            for (int i=0;i<args.Length;i++)
+            {
+                switch(args[i].Trim())
+                {
+                    // the hex file to load is specified
+                    case "-h":
+                    case "--hex":
+                        // a kernel file must be specified
+                        if (args[i+1].Trim().StartsWith("-") || !args[i + 1].Trim().EndsWith("hex"))
+                        {
+                            throw new Exception("You must specify a hex file.");
+                        }
+                        kernelFileName = args[i+1];
+                        i++; // skip the next argument
+                        break;
+                    case "-j":
+                    case "--jump":
+                        // An address must be specified
+                        int value = Convert.ToInt32(args[i+1].Replace("$:", ""), 16);
+                        if (value != 0)
+                        {
+                            jumpStartAddress = value;
+                            i++; // skip the next argument
+                        } else
+                        {
+                            throw new Exception("Invalid address specified: " + args[i + 1]);
+                        }
+                        break;
+                    // Autorun - a value is not expected for this one
+                    case "-r":
+                    case "--run":
+                        autoRun = true;
+                        break;
+                    // Disable IRQs - a value is not expected for this one
+                    case "-i":
+                    case "--irq":
+                        disabledIRQs = true;
+                        break;
+                    default:
+                        throw new Exception("Unknown switch used:" + args[i].Trim());
+
+                }
+            }
+        }
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-            kernel = new FoenixSystem(this.gpu);
+
+            kernel = new FoenixSystem(this.gpu, kernelFileName);
             
             terminal = new SerialTerminal();
             kernel.Memory.UART1.TransmitByte += SerialTransmitByte;
@@ -57,6 +112,14 @@ namespace FoenixIDE.UI
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
             
+            if (disabledIRQs)
+            {
+                debugWindow.DisableIRQs(true);
+            }
+            if (autoRun)
+            {
+                debugWindow.RunButton_Click(null, null);
+            }
         }
 
         private void ShowDebugWindow()
@@ -281,7 +344,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void LoadHexFile(bool ResetMemory)
+        private bool LoadHexFile(bool ResetMemory)
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -294,9 +357,8 @@ namespace FoenixIDE.UI
                 memoryWindow.Close();
                 if (ResetMemory)
                 {
-                    kernel = new FoenixSystem(this.gpu);
+                    kernel = new FoenixSystem(this.gpu, dialog.FileName);
                 }
-                kernel.SetKernel(dialog.FileName);
                 kernel.ResetCPU(ResetMemory);
                 ShowDebugWindow();
                 ShowMemoryWindow();
@@ -304,7 +366,9 @@ namespace FoenixIDE.UI
                 {
                     tileEditor.SetMemory(kernel.Memory);
                 }
+                return true;
             }
+            return false;
         }
         private void MenuOpenHexFile_Click(object sender, EventArgs e)
         {
@@ -331,12 +395,11 @@ namespace FoenixIDE.UI
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu)
+                kernel = new FoenixSystem(this.gpu, dialog.FileName)
                 {
                     Resources = ResChecker,
                     Breakpoints = CPUWindow.Instance.breakpoints
                 };
-                kernel.SetKernel(dialog.FileName);
                 kernel.ResetCPU(true);
                 ShowDebugWindow();
                 ShowMemoryWindow();

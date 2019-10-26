@@ -28,7 +28,7 @@ namespace FoenixIDE
         public Processor.Breakpoints Breakpoints;
         public ListFile lstFile;
 
-        public FoenixSystem(Gpu gpu)
+        public FoenixSystem(Gpu gpu, string kernelFileName)
         {
             Memory = new MemoryManager
             {
@@ -61,6 +61,10 @@ namespace FoenixIDE
             // Write bytes $9F in the joystick registers to mean that they are not installed.
             Memory.WriteWord(0xAFE800, 0x9F9F);
             Memory.WriteWord(0xAFE802, 0x9F9F);
+            if (kernelFileName != null)
+            {
+                defaultKernel = kernelFileName;
+            }
         }
 
         private void CPU_SimulatorCommand(int EventID)
@@ -135,11 +139,6 @@ namespace FoenixIDE
                 }
             }
             CPU.Reset();
-        }
-
-        public void SetKernel(String value)
-        {
-            defaultKernel = value;
         }
     }
 }

@@ -63,6 +63,11 @@ namespace FoenixIDE.UI
             }
         }
 
+        public void DisableIRQs(bool value)
+        {
+            BreakOnIRQCheckBox.Checked = !value;
+        }
+
         private void ThreadProc()
         {
             while (!kernel.CPU.DebugPause && !kernel.CPU.Waiting)
@@ -488,13 +493,13 @@ namespace FoenixIDE.UI
                     }
                     if (line == null)
                     {
-                        line = GetExecutionInstruction(currentPC);
+                        line = GetExecutionInstruction(nextPC);
                         if (line == null)
                         {
-                            GenerateNextInstruction(currentPC);
+                            GenerateNextInstruction(nextPC);
                         }
                     }
-                    Invoke(new breakpointSetter(BreakpointReached), new object[] { currentPC });
+                    Invoke(new breakpointSetter(BreakpointReached), new object[] { nextPC });
                 }
             }
 
@@ -551,7 +556,17 @@ namespace FoenixIDE.UI
                 finally
                 { }
             }
-            queue.Add(line);
+            // find the proper place to insert the line, based on the PC
+            int index = 0;
+            for (index = 0; index < queue.Count; index++)
+            {
+                DebugLine l = queue[index];
+                if (l.PC > pc)
+                {
+                    break;
+                }
+            }
+            queue.Insert(index, line);
         }
 
         private void UpdateDebugLines(int newDebugLine, bool state)

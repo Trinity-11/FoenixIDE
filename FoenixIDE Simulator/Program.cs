@@ -13,11 +13,20 @@ namespace FoenixIDE
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
+            if (args.Length > 0)
+            {
+                Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress);
+            }
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWindow());
+            Application.Run(new MainWindow(args));
+        }
+
+        static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
