@@ -92,14 +92,14 @@ namespace FoenixIDE.UI
         private void BasicWindow_Load(object sender, EventArgs e)
         {
 
-            kernel = new FoenixSystem(this.gpu, kernelFileName);
+            kernel = new FoenixSystem(this.gpu);
             
             terminal = new SerialTerminal();
             kernel.Memory.UART1.TransmitByte += SerialTransmitByte;
             kernel.Memory.UART2.TransmitByte += SerialTransmitByte;
 
             gpu.StartOfFrame += SOF;
-            kernel.ResetCPU(true);
+            kernel.ResetCPU(true, kernelFileName);
             ShowDebugWindow();
             ShowMemoryWindow();
 
@@ -314,7 +314,7 @@ namespace FoenixIDE.UI
             debugWindow.PauseButton_Click(null, null);
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.ResetCPU(true);
+            kernel.ResetCPU(true, null);
             memoryWindow.UpdateMCRButtons();
             kernel.CPU.Run();
             debugWindow.UpdateQueue();
@@ -329,7 +329,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
             previousCounter = 0;
-            kernel.ResetCPU(true);
+            kernel.ResetCPU(true, null);
             memoryWindow.UpdateMCRButtons();
         }
 
@@ -357,9 +357,9 @@ namespace FoenixIDE.UI
                 memoryWindow.Close();
                 if (ResetMemory)
                 {
-                    kernel = new FoenixSystem(this.gpu, dialog.FileName);
+                    kernel = new FoenixSystem(this.gpu);
                 }
-                kernel.ResetCPU(ResetMemory);
+                kernel.ResetCPU(ResetMemory, dialog.FileName);
                 ShowDebugWindow();
                 ShowMemoryWindow();
                 if (tileEditor != null && tileEditor.Visible)
@@ -395,12 +395,12 @@ namespace FoenixIDE.UI
             {
                 debugWindow.Close();
                 memoryWindow.Close();
-                kernel = new FoenixSystem(this.gpu, dialog.FileName)
+                kernel = new FoenixSystem(this.gpu)
                 {
                     Resources = ResChecker,
                     Breakpoints = CPUWindow.Instance.breakpoints
                 };
-                kernel.ResetCPU(true);
+                kernel.ResetCPU(true, dialog.FileName);
                 ShowDebugWindow();
                 ShowMemoryWindow();
             }

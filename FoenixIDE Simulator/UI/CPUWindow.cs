@@ -56,7 +56,7 @@ namespace FoenixIDE.UI
             {
                 queue = kernel.lstFile.Lines;
             }
-                else
+            else
             {
                 queue = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
                 GenerateNextInstruction(kernel.CPU.GetLongPC());

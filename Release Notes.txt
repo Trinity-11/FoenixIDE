@@ -1,3 +1,11 @@
+Release 0.2.5.1
+---------------
+Fixed "Load Hex w/o Zeroing": adding the runtime parameters messed this up.
+
+Release 0.2.5.0
+---------------
+Added runtime parameters: -r,--run to autorun; -h, --hex to load a hex program; -i,--irq to disable 'break on interrupts'.
+
 Release 0.2.4.9
 ---------------
 Closing dialog boxes with ESC key.

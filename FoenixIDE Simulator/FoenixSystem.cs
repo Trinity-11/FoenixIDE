@@ -28,7 +28,7 @@ namespace FoenixIDE
         public Processor.Breakpoints Breakpoints;
         public ListFile lstFile;
 
-        public FoenixSystem(Gpu gpu, string kernelFileName)
+        public FoenixSystem(Gpu gpu)
         {
             Memory = new MemoryManager
             {
@@ -61,10 +61,6 @@ namespace FoenixIDE
             // Write bytes $9F in the joystick registers to mean that they are not installed.
             Memory.WriteWord(0xAFE800, 0x9F9F);
             Memory.WriteWord(0xAFE802, 0x9F9F);
-            if (kernelFileName != null)
-            {
-                defaultKernel = kernelFileName;
-            }
         }
 
         private void CPU_SimulatorCommand(int EventID)
@@ -79,11 +75,16 @@ namespace FoenixIDE
             }
         }
 
-        public void ResetCPU(bool ResetMemory)
+        public void ResetCPU(bool ResetMemory, string kernelFilename)
         {
             CPU.Halt();
 
             gpu.Refresh();
+
+            if (kernelFilename != null)
+            {
+                defaultKernel = kernelFilename;
+            }
 
             // This fontset is loaded just in case the kernel doesn't provide one.
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
