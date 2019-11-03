@@ -99,7 +99,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (Width == 8)
+                if (Width == 1)
                     return 0xff;
                 return 0xffff;
             }
@@ -109,7 +109,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (Width == 8)
+                if (Width == 1)
                     return -128;
                 return -32768;
             }
@@ -119,7 +119,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (Width == 8)
+                if (Width == 1)
                     return 127;
                 return 32767;
             }
