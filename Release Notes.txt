@@ -1,3 +1,8 @@
+Release 0.2.5.2
+---------------
+Fixed the Carry and Overflow flags in ADC and SBC in 8 bit mode.
+Added Unit Test project, finally.
+
 Release 0.2.5.1
 ---------------
 Fixed "Load Hex w/o Zeroing": adding the runtime parameters messed this up.
