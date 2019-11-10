@@ -27,6 +27,7 @@ namespace FoenixIDE
         public ResourceChecker Resources;
         public Processor.Breakpoints Breakpoints;
         public ListFile lstFile;
+        private string SDCardPath; // this will be null until a path is selected
 
         public FoenixSystem(Gpu gpu)
         {
@@ -140,6 +141,15 @@ namespace FoenixIDE
                 }
             }
             CPU.Reset();
+        }
+
+        public string GetSDCardPath()
+        {
+            return SDCardPath;
+        }
+        public void SetSDCardPath(string path)
+        {
+            SDCardPath = path;
         }
     }
 }

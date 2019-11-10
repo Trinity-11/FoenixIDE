@@ -19,6 +19,8 @@ namespace FoenixIDE.UI
         public UI.CPUWindow debugWindow;
         public MemoryWindow memoryWindow;
         public UploaderWindow uploaderWindow;
+        private SDCardWindow sdCardWindow;
+
         private TileEditor tileEditor;
         public SerialTerminal terminal;
 
@@ -102,6 +104,7 @@ namespace FoenixIDE.UI
             kernel.ResetCPU(true, kernelFileName);
             ShowDebugWindow();
             ShowMemoryWindow();
+            sdCardWindow = new SDCardWindow();
 
             this.Top = 0;
             this.Left = 0;
@@ -531,6 +534,16 @@ namespace FoenixIDE.UI
         private void TerminalToolStripMenuItem_Click(object sender, EventArgs e)
         {
             terminal.Show();
+        }
+
+        private void sDCardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            sdCardWindow.SetPath(kernel.GetSDCardPath());
+            sdCardWindow.ShowDialog();
+            
+            string path = sdCardWindow.GetPath();
+            kernel.SetSDCardPath(path);
+            SDCardPath.Text = (path == null || path.Length==0 )? "SD Card Disabled" : "SDC: " + path;
         }
     }
 }

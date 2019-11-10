@@ -1,3 +1,7 @@
+Release 0.2.6.0
+---------------
+Added SD Card support.
+
 Release 0.2.5.2
 ---------------
 Fixed the Carry and Overflow flags in ADC and SBC in 8 bit mode.
