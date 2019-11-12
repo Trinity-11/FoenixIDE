@@ -75,6 +75,7 @@
             this.SOFCheckbox = new System.Windows.Forms.CheckBox();
             this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
+            this.SDCardCheckBox = new System.Windows.Forms.CheckBox();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
@@ -379,6 +380,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.SDCardCheckBox);
             this.panel1.Controls.Add(this.OPL2LCheckbox);
             this.panel1.Controls.Add(this.OPL2RCheckbox);
             this.panel1.Controls.Add(this.MPU401Checkbox);
@@ -592,6 +594,16 @@
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 
+            // SDCardCheckBox
+            // 
+            this.SDCardCheckBox.Checked = true;
+            this.SDCardCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.SDCardCheckBox.Location = new System.Drawing.Point(88, 38);
+            this.SDCardCheckBox.Name = "SDCardCheckBox";
+            this.SDCardCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.SDCardCheckBox.TabIndex = 34;
+            this.SDCardCheckBox.UseVisualStyleBackColor = true;
+            // 
             // CPUWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -683,5 +695,6 @@
         private System.Windows.Forms.CheckBox TMR0Checkbox;
         private System.Windows.Forms.CheckBox OPL2LCheckbox;
         private System.Windows.Forms.CheckBox OPL2RCheckbox;
+        private System.Windows.Forms.CheckBox SDCardCheckBox;
     }
 }

@@ -101,6 +101,7 @@ namespace FoenixIDE.UI
             Tooltip.SetToolTip(COM2Checkbox, "Break on COM2 Interrupts");
             Tooltip.SetToolTip(COM1Checkbox, "Break on COM1 Interrupts");
             Tooltip.SetToolTip(MPU401Checkbox, "Break on MPU401 Interrupts");
+            Tooltip.SetToolTip(SDCardCheckBox, "Break on SD Card Interrupts");
 
             // Register 2
             Tooltip.SetToolTip(OPL2RCheckbox, "Break on OPL2 Right Interrupts");
@@ -659,6 +660,7 @@ namespace FoenixIDE.UI
             COM2Checkbox.Visible = visible;
             COM1Checkbox.Visible = visible;
             MPU401Checkbox.Visible = visible;
+            SDCardCheckBox.Visible = visible;
 
             OPL2LCheckbox.Visible = visible;
             OPL2RCheckbox.Visible = visible;
@@ -670,13 +672,21 @@ namespace FoenixIDE.UI
         /// <returns></returns>
         private bool InterruptMatchesCheckboxes()
         {
-            // Read registers
+            // Read Interrupt Register 0
             byte reg0 = kernel.Memory.INTERRUPT.ReadByte(0);
             if ((reg0 & 1) == 1 && SOFCheckbox.Checked)
             {
                 return true;
             }
+
+            // Read Interrupt Register 1
             byte reg1 = kernel.Memory.INTERRUPT.ReadByte(1);
+            if ((reg1 & 0x80 ) == 0x80 && SDCardCheckBox.Checked)
+            {
+                return true;
+            }
+
+            //Read Interrupt Register 2
             byte reg2 = kernel.Memory.INTERRUPT.ReadByte(2);
             if ((reg1 & 1) == 1 && KeyboardCheckBox.Checked)
             {

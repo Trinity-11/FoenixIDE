@@ -1,5 +1,6 @@
 ﻿using FoenixIDE.Basic;
 using FoenixIDE.Simulator.Devices;
+using FoenixIDE.Simulator.Devices.SDCard;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
 using System;
@@ -91,9 +92,9 @@ namespace FoenixIDE.UI
                 }
             }
         }
+
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-
             kernel = new FoenixSystem(this.gpu);
             
             terminal = new SerialTerminal();
@@ -101,27 +102,31 @@ namespace FoenixIDE.UI
             kernel.Memory.UART2.TransmitByte += SerialTransmitByte;
 
             gpu.StartOfFrame += SOF;
+            kernel.Memory.SDCARD.sdCardIRQMethod += SDCardInterrupt;
             kernel.ResetCPU(true, kernelFileName);
-            ShowDebugWindow();
-            ShowMemoryWindow();
-            sdCardWindow = new SDCardWindow();
+            if (kernel.lstFile != null)
+            {
+                ShowDebugWindow();
+                ShowMemoryWindow();
+                sdCardWindow = new SDCardWindow();
 
-            this.Top = 0;
-            this.Left = 0;
-            this.Width = debugWindow.Left;
-            if (this.Width > 1200)
-            {
-                this.Width = 1200;
-            }
-            this.Height = Convert.ToInt32(this.Width * 0.75);
-            
-            if (disabledIRQs)
-            {
-                debugWindow.DisableIRQs(true);
-            }
-            if (autoRun)
-            {
-                debugWindow.RunButton_Click(null, null);
+                this.Top = 0;
+                this.Left = 0;
+                this.Width = debugWindow.Left;
+                if (this.Width > 1200)
+                {
+                    this.Width = 1200;
+                }
+                this.Height = Convert.ToInt32(this.Width * 0.75);
+
+                if (disabledIRQs)
+                {
+                    debugWindow.DisableIRQs(true);
+                }
+                if (autoRun)
+                {
+                    debugWindow.RunButton_Click(null, null);
+                }
             }
         }
 
@@ -214,16 +219,32 @@ namespace FoenixIDE.UI
         public void SOF()
         {
             byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (!kernel.CPU.Flags.IrqDisable && ((~mask & 1) == 1))
+            if (!kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
             {
-                // Set the Keyboard Interrupt
+                // Set the SOF Interrupt
                 byte IRQ0 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
-                IRQ0 |= 1;
+                IRQ0 |= (byte)Register0.FNX0_INT00_SOF;
                 kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
                 kernel.CPU.Pins.IRQ = true;
             }
         }
 
+        public void SDCardInterrupt(SDCardInterrupt irq)
+        {
+            // Check if the Keyboard interrupt is allowed
+            byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
+            if ((~mask & (byte)Register1.FNX1_INT07_SDCARD) == (byte)Register1.FNX1_INT07_SDCARD)
+            {
+                // Set the SD Card Interrupt
+                byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
+                IRQ1 |= (byte)Register1.FNX1_INT07_SDCARD;
+                kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+                kernel.CPU.Pins.IRQ = true;
+
+                // Write the interrupt result
+                kernel.Memory.SDCARD.WriteByte(0, (byte)irq);
+            }
+        }
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
         {
             ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
@@ -361,6 +382,7 @@ namespace FoenixIDE.UI
                 if (ResetMemory)
                 {
                     kernel = new FoenixSystem(this.gpu);
+                    kernel.Memory.SDCARD.sdCardIRQMethod += SDCardInterrupt;
                 }
                 kernel.ResetCPU(ResetMemory, dialog.FileName);
                 ShowDebugWindow();
@@ -369,6 +391,7 @@ namespace FoenixIDE.UI
                 {
                     tileEditor.SetMemory(kernel.Memory);
                 }
+                ResetSDCard();
                 return true;
             }
             return false;
@@ -536,14 +559,30 @@ namespace FoenixIDE.UI
             terminal.Show();
         }
 
-        private void sDCardToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SDCardToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sdCardWindow.SetPath(kernel.GetSDCardPath());
+            sdCardWindow.SetPath(kernel.Memory.SDCARD.GetSDCardPath());
             sdCardWindow.ShowDialog();
-            
+            ResetSDCard();
+        }
+
+        private void ResetSDCard()
+        {
             string path = sdCardWindow.GetPath();
-            kernel.SetSDCardPath(path);
-            SDCardPath.Text = (path == null || path.Length==0 )? "SD Card Disabled" : "SDC: " + path;
+            kernel.Memory.SDCARD.SetSDCardPath(path);
+            byte sdCardStat = 0;
+            if (path == null || path.Length == 0)
+            {
+                SDCardPath.Text = "SD Card Disabled";
+                kernel.Memory.SDCARD.isPresent = false;
+            }
+            else
+            {
+                SDCardPath.Text = "SDC: " + path;
+                sdCardStat = 1;
+                kernel.Memory.SDCARD.isPresent = true;
+            }
+            kernel.Memory.WriteByte(MemoryLocations.MemoryMap.SDCARD_STAT, sdCardStat);
         }
     }
 }

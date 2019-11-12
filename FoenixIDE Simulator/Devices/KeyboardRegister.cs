@@ -83,13 +83,13 @@ namespace FoenixIDE.Simulator.Devices
         {
             // Check if the Keyboard interrupt is allowed
             byte mask = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
-            if ((~mask & 1) == 1)
+            if ((~mask & (byte)Register1.FNX1_INT00_KBD) == (byte)Register1.FNX1_INT00_KBD)
             {
                 kernel.Memory.KEYBOARD.WriteByte(0, (byte)key);
                 kernel.Memory.KEYBOARD.WriteByte(4, 0);
                 // Set the Keyboard Interrupt
                 byte IRQ1 = kernel.Memory.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
-                IRQ1 |= 1;
+                IRQ1 |= (byte)Register1.FNX1_INT00_KBD;
                 kernel.Memory.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
                 kernel.CPU.Pins.IRQ = true;
             }

@@ -27,7 +27,6 @@ namespace FoenixIDE
         public ResourceChecker Resources;
         public Processor.Breakpoints Breakpoints;
         public ListFile lstFile;
-        private string SDCardPath; // this will be null until a path is selected
 
         public FoenixSystem(Gpu gpu)
         {
@@ -43,7 +42,7 @@ namespace FoenixIDE
                 MATH = new MathCoproRegisters(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
                 CODEC = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 2),  // This register is only a single byte but we allow writing a word
                 KEYBOARD = new KeyboardRegister(MemoryMap.KBD_DATA_BUF, 5),
-                SDCARD = new SDCardRegister(MemoryMap.SDCARD_DATA, 2),
+                SDCARD = new SDCardRegister(MemoryMap.SDCARD_DATA, MemoryMap.SDCARD_SIZE),
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
                 UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
                 UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),
@@ -141,15 +140,6 @@ namespace FoenixIDE
                 }
             }
             CPU.Reset();
-        }
-
-        public string GetSDCardPath()
-        {
-            return SDCardPath;
-        }
-        public void SetSDCardPath(string path)
-        {
-            SDCardPath = path;
         }
     }
 }

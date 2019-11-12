@@ -71,6 +71,7 @@
     <Compile Include="Basic\ScanCodes.cs" />
     <Compile Include="DeviceEnum.cs" />
     <Compile Include="Devices\InterruptController.cs" />
+    <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
     <Compile Include="Devices\MPU401.cs" />
     <Compile Include="Devices\OPL2.cs" />

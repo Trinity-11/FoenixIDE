@@ -37,6 +37,7 @@ namespace FoenixIDE.UI
             this.lastKeyPressed = new System.Windows.Forms.ToolStripStatusLabel();
             this.cpsPerf = new System.Windows.Forms.ToolStripStatusLabel();
             this.fpsPerf = new System.Windows.Forms.ToolStripStatusLabel();
+            this.SDCardPath = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOpenHexFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,6 +49,7 @@ namespace FoenixIDE.UI
             this.loadImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tileEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.memoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,8 +65,6 @@ namespace FoenixIDE.UI
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.gpu = new FoenixIDE.Display.Gpu();
-            this.sDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.SDCardPath = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -120,6 +120,18 @@ namespace FoenixIDE.UI
             this.fpsPerf.Padding = new System.Windows.Forms.Padding(2);
             this.fpsPerf.Size = new System.Drawing.Size(48, 23);
             this.fpsPerf.Text = "FPS: 0";
+            // 
+            // SDCardPath
+            // 
+            this.SDCardPath.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.SDCardPath.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.SDCardPath.Name = "SDCardPath";
+            this.SDCardPath.Size = new System.Drawing.Size(105, 23);
+            this.SDCardPath.Text = "SD Card Disabled";
+            this.SDCardPath.Click += new System.EventHandler(this.SDCardToolStripMenuItem_Click);
             // 
             // menuStrip1
             // 
@@ -187,9 +199,9 @@ namespace FoenixIDE.UI
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadImageToolStripMenuItem,
+            this.sDCardToolStripMenuItem,
             this.tileEditorToolStripMenuItem,
-            this.uploaderToolStripMenuItem,
-            this.sDCardToolStripMenuItem});
+            this.uploaderToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
@@ -214,6 +226,13 @@ namespace FoenixIDE.UI
             this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.uploaderToolStripMenuItem.Text = "&Uploader";
             this.uploaderToolStripMenuItem.Click += new System.EventHandler(this.UploaderToolStripMenuItem_Click);
+            // 
+            // sDCardToolStripMenuItem
+            // 
+            this.sDCardToolStripMenuItem.Name = "sDCardToolStripMenuItem";
+            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sDCardToolStripMenuItem.Text = "&SD Card";
+            this.sDCardToolStripMenuItem.Click += new System.EventHandler(this.SDCardToolStripMenuItem_Click);
             // 
             // windowsToolStripMenuItem
             // 
@@ -350,25 +369,6 @@ namespace FoenixIDE.UI
             this.gpu.MouseEnter += new System.EventHandler(this.Gpu_MouseEnter);
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
-            // 
-            // sDCardToolStripMenuItem
-            // 
-            this.sDCardToolStripMenuItem.Name = "sDCardToolStripMenuItem";
-            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.sDCardToolStripMenuItem.Text = "&SD Card";
-            this.sDCardToolStripMenuItem.Click += new System.EventHandler(this.sDCardToolStripMenuItem_Click);
-            // 
-            // SDCardPath
-            // 
-            this.SDCardPath.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.SDCardPath.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
-            this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.SDCardPath.Name = "SDCardPath";
-            this.SDCardPath.Size = new System.Drawing.Size(105, 23);
-            this.SDCardPath.Text = "SD Card Disabled";
-            this.SDCardPath.Click += new System.EventHandler(this.sDCardToolStripMenuItem_Click);
             // 
             // MainWindow
             // 

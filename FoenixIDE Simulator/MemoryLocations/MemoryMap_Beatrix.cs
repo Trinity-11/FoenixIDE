@@ -21,9 +21,10 @@ namespace FoenixIDE.MemoryLocations
 
         public const int SDCARD_START = 0xAF_E808;  // Start of SDCARD memory range
         public const int SDCARD_END = 0xAF_E81F;    // End of SDCARD memory range
-        public const int SDCARD_SIZE = 0x07;        // Size of SD Card memory range
+        public const int SDCARD_SIZE = 0x09;        // Size of SD Card memory range
         public const int SDCARD_DATA = 0xAF_E808;
         public const int SDCARD_CMD = 0xAF_E809;
+        public const int SDCARD_STAT = 0xAF_E810;
 
         // Handling code in CODEC_RAM
         public const int CODEC_START = 0xAF_E820;   // Start of CODEC memory range
