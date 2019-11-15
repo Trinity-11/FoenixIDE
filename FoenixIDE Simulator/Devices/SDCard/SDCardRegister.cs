@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
+    internal class ShortLongFileName
+    {
+        public string shortName;
+        public string longName;
+    }
+
     public class SDCardRegister: MemoryLocations.MemoryRAM
     {
         private SDCardCommand currentCommand = SDCardCommand.NONE;
@@ -15,7 +21,9 @@ namespace FoenixIDE.Simulator.Devices
         public SDCardInterruptEvent sdCardIRQMethod;
         string filename = "";
         string spaces = "        ";
-        List<string> dircontent = new List<string> ();
+        string sdCurrentPath = "";
+
+        List <ShortLongFileName> dircontent = new List<ShortLongFileName> ();
         string filedata = "";
         int filepos = -1;
         private string SDCardPath; // this will be null until a path is selected
@@ -97,7 +105,7 @@ namespace FoenixIDE.Simulator.Devices
                             sdCardIRQMethod?.Invoke(SDCardInterrupt.USB_INT_DISK_READ);
                             break;
                         case SDCardCommand.RD_USB_DATA0:
-                            filedata = dircontent[0];
+                            filedata = dircontent[0].shortName;
                             dircontent.RemoveAt(0);
                             data[0] = (byte)filedata.Length;
                             filepos = -1;
@@ -128,27 +136,42 @@ namespace FoenixIDE.Simulator.Devices
          */
         private void ReadFile(string name)
         {
-            if (name.Contains("."))
+            if (name.Contains("*"))
             {
-
-            }
-            else
-            {
-                name = name.Replace("/", "");
+                // Path is compounded, as long as "CLOSE" is not called
+                if (name.StartsWith("/"))
+                {
+                    sdCurrentPath = name.Substring(1);
+                }
+                else
+                {
+                    sdCurrentPath += name;
+                }
                 dircontent.Clear();
-                string[] dirs = Directory.GetDirectories(SDCardPath, name, SearchOption.TopDirectoryOnly);
-                string[] files = Directory.GetFiles(SDCardPath, name, SearchOption.TopDirectoryOnly);
+                string[] dirs = Directory.GetDirectories(SDCardPath, sdCurrentPath, SearchOption.TopDirectoryOnly);
+                string[] files = Directory.GetFiles(SDCardPath, sdCurrentPath, SearchOption.TopDirectoryOnly);
                 foreach (string dir in dirs)
                 {
-                    dircontent.Add(ShortFilename(dir.Replace(SDCardPath + "\\","")) + (char)(byte)FileAttributes.Directory + spaces + spaces + "\0\0\0\0");
+                    ShortLongFileName slf = new ShortLongFileName();
+                    slf.longName = dir;
+                    slf.shortName = ShortFilename(dir.Replace(SDCardPath + "\\", "")) + (char)(byte)FileAttributes.Directory + spaces + spaces + "\0\0\0\0";
+                    dircontent.Add(slf);
                 }
                 foreach (string file in files)
                 {
                     int size = (int)new FileInfo(file).Length;
                     byte[] sizeB = BitConverter.GetBytes(size);
                     UTF8Encoding utf8 = new UTF8Encoding();
-                    
-                    dircontent.Add(ShortFilename(file.Replace(SDCardPath + "\\", "")) + (char)(byte)FileAttributes.Archive + spaces + spaces + utf8.GetString(sizeB));
+                    ShortLongFileName slf = new ShortLongFileName();
+                    slf.longName = file;
+                    slf.shortName = ShortFilename(file.Replace(SDCardPath + "\\", "")) + (char)(byte)FileAttributes.Archive + spaces + spaces + utf8.GetString(sizeB);
+                    while (ListContains(dircontent, slf.shortName.Substring(0,11)))
+                    {
+                        int fileVal = Convert.ToInt32(slf.shortName.Substring(7, 1));
+                        fileVal++;
+                        slf.shortName = slf.shortName.Substring(0, 7) + fileVal + slf.shortName.Substring(8);
+                    }
+                    dircontent.Add(slf);
                 }
             }
         }
@@ -158,7 +181,7 @@ namespace FoenixIDE.Simulator.Devices
             int pos = longname.IndexOf('.');
             if (pos > 0)
             {
-                string filename = longname.Substring(0, pos);
+                string filename = longname.Substring(0, pos).Replace(" ", "");
                 string extension = longname.Substring(pos+1);
                 if (filename.Length > 8)
                 {
@@ -174,7 +197,7 @@ namespace FoenixIDE.Simulator.Devices
             }
             else
             {
-                string filename = longname;
+                string filename = longname.Replace(" ", "");
                 if (filename.Length > 8)
                 {
                     filename = longname.Substring(0, 6) + "~1";
@@ -182,6 +205,18 @@ namespace FoenixIDE.Simulator.Devices
                 filename += spaces.Substring(0,8-filename.Length);
                 return filename.ToUpper() + "   ";
             }
+        }
+
+        private bool ListContains(List<ShortLongFileName> directory, string shortname)
+        {
+            foreach (ShortLongFileName slf in directory)
+            {
+                if (slf.shortName.Substring(0, 11).Equals(shortname))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
