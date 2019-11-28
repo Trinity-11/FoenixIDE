@@ -335,7 +335,7 @@ namespace FoenixIDE.UI
          */
         private void RestartMenuItemClick(object sender, EventArgs e)
         {
-            debugWindow.PauseButton_Click(null, null);
+            debugWindow.Pause();
             debugWindow.ClearTrace();
             previousCounter = 0;
             kernel.ResetCPU(true, null);
@@ -350,11 +350,13 @@ namespace FoenixIDE.UI
          */
         private void DebugToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            debugWindow.Pause();
             kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
             previousCounter = 0;
             kernel.ResetCPU(true, null);
             memoryWindow.UpdateMCRButtons();
+            debugWindow.Refresh();
         }
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)

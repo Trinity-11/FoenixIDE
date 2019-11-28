@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CPUWindow));
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.StepOver = new System.Windows.Forms.Button();
             this.BPLabel = new System.Windows.Forms.Label();
             this.stepsInput = new System.Windows.Forms.TextBox();
             this.BPCombo = new System.Windows.Forms.ComboBox();
@@ -39,7 +40,6 @@
             this.stepsLabel = new System.Windows.Forms.Label();
             this.StepButton = new System.Windows.Forms.Button();
             this.RunButton = new System.Windows.Forms.Button();
-            this.PauseButton = new System.Windows.Forms.Button();
             this.locationLabel = new System.Windows.Forms.Label();
             this.locationInput = new System.Windows.Forms.TextBox();
             this.JumpButton = new System.Windows.Forms.Button();
@@ -56,6 +56,7 @@
             this.StepOverButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.SDCardCheckBox = new System.Windows.Forms.CheckBox();
             this.OPL2LCheckbox = new System.Windows.Forms.CheckBox();
             this.OPL2RCheckbox = new System.Windows.Forms.CheckBox();
             this.MPU401Checkbox = new System.Windows.Forms.CheckBox();
@@ -75,7 +76,6 @@
             this.SOFCheckbox = new System.Windows.Forms.CheckBox();
             this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
-            this.SDCardCheckBox = new System.Windows.Forms.CheckBox();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
@@ -84,6 +84,7 @@
             // 
             // HeaderPanel
             // 
+            this.HeaderPanel.Controls.Add(this.StepOver);
             this.HeaderPanel.Controls.Add(this.BPLabel);
             this.HeaderPanel.Controls.Add(this.stepsInput);
             this.HeaderPanel.Controls.Add(this.BPCombo);
@@ -92,12 +93,21 @@
             this.HeaderPanel.Controls.Add(this.stepsLabel);
             this.HeaderPanel.Controls.Add(this.StepButton);
             this.HeaderPanel.Controls.Add(this.RunButton);
-            this.HeaderPanel.Controls.Add(this.PauseButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(608, 24);
             this.HeaderPanel.TabIndex = 2;
+            // 
+            // StepOver
+            // 
+            this.StepOver.Location = new System.Drawing.Point(149, 0);
+            this.StepOver.Name = "StepOver";
+            this.StepOver.Size = new System.Drawing.Size(87, 24);
+            this.StepOver.TabIndex = 10;
+            this.StepOver.Text = "Step Over (F7)";
+            this.StepOver.UseVisualStyleBackColor = true;
+            this.StepOver.Click += new System.EventHandler(this.StepOver_Click);
             // 
             // BPLabel
             // 
@@ -112,11 +122,11 @@
             // 
             // stepsInput
             // 
-            this.stepsInput.Dock = System.Windows.Forms.DockStyle.Left;
+            this.stepsInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.stepsInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stepsInput.Location = new System.Drawing.Point(271, 0);
+            this.stepsInput.Location = new System.Drawing.Point(333, 1);
             this.stepsInput.Name = "stepsInput";
-            this.stepsInput.Size = new System.Drawing.Size(47, 23);
+            this.stepsInput.Size = new System.Drawing.Size(33, 23);
             this.stepsInput.TabIndex = 3;
             this.stepsInput.Text = "1";
             this.stepsInput.Enter += new System.EventHandler(this.StepsInput_Enter);
@@ -154,8 +164,8 @@
             // 
             // stepsLabel
             // 
-            this.stepsLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.stepsLabel.Location = new System.Drawing.Point(192, 0);
+            this.stepsLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.stepsLabel.Location = new System.Drawing.Point(248, 0);
             this.stepsLabel.Name = "stepsLabel";
             this.stepsLabel.Padding = new System.Windows.Forms.Padding(10, 4, 0, 0);
             this.stepsLabel.Size = new System.Drawing.Size(79, 24);
@@ -165,9 +175,9 @@
             // StepButton
             // 
             this.StepButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.StepButton.Location = new System.Drawing.Point(128, 0);
+            this.StepButton.Location = new System.Drawing.Point(77, 0);
             this.StepButton.Name = "StepButton";
-            this.StepButton.Size = new System.Drawing.Size(64, 24);
+            this.StepButton.Size = new System.Drawing.Size(72, 24);
             this.StepButton.TabIndex = 2;
             this.StepButton.Text = "Step (F6)";
             this.StepButton.UseVisualStyleBackColor = true;
@@ -176,24 +186,14 @@
             // RunButton
             // 
             this.RunButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.RunButton.Location = new System.Drawing.Point(64, 0);
+            this.RunButton.Location = new System.Drawing.Point(0, 0);
             this.RunButton.Name = "RunButton";
-            this.RunButton.Size = new System.Drawing.Size(64, 24);
+            this.RunButton.Size = new System.Drawing.Size(77, 24);
             this.RunButton.TabIndex = 1;
+            this.RunButton.Tag = "0";
             this.RunButton.Text = "Run (F5)";
             this.RunButton.UseVisualStyleBackColor = true;
             this.RunButton.Click += new System.EventHandler(this.RunButton_Click);
-            // 
-            // PauseButton
-            // 
-            this.PauseButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.PauseButton.Location = new System.Drawing.Point(0, 0);
-            this.PauseButton.Name = "PauseButton";
-            this.PauseButton.Size = new System.Drawing.Size(64, 24);
-            this.PauseButton.TabIndex = 0;
-            this.PauseButton.Text = "Pause";
-            this.PauseButton.UseVisualStyleBackColor = true;
-            this.PauseButton.Click += new System.EventHandler(this.PauseButton_Click);
             // 
             // locationLabel
             // 
@@ -404,6 +404,16 @@
             this.panel1.Size = new System.Drawing.Size(230, 74);
             this.panel1.TabIndex = 12;
             // 
+            // SDCardCheckBox
+            // 
+            this.SDCardCheckBox.Checked = true;
+            this.SDCardCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.SDCardCheckBox.Location = new System.Drawing.Point(88, 38);
+            this.SDCardCheckBox.Name = "SDCardCheckBox";
+            this.SDCardCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.SDCardCheckBox.TabIndex = 34;
+            this.SDCardCheckBox.UseVisualStyleBackColor = true;
+            // 
             // OPL2LCheckbox
             // 
             this.OPL2LCheckbox.Checked = true;
@@ -587,22 +597,12 @@
             // registerDisplay1
             // 
             this.registerDisplay1.CPU = null;
-            this.registerDisplay1.Location = new System.Drawing.Point(0, 48);
+            this.registerDisplay1.Location = new System.Drawing.Point(2, 50);
             this.registerDisplay1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.registerDisplay1.Name = "registerDisplay1";
             this.registerDisplay1.Size = new System.Drawing.Size(366, 49);
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
-            // 
-            // SDCardCheckBox
-            // 
-            this.SDCardCheckBox.Checked = true;
-            this.SDCardCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.SDCardCheckBox.Location = new System.Drawing.Point(88, 38);
-            this.SDCardCheckBox.Name = "SDCardCheckBox";
-            this.SDCardCheckBox.Size = new System.Drawing.Size(15, 14);
-            this.SDCardCheckBox.TabIndex = 34;
-            this.SDCardCheckBox.UseVisualStyleBackColor = true;
             // 
             // CPUWindow
             // 
@@ -656,7 +656,6 @@
         private global::System.Windows.Forms.Button JumpButton;
         private global::System.Windows.Forms.Button RunButton;
         private global::System.Windows.Forms.Button StepButton;
-        private global::System.Windows.Forms.Button PauseButton;
         private global::System.Windows.Forms.TextBox lastLine;
         private global::System.Windows.Forms.TextBox stackText;
         private global::System.Windows.Forms.Label locationLabel;
@@ -696,5 +695,6 @@
         private System.Windows.Forms.CheckBox OPL2LCheckbox;
         private System.Windows.Forms.CheckBox OPL2RCheckbox;
         private System.Windows.Forms.CheckBox SDCardCheckBox;
+        private System.Windows.Forms.Button StepOver;
     }
 }

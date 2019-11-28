@@ -369,25 +369,55 @@ namespace FoenixIDE.UI
 
         public void RunButton_Click(object sender, EventArgs e)
         {
-            // Clear the interrupt
-            IRQPC = -1;
             DebugPanel_Leave(sender, e);
-            kernel.CPU.DebugPause = false;
-            RunButton.Enabled = false;
-            lastLine.Text = "";
-            t = new Thread(new ThreadStart(ThreadProc));
-            UpdateTraceTimer.Enabled = true;
-            t.Start();
+            if (RunButton.Tag.Equals("0"))
+            {
+                // Clear the interrupt
+                IRQPC = -1;
+                
+                kernel.CPU.DebugPause = false;
+                lastLine.Text = "";
+                t = new Thread(new ThreadStart(ThreadProc));
+                UpdateTraceTimer.Enabled = true;
+                t.Start();
+                RunButton.Text = "Pause (F5)";
+                RunButton.Tag = "1";
+            }
+            else
+            {
+                Pause();
+            }
         }
 
-        public void PauseButton_Click(object sender, EventArgs e)
+        public void Pause()
         {
-            DebugPanel_Leave(sender, e);
             kernel.CPU.DebugPause = true;
             t?.Join();
-            RunButton.Enabled = true;
             UpdateTraceTimer.Enabled = false;
             RefreshStatus();
+            RunButton.Text = "Run (F5)";
+            RunButton.Tag = "0";
+        }
+
+        private void StepOver_Click(object sender, EventArgs e)
+        {
+            int pc = kernel.CPU.GetLongPC();
+            DebugLine line = GetExecutionInstruction(pc);
+
+            // Set a breakpoint to the next address
+            int nextAddress = pc + line.commandLength;
+            int newValue = breakpoints.Add(nextAddress.ToString("X"));
+
+            if (newValue != -1)
+            {
+                // Run the CPU until the breakpoint is reached
+                RunButton_Click(null, null);
+
+                // Ensure the breakpoint is removed
+                isStepOver = true;
+                RunButton.Text = "Run (F5)";
+                RunButton.Tag = "0";
+            }
         }
 
         private void StepButton_Click(object sender, EventArgs e)
@@ -395,6 +425,7 @@ namespace FoenixIDE.UI
             DebugPanel_Leave(sender, e);
             kernel.CPU.DebugPause = true;
             t?.Join();
+            RunButton.Text = "Run (F5)";
             UpdateTraceTimer.Enabled = false;
             RunButton.Enabled = true;
             int.TryParse(stepsInput.Text, out int steps);
@@ -480,9 +511,9 @@ namespace FoenixIDE.UI
             {
                 
                 int nextPC = kernel.CPU.GetLongPC();
-                if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && ((kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes())|| kernel.CPU.CurrentOpcode.Value == 0)))
+                if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && ((kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) || kernel.CPU.CurrentOpcode.Value == 0)))
                 {
-                    if (UpdateTraceTimer.Enabled)
+                    if (UpdateTraceTimer.Enabled || kernel.CPU.CurrentOpcode.Value == 0)
                     {
                         UpdateTraceTimer.Enabled = false;
                         kernel.CPU.DebugPause = true;
@@ -627,13 +658,22 @@ namespace FoenixIDE.UI
 
         private void CPUWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.F5)
+            switch (e.KeyCode)
             {
-                RunButton_Click(sender, null);
-            }
-            else if (e.KeyCode == Keys.F6)
-            {
-                StepButton_Click(sender, null);
+                case Keys.F5:
+                    RunButton.Focus();
+                    RunButton_Click(sender, null);
+                    break;
+
+                case Keys.F6:
+                    StepButton.Focus();
+                    StepButton_Click(sender, null);
+                    break;
+
+                case Keys.F7:
+                    StepOverButton.Focus();
+                    StepOver_Click(sender, null);
+                    break;
             }
         }
 
