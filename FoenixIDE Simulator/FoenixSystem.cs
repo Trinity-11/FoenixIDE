@@ -47,7 +47,8 @@ namespace FoenixIDE
                 UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
                 UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),
                 OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
-                MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2)
+                MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2),
+                VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE)
             };
 
             this.CPU = new CPU(Memory);
@@ -56,6 +57,7 @@ namespace FoenixIDE
             gpu.VRAM = Memory.VIDEO;
             gpu.RAM = Memory.RAM;
             gpu.VICKY = Memory.VICKY;
+            Memory.VDMA.setVideoRam(Memory.VIDEO);
             // This fontset is loaded just in case the kernel doesn't provide one.
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
             // Write bytes $9F in the joystick registers to mean that they are not installed.

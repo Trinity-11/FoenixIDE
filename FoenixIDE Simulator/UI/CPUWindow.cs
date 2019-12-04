@@ -426,6 +426,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             t?.Join();
             RunButton.Text = "Run (F5)";
+            RunButton.Tag = "0";
             UpdateTraceTimer.Enabled = false;
             RunButton.Enabled = true;
             int.TryParse(stepsInput.Text, out int steps);
@@ -481,6 +482,8 @@ namespace FoenixIDE.UI
         private delegate void breakpointSetter(int pc);
         private void BreakpointReached(int pc)
         {
+            RunButton.Text = "Run (F5)";
+            RunButton.Tag = "0";
             if (isStepOver)
             {
                 isStepOver = false;
@@ -556,7 +559,7 @@ namespace FoenixIDE.UI
         {
             foreach (DebugLine l in queue)
             {
-                if (l.PC == PC)
+                if (l !=null &&  l.PC == PC)
                 {
                     return l;
                 }

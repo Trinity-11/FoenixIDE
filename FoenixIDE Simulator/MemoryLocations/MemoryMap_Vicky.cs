@@ -18,7 +18,10 @@ namespace FoenixIDE.MemoryLocations
         public const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0100;
         public const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0140;
         public const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
-        
+
+        public const int VDMA_START = 0xAF_0400;
+        public const int VDMA_SIZE = 0x100;
+
         public const int RTC_SEC = 0xAF_0800; // Seconds Register
         public const int RTC_SEC_ALARM = 0xAF_0801; // Seconds Alarm Register
         public const int RTC_MIN = 0xAF_0802; // Minutes Register

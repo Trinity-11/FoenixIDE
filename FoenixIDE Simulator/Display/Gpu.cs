@@ -484,7 +484,7 @@ namespace FoenixIDE.Display
             {
                 for (int col = borderXSize; col < (width - borderXSize); col++)
                 {
-                    value = graphicsLUT[lutIndex * 256 + VRAM.ReadByte(bitmapAddress++)];
+                    value = graphicsLUT[lutIndex * 256 + VRAM.ReadByte(bitmapAddress + col + line * 640)];
                     if (gammaCorrection != null )
                     {
                         value = (int)((gammaCorrection[(value & 0x00FF0000) >> 0x10] << 0x10) +

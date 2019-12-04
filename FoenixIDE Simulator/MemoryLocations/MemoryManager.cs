@@ -34,6 +34,7 @@ namespace FoenixIDE.MemoryLocations
         public UART UART2 = null;
         public OPL2 OPL2 = null;
         public MPU401 MPU401 = null;
+        public VDMA VDMA = null;
 
         public bool VectorPull = false;
 
@@ -132,6 +133,12 @@ namespace FoenixIDE.MemoryLocations
             {
                 Device = SDCARD;
                 DeviceAddress = Address - MemoryMap.SDCARD_DATA;
+                return;
+            }
+            if (Address >= MemoryMap.VDMA_START && Address < MemoryMap.VDMA_START + MemoryMap.VDMA_SIZE)
+            {
+                Device = VDMA;
+                DeviceAddress = Address - MemoryMap.VDMA_START;
                 return;
             }
             if (Address >= MemoryMap.VICKY_START && Address <= MemoryMap.VICKY_END)

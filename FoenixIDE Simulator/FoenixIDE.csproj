@@ -73,6 +73,7 @@
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
+    <Compile Include="Devices\VDMA.cs" />
     <Compile Include="Devices\MPU401.cs" />
     <Compile Include="Devices\OPL2.cs" />
     <Compile Include="Devices\SDCard\SDCardCommand.cs" />

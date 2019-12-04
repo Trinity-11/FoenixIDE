@@ -88,9 +88,9 @@ namespace FoenixIDE.MemoryLocations
             return ReadByte(Address) + (ReadByte(Address + 1) << 8) + (ReadByte(Address + 2) << 16);
         }
 
-        internal void Load(byte[] SourceData, int SrcStart, int DestStart, int length)
+        internal void Load(byte[] SourceData, int SrcStart, int DestStart, int copyLength)
         {
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < copyLength; i++)
             {
                 this.data[DestStart + i] = SourceData[SrcStart + i];
             }
