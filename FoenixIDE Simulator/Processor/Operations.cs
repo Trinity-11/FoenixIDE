@@ -942,7 +942,7 @@ namespace FoenixIDE.Processor
             // For MVP, X and Y are decremented
             int dir = (instruction == OpcodeList.MVP_BlockMove) ? -1 : 1;
 
-            while (cpu.A.Value != 0xFFFF)
+            do
             {
                 // The addresses must remain in the correct bank, so the addresses will wrap
                 int sourceAddr = sourceBank + cpu.X.Value;
@@ -952,6 +952,7 @@ namespace FoenixIDE.Processor
                 cpu.Y.Value += dir;
                 cpu.A.Value--;
             }
+            while (cpu.A.Value != 0xFFFF);
         }
 
         public void ExecuteADC(byte instruction, AddressModes addressMode, int signature)

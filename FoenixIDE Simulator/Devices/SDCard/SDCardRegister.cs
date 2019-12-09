@@ -11,6 +11,7 @@ namespace FoenixIDE.Simulator.Devices
     {
         public string shortName;
         public string longName;
+        public bool isDirectory = false;
     }
 
     public class SDCardRegister: MemoryLocations.MemoryRAM
@@ -113,6 +114,7 @@ namespace FoenixIDE.Simulator.Devices
                             break;
                         case SDCardCommand.FILE_CLOSE:
                             sdCardIRQMethod?.Invoke(SDCardInterrupt.USB_INT_DISK_READ);
+                            sdCurrentPath = "";
                             break;
                         case SDCardCommand.RD_USB_DATA0:
                             if (fileToReadAsBytes == null)
@@ -158,77 +160,14 @@ namespace FoenixIDE.Simulator.Devices
             {
                 fileToReadAsBytes = null;
                 // Path is compounded, as long as "CLOSE" is not called
-                if (name.StartsWith("/"))
-                {
-                    sdCurrentPath = name.Substring(1).Replace("/*", "");
-                }
-                else
-                {
-                    sdCurrentPath += name;
-                }
-                // Correct the path for Windows
                 string rootPath = SDCardPath;
-                if (sdCurrentPath.Length > 1)
+                if (sdCurrentPath.Length > 0)
                 {
-                    // we only store the name of the file, not the path
-                    int lastSlash = sdCurrentPath.LastIndexOf("/");
-                    if (lastSlash > 0)
-                    {
-                        sdCurrentPath = sdCurrentPath.Substring(lastSlash + 1);
-                    }
-                    ShortLongFileName slf = FindByShortName(sdCurrentPath);
-                    if (slf != null)
-                    {
-                        rootPath = slf.longName;
-                    }
-                    else
-                    {
-                        rootPath = SDCardPath + "\\" + sdCurrentPath.Substring(0, sdCurrentPath.Length - 1);
-                    }
+                    rootPath = sdCurrentPath;
                 }
+                
                 dircontent.Clear();
-                string[] dirs = Directory.GetDirectories(rootPath, "*", SearchOption.TopDirectoryOnly);
-                string[] files = Directory.GetFiles(rootPath, "*", SearchOption.TopDirectoryOnly);
-
-                // Add the parent folder only if the inital name is not /*
-                if (!rootPath.Equals(SDCardPath))
-                {
-                    ShortLongFileName slf = new ShortLongFileName();
-                    DirectoryInfo parent = Directory.GetParent(rootPath);
-                    slf.longName = parent.ToString();
-                    slf.shortName = ".." + spaces + spaces[0] + (char)(byte)FileAttributes.Directory + spaces + spaces + "\0\0\0\0";
-                    dircontent.Add(slf);
-                }
-                foreach (string dir in dirs)
-                {
-                    ShortLongFileName slf = new ShortLongFileName();
-                    slf.longName = dir;
-                    slf.shortName = ShortFilename(dir.Substring(rootPath.Length)) + (char)(byte)FileAttributes.Directory + spaces + spaces + "\0\0\0\0";
-                    dircontent.Add(slf);
-                }
-                foreach (string file in files)
-                {
-                    int size = (int)new FileInfo(file).Length;
-                    byte[] sizeB = BitConverter.GetBytes(size);
-                    
-                    ShortLongFileName slf = new ShortLongFileName();
-                    slf.longName = file;
-                    slf.shortName = ShortFilename(file.Substring(rootPath.Length)) + (char)(byte)FileAttributes.Archive + spaces + spaces + System.Text.Encoding.Default.GetString(sizeB);
-                    while (ListContains(dircontent, slf.shortName.Substring(0,11)))
-                    {
-                        if (slf.shortName.Substring(7, 1).Equals("\0"))
-                        {
-                            break;
-                        }
-
-                        int fileVal = Convert.ToInt32(slf.shortName.Substring(7, 1));
-                        fileVal++;
-                        slf.shortName = slf.shortName.Substring(0, 7) + fileVal + slf.shortName.Substring(8);
-                        
-                        
-                    }
-                    dircontent.Add(slf);
-                }
+                loadDirContents(rootPath);
             }
             else
             {
@@ -246,9 +185,16 @@ namespace FoenixIDE.Simulator.Devices
                 ShortLongFileName slf = FindByShortName(fileToOpen);
                 if (slf != null)
                 {
-                    dircontent.Clear();
-                    dircontent.Add(slf);
-                    fileToReadAsBytes = slf.longName;
+                    if (slf.isDirectory)
+                    {
+                        sdCurrentPath = slf.longName;
+                    }
+                    else
+                    {
+                        dircontent.Clear();
+                        dircontent.Add(slf);
+                        fileToReadAsBytes = slf.longName;
+                    }
                 }
             }
         }
@@ -299,6 +245,10 @@ namespace FoenixIDE.Simulator.Devices
         private ShortLongFileName FindByShortName(string name)
         {
             string shortName = name.Replace(".", "");
+            if (name.Equals(".."))
+            {
+                shortName = "..";
+            }
             foreach (ShortLongFileName slf in dircontent)
             {
                 string partial = slf.shortName.Substring(0, 11).Replace("\0", "");
@@ -308,6 +258,54 @@ namespace FoenixIDE.Simulator.Devices
                 }
             }
             return null;
+        }
+
+        private void loadDirContents(string path)
+        {
+            string[] dirs = Directory.GetDirectories(path, "*", SearchOption.TopDirectoryOnly);
+            string[] files = Directory.GetFiles(path, "*", SearchOption.TopDirectoryOnly);
+
+            // Add the parent folder only if the inital name is not /*
+            if (!path.Equals(SDCardPath))
+            {
+                ShortLongFileName slf = new ShortLongFileName();
+                DirectoryInfo parent = Directory.GetParent(path);
+                slf.longName = parent.ToString();
+                slf.shortName = ".." + spaces + spaces[0] + (char)(byte)FileAttributes.Directory + spaces + spaces + "\0\0\0\0";
+                slf.isDirectory = true;
+                dircontent.Add(slf);
+            }
+            foreach (string dir in dirs)
+            {
+                ShortLongFileName slf = new ShortLongFileName();
+                slf.longName = dir;
+                slf.shortName = ShortFilename(dir.Substring(path.Length)) + (char)(byte)FileAttributes.Directory + spaces + spaces + "\0\0\0\0";
+                slf.isDirectory = true;
+                dircontent.Add(slf);
+            }
+            foreach (string file in files)
+            {
+                int size = (int)new FileInfo(file).Length;
+                byte[] sizeB = BitConverter.GetBytes(size);
+
+                ShortLongFileName slf = new ShortLongFileName();
+                slf.longName = file;
+                slf.shortName = ShortFilename(file.Substring(path.Length)) + (char)(byte)FileAttributes.Archive + spaces + spaces + System.Text.Encoding.Default.GetString(sizeB);
+                while (ListContains(dircontent, slf.shortName.Substring(0, 11)))
+                {
+                    if (slf.shortName.Substring(7, 1).Equals("\0"))
+                    {
+                        break;
+                    }
+
+                    int fileVal = Convert.ToInt32(slf.shortName.Substring(7, 1));
+                    fileVal++;
+                    slf.shortName = slf.shortName.Substring(0, 7) + fileVal + slf.shortName.Substring(8);
+
+
+                }
+                dircontent.Add(slf);
+            }
         }
     }
 }
