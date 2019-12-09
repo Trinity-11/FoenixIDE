@@ -1,3 +1,8 @@
+Release 0.2.6.3
+---------------
+Fixed a problem with MVN/MVP when Accumulator was #$FFFF.
+More SD card support.  The directories are now being read properly.
+
 Release 0.2.6.0
 ---------------
 Added SD Card support.
