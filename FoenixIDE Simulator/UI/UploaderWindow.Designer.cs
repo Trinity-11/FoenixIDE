@@ -54,18 +54,19 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.C256SrcAddress = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.C256SrcAddressLabel = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.DebugModeCheckbox = new System.Windows.Forms.CheckBox();
+            this.ReflashCheckbox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // ConnectButton
             // 
             this.ConnectButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ConnectButton.Location = new System.Drawing.Point(13, 15);
+            this.ConnectButton.Location = new System.Drawing.Point(15, 12);
             this.ConnectButton.Margin = new System.Windows.Forms.Padding(2);
             this.ConnectButton.Name = "ConnectButton";
-            this.ConnectButton.Size = new System.Drawing.Size(112, 24);
+            this.ConnectButton.Size = new System.Drawing.Size(97, 24);
             this.ConnectButton.TabIndex = 0;
             this.ConnectButton.Text = "Connect";
             this.ConnectButton.UseVisualStyleBackColor = true;
@@ -74,7 +75,7 @@
             // COMPortComboBox
             // 
             this.COMPortComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.COMPortComboBox.Location = new System.Drawing.Point(134, 19);
+            this.COMPortComboBox.Location = new System.Drawing.Point(116, 13);
             this.COMPortComboBox.Margin = new System.Windows.Forms.Padding(2);
             this.COMPortComboBox.Name = "COMPortComboBox";
             this.COMPortComboBox.Size = new System.Drawing.Size(110, 21);
@@ -126,21 +127,22 @@
             // 
             this.DestinationAddressLabel.AutoSize = true;
             this.DestinationAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DestinationAddressLabel.Location = new System.Drawing.Point(146, 106);
+            this.DestinationAddressLabel.Location = new System.Drawing.Point(142, 108);
             this.DestinationAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DestinationAddressLabel.Name = "DestinationAddressLabel";
-            this.DestinationAddressLabel.Size = new System.Drawing.Size(123, 13);
+            this.DestinationAddressLabel.Size = new System.Drawing.Size(119, 13);
             this.DestinationAddressLabel.TabIndex = 6;
-            this.DestinationAddressLabel.Text = "C256 Dest. Address:";
+            this.DestinationAddressLabel.Text = "C256 Dest Address:";
+            this.DestinationAddressLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // SendBinaryButton
             // 
             this.SendBinaryButton.Enabled = false;
             this.SendBinaryButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SendBinaryButton.Location = new System.Drawing.Point(356, 15);
+            this.SendBinaryButton.Location = new System.Drawing.Point(376, 12);
             this.SendBinaryButton.Margin = new System.Windows.Forms.Padding(2);
             this.SendBinaryButton.Name = "SendBinaryButton";
-            this.SendBinaryButton.Size = new System.Drawing.Size(112, 24);
+            this.SendBinaryButton.Size = new System.Drawing.Size(92, 24);
             this.SendBinaryButton.TabIndex = 7;
             this.SendBinaryButton.Text = "Send Binary";
             this.SendBinaryButton.UseVisualStyleBackColor = true;
@@ -162,7 +164,7 @@
             // DollarSignLabel
             // 
             this.DollarSignLabel.AutoSize = true;
-            this.DollarSignLabel.Location = new System.Drawing.Point(260, 106);
+            this.DollarSignLabel.Location = new System.Drawing.Point(260, 107);
             this.DollarSignLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DollarSignLabel.Name = "DollarSignLabel";
             this.DollarSignLabel.Size = new System.Drawing.Size(13, 13);
@@ -171,7 +173,7 @@
             // 
             // UploadProgressBar
             // 
-            this.UploadProgressBar.Location = new System.Drawing.Point(8, 170);
+            this.UploadProgressBar.Location = new System.Drawing.Point(6, 160);
             this.UploadProgressBar.Margin = new System.Windows.Forms.Padding(2);
             this.UploadProgressBar.Name = "UploadProgressBar";
             this.UploadProgressBar.Size = new System.Drawing.Size(459, 21);
@@ -182,10 +184,10 @@
             // DisconnectButton
             // 
             this.DisconnectButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DisconnectButton.Location = new System.Drawing.Point(13, 15);
+            this.DisconnectButton.Location = new System.Drawing.Point(15, 12);
             this.DisconnectButton.Margin = new System.Windows.Forms.Padding(2);
             this.DisconnectButton.Name = "DisconnectButton";
-            this.DisconnectButton.Size = new System.Drawing.Size(112, 24);
+            this.DisconnectButton.Size = new System.Drawing.Size(97, 24);
             this.DisconnectButton.TabIndex = 11;
             this.DisconnectButton.Text = "Disconnect";
             this.DisconnectButton.UseVisualStyleBackColor = true;
@@ -221,7 +223,7 @@
             // EmuSrcAddress
             // 
             this.EmuSrcAddress.Enabled = false;
-            this.EmuSrcAddress.Location = new System.Drawing.Point(272, 81);
+            this.EmuSrcAddress.Location = new System.Drawing.Point(272, 82);
             this.EmuSrcAddress.Margin = new System.Windows.Forms.Padding(2);
             this.EmuSrcAddress.MaxLength = 7;
             this.EmuSrcAddress.Name = "EmuSrcAddress";
@@ -235,17 +237,18 @@
             // 
             this.EmuSourceAddressLabel.AutoSize = true;
             this.EmuSourceAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.EmuSourceAddressLabel.Location = new System.Drawing.Point(161, 83);
+            this.EmuSourceAddressLabel.Location = new System.Drawing.Point(154, 83);
             this.EmuSourceAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.EmuSourceAddressLabel.Name = "EmuSourceAddressLabel";
             this.EmuSourceAddressLabel.Size = new System.Drawing.Size(107, 13);
             this.EmuSourceAddressLabel.TabIndex = 14;
             this.EmuSourceAddressLabel.Text = "Emu Src Address:";
+            this.EmuSourceAddressLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(260, 83);
+            this.label2.Location = new System.Drawing.Point(260, 84);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(13, 13);
@@ -289,7 +292,7 @@
             // FetchRadio
             // 
             this.FetchRadio.AutoSize = true;
-            this.FetchRadio.Location = new System.Drawing.Point(15, 140);
+            this.FetchRadio.Location = new System.Drawing.Point(15, 137);
             this.FetchRadio.Margin = new System.Windows.Forms.Padding(2);
             this.FetchRadio.Name = "FetchRadio";
             this.FetchRadio.Size = new System.Drawing.Size(122, 17);
@@ -301,7 +304,7 @@
             // C256SrcSize
             // 
             this.C256SrcSize.Enabled = false;
-            this.C256SrcSize.Location = new System.Drawing.Point(394, 138);
+            this.C256SrcSize.Location = new System.Drawing.Point(394, 135);
             this.C256SrcSize.Margin = new System.Windows.Forms.Padding(2);
             this.C256SrcSize.MaxLength = 7;
             this.C256SrcSize.Name = "C256SrcSize";
@@ -309,12 +312,13 @@
             this.C256SrcSize.TabIndex = 25;
             this.C256SrcSize.Text = "00:0000";
             this.C256SrcSize.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.C256SrcSize.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(346, 141);
+            this.label1.Location = new System.Drawing.Point(346, 138);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
@@ -324,7 +328,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(382, 142);
+            this.label5.Location = new System.Drawing.Point(382, 139);
             this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(13, 13);
@@ -334,7 +338,7 @@
             // C256SrcAddress
             // 
             this.C256SrcAddress.Enabled = false;
-            this.C256SrcAddress.Location = new System.Drawing.Point(272, 138);
+            this.C256SrcAddress.Location = new System.Drawing.Point(272, 135);
             this.C256SrcAddress.Margin = new System.Windows.Forms.Padding(2);
             this.C256SrcAddress.MaxLength = 7;
             this.C256SrcAddress.Name = "C256SrcAddress";
@@ -342,22 +346,24 @@
             this.C256SrcAddress.TabIndex = 22;
             this.C256SrcAddress.Text = "00:0000";
             this.C256SrcAddress.TextChanged += new System.EventHandler(this.AddressTextBox_TextChanged);
+            this.C256SrcAddress.Leave += new System.EventHandler(this.BlockAddressTextBox_Leave);
             // 
-            // label6
+            // C256SrcAddressLabel
             // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(155, 141);
-            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(112, 13);
-            this.label6.TabIndex = 21;
-            this.label6.Text = "C256 Src Address:";
+            this.C256SrcAddressLabel.AutoSize = true;
+            this.C256SrcAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.C256SrcAddressLabel.Location = new System.Drawing.Point(149, 138);
+            this.C256SrcAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.C256SrcAddressLabel.Name = "C256SrcAddressLabel";
+            this.C256SrcAddressLabel.Size = new System.Drawing.Size(112, 13);
+            this.C256SrcAddressLabel.TabIndex = 21;
+            this.C256SrcAddressLabel.Text = "C256 Src Address:";
+            this.C256SrcAddressLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(260, 141);
+            this.label7.Location = new System.Drawing.Point(260, 137);
             this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(13, 13);
@@ -376,12 +382,25 @@
             this.DebugModeCheckbox.Text = "Debug Mode";
             this.DebugModeCheckbox.UseVisualStyleBackColor = true;
             // 
+            // ReflashCheckbox
+            // 
+            this.ReflashCheckbox.AutoSize = true;
+            this.ReflashCheckbox.Enabled = false;
+            this.ReflashCheckbox.Location = new System.Drawing.Point(320, 17);
+            this.ReflashCheckbox.Name = "ReflashCheckbox";
+            this.ReflashCheckbox.Size = new System.Drawing.Size(51, 17);
+            this.ReflashCheckbox.TabIndex = 28;
+            this.ReflashCheckbox.Text = "Flash";
+            this.ReflashCheckbox.UseVisualStyleBackColor = true;
+            this.ReflashCheckbox.CheckedChanged += new System.EventHandler(this.SendFileRadio_CheckedChanged);
+            // 
             // UploaderWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(472, 200);
+            this.ClientSize = new System.Drawing.Size(472, 187);
+            this.Controls.Add(this.ReflashCheckbox);
             this.Controls.Add(this.DebugModeCheckbox);
             this.Controls.Add(this.C256DestAddress);
             this.Controls.Add(this.C256SrcAddress);
@@ -392,7 +411,7 @@
             this.Controls.Add(this.C256SrcSize);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.label6);
+            this.Controls.Add(this.C256SrcAddressLabel);
             this.Controls.Add(this.FetchRadio);
             this.Controls.Add(this.EmuSrcSize);
             this.Controls.Add(this.label3);
@@ -454,8 +473,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox C256SrcAddress;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label C256SrcAddressLabel;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox DebugModeCheckbox;
+        private System.Windows.Forms.CheckBox ReflashCheckbox;
     }
 }

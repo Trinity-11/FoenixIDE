@@ -1,3 +1,7 @@
+Release 0.2.7.0
+---------------
+Added the Flash command to the Uploader dialog.
+
 Release 0.2.6.3
 ---------------
 Fixed a problem with MVN/MVP when Accumulator was #$FFFF.

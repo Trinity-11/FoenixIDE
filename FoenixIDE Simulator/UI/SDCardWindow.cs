@@ -19,8 +19,14 @@ namespace FoenixIDE.Simulator.UI
 
         private void BrowseFileButton_Click(object sender, EventArgs e)
         {
+            if (SDCardFolderText.Text.Length == 0)
+            {
+                FolderDialog.SelectedPath = Application.StartupPath;
+            }
             if (FolderDialog.ShowDialog() == DialogResult.OK) {
                 SDCardFolderText.Text = FolderDialog.SelectedPath;
+                SDCardEnabled.Checked = true;
+                Close();
             }
         }
 
