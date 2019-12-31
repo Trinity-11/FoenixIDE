@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -314,9 +315,15 @@ namespace FoenixIDE.UI
                     }
                     if (ReflashCheckbox.Checked && MessageBox.Show("Are you sure you want to reflash your C256 System?", "Reflash", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                     {
+                        CountdownLabel.Visible = true;
+                        this.Update();
+
                         EraseFlash();
                         int SrcFlashAddress = Convert.ToInt32(C256DestAddress.Text.Replace(":", ""), 16);
                         ProgramFlash(SrcFlashAddress);
+
+                        CountdownLabel.Visible = false;
+                        this.Update();
                     }
                     if (DebugModeCheckbox.Checked)
                     {
@@ -391,6 +398,8 @@ namespace FoenixIDE.UI
 
         private void EraseFlash()
         {
+            CountdownLabel.Text = "Erasing Flash";
+            this.Update();
             byte[] commandBuffer = new byte[8];
             commandBuffer[0] = 0x55;   // Header
             commandBuffer[1] = 0x11;   // Reset Flash
@@ -405,6 +414,8 @@ namespace FoenixIDE.UI
 
         private void ProgramFlash(int address)
         {
+            CountdownLabel.Text = "Programming Flash";
+            this.Update();
             byte[] commandBuffer = new byte[8];
             commandBuffer[0] = 0x55;   // Header
             commandBuffer[1] = 0x10;   // Reset Flash
@@ -414,7 +425,7 @@ namespace FoenixIDE.UI
             commandBuffer[5] = 0x00;
             commandBuffer[6] = 0x00;
             commandBuffer[7] = Checksum(commandBuffer, 7);
-            SendMessage(commandBuffer, null);
+            SendMessage(commandBuffer, null, 10000);
         }
 
         private void SendData(byte[] buffer, int startAddress, int size)
@@ -605,7 +616,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        public void SendMessage(byte[] command, byte[] data)
+        public void SendMessage(byte[] command, byte[] data, int delay = 0)
         {
             //            int dwStartTime = System.Environment.TickCount;
             byte byte_buffer;
@@ -615,12 +626,35 @@ namespace FoenixIDE.UI
             Stat0 = 0;
             Stat1 = 0;
             LRC = 0;
-
+            
+            if (delay > 2000)
+            {
+                serial.ReadTimeout = delay;
+            }
+            if (delay > 0)
+            {
+                long StartTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                int roundTime = delay / 1000;
+                string label = CountdownLabel.Text;
+                do
+                {
+                    CountdownLabel.Text = label + " - " + roundTime + "s";
+                    this.Update();
+                    Thread.Sleep(1000);
+                    roundTime--;
+                }
+                while (System.DateTimeOffset.Now.ToUnixTimeMilliseconds() - StartTime < delay);
+                CountdownLabel.Text = label + " - Done!";
+            }
             do
             {
                 byte_buffer = (byte)serial.ReadByte();
             }
             while (byte_buffer != 0xAA);
+            if (delay > 2000)
+            {
+                serial.ReadTimeout = 2000;
+            }
 
             if (byte_buffer == 0xAA)
             {

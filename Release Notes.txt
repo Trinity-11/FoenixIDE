@@ -1,3 +1,7 @@
+Release 0.2.7.3
+---------------
+Fixed a few issues with the Flash commands delay.  Also added the countdown timer.
+
 Release 0.2.7.0
 ---------------
 Added the Flash command to the Uploader dialog.

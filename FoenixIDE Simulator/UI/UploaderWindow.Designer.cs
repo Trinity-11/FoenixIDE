@@ -58,6 +58,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.DebugModeCheckbox = new System.Windows.Forms.CheckBox();
             this.ReflashCheckbox = new System.Windows.Forms.CheckBox();
+            this.CountdownLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // ConnectButton
@@ -176,9 +177,10 @@
             this.UploadProgressBar.Location = new System.Drawing.Point(6, 160);
             this.UploadProgressBar.Margin = new System.Windows.Forms.Padding(2);
             this.UploadProgressBar.Name = "UploadProgressBar";
-            this.UploadProgressBar.Size = new System.Drawing.Size(459, 21);
+            this.UploadProgressBar.Size = new System.Drawing.Size(459, 24);
             this.UploadProgressBar.Step = 1;
             this.UploadProgressBar.TabIndex = 10;
+            this.UploadProgressBar.Value = 100;
             this.UploadProgressBar.Visible = false;
             // 
             // DisconnectButton
@@ -394,12 +396,28 @@
             this.ReflashCheckbox.UseVisualStyleBackColor = true;
             this.ReflashCheckbox.CheckedChanged += new System.EventHandler(this.SendFileRadio_CheckedChanged);
             // 
+            // CountdownLabel
+            // 
+            this.CountdownLabel.BackColor = System.Drawing.Color.LightSeaGreen;
+            this.CountdownLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CountdownLabel.ForeColor = System.Drawing.Color.White;
+            this.CountdownLabel.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
+            this.CountdownLabel.Location = new System.Drawing.Point(10, 164);
+            this.CountdownLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.CountdownLabel.Name = "CountdownLabel";
+            this.CountdownLabel.Size = new System.Drawing.Size(451, 16);
+            this.CountdownLabel.TabIndex = 29;
+            this.CountdownLabel.Text = "Erasing Flash";
+            this.CountdownLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.CountdownLabel.Visible = false;
+            // 
             // UploaderWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(472, 187);
+            this.ClientSize = new System.Drawing.Size(472, 193);
+            this.Controls.Add(this.CountdownLabel);
             this.Controls.Add(this.ReflashCheckbox);
             this.Controls.Add(this.DebugModeCheckbox);
             this.Controls.Add(this.C256DestAddress);
@@ -477,5 +495,6 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox DebugModeCheckbox;
         private System.Windows.Forms.CheckBox ReflashCheckbox;
+        private System.Windows.Forms.Label CountdownLabel;
     }
 }
