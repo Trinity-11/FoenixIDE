@@ -8,3 +8,4 @@ CharSet Manager/.vs/CharSet Manager/v15/.suo
 Tests/*.hex
 Tests/*.lst
 bin/Debug
+packages

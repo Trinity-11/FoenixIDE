@@ -297,6 +297,10 @@ namespace FoenixIDE.UI
 
                                         break;
 
+                                    case "02":
+                                        bank = HexFile.GetByte(data, 0, 2) * 16;
+                                        break;
+
                                     case "04":
                                         bank = HexFile.GetByte(data, 0, 2) << 16;
                                         break;
