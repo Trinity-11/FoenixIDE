@@ -158,8 +158,8 @@ namespace FoenixIDE.UI
         {
             OpenFileDialog openFileDlg = new OpenFileDialog
             {
-                DefaultExt = ".bin",
-                Filter = "Binary documents|*.bin|Hex documents|*.hex",
+                DefaultExt = ".hex",
+                Filter = "Hex documents|*.hex|Binary documents|*.bin",
                 Title = "Upload to the C256 Foenix"
             };
 
@@ -295,10 +295,6 @@ namespace FoenixIDE.UI
                                         }
                                         UploadProgressBar.Increment(length);
 
-                                        break;
-
-                                    case "02":
-                                        bank = HexFile.GetByte(data, 0, 2) * 16;
                                         break;
 
                                     case "04":
