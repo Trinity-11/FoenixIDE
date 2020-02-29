@@ -61,6 +61,10 @@ namespace FoenixIDE.Simulator.FileFormat
                         case "01":
                             break;
 
+                        case "02":
+                            bank = GetByte(data, 0, 2) * 16;
+                            break;
+
                         // extended linear address 
                         // lower byte will populate the bank number. 
                         case "04":
