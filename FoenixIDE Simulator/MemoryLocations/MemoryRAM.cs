@@ -107,11 +107,19 @@ namespace FoenixIDE.MemoryLocations
             WriteByte(Address + 1, (byte)(Value >> 8 & 0xff));
         }
 
-        internal void Copy(int SourceAddress, MemoryRAM Destination, int DestAddress, int Length)
+        // Duplicate a memory block
+        internal void Duplicate(int SourceAddress, int DestAddress, int Length)
         {
-            System.Array.Copy(data, SourceAddress, Destination.data, DestAddress, Length);
+            System.Array.Copy(data, SourceAddress, data, DestAddress, Length);
         }
-        internal void Copy(int SourceAddress, byte[] buffer, int DestAddress, int Length)
+
+        // Copy data from a buffer to RAM
+        internal void CopyBuffer(byte[] buffer, int SourceAddress, int DestAddress, int Length)
+        {
+            System.Array.Copy(buffer, SourceAddress, data, DestAddress, Length);
+        }
+
+        internal void CopyIntoBuffer(int SourceAddress, byte[] buffer, int DestAddress, int Length)
         {
             System.Array.Copy(data, SourceAddress, buffer, DestAddress, Length);
         }

@@ -27,10 +27,12 @@ namespace FoenixIDE.MemoryLocations
         public const int SDCARD_STAT = 0xAF_E810;
 
         // Handling code in CODEC_RAM
-        public const int CODEC_START = 0xAF_E820;   // Start of CODEC memory range
-        public const int CODEC_END = 0xAF_E823;     // End of CODEC memory range
-        public const int CODEC_SIZE = 0x04;         // Size of CODEC memory range
-        public const int CODEC_WR_CTRL = 0xAF_E822; // codec write address
+        public const int CODEC_START = 0xAF_E820;     // Start of CODEC memory range
+        public const int CODEC_SIZE = 0x04;           // Size of CODEC memory range
+        public const int CODEC_WR_CTRL = 0xAF_E822;   // codec write address
+
+        public const int CODEC_START_FMX = 0xAF_E900;    // Start of CODEC for FMX
+        public const int CODEC_WR_CTRL_FMX = 0xAF_E902;  // codec write address for FMX
 
         public const int OPL2_S_BASE = 0xAF_E700;   // Start of OPL2 Stereo range
 

@@ -21,7 +21,7 @@ namespace FoenixIDE.UI
         public static byte Stat1 = 0;
         public static byte LRC = 0;
         public static string[] ports;
-        public IMappable Memory = null;
+        public FoenixSystem kernel = null;
 
         SerialPort serial = new SerialPort();
         private Queue<byte> recievedData = new Queue<byte>();
@@ -119,11 +119,8 @@ namespace FoenixIDE.UI
             {
                 if (Path.GetExtension(filename).ToUpper().Equals(".BIN"))
                 {
-
-
                     FileInfo f = new FileInfo(filename);
-                    flen = f.Length;
-                    
+                    flen = f.Length;   
                 }
                 else
                 {
@@ -337,7 +334,7 @@ namespace FoenixIDE.UI
                     MessageBox.Show("Transfer Done! System Reset!", "Send Binary Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            else if (BlockSendRadio.Checked)
+            else if (BlockSendRadio.Checked && kernel.CPU != null)
             {
                 // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
                 if (DebugModeCheckbox.Checked)
@@ -351,7 +348,7 @@ namespace FoenixIDE.UI
                 byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
                 for (int start = blockAddress; start < blockAddress + transmissionSize; start++)
                 {
-                    DataBuffer[offset++] = Memory.ReadByte(start);
+                    DataBuffer[offset++] = kernel.CPU.Memory.ReadByte(start);
                 }
                 SendData(DataBuffer, FnxAddressPtr, transmissionSize);
                 // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00

@@ -12,8 +12,7 @@ namespace FoenixIDE.MemoryLocations
         // c# Memory Blocks
 
         public const int RAM_START = 0x00_0000; // Beginning of 2MB RAM
-        public const int RAM_END = 0x3F_FFFF; // End of 4MB RAM FMX
-        public const int RAM_SIZE = 0x40_0000; // 2MB RAM
+        public const int RAM_SIZE = 0x20_0000; // 2MB RAM
         public const int PAGE_SIZE = 0x1_0000; // 64KB
 
         // Beginning of Vicky Address Space

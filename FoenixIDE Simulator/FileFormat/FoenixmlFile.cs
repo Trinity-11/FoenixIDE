@@ -1,4 +1,5 @@
 ﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
@@ -10,20 +11,21 @@ namespace FoenixIDE.Simulator.FileFormat
 {
     class FoeniXmlFile
     {
-        private IMappable Memory;
+        // Prepare a 4MB buffer to read data in
+        public byte[] buffer = new byte[0x40_0000];
         private ResourceChecker Resources;
         private const int PHRASE_LENGTH = 16;
         private Processor.Breakpoints BreakPoints;
+        public BoardVersion Version = BoardVersion.RevB;
 
         private FoeniXmlFile() { }
 
-        public FoeniXmlFile(IMappable memory, ResourceChecker resources, Processor.Breakpoints breakpoints)
+        public FoeniXmlFile(ResourceChecker resources, Processor.Breakpoints breakpoints)
         {
-            this.Memory = memory;
             this.Resources = resources;
             this.BreakPoints = breakpoints;
         }
-        public void Write(String filename, bool compact)
+        public void Write(IMappable memory, String filename, bool compact)
         {
             XmlWriter xmlWriter = XmlWriter.Create(filename);
             xmlWriter.WriteStartDocument();
@@ -31,7 +33,9 @@ namespace FoenixIDE.Simulator.FileFormat
             xmlWriter.WriteComment("Export of FoenixIDE for C256.  All values are in hexadecimal form");
             xmlWriter.WriteRaw("\r");
 
+
             xmlWriter.WriteStartElement("project");
+            xmlWriter.WriteAttributeString("version", Version.ToString());
             xmlWriter.WriteRaw("\r");
 
             // Write resources
@@ -126,7 +130,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 writer.WriteAttributeString("address", "$" + (startAddress).ToString("X6"));
                 for (int i = 0; i < PHRASE_LENGTH; i++)
                 {
-                    writer.WriteString(Memory.ReadByte(startAddress + i).ToString("X2") + " ");
+                    writer.WriteString(buffer[startAddress + i].ToString("X2") + " ");
                 }
                 writer.WriteEndElement();
                 writer.WriteRaw("\r");
@@ -139,7 +143,7 @@ namespace FoenixIDE.Simulator.FileFormat
             int sum = 0;
             for (int i = 0; i < 255; i++)
             {
-                sum += Memory.ReadByte(startAddress + i);
+                sum += buffer[startAddress + i];
             }
             return sum;
         }
@@ -150,7 +154,7 @@ namespace FoenixIDE.Simulator.FileFormat
             int sum = 0;
             for (int i = 0; i < PHRASE_LENGTH; i++)
             {
-                sum += Memory.ReadByte(startAddress + i);
+                sum += buffer[startAddress + i];
             }
             return sum;
         }
@@ -161,6 +165,7 @@ namespace FoenixIDE.Simulator.FileFormat
         public void Load(String filename)
         {
             XmlReader reader = XmlReader.Create(filename);
+            Version = BoardVersion.RevB;
             if (Resources == null)
             {
                 Resources = new ResourceChecker();
@@ -188,6 +193,14 @@ namespace FoenixIDE.Simulator.FileFormat
                         };
                         Resources.Add(res);
                     }
+                    if (reader.Name.Equals("project"))
+                    {
+                        String version = reader.GetAttribute("version");
+                        if (version != null)
+                        {
+                            Enum.TryParse<BoardVersion>(version, out Version);
+                        }
+                    }
                 }
             }
             reader.Close();
@@ -201,7 +214,7 @@ namespace FoenixIDE.Simulator.FileFormat
             {
                 for (int i = 0; i < values.Length / 3; i++)
                 {
-                    Memory.WriteByte(addr++, Convert.ToByte(values.Substring(i*3,2), 16));
+                    buffer[addr++] = Convert.ToByte(values.Substring(i * 3, 2), 16);
                 }
             }
         }

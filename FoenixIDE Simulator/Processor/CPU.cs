@@ -154,6 +154,7 @@ namespace FoenixIDE.Processor
                 }
             }
             int pc = GetLongPC();
+            // TODO - if pc > RAM size, then throw an exception
             CurrentOpcode = opcodes[Memory.RAM.ReadByte(pc)];
             OpcodeLength = CurrentOpcode.Length;
             OpcodeCycles = 1;
