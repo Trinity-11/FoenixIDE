@@ -154,6 +154,7 @@ namespace FoenixIDE.Processor
                 }
             }
             int pc = GetLongPC();
+            // TODO - if pc > RAM size, then throw an exception
             CurrentOpcode = opcodes[Memory.RAM.ReadByte(pc)];
             OpcodeLength = CurrentOpcode.Length;
             OpcodeCycles = 1;
@@ -163,28 +164,6 @@ namespace FoenixIDE.Processor
             CurrentOpcode.Execute(SignatureBytes);
             clockCyles += OpcodeCycles;
             return false;
-        }
-
-        /// <summary>
-        /// Executes instructions until a STP or reset
-        /// </summary>
-        public void Run()
-        {
-            CPUThread = new Thread(new ThreadStart(this.RunLoop));
-
-            //StartTime = DateTime.Now;
-            clockCyles = 0;
-            CPUThread.Start();
-        }
-
-        public void RunLoop()
-        {
-            while (!DebugPause && !Pins.Ready_)
-            {
-                if (Pins.Reset)
-                    Reset();
-                ExecuteNext();
-            }
         }
 
         // Simulator State management 
@@ -197,9 +176,8 @@ namespace FoenixIDE.Processor
         {
             if (CPUThread != null && CPUThread.ThreadState == ThreadState.Running)
             {
-                Thread tmp = CPUThread;
+                CPUThread.Abort();
                 CPUThread = null;
-                tmp.Abort();
             }
         }
 

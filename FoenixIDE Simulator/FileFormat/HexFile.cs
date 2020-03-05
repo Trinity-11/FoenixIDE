@@ -5,7 +5,9 @@ namespace FoenixIDE.Simulator.FileFormat
 {
     public class HexFile
     {
-        public static String Load(MemoryLocations.IMappable memory, string Filename)
+        public byte[] buffer = new byte[0x40_0000];
+
+        public String Load(string Filename, int gabeAddressBank)
         {
             int bank = 0;
             int address = 0;
@@ -24,8 +26,6 @@ namespace FoenixIDE.Simulator.FileFormat
                 }
                 else
                 {
-                    processedFileName = null;
-                    Application.Exit();
                     return null;
                 }
             }
@@ -52,7 +52,11 @@ namespace FoenixIDE.Simulator.FileFormat
                             for (int i = 0; i < data.Length; i += 2)
                             {
                                 int b = GetByte(data, i, 1);
-                                memory.WriteByte(bank + address, (byte)b);
+                                buffer[bank + address] = (byte)b;
+                                if (bank == gabeAddressBank)
+                                {
+                                    buffer[address] = (byte)b;
+                                }
                                 address++;
                             }
                             break;

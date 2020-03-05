@@ -260,10 +260,10 @@ namespace FoenixIDE.Display
         public static byte[] LoadGammaCorrection(MemoryRAM VKY)
         {
             // Read the color lookup tables
-            int gamAddress = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
+            int gammaAddress = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
             // 
             byte[] result = new byte[3*256];
-            VKY.Copy(gamAddress, result, 0, 3 * 256);
+            VKY.CopyIntoBuffer(gammaAddress, result, 0, 3 * 256);
             return result;
         }
 

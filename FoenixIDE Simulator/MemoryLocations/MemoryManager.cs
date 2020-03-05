@@ -80,7 +80,7 @@ namespace FoenixIDE.MemoryLocations
             //        return;
             //    }
             //}
-            if (Address == MemoryMap.CODEC_WR_CTRL)
+            if (Address == CODEC.StartAddress)
             {
                 Device = CODEC;
                 DeviceAddress = 0;
@@ -92,13 +92,13 @@ namespace FoenixIDE.MemoryLocations
                 DeviceAddress = Address - MATH.StartAddress;
                 return;
             }
-            if (Address >= MemoryMap.INT_PENDING_REG0 && Address <= MemoryMap.INT_PENDING_REG2)
+            if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.StartAddress + INTERRUPT.Length - 1)
             {
                 Device = INTERRUPT;
                 DeviceAddress = Address - INTERRUPT.StartAddress;
                 return;
             }
-            if (Address >= MemoryMap.RAM_START && Address <= MemoryMap.RAM_END)
+            if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)
             {
                 Device = RAM;
                 DeviceAddress = Address - RAM.StartAddress;
@@ -209,6 +209,7 @@ namespace FoenixIDE.MemoryLocations
         public int ReadWord(int Address)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
+            // TODO - if device is null, generate a software interrupt.
             return device.ReadByte(deviceAddress) | (device.ReadByte(deviceAddress + 1) << 8);
         }
 

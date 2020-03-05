@@ -155,7 +155,7 @@ namespace FoenixIDE.UI
                                             e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
                                         // Check if the memory still matches the opcodes
-                                        if (!q0.CheckOpcodes(kernel.Memory.RAM))
+                                        if (!q0.CheckOpcodes(kernel.MemMgr.RAM))
                                         {
                                             e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
@@ -192,7 +192,7 @@ namespace FoenixIDE.UI
                                 e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
                             // Check if the memory still matches the opcodes
-                            if (!line.CheckOpcodes(kernel.Memory.RAM))
+                            if (!line.CheckOpcodes(kernel.MemMgr.RAM))
                             {
                                 e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
@@ -392,8 +392,9 @@ namespace FoenixIDE.UI
         public void Pause()
         {
             kernel.CPU.DebugPause = true;
-            t?.Join();
             UpdateTraceTimer.Enabled = false;
+            kernel.CPU.Halt();
+            t?.Join();
             RefreshStatus();
             RunButton.Text = "Run (F5)";
             RunButton.Tag = "0";
@@ -573,7 +574,7 @@ namespace FoenixIDE.UI
             byte[] command = new byte[cmdLength];
             for (int i = 0; i < cmdLength; i++)
             {
-                command[i] = kernel.Memory.RAM.ReadByte(pc + i);
+                command[i] = kernel.MemMgr.RAM.ReadByte(pc + i);
             }
             string opcodes = oc.ToString(kernel.CPU.ReadSignature(oc, pc));
             //string status = "";
@@ -716,21 +717,21 @@ namespace FoenixIDE.UI
         private bool InterruptMatchesCheckboxes()
         {
             // Read Interrupt Register 0
-            byte reg0 = kernel.Memory.INTERRUPT.ReadByte(0);
+            byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
             if ((reg0 & 1) == 1 && SOFCheckbox.Checked)
             {
                 return true;
             }
 
             // Read Interrupt Register 1
-            byte reg1 = kernel.Memory.INTERRUPT.ReadByte(1);
+            byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
             if ((reg1 & 0x80 ) == 0x80 && SDCardCheckBox.Checked)
             {
                 return true;
             }
 
             //Read Interrupt Register 2
-            byte reg2 = kernel.Memory.INTERRUPT.ReadByte(2);
+            byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
             if ((reg1 & 1) == 1 && KeyboardCheckBox.Checked)
             {
                 return true;

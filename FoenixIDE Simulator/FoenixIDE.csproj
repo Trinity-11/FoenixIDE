@@ -69,7 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basic\ScanCodes.cs" />
-    <Compile Include="DeviceEnum.cs" />
+    <Compile Include="Devices\BoardVersion.cs" />
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
