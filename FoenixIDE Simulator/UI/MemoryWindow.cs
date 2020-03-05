@@ -18,6 +18,8 @@ namespace FoenixIDE.UI
         public int StartAddress = 0;
         public int EndAddress = 0xFF;
         const int PageSize = 0xFF;
+        public delegate void GammaButtonClicked(bool gamma);
+        public GammaButtonClicked SetGamma;
 
         public MemoryWindow()
         {
@@ -276,6 +278,10 @@ namespace FoenixIDE.UI
             if (StartAddressText.Text.StartsWith("AF", false, null))
             {
                 RefreshMemoryView();
+            }
+            if (btn == MCRBit6Button)
+            {
+                SetGamma?.Invoke((int)MCRBit6Button.Tag == 1);
             }
         }
 

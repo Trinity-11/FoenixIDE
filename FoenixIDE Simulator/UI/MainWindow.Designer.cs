@@ -170,7 +170,7 @@ namespace FoenixIDE.UI
             this.dipSwitch.Size = new System.Drawing.Size(129, 23);
             this.dipSwitch.Text = "toolStripStatusLabel1";
             this.dipSwitch.ToolTipText = "DIP Switches";
-            this.dipSwitch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dipSwitch_MouseDown);
+            this.dipSwitch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DipSwitch_MouseDown);
             this.dipSwitch.Paint += new System.Windows.Forms.PaintEventHandler(this.DipSwitch_Paint);
             // 
             // menuStrip1

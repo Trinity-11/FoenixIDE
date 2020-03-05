@@ -392,8 +392,9 @@ namespace FoenixIDE.UI
         public void Pause()
         {
             kernel.CPU.DebugPause = true;
-            t?.Join();
             UpdateTraceTimer.Enabled = false;
+            kernel.CPU.Halt();
+            t?.Join();
             RefreshStatus();
             RunButton.Text = "Run (F5)";
             RunButton.Tag = "0";

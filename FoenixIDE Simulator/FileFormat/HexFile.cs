@@ -7,7 +7,7 @@ namespace FoenixIDE.Simulator.FileFormat
     {
         public byte[] buffer = new byte[0x40_0000];
 
-        public String Load(string Filename)
+        public String Load(string Filename, int gabeAddressBank)
         {
             int bank = 0;
             int address = 0;
@@ -53,6 +53,10 @@ namespace FoenixIDE.Simulator.FileFormat
                             {
                                 int b = GetByte(data, i, 1);
                                 buffer[bank + address] = (byte)b;
+                                if (bank == gabeAddressBank)
+                                {
+                                    buffer[address] = (byte)b;
+                                }
                                 address++;
                             }
                             break;

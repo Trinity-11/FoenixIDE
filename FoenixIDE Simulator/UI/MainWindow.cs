@@ -38,7 +38,7 @@ namespace FoenixIDE.UI
         private int jumpStartAddress;
         private bool disabledIRQs = false;
         private bool autoRun = false;
-        private BoardVersion version = BoardVersion.RevB;
+        private BoardVersion version = BoardVersion.RevC;
 
         public MainWindow(string[] programArgs)
         {
@@ -114,7 +114,6 @@ namespace FoenixIDE.UI
         {
             kernel = new FoenixSystem(this.gpu, version);
             terminal = new SerialTerminal();
-            gpu.StartOfFrame += SOF;
 
             if (kernelFileName != null)
             {
@@ -140,6 +139,7 @@ namespace FoenixIDE.UI
                 this.Width = 1200;
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
+            DisplayBoardVersion();
         }
 
         private void ShowDebugWindow()
@@ -180,6 +180,7 @@ namespace FoenixIDE.UI
                 memoryWindow.BringToFront();
             }
             memoryWindow.UpdateMCRButtons();
+            memoryWindow.SetGamma += UpdateGamma;
         }
 
         public void SerialTransmitByte(byte Value)
@@ -297,6 +298,7 @@ namespace FoenixIDE.UI
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            gpu.StartOfFrame = null;
             debugWindow.Close();
             memoryWindow.Close();
             this.Close();
@@ -355,15 +357,20 @@ namespace FoenixIDE.UI
          */
         private void RestartMenuItemClick(object sender, EventArgs e)
         {
+            gpu.StartOfFrame = null;
             debugWindow.Pause();
             debugWindow.ClearTrace();
             previousCounter = 0;
-            SetDipSwitchMemory();
             kernel.ResetCPU(true, null);
+            debugWindow.SetKernel(kernel);
+            SetDipSwitchMemory();
+            gpu.StartOfFrame += SOF;
+            memoryWindow.Memory = kernel.CPU.Memory;
             memoryWindow.UpdateMCRButtons();
-            kernel.CPU.Run();
-            debugWindow.UpdateQueue();
+
+            // Restart the CPU
             debugWindow.RunButton_Click(null, null);
+            
         }
         
         /** 
@@ -371,18 +378,22 @@ namespace FoenixIDE.UI
          */
         private void DebugToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            gpu.StartOfFrame = null;
             debugWindow.Pause();
-            kernel.CPU.DebugPause = true;
             debugWindow.ClearTrace();
             previousCounter = 0;
-            SetDipSwitchMemory();
             kernel.ResetCPU(true, null);
+            debugWindow.SetKernel(kernel);
+            SetDipSwitchMemory();
+            gpu.StartOfFrame += SOF;
+            memoryWindow.Memory = kernel.CPU.Memory;
             memoryWindow.UpdateMCRButtons();
             debugWindow.Refresh();
         }
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            gpu.StartOfFrame = null;
             ModeText.Text = "Shutting down CPU thread";
             if (kernel.CPU != null)
             {
@@ -397,6 +408,7 @@ namespace FoenixIDE.UI
 
         private bool LoadHexFile(bool ResetMemory)
         {
+            gpu.StartOfFrame = null;
             OpenFileDialog dialog = new OpenFileDialog
             {
                 Filter = "Hex Filed|*.hex",
@@ -434,6 +446,7 @@ namespace FoenixIDE.UI
                         ResetSDCard();
                         EnableMenuItems();
                         performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
+                        gpu.StartOfFrame += SOF;
                         return true;
                     }
                 }
@@ -456,6 +469,7 @@ namespace FoenixIDE.UI
          */
         private void LoadFNXMLFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            gpu.StartOfFrame = null;
             OpenFileDialog dialog = new OpenFileDialog
             {
                 Title = "Load Project File",
@@ -464,8 +478,14 @@ namespace FoenixIDE.UI
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                debugWindow.Close();
-                memoryWindow.Close();
+                if (debugWindow != null)
+                {
+                    debugWindow.Close();
+                }
+                if (memoryWindow != null)
+                {
+                    memoryWindow.Close();
+                }
 
                 // TODO - this code is so coupled - we need to set the version in the XML file too.
                 kernel = new FoenixSystem(this.gpu, version)
@@ -479,6 +499,7 @@ namespace FoenixIDE.UI
                     ShowDebugWindow();
                     ShowMemoryWindow();
                     EnableMenuItems();
+                    gpu.StartOfFrame += SOF;
                 }
             }
         }
@@ -639,17 +660,27 @@ namespace FoenixIDE.UI
             kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.SDCARD_STAT, sdCardStat);
         }
 
+        private void DisplayBoardVersion()
+        {
+            if (version == BoardVersion.RevB)
+            {
+                toolStripRevision.Text = "Rev B";
+            }
+            else
+            {
+                toolStripRevision.Text = "Rev C";
+            }
+        }
         private void ToolStripRevision_Click(object sender, EventArgs e)
         {
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
-                toolStripRevision.Text = "Rev C";
             } else
             {
                 version = BoardVersion.RevB;
-                toolStripRevision.Text = "Rev B";
             }
+            DisplayBoardVersion();
             // TODO - Reset the memory and reload the program?
         }
 
@@ -674,28 +705,32 @@ namespace FoenixIDE.UI
         private void DipSwitch_Paint(object sender, PaintEventArgs e)
         {
             base.OnPaint(e);
-            int textOffset = 24;
-            ToolStripStatusLabel label = (ToolStripStatusLabel)sender;
-            int bankHeight = label.Height;
-            int switchWidth = (label.Width - textOffset) / 8;
-            int dipHeight = (bankHeight - 5) / 2;
-            
-            int offset = 2;
-            e.Graphics.FillRectangle(Brushes.Red, new Rectangle(0, 0, Width, Height));
-            e.Graphics.DrawString("OFF", SystemFonts.SmallCaptionFont, Brushes.White, 0, 9);
-            e.Graphics.DrawString("ON", SystemFonts.SmallCaptionFont, Brushes.White, 2, -2);
 
-            for (int i = 0; i < 8; i++)
+            if (version == BoardVersion.RevC)
             {
-                // Draw the switch slide
-                e.Graphics.FillRectangle(Brushes.LightGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
-                e.Graphics.DrawRectangle(Pens.DarkGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
-                int top = (switches[i]) ? offset + 1 : offset + dipHeight;
-                e.Graphics.FillEllipse(Brushes.DarkSlateGray, new Rectangle(textOffset + (i * switchWidth) + 1, top, switchWidth - offset *2, dipHeight));
+                int textOffset = 24;
+                ToolStripStatusLabel label = (ToolStripStatusLabel)sender;
+                int bankHeight = label.Height;
+                int switchWidth = (label.Width - textOffset) / 8;
+                int dipHeight = (bankHeight - 5) / 2;
+
+                int offset = 2;
+                e.Graphics.FillRectangle(Brushes.Red, new Rectangle(0, 0, Width, Height));
+                e.Graphics.DrawString("OFF", SystemFonts.SmallCaptionFont, Brushes.White, 0, 9);
+                e.Graphics.DrawString("ON", SystemFonts.SmallCaptionFont, Brushes.White, 2, -2);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    // Draw the switch slide
+                    e.Graphics.FillRectangle(Brushes.LightGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
+                    e.Graphics.DrawRectangle(Pens.DarkGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
+                    int top = (switches[i]) ? offset + 1 : offset + dipHeight;
+                    e.Graphics.FillEllipse(Brushes.DarkSlateGray, new Rectangle(textOffset + (i * switchWidth) + 1, top, switchWidth - offset * 2, dipHeight));
+                }
             }
         }
 
-        private void dipSwitch_MouseDown(object sender, MouseEventArgs e)
+        private void DipSwitch_MouseDown(object sender, MouseEventArgs e)
         {
             ToolStripStatusLabel label = (ToolStripStatusLabel)sender;
             int textOffset = 24;
@@ -715,10 +750,42 @@ namespace FoenixIDE.UI
         {
             // if kernel memory is available, set the memory
             byte bootMode = (byte)((switches[0] ? 0 : 1) + (switches[1] ? 0 : 2));
+            byte userMode = (byte)((switches[2] ? 0 : 1) + (switches[3] ? 0 : 2) + (switches[4] ? 0 : 4));
             if (kernel.MemMgr != null)
             {
-                kernel.MemMgr.WriteByte(0xAF_E80E, bootMode);
+                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.DIP_BOOT_MODE, bootMode);
+                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.DIP_USER_MODE, userMode);
+
+                // switch 5 - high-res mode
+                byte hiRes = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR + 1);
+                if (switches[5])
+                {
+                    hiRes |= 1;
+                }
+                else
+                {
+                    hiRes &= 0xFE;
+                }
+                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR + 1, hiRes);
+
+                // switch 6 - Gamma
+                byte MCR = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
+                if (switches[6])
+                {
+                    MCR |= 0x40;
+                }
+                else
+                {
+                    MCR &= 0b1011_1111;
+                }
+                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR, MCR);
             }
+        }
+
+        public void UpdateGamma(bool gamma)
+        {
+            switches[6] = gamma;
+            dipSwitch.Invalidate();
         }
     }
 }

@@ -20,6 +20,10 @@ namespace FoenixIDE.MemoryLocations
         public const int DIPSWITCH = 0xAF_E804; // (R) $AFE804...$AFE807
 
         public const int SDCARD_START = 0xAF_E808;  // Start of SDCARD memory range
+
+        public const int DIP_USER_MODE = 0xAF_E80D;
+        public const int DIP_BOOT_MODE = 0xAF_E80E;  
+
         public const int SDCARD_END = 0xAF_E81F;    // End of SDCARD memory range
         public const int SDCARD_SIZE = 0x09;        // Size of SD Card memory range
         public const int SDCARD_DATA = 0xAF_E808;

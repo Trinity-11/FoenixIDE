@@ -61,6 +61,13 @@ namespace FoenixIDE
                 defaultKernel = kernelFilename;
             }
 
+            // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
+            int BasePageAddress = 0x18_0000;
+            if (boardVersion == BoardVersion.RevC)
+            {
+                BasePageAddress = 0x38_0000;
+            }
+
             if (defaultKernel.EndsWith(".fnxml", true, null))
             {
                 FoeniXmlFile fnxml = new FoeniXmlFile(Resources, CPUWindow.Instance.breakpoints);
@@ -71,7 +78,7 @@ namespace FoenixIDE
             else
             {
                 HexFile hexFileLoader = new HexFile();
-                defaultKernel = hexFileLoader.Load(defaultKernel);
+                defaultKernel = hexFileLoader.Load(defaultKernel, BasePageAddress);
                 if (defaultKernel != null)
                 {
                     if (ResetMemory)
@@ -93,37 +100,25 @@ namespace FoenixIDE
             }
 
 
-            // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
-            int BasePageAddress = 0x18_0000;
-            if (boardVersion == BoardVersion.RevC)
+            
+            // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block for RevB or 0x38_0000 to 0x38_FFFF block for Rev C
+            List<DebugLine> copiedLines = new List<DebugLine>();
+            if (lstFile.Lines.Count > 0)
             {
-                BasePageAddress = 0x38_0000;
-            }
-            if (MemMgr.ReadLong(MemoryMap.VECTORS_BEGIN) == 0 && MemMgr.ReadLong(BasePageAddress + 0xFFE0) != 0 
-                ||
-                MemMgr.ReadLong(MemoryMap.VECTOR_ERESET) == 0 && MemMgr.ReadLong(BasePageAddress + 0xFFFC) != 0
-                )
-            {
-                MemMgr.RAM.Duplicate(BasePageAddress, 0, MemoryMap.PAGE_SIZE);
-                // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block
-                List<DebugLine> copiedLines = new List<DebugLine>();
-                if (lstFile.Lines.Count > 0)
+                List<DebugLine> tempLines = new List<DebugLine>();
+                foreach (DebugLine line in lstFile.Lines)
                 {
-                    List<DebugLine> tempLines = new List<DebugLine>();
-                    foreach (DebugLine line in lstFile.Lines)
+                    if (line.PC >= BasePageAddress && line.PC < BasePageAddress + 0x1_0000)
                     {
-                        if (line.PC >= BasePageAddress && line.PC < BasePageAddress + 0x1_0000)
-                        {
-                            DebugLine dl = (DebugLine)line.Clone();
-                            dl.PC -= BasePageAddress;
-                            copiedLines.Add(dl);
-                        }
+                        DebugLine dl = (DebugLine)line.Clone();
+                        dl.PC -= BasePageAddress;
+                        copiedLines.Add(dl);
                     }
                 }
-                if (copiedLines.Count > 0)
-                {
-                    lstFile.Lines.InsertRange(0, copiedLines);
-                }
+            }
+            if (copiedLines.Count > 0)
+            {
+                lstFile.Lines.InsertRange(0, copiedLines);
             }
             CPU.Reset();
             return true;

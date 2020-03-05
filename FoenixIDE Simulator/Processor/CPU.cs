@@ -166,28 +166,6 @@ namespace FoenixIDE.Processor
             return false;
         }
 
-        /// <summary>
-        /// Executes instructions until a STP or reset
-        /// </summary>
-        public void Run()
-        {
-            CPUThread = new Thread(new ThreadStart(this.RunLoop));
-
-            //StartTime = DateTime.Now;
-            clockCyles = 0;
-            CPUThread.Start();
-        }
-
-        public void RunLoop()
-        {
-            while (!DebugPause && !Pins.Ready_)
-            {
-                if (Pins.Reset)
-                    Reset();
-                ExecuteNext();
-            }
-        }
-
         // Simulator State management 
         /// <summary>
         /// Pause the CPU execution due to a STP instruction. The CPU may only be restarted
@@ -198,9 +176,8 @@ namespace FoenixIDE.Processor
         {
             if (CPUThread != null && CPUThread.ThreadState == ThreadState.Running)
             {
-                Thread tmp = CPUThread;
+                CPUThread.Abort();
                 CPUThread = null;
-                tmp.Abort();
             }
         }
 
