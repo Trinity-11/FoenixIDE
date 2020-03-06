@@ -47,6 +47,7 @@ namespace FoenixIDE.UI
                 DecodeProgramArguments(programArgs);
             }
             InitializeComponent();
+            performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
 
         }
 
@@ -309,27 +310,35 @@ namespace FoenixIDE.UI
         DateTime previousTime = DateTime.Now;
         private void PerformanceTimer_Tick(object sender, EventArgs e)
         {
-            DateTime currentTime = DateTime.Now;
-            TimeSpan s = currentTime - previousTime;
-            int currentCounter = kernel.CPU.CycleCounter;
-            int currentFrame = gpu.paintCycle;
-            double cps = (currentCounter - previousCounter) / s.TotalSeconds;
-            double fps = (currentFrame - previousFrame) / s.TotalSeconds;
+            if (kernel != null  && kernel.CPU != null)
+            {
+                DateTime currentTime = DateTime.Now;
+                TimeSpan s = currentTime - previousTime;
+                int currentCounter = kernel.CPU.CycleCounter;
+                int currentFrame = gpu.paintCycle;
+                double cps = (currentCounter - previousCounter) / s.TotalSeconds;
+                double fps = (currentFrame - previousFrame) / s.TotalSeconds;
 
-            previousCounter = currentCounter;
-            previousTime = currentTime;
-            previousFrame = currentFrame;
-            cpsPerf.Text = "CPS: " + cps.ToString("N0");
-            fpsPerf.Text = "FPS: " + fps.ToString("N0");
-            // write the time to memory - values are BCD
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Second));
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Minute));
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_HRS - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Hour));
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DAY - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Day));
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MONTH - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Month));
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_YEAR - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Year % 100));
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_CENTURY - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Year / 100));
-            kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DOW - kernel.MemMgr.VICKY.StartAddress, (byte)(currentTime.DayOfWeek+1));
+                previousCounter = currentCounter;
+                previousTime = currentTime;
+                previousFrame = currentFrame;
+                cpsPerf.Text = "CPS: " + cps.ToString("N0");
+                fpsPerf.Text = "FPS: " + fps.ToString("N0");
+                // write the time to memory - values are BCD
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Second));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Minute));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_HRS - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Hour));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DAY - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Day));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MONTH - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Month));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_YEAR - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Year % 100));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_CENTURY - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Year / 100));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DOW - kernel.MemMgr.VICKY.StartAddress, (byte)(currentTime.DayOfWeek + 1));
+            }
+            else
+            {
+                cpsPerf.Text = "CPS: 0";
+                fpsPerf.Text = "FPS: 0";
+            }
         }
 
         private byte BCD(int val)
@@ -359,18 +368,40 @@ namespace FoenixIDE.UI
         {
             gpu.StartOfFrame = null;
             debugWindow.Pause();
-            debugWindow.ClearTrace();
-            previousCounter = 0;
-            kernel.ResetCPU(true, null);
-            debugWindow.SetKernel(kernel);
-            SetDipSwitchMemory();
-            gpu.StartOfFrame += SOF;
-            memoryWindow.Memory = kernel.CPU.Memory;
-            memoryWindow.UpdateMCRButtons();
-
-            // Restart the CPU
-            debugWindow.RunButton_Click(null, null);
             
+            previousCounter = 0;
+            if (kernel.ResetCPU(true, null))
+            {
+                debugWindow.SetKernel(kernel);
+                debugWindow.ClearTrace();
+                SetDipSwitchMemory();
+                gpu.StartOfFrame += SOF;
+                memoryWindow.Memory = kernel.CPU.Memory;
+                memoryWindow.UpdateMCRButtons();
+
+                // Restart the CPU
+                debugWindow.RunButton_Click(null, null);
+            }
+
+            
+            // Code is tightly coupled with memory manager
+            //kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
+            //kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
+            //kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
+            //if (kernel.lstFile != null)
+            //{
+            //    ShowDebugWindow();
+            //    ShowMemoryWindow();
+            //    if (tileEditor != null && tileEditor.Visible)
+            //    {
+            //        tileEditor.SetMemory(kernel.MemMgr);
+            //    }
+            //    ResetSDCard();
+            //    EnableMenuItems();
+            //    performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
+                
+            //}
+
         }
         
         /** 
@@ -380,15 +411,18 @@ namespace FoenixIDE.UI
         {
             gpu.StartOfFrame = null;
             debugWindow.Pause();
-            debugWindow.ClearTrace();
+            
             previousCounter = 0;
-            kernel.ResetCPU(true, null);
-            debugWindow.SetKernel(kernel);
-            SetDipSwitchMemory();
-            gpu.StartOfFrame += SOF;
-            memoryWindow.Memory = kernel.CPU.Memory;
-            memoryWindow.UpdateMCRButtons();
-            debugWindow.Refresh();
+            if (kernel.ResetCPU(true, null))
+            {
+                debugWindow.SetKernel(kernel);
+                debugWindow.ClearTrace();
+                SetDipSwitchMemory();
+                gpu.StartOfFrame += SOF;
+                memoryWindow.Memory = kernel.CPU.Memory;
+                memoryWindow.UpdateMCRButtons();
+                debugWindow.Refresh();
+            }
         }
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
@@ -445,7 +479,6 @@ namespace FoenixIDE.UI
                         }
                         ResetSDCard();
                         EnableMenuItems();
-                        performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
                         gpu.StartOfFrame += SOF;
                         return true;
                     }
