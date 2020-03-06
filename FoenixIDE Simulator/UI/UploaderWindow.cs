@@ -1,4 +1,5 @@
 ﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace FoenixIDE.UI
         public static byte LRC = 0;
         public static string[] ports;
         public FoenixSystem kernel = null;
+        private BoardVersion boardVersion = BoardVersion.RevC;
 
         SerialPort serial = new SerialPort();
         private Queue<byte> recievedData = new Queue<byte>();
@@ -213,7 +215,13 @@ namespace FoenixIDE.UI
             UploadProgressBar.Maximum = transmissionSize;
             UploadProgressBar.Value = 0;
             UploadProgressBar.Visible = true;
-            
+
+            int BasePageAddress = 0x18_0000;
+            if (boardVersion == BoardVersion.RevC)
+            {
+                BasePageAddress = 0x38_0000;
+            }
+
             if (SendFileRadio.Checked)
             {
                 if (serial.IsOpen)
@@ -234,7 +242,7 @@ namespace FoenixIDE.UI
                         SendData(DataBuffer, FnxAddressPtr, transmissionSize);
 
                         // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                        if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == 0x18_0000 && DataBuffer.Length > 0xFFFF))
+                        if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == BasePageAddress && DataBuffer.Length > 0xFFFF))
                         {
                             PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
                         }
@@ -280,14 +288,15 @@ namespace FoenixIDE.UI
                                             Array.Copy(DataBuffer, 0, pageFF, bank + address - 0xFF00, pageFFLen);
                                             resetVector = true;
                                         }
-                                        else if (bank + address >= 0x18_FF00 && (bank + address) < 0x18_FFFF)
+                                        // TODO - make this backward compatible
+                                        else if (bank + address >= (BasePageAddress + 0xFF00) && (bank + address) < (BasePageAddress + 0xFFFF))
                                         {
                                             int pageFFLen = length - ((bank + address + length) - 0x19_0000);
                                             if (pageFFLen > length)
                                             {
                                                 pageFFLen = length;
                                             }
-                                            Array.Copy(DataBuffer, 0, pageFF, bank + address - 0x18_FF00, length);
+                                            Array.Copy(DataBuffer, 0, pageFF, bank + address - (BasePageAddress + 0xFF00), length);
                                             resetVector = true;
                                         }
                                         UploadProgressBar.Increment(length);
@@ -352,7 +361,7 @@ namespace FoenixIDE.UI
                 }
                 SendData(DataBuffer, FnxAddressPtr, transmissionSize);
                 // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == 0x18_0000 && DataBuffer.Length > 0xFFFF))
+                if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == BasePageAddress && DataBuffer.Length > 0xFFFF))
                 {
                     PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
                 }
