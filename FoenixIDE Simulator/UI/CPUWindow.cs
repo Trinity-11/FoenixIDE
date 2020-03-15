@@ -18,6 +18,7 @@ namespace FoenixIDE.UI
         private bool isStepOver = false;
 
         public Processor.Breakpoints breakpoints = new Processor.Breakpoints();
+        public SortedList<int, string> labels = new SortedList<int, string>();
 
         public static CPUWindow Instance = null;
         private FoenixSystem kernel = null;
@@ -34,7 +35,6 @@ namespace FoenixIDE.UI
         private int IRQPC = 0; // we only keep track of a single interrupt
         private int TopLineIndex = 0; // this is to help us track which line is the current one being executed
 
-        Thread t;
         Point position = new Point();
 
         public CPUWindow()
@@ -377,9 +377,9 @@ namespace FoenixIDE.UI
                 
                 kernel.CPU.DebugPause = false;
                 lastLine.Text = "";
-                t = new Thread(new ThreadStart(ThreadProc));
+                kernel.CPU.CPUThread = new Thread(new ThreadStart(ThreadProc));
                 UpdateTraceTimer.Enabled = true;
-                t.Start();
+                kernel.CPU.CPUThread.Start();
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
             }
@@ -394,7 +394,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             UpdateTraceTimer.Enabled = false;
             kernel.CPU.Halt();
-            t?.Join();
+            kernel.CPU.CPUThread?.Join();
             RefreshStatus();
             RunButton.Text = "Run (F5)";
             RunButton.Tag = "0";
@@ -425,7 +425,7 @@ namespace FoenixIDE.UI
         {
             DebugPanel_Leave(sender, e);
             kernel.CPU.DebugPause = true;
-            t?.Join();
+            kernel.CPU.CPUThread?.Join();
             RunButton.Text = "Run (F5)";
             RunButton.Tag = "0";
             UpdateTraceTimer.Enabled = false;
@@ -657,7 +657,7 @@ namespace FoenixIDE.UI
         {
             // Kill the thread
             kernel.CPU.DebugPause = true;
-            t?.Join();
+            kernel.CPU.CPUThread?.Join();
         }
 
         private void CPUWindow_KeyDown(object sender, KeyEventArgs e)

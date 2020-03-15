@@ -233,6 +233,7 @@
     <EmbeddedResource Include="UI\UploaderWindow.resx">
       <DependentUpon>UploaderWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <Compile Include="Basic\MultimediaTimer.cs" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.IO;
 
 namespace FoenixIDE.UI
 {
@@ -71,6 +72,10 @@ namespace FoenixIDE.UI
 
         }
 
+        public void AllowSave()
+        {
+            SaveButton.Visible = true;
+        }
         public void RefreshMemoryView()
         {
             StringBuilder s = new StringBuilder();
@@ -411,6 +416,23 @@ namespace FoenixIDE.UI
         private void MemoryText_MouseLeave(object sender, EventArgs e)
         {
             HighlightPanel.Visible = false;
+        }
+
+        /**
+         * Save the content of memory to a binary file.
+         */
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            if (SaveDialog.ShowDialog() == DialogResult.OK)
+            {
+                FileStream outputFile = File.Create(SaveDialog.FileName);
+                MemoryRAM ram = (MemoryRAM)Memory;
+                byte[] buffer = new byte[ram.Length];
+                ram.CopyIntoBuffer(0, buffer, 0, ram.Length);
+                outputFile.Write(buffer, 0, buffer.Length);
+                outputFile.Flush();
+                outputFile.Close();
+            }
         }
     }
 }

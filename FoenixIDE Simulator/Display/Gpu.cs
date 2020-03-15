@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.MemoryLocations;
 using System.Diagnostics;
+using FoenixIDE.Timers;
 
 namespace FoenixIDE.Display
 {
@@ -41,8 +42,8 @@ namespace FoenixIDE.Display
         /// number of frames to wait to refresh the screen.
         /// One frame = 1/60 second.
         /// </summary>
-        public int RefreshTimer = 0;
-        private const int BLINK_RATE = 30;
+        public int BlinkingCounter = BLINK_RATE;
+        public const int BLINK_RATE = 30;
 
         // To provide a better contrast when writing on top of bitmaps
         Brush BackgroundTextBrush = new SolidBrush(Color.Black);
@@ -51,10 +52,11 @@ namespace FoenixIDE.Display
         Brush InvertedBrush = new SolidBrush(Color.Blue);
         Brush CursorBrush = new SolidBrush(Color.LightBlue);
 
-        Timer gpuRefreshTimer = new Timer
-        {
-            Interval = 15
-        };
+        //Timer gpuRefreshTimer = new Timer
+        //{
+        //    Interval = 15
+        //};
+        private MultimediaTimer hiresTimer = new MultimediaTimer(16);
 
         public Gpu()
         {
@@ -65,11 +67,13 @@ namespace FoenixIDE.Display
         void Gpu_Load(object sender, EventArgs e)
         {
             this.Paint += new PaintEventHandler(Gpu_Paint);
-            gpuRefreshTimer.Tick += new EventHandler(GpuRefreshTimer_Tick);
+            //gpuRefreshTimer.Tick += new EventHandler(GpuRefreshTimer_Tick);
+            hiresTimer.Elapsed += new MultimediaElapsedEventHandler(GpuRefreshTimer_Tick);
 
             if (DesignMode)
             {
-                gpuRefreshTimer.Enabled = false;
+                //gpuRefreshTimer.Enabled = false;
+                hiresTimer.Stop();
             }
             else
             {
@@ -80,20 +84,17 @@ namespace FoenixIDE.Display
                 int sidemargin = ParentForm.Width - ClientRectangle.Width;
                 ParentForm.Height = htarget + topmargin;
                 ParentForm.Width = (int)Math.Ceiling(htarget * 1.6) + sidemargin;
-                gpuRefreshTimer.Enabled = true;
+                //gpuRefreshTimer.Enabled = true;
+                hiresTimer.Start();
             }
         }
-
         void GpuRefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (RefreshTimer-- > 0)
+            if (BlinkingCounter-- == 0)
             {
-                Invalidate();
-                return;
+                CursorState = !CursorState;
+                BlinkingCounter = BLINK_RATE;
             }
-
-            CursorState = !CursorState;
-            RefreshTimer = BLINK_RATE;
             Invalidate();
         }
 
@@ -519,7 +520,8 @@ namespace FoenixIDE.Display
 
             // Now read the tilemap
             int tilemapAddress = 0xAF5000 + 0x800 * layer;
-            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, 16, 16), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            int bitmapWidth = bitmap.Width;
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmapWidth, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
 
             int colOffset = bkgrnd ? (80 - ColumnsVisible) / 2 * charWidth / tileSize: 0;
@@ -554,7 +556,8 @@ namespace FoenixIDE.Display
                                                   (gammaCorrection[0x100 + ((value & 0x0000FF00) >> 0x08)] << 0x08) +
                                                   (gammaCorrection[0x200 + (value & 0x000000FF)]) + 0xFF000000);
                                 }
-                                System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmap.Width + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
+                                
+                                System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * bitmapWidth + col + tileCol * 16 + tileRow * 16 * 640) * 4, value);
                             }
                         }
                     }

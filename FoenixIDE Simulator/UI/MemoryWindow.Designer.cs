@@ -52,6 +52,8 @@
             this.MasterControlLabel = new System.Windows.Forms.Label();
             this.HighlightPanel = new System.Windows.Forms.TextBox();
             this.PositionLabel = new System.Windows.Forms.Label();
+            this.SaveButton = new System.Windows.Forms.Button();
+            this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.HeaderPanel.SuspendLayout();
             this.FooterPanel.SuspendLayout();
             this.SuspendLayout();
@@ -60,6 +62,7 @@
             // 
             this.HeaderPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.HeaderPanel.Controls.Add(this.SaveButton);
             this.HeaderPanel.Controls.Add(this.AddressCombo);
             this.HeaderPanel.Controls.Add(this.PreviousButton);
             this.HeaderPanel.Controls.Add(this.NextButton);
@@ -347,6 +350,22 @@
             this.PositionLabel.Text = "Position Label";
             this.PositionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // SaveButton
+            // 
+            this.SaveButton.Location = new System.Drawing.Point(490, 1);
+            this.SaveButton.Name = "SaveButton";
+            this.SaveButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveButton.TabIndex = 11;
+            this.SaveButton.Text = "Save";
+            this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Visible = false;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
+            // 
+            // SaveDialog
+            // 
+            this.SaveDialog.Filter = "Binary files|*.bin";
+            this.SaveDialog.Title = "Save Memory to File";
+            // 
             // MemoryWindow
             // 
             this.AcceptButton = this.ViewButton;
@@ -400,5 +419,7 @@
         private System.Windows.Forms.TextBox HighlightPanel;
         private System.Windows.Forms.ComboBox AddressCombo;
         private System.Windows.Forms.Label PositionLabel;
+        private System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.SaveFileDialog SaveDialog;
     }
 }

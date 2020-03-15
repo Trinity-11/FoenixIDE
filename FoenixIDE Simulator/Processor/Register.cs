@@ -10,7 +10,8 @@ namespace FoenixIDE.Processor
     {
         protected int _value;
         private int byteLength = 2;
-        public int TopOfStack = 0xd6ff;
+        public const int DefaultStackValue = 0xd6ff;
+        public int TopOfStack = DefaultStackValue;
 
         /// <summary>
         /// Forces the upper 8 bits to 0 when the register changes to 8 bit mode, or when writing or reading 
@@ -180,7 +181,8 @@ namespace FoenixIDE.Processor
 
         public virtual void Reset()
         {
-            this.Value = TopOfStack;
+            this.TopOfStack = DefaultStackValue;
+            this.Value = DefaultStackValue;
             this.byteLength = 2;
         }
     }

@@ -191,6 +191,7 @@ namespace FoenixIDE.Processor
             A.Value = 0;
             X.Value = 0;
             Y.Value = 0;
+            Stack.Reset();
             DataBank.Value = 0;
             DirectPage.Value = 0;
             ProgramBank.Value = 0;

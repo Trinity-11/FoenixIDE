@@ -216,10 +216,10 @@ namespace FoenixIDE.UI
             UploadProgressBar.Value = 0;
             UploadProgressBar.Visible = true;
 
-            int BasePageAddress = 0x18_0000;
+            int BaseBankAddress = 0x18_0000;
             if (boardVersion == BoardVersion.RevC)
             {
-                BasePageAddress = 0x38_0000;
+                BaseBankAddress = 0x38_0000;
             }
 
             if (SendFileRadio.Checked)
@@ -242,7 +242,7 @@ namespace FoenixIDE.UI
                         SendData(DataBuffer, FnxAddressPtr, transmissionSize);
 
                         // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                        if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == BasePageAddress && DataBuffer.Length > 0xFFFF))
+                        if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == BaseBankAddress && DataBuffer.Length > 0xFFFF))
                         {
                             PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
                         }
@@ -250,7 +250,12 @@ namespace FoenixIDE.UI
                     else
                     {
                         bool resetVector = false;
+                        // Page FF is used to store IRQ vectors - this is only used when the program modifies the
+                        // values between BaseBank + FF00 to BaseBank + FFFF
+                        // BaseBank on RevB is $18
+                        // BaseBank on RevC is $38
                         byte[] pageFF = new byte[256];
+                        PreparePacket2Read(pageFF, 0xFF00, 0, 255);
                         // If send HEX files, each time we encounter a "bank" change - record 04 - send a new data block
                         string[] lines = System.IO.File.ReadAllLines(FileNameTextBox.Text);
                         int bank = 0;
@@ -278,29 +283,23 @@ namespace FoenixIDE.UI
                                             DataBuffer[i / 2] = (byte)HexFile.GetByte(data, i, 1);
                                         }
                                         PreparePacket2Write(DataBuffer, bank + address, 0, length);
-                                        if (bank + address >= 0xFF00 && (bank + address) < 0xFFFF)
-                                        {
-                                            int pageFFLen = length - ((bank + address + length) - 0x1_0000);
-                                            if (pageFFLen > length)
-                                            {
-                                                pageFFLen = length;
-                                            }
-                                            Array.Copy(DataBuffer, 0, pageFF, bank + address - 0xFF00, pageFFLen);
-                                            resetVector = true;
-                                        }
+                                        
                                         // TODO - make this backward compatible
-                                        else if (bank + address >= (BasePageAddress + 0xFF00) && (bank + address) < (BasePageAddress + 0xFFFF))
+                                        if (bank + address >= (BaseBankAddress + 0xFF00) && (bank + address) < (BaseBankAddress + 0xFFFF))
                                         {
-                                            int pageFFLen = length - ((bank + address + length) - 0x19_0000);
+                                            int pageFFLen = length - ((bank + address + length) - (BaseBankAddress + 0x1_0000));
                                             if (pageFFLen > length)
                                             {
                                                 pageFFLen = length;
                                             }
-                                            Array.Copy(DataBuffer, 0, pageFF, bank + address - (BasePageAddress + 0xFF00), length);
+                                            Array.Copy(DataBuffer, 0, pageFF, bank + address - (BaseBankAddress + 0xFF00), length);
                                             resetVector = true;
                                         }
                                         UploadProgressBar.Increment(length);
 
+                                        break;
+                                    case "01":
+                                        // Don't do anything... this is the end of file record.
                                         break;
 
                                     case "02":
@@ -310,6 +309,11 @@ namespace FoenixIDE.UI
                                     case "04":
                                         bank = HexFile.GetByte(data, 0, 2) << 16;
                                         break;
+
+                                    default:
+                                        Console.WriteLine("Unsupport HEX record type:" + rectype);
+                                        break;
+
                                 }
                             }
                         }
@@ -361,7 +365,7 @@ namespace FoenixIDE.UI
                 }
                 SendData(DataBuffer, FnxAddressPtr, transmissionSize);
                 // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == BasePageAddress && DataBuffer.Length > 0xFFFF))
+                if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == BaseBankAddress && DataBuffer.Length > 0xFFFF))
                 {
                     PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
                 }
@@ -387,6 +391,7 @@ namespace FoenixIDE.UI
                             " to " + (blockAddress + transmissionSize - 1).ToString("X6")
                     };
                     tempMem.GotoAddress(blockAddress);
+                    tempMem.AllowSave();
                     tempMem.Show();
                 }
             }

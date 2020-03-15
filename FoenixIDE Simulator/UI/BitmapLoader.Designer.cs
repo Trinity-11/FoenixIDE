@@ -245,7 +245,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "BitmapLoader";
-            this.Text = "Bitmap Loader Window";
+            this.Text = "Bitmap/Bin Loader Window";
             this.Load += new System.EventHandler(this.BitmapLoader_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BitmapLoader_KeyDown);
             this.ResumeLayout(false);

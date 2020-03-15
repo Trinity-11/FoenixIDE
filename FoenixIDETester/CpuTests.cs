@@ -1,6 +1,7 @@
 ﻿using System;
 using FoenixIDE.MemoryLocations;
 using FoenixIDE.Processor;
+using FoenixIDE.Simulator.Devices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 /*
@@ -19,7 +20,9 @@ namespace FoenixIDETester
         {
             mgr = new MemoryManager
             {
-                RAM = new MemoryRAM(0, 1024)  // Only setup 1K of RAM - this should be tons to test our CPU
+                RAM = new MemoryRAM(0, 1024),  // Only setup 1K of RAM - this should be tons to test our CPU
+                CODEC = new CodecRAM(1025,1),
+                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4)
             };
             cpu = new CPU(mgr);
             cpu.SetEmulationMode();

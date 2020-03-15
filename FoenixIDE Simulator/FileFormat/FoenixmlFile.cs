@@ -11,21 +11,23 @@ namespace FoenixIDE.Simulator.FileFormat
 {
     class FoeniXmlFile
     {
-        // Prepare a 4MB buffer to read data in
-        public byte[] buffer = new byte[0x40_0000];
         private ResourceChecker Resources;
         private const int PHRASE_LENGTH = 16;
         private Processor.Breakpoints BreakPoints;
+        private SortedList<int, string> Labels;
+        private MemoryRAM ram;
         public BoardVersion Version = BoardVersion.RevB;
 
         private FoeniXmlFile() { }
 
-        public FoeniXmlFile(ResourceChecker resources, Processor.Breakpoints breakpoints)
+        public FoeniXmlFile(MemoryRAM ram, ResourceChecker resources, Processor.Breakpoints breakpoints, SortedList<int, string> labels)
         {
+            this.ram = ram;
             this.Resources = resources;
             this.BreakPoints = breakpoints;
+            this.Labels = labels;
         }
-        public void Write(IMappable memory, String filename, bool compact)
+        public void Write(String filename, bool compact)
         {
             XmlWriter xmlWriter = XmlWriter.Create(filename);
             xmlWriter.WriteStartDocument();
@@ -67,6 +69,20 @@ namespace FoenixIDE.Simulator.FileFormat
             xmlWriter.WriteEndElement(); // end breakpoints
             xmlWriter.WriteRaw("\r");
 
+            // Write labels
+            xmlWriter.WriteStartElement("labels");
+            xmlWriter.WriteRaw("\r");
+            foreach (KeyValuePair<int, string> kvp in Labels)
+            {
+                xmlWriter.WriteStartElement("label");
+                xmlWriter.WriteAttributeString("address", kvp.Key.ToString("X6"));
+                xmlWriter.WriteAttributeString("name", kvp.Value);
+                xmlWriter.WriteEndElement();  // end resource
+                xmlWriter.WriteRaw("\r");
+            }
+            xmlWriter.WriteEndElement(); // end breakpoints
+            xmlWriter.WriteRaw("\r");
+
             // Write pages
             xmlWriter.WriteStartElement("pages");
             if (compact)
@@ -83,7 +99,7 @@ namespace FoenixIDE.Simulator.FileFormat
             // We don't need to scan $FFFF pages, only scan the ones we know are gettings used
             // Scan each of the banks and pages and save to an XML file
             // If a page is blank, don't export it.
-            for (int i = 0; i < 0x200000; i = i + 256)
+            for (int i = 0; i < ram.Length; i = i + 256)
             {
                 if (PageChecksum(i) != 0)
                 {
@@ -91,13 +107,13 @@ namespace FoenixIDE.Simulator.FileFormat
                 }
             }
 
-            for (int i = 0xAF_0000; i < 0xF0_0000; i = i + 256)
-            {
-                if (PageChecksum(i) != 0)
-                {
-                    WriteData(i, xmlWriter, compact);
-                }
-            }
+            //for (int i = 0xAF_0000; i < 0xF0_0000; i = i + 256)
+            //{
+            //    if (PageChecksum(i) != 0)
+            //    {
+            //        WriteData(i, xmlWriter, compact);
+            //    }
+            //}
             xmlWriter.WriteEndElement(); // end pages
             xmlWriter.WriteEndElement(); // end project
 
@@ -130,7 +146,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 writer.WriteAttributeString("address", "$" + (startAddress).ToString("X6"));
                 for (int i = 0; i < PHRASE_LENGTH; i++)
                 {
-                    writer.WriteString(buffer[startAddress + i].ToString("X2") + " ");
+                    writer.WriteString(ram.ReadByte(startAddress + i).ToString("X2") + " ");
                 }
                 writer.WriteEndElement();
                 writer.WriteRaw("\r");
@@ -143,7 +159,7 @@ namespace FoenixIDE.Simulator.FileFormat
             int sum = 0;
             for (int i = 0; i < 255; i++)
             {
-                sum += buffer[startAddress + i];
+                sum += ram.ReadByte(startAddress + i);
             }
             return sum;
         }
@@ -154,7 +170,7 @@ namespace FoenixIDE.Simulator.FileFormat
             int sum = 0;
             for (int i = 0; i < PHRASE_LENGTH; i++)
             {
-                sum += buffer[startAddress + i];
+                sum += ram.ReadByte(startAddress + i);
             }
             return sum;
         }
@@ -181,6 +197,7 @@ namespace FoenixIDE.Simulator.FileFormat
                     if (reader.Name.Equals("data"))
                     {
                         LoadMemory(reader.GetAttribute("address"), reader.ReadElementContentAsString());
+                        continue;
                     }
                     if (reader.Name.Equals("resource"))
                     {
@@ -192,6 +209,20 @@ namespace FoenixIDE.Simulator.FileFormat
                             Length = Convert.ToInt32(reader.GetAttribute("length"), 16)
                         };
                         Resources.Add(res);
+                        continue;
+                    }
+                    if (reader.Name.Equals("label"))
+                    {
+                        int address = Convert.ToInt32(reader.GetAttribute("address"), 16);
+                        string name = reader.GetAttribute("name");
+                        Labels.Add(address, name);
+                        continue;
+                    }
+                    if (reader.Name.Equals("breakpoint"))
+                    {
+                        string address = reader.GetAttribute("address");
+                        BreakPoints.Add(address);
+                        continue;
                     }
                     if (reader.Name.Equals("project"))
                     {
@@ -200,6 +231,7 @@ namespace FoenixIDE.Simulator.FileFormat
                         {
                             Enum.TryParse<BoardVersion>(version, out Version);
                         }
+                        continue;
                     }
                 }
             }
@@ -214,7 +246,7 @@ namespace FoenixIDE.Simulator.FileFormat
             {
                 for (int i = 0; i < values.Length / 3; i++)
                 {
-                    buffer[addr++] = Convert.ToByte(values.Substring(i * 3, 2), 16);
+                    ram.WriteByte(addr++, Convert.ToByte(values.Substring(i * 3, 2), 16));
                 }
             }
         }

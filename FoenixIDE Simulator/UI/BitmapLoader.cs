@@ -139,7 +139,7 @@ namespace FoenixIDE.UI
                 FileInfo info = new FileInfo(bmpFilename);
                 FileSizeResultLabel.Text = FormatAddress((int)info.Length);
                 BitmapSizeValueLabel.Text = "Unspecified";
-                PixelDepthValueLabel.Text = "8";
+                PixelDepthValueLabel.Text = "N/A";
             }
         }
 
@@ -194,11 +194,14 @@ namespace FoenixIDE.UI
         private void StoreButton_Click(object sender, EventArgs e)
         {
             StoreButton.Enabled = false;
-
-            // TODO: determine what to do with the control register
-            controlByte = (byte)((LUTCombo.SelectedIndex << 1) + 1);
-            Memory.WriteByte(controlRegisterAddress, controlByte); // enable
-
+            string extension = Path.GetExtension(FileNameTextBox.Text).ToLower();
+            bool binFile = !extension.Equals("bmp");
+            if (!binFile)
+            {
+                // TODO: determine what to do with the control register
+                controlByte = (byte)((LUTCombo.SelectedIndex << 1) + 1);
+                Memory.WriteByte(controlRegisterAddress, controlByte); // enable
+            }
             // Store the address in the pointer address - little endian - 24 bits
             string strAddress = LoadAddressTextBox.Text.Replace(":", "");
             int videoAddress = 0;
@@ -214,67 +217,79 @@ namespace FoenixIDE.UI
                 Name = Path.GetFileNameWithoutExtension(FileNameTextBox.Text)
             };
 
-            // Store the bitmap at the user's determined address
-            // The method below simply takes the file and writes it in memory.
-            // What we want is the actual pixels.
-            ImageConverter converter = new ImageConverter();
-            byte[] data = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-            int startOffset = BitConverter.ToInt32(data, 10);
-            int fileLength = BitConverter.ToInt32(data, 2);
-            res.Length = bitmap.Height * bitmap.Width;
-            if (ResChecker.Add(res))
+            if (!binFile)
             {
-
-                // The addresses in Vicky a offset by $B0:0000
-                videoAddress = videoAddress - 0xB0_0000;
-                Memory.WriteByte(pointerAddress, LowByte(videoAddress));
-                Memory.WriteByte(pointerAddress + 1, MidByte(videoAddress));
-                Memory.WriteByte(pointerAddress + 2, HighByte(videoAddress));
-
-                // Store the strides in the strideX and strideY
-                Memory.WriteByte(strideXAddress, LowByte(strideX));
-                Memory.WriteByte(strideXAddress + 1, MidByte(strideX));
-                Memory.WriteByte(strideYAddress, LowByte(strideY));
-                Memory.WriteByte(strideYAddress + 1, MidByte(strideY));
-
-
-
-                int numberOfColors = BitConverter.ToInt32(data, 46);
-                int lutOffset = 0xAF_2000 + LUTCombo.SelectedIndex * 1024;
-                if (numberOfColors == 0)
+                // Store the bitmap at the user's determined address
+                // The method below simply takes the file and writes it in memory.
+                // What we want is the actual pixels.
+                ImageConverter converter = new ImageConverter();
+                byte[] data = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+                int startOffset = BitConverter.ToInt32(data, 10);
+                int fileLength = BitConverter.ToInt32(data, 2);
+                res.Length = bitmap.Height * bitmap.Width;
+                if (ResChecker.Add(res))
                 {
-                    // we need to create a LUT - each LUT only accepts 256 entries - 0 is black
-                    TransformBitmap(data, startOffset, Int32.Parse(PixelDepthValueLabel.Text), lutOffset, writeVideoAddress, bitmap.Width, bitmap.Height);
+
+                    // The addresses in Vicky a offset by $B0:0000
+                    videoAddress = videoAddress - 0xB0_0000;
+                    Memory.WriteByte(pointerAddress, LowByte(videoAddress));
+                    Memory.WriteByte(pointerAddress + 1, MidByte(videoAddress));
+                    Memory.WriteByte(pointerAddress + 2, HighByte(videoAddress));
+
+                    // Store the strides in the strideX and strideY
+                    Memory.WriteByte(strideXAddress, LowByte(strideX));
+                    Memory.WriteByte(strideXAddress + 1, MidByte(strideX));
+                    Memory.WriteByte(strideYAddress, LowByte(strideY));
+                    Memory.WriteByte(strideYAddress + 1, MidByte(strideY));
+
+
+
+                    int numberOfColors = BitConverter.ToInt32(data, 46);
+                    int lutOffset = 0xAF_2000 + LUTCombo.SelectedIndex * 1024;
+                    if (numberOfColors == 0)
+                    {
+                        // we need to create a LUT - each LUT only accepts 256 entries - 0 is black
+                        TransformBitmap(data, startOffset, Int32.Parse(PixelDepthValueLabel.Text), lutOffset, writeVideoAddress, bitmap.Width, bitmap.Height);
+                    }
+                    else
+                    {
+                        for (int offset = 54; offset < 1024 + 54; offset = offset + 4)
+                        {
+                            int color = BitConverter.ToInt32(data, offset);
+                            Memory.WriteByte(lutOffset, LowByte(color));
+                            Memory.WriteByte(lutOffset + 1, MidByte(color));
+                            Memory.WriteByte(lutOffset + 2, HighByte(color));
+                            Memory.WriteByte(lutOffset + 3, 0xFF); // Alpha
+                            lutOffset = lutOffset + 4;
+                        }
+                        for (int line = 0; line < bitmap.Height; line++)
+                        {
+                            for (int i = 0; i < bitmap.Width; i++)
+                            {
+                                Memory.WriteByte(writeVideoAddress + (bitmap.Height - line + 1) * bitmap.Width + i, data[startOffset + line * bitmap.Width + i]);
+                            }
+                        }
+                    }
+                    if (BitmapTypesCombo.SelectedIndex > 0 && BitmapTypesCombo.SelectedIndex < 5)
+                    {
+                        int layer = BitmapTypesCombo.SelectedIndex - 1;
+                        OnTileLoaded?.Invoke(layer);
+                    }
+                    MessageBox.Show("Transfer successful!", "Bitmap Storage", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
                 }
                 else
                 {
-                    for (int offset = 54; offset < 1024 + 54; offset = offset + 4)
-                    {
-                        int color = BitConverter.ToInt32(data, offset);
-                        Memory.WriteByte(lutOffset, LowByte(color));
-                        Memory.WriteByte(lutOffset + 1, MidByte(color));
-                        Memory.WriteByte(lutOffset + 2, HighByte(color));
-                        Memory.WriteByte(lutOffset + 3, 0xFF); // Alpha
-                        lutOffset = lutOffset + 4;
-                    }
-                    for (int line = 0; line < bitmap.Height; line++)
-                    {
-                        for (int i = 0; i < bitmap.Width; i++)
-                        {
-                            Memory.WriteByte(writeVideoAddress + (bitmap.Height - line + 1) * bitmap.Width + i, data[startOffset + line * bitmap.Width + i]);
-                        }
-                    }
+                    StoreButton.Enabled = true;
                 }
-                if (BitmapTypesCombo.SelectedIndex > 0 && BitmapTypesCombo.SelectedIndex < 5)
-                {
-                    int layer = BitmapTypesCombo.SelectedIndex - 1;
-                    OnTileLoaded?.Invoke(layer);
-                }
-                MessageBox.Show("Transfer successful!", "Bitmap Storage", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
             }
             else
             {
+                byte[] data = File.ReadAllBytes(FileNameTextBox.Text);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    Memory.WriteByte(videoAddress + i, data[i]);
+                }
                 StoreButton.Enabled = true;
             }
         }

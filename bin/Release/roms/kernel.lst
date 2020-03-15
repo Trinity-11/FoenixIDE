@@ -1,26 +1,26 @@
 
 ; 64tass Turbo Assembler Macro V1.54.1900 listing file
-; 64tass --m65816 -D TARGET=1 --long-address --flat -b -o kernel.bin --list kernel.lst --labels=kernel.lbl src\kernel.asm
-; Wed Jan 08 00:04:57 2020
+; 64tass.exe --long-address -D TARGET=2 -x --intel-hex -o kernel.hex --list kernel.lst src/kernel.asm
+; Thu Mar 12 00:33:16 2020
 
 ;Offset	;Hex		;Monitor	;Source
 
 ;******  Command line definitions
 
-=1					TARGET=1
+=2					TARGET=2
 
-;******  Processing input file: src\kernel.asm
+;******  Processing input file: src/kernel.asm
 
 =1					TARGET_FLASH = 1              ; The code is being assembled for Flash
 =2					TARGET_RAM = 2                ; The code is being assembled for RAM
 
-;******  Processing file: src\macros_inc.asm
+;******  Processing file: src/macros_inc.asm
 
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\characters.asm
+;******  Processing file: src/characters.asm
 
 =$03					CHAR_CTRL_C = $03   ; CTRL-C
 =$08					CHAR_BS = $08       ; Backspace (delete character to the left of the cursor)
@@ -35,16 +35,16 @@
 =$9d					CHAR_LEFT = $9D     ; Left arrow
 =$7f					CHAR_DEL = $7F      ; Delete key (delete the character at the cursor)
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\simulator_inc.asm
+;******  Processing file: src/simulator_inc.asm
 
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\page_00_inc.asm
+;******  Processing file: src/page_00_inc.asm
 
 =$000000				BANK0_BEGIN      = $000000 ;Start of bank 0 and Direct page
 =$000000				unused_0000      = $000000 ;12 Bytes unused
@@ -116,28 +116,6 @@
 =$0000e4				MOUSE_POS_Y_HI   = $0000E4
 =$0000f0				USER_TEMP        = $0000F0 ;32 Bytes Temp space for user programs
 =$000100				GAVIN_BLOCK      = $000100 ;256 Bytes Gavin reserved, overlaps debugging registers at $1F0
-=$000100				MULTIPLIER_0     = $000100 ;0 Byte  Unsigned multiplier
-=$000100				M0_OPERAND_A     = $000100 ;2 Bytes Operand A (ie: A x B)
-=$000102				M0_OPERAND_B     = $000102 ;2 Bytes Operand B (ie: A x B)
-=$000104				M0_RESULT        = $000104 ;4 Bytes Result of A x B
-=$000108				MULTIPLIER_1     = $000108 ;0 Byte  Signed Multiplier
-=$000108				M1_OPERAND_A     = $000108 ;2 Bytes Operand A (ie: A x B)
-=$00010a				M1_OPERAND_B     = $00010A ;2 Bytes Operand B (ie: A x B)
-=$00010c				M1_RESULT        = $00010C ;4 Bytes Result of A x B
-=$000108				DIVIDER_0        = $000108 ;0 Byte  Unsigned divider
-=$000108				D0_OPERAND_A     = $000108 ;2 Bytes Divider 0 Dividend ex: A in  A/B
-=$00010a				D0_OPERAND_B     = $00010A ;2 Bytes Divider 0 Divisor ex B in A/B
-=$00010c				D0_RESULT        = $00010C ;2 Bytes Quotient result of A/B ex: 7/2 = 3 r 1
-=$00010e				D0_REMAINDER     = $00010E ;2 Bytes Remainder of A/B ex: 1 in 7/2=3 r 1
-=$000110				DIVIDER_1        = $000110 ;0 Byte  Signed divider
-=$000110				D1_OPERAND_A     = $000110 ;2 Bytes Divider 1 Dividend ex: A in  A/B
-=$000112				D1_OPERAND_B     = $000112 ;2 Bytes Divider 1 Divisor ex B in A/B
-=$000114				D1_RESULT        = $000114 ;2 Bytes Signed quotient result of A/B ex: 7/2 = 3 r 1
-=$000116				D1_REMAINDER     = $000116 ;2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
-=$000120				ADDER_SIGNED_32  = $000120 ; The 32 Bit Adders takes 12Byte that are NOT RAM Location
-=$000120				ADDER_A          = $000120 ; 4 bytes (32 bit) Accumulator A
-=$000124				ADDER_B          = $000124 ; 4 bytes (32 bit) Accumulator B
-=$000128				ADDER_R          = $000128 ; 4 bytes (32 bit) Result
 =$000140				INT_CONTROLLER   = $000140 ; $000140...$00015F Interrupt Controller
 =$000160				TIMER_CONTROLLER = $000160 ; $000160...$00017F Timer0/Timer1/Timer2 Block
 =$000160				TIMER_CTRL_REGLL = $000160 ;
@@ -194,54 +172,54 @@
 =$000700				CURRUART         = $000700 ; 3-bytes: the base address of the current UART
 =$000703				CHAN_OUT         = $000703 ; 1-byte: the number of the current output channel (for PUTC, etc.)
 =$000704				CHAN_IN          = $000704 ; 1-byte: the number of the current input channel (for GETCH, etc.)
-=$000f00				KEY_BUFFER       = $000F00 ;64 Bytes keyboard buffer
-=$0080					KEY_BUFFER_SIZE  = $0080 ;128 Bytes (constant) keyboard buffer length
-=$000f7f				KEY_BUFFER_END   = $000F7F ;1 Byte  Last byte of keyboard buffer
-=$000f83				KEY_BUFFER_CMD   = $000F83 ;1 Byte  Indicates the Command Process Status
-=$000f84				COMMAND_SIZE_STR = $000F84 ; 1 Byte
-=$000f86				COMMAND_COMP_TMP = $000F86 ; 2 Bytes
-=$000f87				KEYBOARD_SC_FLG  = $000F87 ;1 Bytes that indicate the Status of Left Shift, Left CTRL, Left ALT, Right Shift
-=$000f88				KEYBOARD_SC_TMP  = $000F88 ;1 Byte, Interrupt Save Scan Code while Processing
-=$000f89				KEYBOARD_LOCKS   = $000F89 ;1 Byte, the status of the various lock keys
-=$000f8a				KEYFLAG          = $000F8A ;1 Byte, flag to indicate if CTRL-C has been pressed
-=$000f8b				KEY_BUFFER_RPOS  = $000F8B ;2 Byte, position of the character to read from the KEY_BUFFER
-=$000f8d				KEY_BUFFER_WPOS  = $000F8D ;2 Byte, position of the character to write to the KEY_BUFFER
+=$000f00				KEY_BUFFER       = $000F00 ; 64 Bytes keyboard buffer
+=$0080					KEY_BUFFER_SIZE  = $0080   ;128 Bytes (constant) keyboard buffer length
+=$000f7f				KEY_BUFFER_END   = $000F7F ;  1 Byte  Last byte of keyboard buffer
+=$000f83				KEY_BUFFER_CMD   = $000F83 ;  1 Byte  Indicates the Command Process Status
+=$000f84				COMMAND_SIZE_STR = $000F84 ;  1 Byte
+=$000f86				COMMAND_COMP_TMP = $000F86 ;  2 Bytes
+=$000f87				KEYBOARD_SC_FLG  = $000F87 ;  1 Bytes that indicate the Status of Left Shift, Left CTRL, Left ALT, Right Shift
+=$000f88				KEYBOARD_SC_TMP  = $000F88 ;  1 Byte, Interrupt Save Scan Code while Processing
+=$000f89				KEYBOARD_LOCKS   = $000F89 ;  1 Byte, the status of the various lock keys
+=$000f8a				KEYFLAG          = $000F8A ;  1 Byte, flag to indicate if CTRL-C has been pressed
+=$000f8b				KEY_BUFFER_RPOS  = $000F8B ;  2 Byte, position of the character to read from the KEY_BUFFER
+=$000f8d				KEY_BUFFER_WPOS  = $000F8D ;  2 Byte, position of the character to write to the KEY_BUFFER
 =$001000				KERNEL_JMP_BEGIN = $001000 ; Reserved for the Kernel jump table
 =$001fff				KERNEL_JMP_END   = $001FFF
 =$002000				TEST_BEGIN       = $002000 ;28672 Bytes Test/diagnostic code for prototype.
 =$007fff				TEST_END         = $007FFF ;0 Byte
 =$008000				STACK_BEGIN      = $008000 ;32512 Bytes The default beginning of stack space
 =$00feff				STACK_END        = $00FEFF ;0 Byte  End of stack space. Everything below this is I/O space
-=$38ff00				ISR_BEGIN        = $38FF00 ; Byte  Beginning of CPU vectors in Direct page
-=$38ff00				HRESET           = $38FF00 ;16 Bytes Handle RESET asserted. Reboot computer and re-initialize the kernel.
-=$38ff10				HCOP             = $38FF10 ;16 Bytes Handle the COP instruction. Program use; not used by OS
-=$38ff20				HBRK             = $38FF20 ;16 Bytes Handle the BRK instruction. Returns to BASIC Ready prompt.
-=$38ff30				HABORT           = $38FF30 ;16 Bytes Handle ABORT asserted. Return to Ready prompt with an error message.
-=$38ff40				HNMI             = $38FF40 ;32 Bytes Handle NMI
-=$38ff60				HIRQ             = $38FF60 ;32 Bytes Handle IRQ
-=$38ff80				Unused_FF80      = $38FF80 ;End of direct page Interrrupt handlers
-=$38ffe0				VECTORS_BEGIN    = $38FFE0 ;0 Byte  Interrupt vectors
-=$38ffe0				JMP_READY        = $38FFE0 ;4 Bytes Jumps to ROM READY routine. Modified whenever alternate command interpreter is loaded.
-=$38ffe4				VECTOR_COP       = $38FFE4 ;2 Bytes Native COP Interrupt vector
-=$38ffe6				VECTOR_BRK       = $38FFE6 ;2 Bytes Native BRK Interrupt vector
-=$38ffe8				VECTOR_ABORT     = $38FFE8 ;2 Bytes Native ABORT Interrupt vector
-=$38ffea				VECTOR_NMI       = $38FFEA ;2 Bytes Native NMI Interrupt vector
-=$38ffec				VECTOR_RESET     = $38FFEC ;2 Bytes Unused (Native RESET vector)
-=$38ffee				VECTOR_IRQ       = $38FFEE ;2 Bytes Native IRQ Vector
-=$38fff0				RETURN           = $38FFF0 ;4 Bytes RETURN key handler. Points to BASIC or MONITOR subroutine to execute when RETURN is pressed.
-=$38fff4				VECTOR_ECOP      = $38FFF4 ;2 Bytes Emulation mode interrupt handler
-=$38fff6				VECTOR_EBRK      = $38FFF6 ;2 Bytes Emulation mode interrupt handler
-=$38fff8				VECTOR_EABORT    = $38FFF8 ;2 Bytes Emulation mode interrupt handler
-=$38fffa				VECTOR_ENMI      = $38FFFA ;2 Bytes Emulation mode interrupt handler
-=$38fffc				VECTOR_ERESET    = $38FFFC ;2 Bytes Emulation mode interrupt handler
-=$38fffe				VECTOR_EIRQ      = $38FFFE ;2 Bytes Emulation mode interrupt handler
-=$400000				VECTORS_END      = $400000 ;*End of vector space
+=$00ff00				ISR_BEGIN        = $00FF00 ; Byte  Beginning of CPU vectors in Direct page
+=$00ff00				HRESET           = $00FF00 ;16 Bytes Handle RESET asserted. Reboot computer and re-initialize the kernel.
+=$00ff10				HCOP             = $00FF10 ;16 Bytes Handle the COP instruction. Program use; not used by OS
+=$00ff20				HBRK             = $00FF20 ;16 Bytes Handle the BRK instruction. Returns to BASIC Ready prompt.
+=$00ff30				HABORT           = $00FF30 ;16 Bytes Handle ABORT asserted. Return to Ready prompt with an error message.
+=$00ff40				HNMI             = $00FF40 ;32 Bytes Handle NMI
+=$00ff60				HIRQ             = $00FF60 ;32 Bytes Handle IRQ
+=$00ff80				Unused_FF80      = $00FF80 ;End of direct page Interrrupt handlers
+=$00ffe0				VECTORS_BEGIN    = $00FFE0 ;0 Byte  Interrupt vectors
+=$00ffe0				JMP_READY        = $00FFE0 ;4 Bytes Jumps to ROM READY routine. Modified whenever alternate command interpreter is loaded.
+=$00ffe4				VECTOR_COP       = $00FFE4 ;2 Bytes Native COP Interrupt vector
+=$00ffe6				VECTOR_BRK       = $00FFE6 ;2 Bytes Native BRK Interrupt vector
+=$00ffe8				VECTOR_ABORT     = $00FFE8 ;2 Bytes Native ABORT Interrupt vector
+=$00ffea				VECTOR_NMI       = $00FFEA ;2 Bytes Native NMI Interrupt vector
+=$00ffec				VECTOR_RESET     = $00FFEC ;2 Bytes Unused (Native RESET vector)
+=$00ffee				VECTOR_IRQ       = $00FFEE ;2 Bytes Native IRQ Vector
+=$00fff0				RETURN           = $00FFF0 ;4 Bytes RETURN key handler. Points to BASIC or MONITOR subroutine to execute when RETURN is pressed.
+=$00fff4				VECTOR_ECOP      = $00FFF4 ;2 Bytes Emulation mode interrupt handler
+=$00fff6				VECTOR_EBRK      = $00FFF6 ;2 Bytes Emulation mode interrupt handler
+=$00fff8				VECTOR_EABORT    = $00FFF8 ;2 Bytes Emulation mode interrupt handler
+=$00fffa				VECTOR_ENMI      = $00FFFA ;2 Bytes Emulation mode interrupt handler
+=$00fffc				VECTOR_ERESET    = $00FFFC ;2 Bytes Emulation mode interrupt handler
+=$00fffe				VECTOR_EIRQ      = $00FFFE ;2 Bytes Emulation mode interrupt handler
+=$010000				VECTORS_END      = $010000 ;*End of vector space
 =$00ffff				BANK0_END        = $00FFFF ;End of Bank 00 and Direct page
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\page_00_data.asm
+;******  Processing file: src/page_00_data.asm
 
 >380000	00 a0 af			                .long $AFA000       ; SCREENBEGIN, 3 bytes, Start of screen in video RAM. This is the upper-left corrner of the current video page being written to. This may not be what's being displayed by VICKY. Update this if you change VICKY's display page.
 >380003	4c 00				                .word 76            ; COLS_VISIBLE, 2 bytes, Columns visible per screen line. A virtual line can be longer than displayed, up to COLS_PER_LINE long. Default = 80
@@ -256,85 +234,85 @@
 >380014	00 80				                .word STACK_BEGIN   ; STACKBOT, 2 bytes, Lowest location the stack should be allowed to write to. If SP falls below this value, the runtime should generate STACK OVERFLOW error and abort.
 >380016	ff fe				                .word STACK_END     ; STACKTOP, 2 bytes, Highest location the stack can occupy. If SP goes above this value, the runtime should generate STACK OVERFLOW error and abort.
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\page_00_code.asm
+;******  Processing file: src/page_00_code.asm
 
-.38ff00	18		clc		RHRESET         CLC
-.38ff01	fb		xce		                XCE
-.38ff02	5c 00 10 38	jmp $381000	                JML BOOT
-.38ff10					RHCOP
-.38ff10	c2 30		rep #$30	                REP #$30        ; set A&X long
-.38ff12	8b		phb		                PHB
-.38ff13	0b		phd		                PHD
-.38ff14	48		pha		                PHA
-.38ff15	da		phx		                PHX
-.38ff16	5a		phy		                PHY
-.38ff17	5c 08 10 38	jmp $381008	                JML BREAK
-.38ff20					RHBRK
-.38ff20	c2 30		rep #$30	                REP #$30        ; set A&X long
-.38ff22	8b		phb		                PHB
-.38ff23	0b		phd		                PHD
-.38ff24	48		pha		                PHA
-.38ff25	da		phx		                PHX
-.38ff26	5a		phy		                PHY
-.38ff27	5c 08 10 38	jmp $381008	                JML BREAK
-.38ff30					RHABORT
-.38ff30	c2 30		rep #$30	                REP #$30        ; set A&X long
-.38ff32	8b		phb		                PHB
-.38ff33	0b		phd		                PHD
-.38ff34	48		pha		                PHA
-.38ff35	da		phx		                PHX
-.38ff36	5a		phy		                PHY
-.38ff37	5c 08 10 38	jmp $381008	                JML BREAK
-.38ff40					 RHNMI
-.38ff40	c2 30		rep #$30	                REP #$30        ; set A&X long
-.38ff42	8b		phb		                PHB
-.38ff43	0b		phd		                PHD
-.38ff44	48		pha		                PHA
-.38ff45	da		phx		                PHX
-.38ff46	5a		phy		                PHY
-.38ff47	22 1e 12 38	jsl $38121e	                JSL NMI_HANDLER
-.38ff4b	7a		ply		                PLY
-.38ff4c	fa		plx		                PLX
-.38ff4d	68		pla		                PLA
-.38ff4e	2b		pld		                PLD
-.38ff4f	ab		plb		                PLB
-.38ff50	40		rti		                RTI
-.38ff60					RHIRQ
-.38ff60	c2 30		rep #$30	                REP #$30        ; set A&X long
-.38ff62	8b		phb		                PHB
-.38ff63	0b		phd		                PHD
-.38ff64	48		pha		                PHA
-.38ff65	da		phx		                PHX
-.38ff66	5a		phy		                PHY
-.38ff67	22 f0 10 38	jsl $3810f0	                JSL IRQ_HANDLER
-.38ff6b	7a		ply		                PLY
-.38ff6c	fa		plx		                PLX
-.38ff6d	68		pla		                PLA
-.38ff6e	2b		pld		                PLD
-.38ff6f	ab		plb		                PLB
-.38ff70	40		rti		                RTI
-.38ffe0	5c 04 00 3a	jmp $3a0004	JUMP_READY      JML MONITOR    ; Kernel READY routine. Rewrite this address to jump to a custom kernel.
->38ffe4	10 ff				RVECTOR_COP     .addr HCOP     ; FFE4
->38ffe6	20 ff				RVECTOR_BRK     .addr HBRK     ; FFE6
->38ffe8	30 ff				RVECTOR_ABORT   .addr HABORT   ; FFE8
->38ffea	40 ff				RVECTOR_NMI     .addr HNMI     ; FFEA
->38ffec	00 00				                .word $0000    ; FFEC
->38ffee	60 ff				RVECTOR_IRQ     .addr HIRQ    ; FFEE
-.38fff0	5c ec 05 39	jmp $3905ec	RRETURN         JML IRETURN
->38fff4	10 ff				RVECTOR_ECOP    .addr HCOP     ; FFF4
->38fff6	20 ff				RVECTOR_EBRK    .addr HBRK     ; FFF6
->38fff8	30 ff				RVECTOR_EABORT  .addr HABORT   ; FFF8
->38fffa	40 ff				RVECTOR_ENMI    .addr HNMI     ; FFFA
->38fffc	00 ff				RVECTOR_ERESET  .addr HRESET   ; FFFC
->38fffe	60 ff				RVECTOR_EIRQ    .addr HIRQ     ; FFFE
+.ff00	18		clc		RHRESET         CLC
+.ff01	fb		xce		                XCE
+.ff02	5c 00 10 38	jmp $381000	                JML BOOT
+.ff10					RHCOP
+.ff10	c2 30		rep #$30	                REP #$30        ; set A&X long
+.ff12	8b		phb		                PHB
+.ff13	0b		phd		                PHD
+.ff14	48		pha		                PHA
+.ff15	da		phx		                PHX
+.ff16	5a		phy		                PHY
+.ff17	5c 08 10 38	jmp $381008	                JML BREAK
+.ff20					RHBRK
+.ff20	c2 30		rep #$30	                REP #$30        ; set A&X long
+.ff22	8b		phb		                PHB
+.ff23	0b		phd		                PHD
+.ff24	48		pha		                PHA
+.ff25	da		phx		                PHX
+.ff26	5a		phy		                PHY
+.ff27	5c 08 10 38	jmp $381008	                JML BREAK
+.ff30					RHABORT
+.ff30	c2 30		rep #$30	                REP #$30        ; set A&X long
+.ff32	8b		phb		                PHB
+.ff33	0b		phd		                PHD
+.ff34	48		pha		                PHA
+.ff35	da		phx		                PHX
+.ff36	5a		phy		                PHY
+.ff37	5c 08 10 38	jmp $381008	                JML BREAK
+.ff40					 RHNMI
+.ff40	c2 30		rep #$30	                REP #$30        ; set A&X long
+.ff42	8b		phb		                PHB
+.ff43	0b		phd		                PHD
+.ff44	48		pha		                PHA
+.ff45	da		phx		                PHX
+.ff46	5a		phy		                PHY
+.ff47	22 1e 12 38	jsl $38121e	                JSL NMI_HANDLER
+.ff4b	7a		ply		                PLY
+.ff4c	fa		plx		                PLX
+.ff4d	68		pla		                PLA
+.ff4e	2b		pld		                PLD
+.ff4f	ab		plb		                PLB
+.ff50	40		rti		                RTI
+.ff60					RHIRQ
+.ff60	c2 30		rep #$30	                REP #$30        ; set A&X long
+.ff62	8b		phb		                PHB
+.ff63	0b		phd		                PHD
+.ff64	48		pha		                PHA
+.ff65	da		phx		                PHX
+.ff66	5a		phy		                PHY
+.ff67	22 f0 10 38	jsl $3810f0	                JSL IRQ_HANDLER
+.ff6b	7a		ply		                PLY
+.ff6c	fa		plx		                PLX
+.ff6d	68		pla		                PLA
+.ff6e	2b		pld		                PLD
+.ff6f	ab		plb		                PLB
+.ff70	40		rti		                RTI
+.ffe0	5c 04 00 3a	jmp $3a0004	JUMP_READY      JML MONITOR    ; Kernel READY routine. Rewrite this address to jump to a custom kernel.
+>ffe4	10 ff				RVECTOR_COP     .addr HCOP     ; FFE4
+>ffe6	20 ff				RVECTOR_BRK     .addr HBRK     ; FFE6
+>ffe8	30 ff				RVECTOR_ABORT   .addr HABORT   ; FFE8
+>ffea	40 ff				RVECTOR_NMI     .addr HNMI     ; FFEA
+>ffec	00 00				                .word $0000    ; FFEC
+>ffee	60 ff				RVECTOR_IRQ     .addr HIRQ    ; FFEE
+.fff0	5c ec 05 39	jmp $3905ec	RRETURN         JML IRETURN
+>fff4	10 ff				RVECTOR_ECOP    .addr HCOP     ; FFF4
+>fff6	20 ff				RVECTOR_EBRK    .addr HBRK     ; FFF6
+>fff8	30 ff				RVECTOR_EABORT  .addr HABORT   ; FFF8
+>fffa	40 ff				RVECTOR_ENMI    .addr HNMI     ; FFFA
+>fffc	00 ff				RVECTOR_ERESET  .addr HRESET   ; FFFC
+>fffe	60 ff				RVECTOR_EIRQ    .addr HIRQ     ; FFFE
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\Math_def.asm
+;******  Processing file: src/Math_def.asm
 
 =$000100				UNSIGNED_MULT_A_LO  = $000100
 =$000101				UNSIGNED_MULT_A_HI  = $000101
@@ -381,10 +359,10 @@
 =$00012a				ADDER32_R_HL        = $00012A
 =$00012b				ADDER32_R_HH        = $00012B
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\interrupt_def.asm
+;******  Processing file: src/interrupt_def.asm
 
 =$000140				INT_PENDING_REG0 = $000140 ;
 =$000141				INT_PENDING_REG1 = $000141 ;
@@ -435,19 +413,19 @@
 =$40					FNX3_INT06_TBD        = $40  ;External Expansion
 =$80					FNX3_INT07_TBD        = $80  ; SDCARD Insertion
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\dram_inc.asm
+;******  Processing file: src/dram_inc.asm
 
 =$afa000				SCREEN_PAGE0     = $AFA000 ;8192 Bytes First page of display RAM. This is used at boot time to display the welcome screen and the BASIC or MONITOR command screens.
 =$afc000				SCREEN_PAGE1     = $AFC000 ;8192 Bytes Additional page of display RAM. This can be used for page flipping or to handle multiple edit buffers.
 =$b00000				SCREEN_END       = $B00000 ;End of display memory
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\vicky_def.asm
+;******  Processing file: src/vicky_def.asm
 
 =$af0000				MASTER_CTRL_REG_L	      = $AF0000
 =$01					Mstr_Ctrl_Text_Mode_En  = $01       ; Enable the Text Mode
@@ -769,10 +747,10 @@
 =$afe000				BTX_START               = $AFE000     ; BEATRIX Registers
 =$afffff				BTX_END                 = $AFFFFF
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\super_io_def.asm
+;******  Processing file: src/super_io_def.asm
 
 =$af1100				PME_STS_REG     = $AF1100
 =$af1102				PME_EN_REG		  = $AF1102
@@ -856,10 +834,10 @@
 =$af115e				LED2_REG    		    = $AF115E
 =$af115f				KEYBOARD_SCAN_CODE	= $AF115F
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\keyboard_def.asm
+;******  Processing file: src/keyboard_def.asm
 
 =$af1064				STATUS_PORT 	= $AF1064
 =$af1060				KBD_OUT_BUF 	= $AF1060
@@ -899,10 +877,10 @@
 =$80					KB_CTRL_C = $80             ; CTRL-C was pressed
 =$60					KB_CREDITS = $60            ; Credits key was pressed
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\SID_def.asm
+;******  Processing file: src/SID_def.asm
 
 =$afe400				SID0_V1_FREQ_LO    = $AFE400 ;SID - L - Voice 1 (Write Only) - FREQ LOW
 =$afe401				SID0_V1_FREQ_HI    = $AFE401 ;SID - L - Voice 1 (Write Only) - FREQ HI
@@ -937,10 +915,10 @@
 =$afe41e				SID0_NOT_USED1     = $AFE41E ;SID - L - NOT USED
 =$afe41f				SID0_NOT_USED2     = $AFE41F ;SID - L - NOT USED
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\RTC_def.asm
+;******  Processing file: src/RTC_def.asm
 
 =$af0800				RTC_SEC       = $AF0800 ;Seconds Register
 =$af0801				RTC_SEC_ALARM = $AF0801 ;Seconds Alarm Register
@@ -959,10 +937,10 @@
 =$af080e				RTC_CTRL      = $AF080E ;Control Register
 =$af080f				RTC_CENTURY   = $AF080F ;Century Register
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\io_def.asm
+;******  Processing file: src/io_def.asm
 
 =0					CHAN_CONSOLE  = 0           ; ID for screen and keyboard access
 =1					CHAN_COM1     = 1           ; ID for serial access on COM1 (external port)
@@ -975,10 +953,10 @@
 =$afe901				CODEC_DATA_HI = $AFE901     ;(W) MSB od Add/Data Reg to Control CODEC See WM8776 Spec
 =$afe902				CODEC_WR_CTRL = $AFE902     ;(W) Bit[0] = 1 -> Start Writing the CODEC Control Register
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\Trinity_CFP9301_def.asm
+;******  Processing file: src/Trinity_CFP9301_def.asm
 
 =$afe800				JOYSTICK0           = $AFE800   ;(R) Joystick 0 - J7 (next to SD Card)
 =$afe801				JOYSTICK1           = $AFE801   ;(R) Joystick 1 - J8
@@ -1008,10 +986,10 @@
 =$02					DIP_BOOT_FLOPPY     = $02
 =$03					DIP_BOOT_BASIC      = $03
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\Unity_CFP9307_def.asm
+;******  Processing file: src/Unity_CFP9307_def.asm
 
 =$afe830				IDE_DATA      = $AFE830 ; 8Bit Access here Only
 =$afe831				IDE_ERROR     = $AFE831 ; Error Information register (only read when there is an error ) - Probably clears Error Bits
@@ -1024,10 +1002,10 @@
 =$afe838				IDE_DATA_LO   = $AFE838 ; The 16Bits Buffer is LITTLE ENDIAN, the 65C816 is BIG ENDIAN, but UNITY does the conversion
 =$afe839				IDE_DATA_HI   = $AFE839 ;
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\GABE_Control_Registers_def.asm
+;******  Processing file: src/GABE_Control_Registers_def.asm
 
 =$afe880				GABE_MSTR_CTRL      = $AFE880
 =$01					GABE_CTRL_PWR_LED   = $01     ; Controls the LED in the Front of the case (Next to the reset button)
@@ -1053,18 +1031,18 @@
 =$40					GABE_SYS_STAT_CPUA  = $40     ; Indicates the (8bit/16bit) Size of the Accumulator
 =$80					GABE_SYS_STAT_CPUX  = $80     ; Indicates the (8bit/16bit) Size of the Accumulator
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\basic_inc.asm
+;******  Processing file: src/basic_inc.asm
 
 =$3a0000				BASIC = $3A0000
 =3801092				MONITOR = BASIC + 4
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\kernel_jumptable.asm
+;******  Processing file: src/kernel_jumptable.asm
 
 .381000	5c 00 04 39	jmp $390400	BOOT            JML IBOOT
 .381004	5c 40 13 39	jmp $391340	RESTORE         JML IRESTORE
@@ -1127,10 +1105,10 @@
 .3810e8	5c a5 10 39	jmp $3910a5	BM_FILL_SCREEN  JML IBM_FILL_SCREEN
 .3810ec	5c 3d 37 38	jmp $38373d	OPL2_TONE_TEST  JML IOPL2_TONE_TEST
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\Interrupt_Handler.asm
+;******  Processing file: src/Interrupt_Handler.asm
 
 .3810f0					IRQ_HANDLER
 .3810f0	e2 20		sep #$20	                SEP #$20        ; set A short
@@ -1266,13 +1244,13 @@
 .38121e					NMI_HANDLER
 .38121e	6b		rtl		                RTL
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\SDOS.asm
+;******  Processing file: src/SDOS.asm
 
 
-;******  Processing file: src\ch376s_inc.asm
+;******  Processing file: src/ch376s_inc.asm
 
 =$00					DEF_NULL_CHAR           = $00
 =$2a					DEF_WILDCARD_CHAR       = $2A
@@ -1326,7 +1304,7 @@
 =$02					SDCARD_PRSNT_WP         = $02
 =$04					SDCARD_PRSNT_MNTED      = $04  ; Card is present and Mounted1
 
-;******  Return to file: src\SDOS.asm
+;******  Return to file: src/SDOS.asm
 
 .0000					fatrec
 >0000					  name      .fill 8
@@ -1676,10 +1654,10 @@
 .3814b3	af 2c 03 00	lda $00032c	              LDA @lSDOS_BYTE_NUMBER  ; Load the Previously number of Byte
 .3814b7	c9 ff ff	cmp #$ffff	              CMP #$FFFF
 .3814ba	d0 24		bne $3814e0	              BNE SDOS_READ_DONE                  ; if it equal 64K, then the file is bigger than 64K
-.3814bc	af 28 01 00	lda $000128	              LDA @lADDER_R
-.3814c0	8f 20 01 00	sta $000120	              STA @lADDER_A
-.3814c4	af 2a 01 00	lda $00012a	              LDA @lADDER_R+2
-.3814c8	8f 22 01 00	sta $000122	              STA @lADDER_A+2
+.3814bc	af 28 01 00	lda $000128	              LDA @lADDER32_R_LL
+.3814c0	8f 20 01 00	sta $000120	              STA @lADDER32_A_LL
+.3814c4	af 2a 01 00	lda $00012a	              LDA @lADDER32_R_LL+2
+.3814c8	8f 22 01 00	sta $000122	              STA @lADDER32_A_LL+2
 .3814cc	20 4e 15	jsr $38154e	              JSR SDOS_SET_FILE_LENGTH ;
 .3814cf	20 34 15	jsr $381534	              JSR SDOS_COMPUTE_LOCATE_POINTER
 .3814d2	e2 20		sep #$20	                SEP #$20        ; set A short
@@ -1791,25 +1769,49 @@
 >3816b8	46 49 4c 45 20 4c 4f 41		sd_card_msg7        .text "FILE LOADED", $00
 >3816c0	44 45 44 00
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\OPL2_Library.asm
+;******  Processing file: src/OPL2_Library.asm
 
 
-;******  Processing file: src\OPL2_def.asm
+;******  Processing file: src/OPL3_def.asm
 
-=$afe500				OPL2_L_BASE               = $AFE500
-=$afe502				OPL2_L_TIMER1             = $AFE502 ; TIMER-1
-=$afe503				OPL2_L_TIMER2             = $AFE503 ; TIMER-2
-=$afe504				OPL2_L_IRQ                = $AFE504 ;
-=$afe700				OPL2_S_BASE                 = $AFE700
-=$afe720				OPL2_S_AM_VID_EG_KSR_MULT = $AFE720 ; $20..$35 (21 Registers)
-=$afe740				OPL2_S_KSL_TL             = $AFE740;  $40..$55 (21 Registers)
-=$afe760				OPL2_S_AR_DR              = $AFE760;  $60..$75 (21 Registers)
-=$afe780				OPL2_S_SL_RR              = $AFE780;  $80..$95 (21 Registers)
-=$afe7c0				OPL2_S_FEEDBACK           = $AFE7C0;  $C0..$C9
-=$afe7e0				OPL2_S_WAVE_SELECT        = $AFE7E0;  $E0..$F5
+=$afe600				OPL3_R_BASE               = $AFE600
+=$e600					OPL3_R_BASE_LL            = $E600
+=$00af					OPL3_R_BASE_HL            = $00AF
+=$afe601				OPL3_R_TEST               = $AFE601 ; TEST
+=$afe602				OPL3_R_TIMER1             = $AFE602 ; TIMER-1
+=$afe603				OPL3_R_TIMER2             = $AFE603 ; TIMER-2
+=$afe604				OPL3_R_IRQ                = $AFE604 ;
+=$afe605				OPL3_R_OPL3_MODE          = $AFE605 ; Set bit 0 to 1 if you want to use in OPL3 Mode
+=$afe608				OPL3_R_CSM                = $AFE608 ;
+=$afe620				OPL3_R_AM_VID_EG_KSR_MULT = $AFE620 ; $40..$35 (21 Registers)
+=$afe640				OPL3_R_KSL_TL             = $AFE640;  $40..$55 (21 Registers)
+=$afe660				OPL3_R_AR_DR              = $AFE660;  $60..$75 (21 Registers)
+=$afe680				OPL3_R_SL_RR              = $AFE680;  $80..$95 (21 Registers)
+=$afe6a0				OPL3_R_FNumber            = $AFE6A0;  $A0..$A8
+=$afe6b0				OPL3_R_KON_BLOCK_FNumber  = $AFE6B0;  $B0..$B9
+=$afe6bd				OPL3_R_DPTH_RHYTM         = $AFE6BD;  $BD
+=$afe6c0				OPL3_R_FEEDBACK           = $AFE6C0;  $C0..$C9
+=$afe6e0				OPL3_R_WAVE_SELECT        = $AFE6E0;  $E0..$F5
+=$afe700				OPL3_L_BASE               = $AFE700
+=$e700					OPL3_L_BASE_LL            = $E700
+=$00af					OPL3_L_BASE_HL            = $00AF
+=$afe701				OPL3_L_TEST               = $AFE701 ; TEST
+=$afe702				OPL3_L_TIMER1             = $AFE702 ; TIMER-1
+=$afe703				OPL3_L_TIMER2             = $AFE703 ; TIMER-2
+=$afe704				OPL3_L_IRQ                = $AFE704 ;
+=$afe708				OPL3_L_CSM                = $AFE708 ;
+=$afe720				OPL3_L_AM_VID_EG_KSR_MULT = $AFE720 ; $40..$35 (21 Registers)
+=$afe740				OPL3_L_KSL_TL             = $AFE740;  $40..$55 (21 Registers)
+=$afe760				OPL3_L_AR_DR              = $AFE760;  $60..$75 (21 Registers)
+=$afe780				OPL3_L_SL_RR              = $AFE780;  $80..$95 (21 Registers)
+=$afe7a0				OPL3_L_FNumber            = $AFE7A0;  $A0..$A8
+=$afe7b0				OPL3_L_KON_BLOCK_FNumber  = $AFE7B0;  $B0..$B9
+=$afe7bd				OPL3_L_DPTH_RHYTM         = $AFE7BD;  $BD
+=$afe7c0				OPL3_L_FEEDBACK           = $AFE7C0;  $C0..$C9
+=$afe7e0				OPL3_L_WAVE_SELECT        = $AFE7E0;  $E0..$F5
 =$80					TREMOLO    = $80
 =$40					VIBRATO    = $40
 =$20					SUSTAINING = $20
@@ -1857,10 +1859,10 @@
 >3816f4	10 08 04 02 01			drumBits                  .byte $10, $08, $04, $02, $01
 >3816f9	20 40 60 80 e0 c0		instrumentBaseRegs        .byte $20, $40, $60, $80, $E0, $C0
 
-;******  Return to file: src\OPL2_Library.asm
+;******  Return to file: src/OPL2_Library.asm
 
 
-;******  Processing file: src\OPL2_Instruments.asm
+;******  Processing file: src/OPL2_Instruments.asm
 
 >3816ff	00 24 4f f2 0b 00 0e 31		INSTRUMENT_ACCORDN    .text $00, $24, $4F, $F2, $0B, $00, $0E, $31, $00, $52, $0B, $00, 'ACCORDN   '
 >381707	00 52 0b 00 41 43 43 4f 52 44 4e 20 20 20
@@ -2153,10 +2155,10 @@
 >38235f	00 06 00 ff f0 00 0e c4		INSTRUMENT_XYLO3      .text $00, $06, $00, $FF, $F0, $00, $0E, $C4, $00, $F8, $B5, $00, 'XYLO3     '
 >382367	00 f8 b5 00 58 59 4c 4f 33 20 20 20 20 20
 
-;******  Return to file: src\OPL2_Library.asm
+;******  Return to file: src/OPL2_Library.asm
 
 
-;******  Processing file: src\OPL2_Midi_Drums.asm
+;******  Processing file: src/OPL2_Midi_Drums.asm
 
 >382375	00 3e 00 9f 0f 0f 00 30		DRUMINS_CLAP2         .text $00, $3E, $00, $9F, $0F, $0F, $00, $30, $00, $87, $FA, $00
 >38237d	00 87 fa 00
@@ -2311,10 +2313,10 @@
 >382725	15 26 38 00 21 26 38 00		              .dword DRUMINS_TRIANGL2, DRUMINS_RIMSHOT3, DRUMINS_RIMSHOT4, DRUMINS_TAIKO
 >38272d	2d 26 38 00 39 26 38 00
 
-;******  Return to file: src\OPL2_Library.asm
+;******  Return to file: src/OPL2_Library.asm
 
 
-;******  Processing file: src\OPL2_Midi_Instruments.asm
+;******  Processing file: src/OPL2_Midi_Instruments.asm
 
 >382735	00 33 5a b2 50 01 00 31		MIDI_INSTRUMENT_PIANO1     .text $00, $33, $5A, $B2, $50, $01, $00, $31, $00, $B1, $F5, $01
 >38273d	00 b1 f5 01
@@ -2616,10 +2618,10 @@
 >382f1d	ed 2c 38 00 f9 2c 38 00 05 2d 38 00 11 2d 38 00
 >382f2d	1d 2d 38 00 29 2d 38 00		              	.dword MIDI_INSTRUMENT_APPLAUSE, MIDI_INSTRUMENT_GUNSHOT
 
-;******  Return to file: src\OPL2_Library.asm
+;******  Return to file: src/OPL2_Library.asm
 
 
-;******  Processing file: src\OPL2_Midi_Instruments_Win31.asm
+;******  Processing file: src/OPL2_Midi_Instruments_Win31.asm
 
 >382f35	00 01 8f f2 f4 38 00 01		MIDIW31_INSTRUMENT_PIANO1     .text $00, $01, $8F, $F2, $F4, $38, $00, $01, $0D, $F2, $F7, $00
 >382f3d	0d f2 f7 00
@@ -2921,7 +2923,7 @@
 >38371d	ed 34 38 00 f9 34 38 00 05 35 38 00 11 35 38 00
 >38372d	1d 35 38 00 29 35 38 00			                 .dword MIDIW31_INSTRUMENT_APPLAUSE, MIDIW31_INSTRUMENT_GUNSHOT
 
-;******  Return to file: src\OPL2_Library.asm
+;******  Return to file: src/OPL2_Library.asm
 
 >383735	3c 42 44 45 47 49 4b 4c		NOTE_INTRO  .byte  $3C, $42, $44, $45, $47, $49, $4B, $4C
 .38373d					IOPL2_TONE_TEST
@@ -2984,10 +2986,10 @@
 .38379a	68		pla		                PLA             ; end setdp macro
 .38379b	c2 20		rep #$20	                REP #$20        ; set A long
 .38379d	18		clc		              CLC
-.38379e	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.38379e	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .3837a1	65 32		adc $32		              ADC OPL2_PARAMETER0
 .3837a3	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.3837a5	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.3837a5	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .3837a8	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .3837aa	e2 20		sep #$20	                SEP #$20        ; set A short
 .3837ac	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3001,10 +3003,10 @@
 .3837b7	28		plp		                PLP
 .3837b8	68		pla		                PLA             ; end setdp macro
 .3837b9	c2 20		rep #$20	                REP #$20        ; set A long
-.3837bb	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.3837bb	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .3837be	69 01 00	adc #$0001	              ADC #$0001
 .3837c1	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.3837c3	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.3837c3	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .3837c6	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .3837c8	e2 20		sep #$20	                SEP #$20        ; set A short
 .3837ca	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3050,10 +3052,10 @@
 .383807	85 2b		sta $2b		              STA OPL2_REG_OFFSET+1;
 .383809	c2 30		rep #$30	                REP #$30        ; set A&X long
 .38380b	18		clc		              CLC
-.38380c	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.38380c	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .38380f	65 2a		adc $2a		              ADC OPL2_REG_OFFSET
 .383811	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383813	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383813	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383816	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383818	e2 20		sep #$20	                SEP #$20        ; set A short
 .38381a	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3079,10 +3081,10 @@
 .383838	85 2b		sta $2b		              STA OPL2_REG_OFFSET+1;
 .38383a	c2 30		rep #$30	                REP #$30        ; set A&X long
 .38383c	18		clc		              CLC
-.38383d	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.38383d	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .383840	65 2a		adc $2a		              ADC OPL2_REG_OFFSET
 .383842	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383844	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383844	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383847	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383849	e2 20		sep #$20	                SEP #$20        ; set A short
 .38384b	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3106,10 +3108,10 @@
 .383867	85 2b		sta $2b		              STA OPL2_REG_OFFSET+1;
 .383869	c2 30		rep #$30	                REP #$30        ; set A&X long
 .38386b	18		clc		              CLC
-.38386c	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.38386c	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .38386f	65 2a		adc $2a		              ADC OPL2_REG_OFFSET
 .383871	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383873	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383873	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383876	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383878	e2 20		sep #$20	                SEP #$20        ; set A short
 .38387a	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3134,10 +3136,10 @@
 .383897	85 2b		sta $2b		              STA OPL2_REG_OFFSET+1;
 .383899	c2 30		rep #$30	                REP #$30        ; set A&X long
 .38389b	18		clc		              CLC
-.38389c	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.38389c	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .38389f	65 2a		adc $2a		              ADC OPL2_REG_OFFSET
 .3838a1	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.3838a3	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.3838a3	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .3838a6	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .3838a8	e2 20		sep #$20	                SEP #$20        ; set A short
 .3838aa	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3168,10 +3170,10 @@
 .3838d2	28		plp		                PLP
 .3838d3	68		pla		                PLA             ; end setdp macro
 .3838d4	c2 20		rep #$20	                REP #$20        ; set A long
-.3838d6	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.3838d6	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .3838d9	69 bd 00	adc #$00bd	              ADC #$00BD
 .3838dc	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.3838de	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.3838de	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .3838e1	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .3838e3	e2 20		sep #$20	                SEP #$20        ; set A short
 .3838e5	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3186,10 +3188,10 @@
 .3838f2	28		plp		                PLP
 .3838f3	68		pla		                PLA             ; end setdp macro
 .3838f4	c2 20		rep #$20	                REP #$20        ; set A long
-.3838f6	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.3838f6	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .3838f9	69 bd 00	adc #$00bd	              ADC #$00BD
 .3838fc	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.3838fe	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.3838fe	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383901	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383903	e2 20		sep #$20	                SEP #$20        ; set A short
 .383905	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3204,10 +3206,10 @@
 .383912	28		plp		                PLP
 .383913	68		pla		                PLA             ; end setdp macro
 .383914	c2 20		rep #$20	                REP #$20        ; set A long
-.383916	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.383916	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .383919	69 bd 00	adc #$00bd	              ADC #$00BD
 .38391c	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.38391e	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.38391e	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383921	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383923	e2 20		sep #$20	                SEP #$20        ; set A short
 .383925	a7 2c		lda [$2c]	              LDA [OPL2_IND_ADDY_LL]
@@ -3332,7 +3334,7 @@
 .383a04	29 0f		and #$0f	              AND #$0F
 .383a06	aa		tax		              TAX
 .383a07	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 6 in Instrument Profile
-.383a09	9f c0 e7 af	sta $afe7c0,x	              STA @lOPL2_S_FEEDBACK,X
+.383a09	9f c0 e6 af	sta $afe6c0,x	              STA @lOPL3_R_FEEDBACK,X
 .383a0d	c8		iny		              INY
 .383a0e	a9 01		lda #$01	              LDA #$01
 .383a10	85 26		sta $26		              STA OPL2_OPERATOR
@@ -3379,92 +3381,92 @@
 .383a67					Percussion_A
 .383a67	e2 20		sep #$20	                SEP #$20        ; set A short
 .383a69	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 1 in Instrument Profile
-.383a6b	8f 31 e7 af	sta $afe731	              STA @lOPL2_S_AM_VID_EG_KSR_MULT + $11
+.383a6b	8f 31 e6 af	sta $afe631	              STA @lOPL3_R_AM_VID_EG_KSR_MULT + $11
 .383a6f	c8		iny		              INY
 .383a70	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 2 in Instrument Profile
-.383a72	8f 51 e7 af	sta $afe751	              STA @lOPL2_S_KSL_TL + $11
+.383a72	8f 51 e6 af	sta $afe651	              STA @lOPL3_R_KSL_TL + $11
 .383a76	c8		iny		              INY
 .383a77	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 3 in Instrument Profile
-.383a79	8f 71 e7 af	sta $afe771	              STA @lOPL2_S_AR_DR + $11
+.383a79	8f 71 e6 af	sta $afe671	              STA @lOPL3_R_AR_DR + $11
 .383a7d	c8		iny		              INY
 .383a7e	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 4 in Instrument Profile
-.383a80	8f 91 e7 af	sta $afe791	              STA @lOPL2_S_SL_RR + $11
+.383a80	8f 91 e6 af	sta $afe691	              STA @lOPL3_R_SL_RR + $11
 .383a84	c8		iny		              INY
 .383a85	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 5 in Instrument Profile
-.383a87	8f f1 e7 af	sta $afe7f1	              STA @lOPL2_S_WAVE_SELECT + $11
+.383a87	8f f1 e6 af	sta $afe6f1	              STA @lOPL3_R_WAVE_SELECT + $11
 .383a8b	6b		rtl		                RTL
 .383a8c					Percussion_9
 .383a8c	e2 20		sep #$20	                SEP #$20        ; set A short
 .383a8e	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 1 in Instrument Profile
-.383a90	8f 35 e7 af	sta $afe735	              STA @lOPL2_S_AM_VID_EG_KSR_MULT + $15
+.383a90	8f 35 e6 af	sta $afe635	              STA @lOPL3_R_AM_VID_EG_KSR_MULT + $15
 .383a94	c8		iny		              INY
 .383a95	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 2 in Instrument Profile
-.383a97	8f 55 e7 af	sta $afe755	              STA @lOPL2_S_KSL_TL + $15
+.383a97	8f 55 e6 af	sta $afe655	              STA @lOPL3_R_KSL_TL + $15
 .383a9b	c8		iny		              INY
 .383a9c	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 3 in Instrument Profile
-.383a9e	8f 75 e7 af	sta $afe775	              STA @lOPL2_S_AR_DR + $15
+.383a9e	8f 75 e6 af	sta $afe675	              STA @lOPL3_R_AR_DR + $15
 .383aa2	c8		iny		              INY
 .383aa3	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 4 in Instrument Profile
-.383aa5	8f 95 e7 af	sta $afe795	              STA @lOPL2_S_SL_RR + $15
+.383aa5	8f 95 e6 af	sta $afe695	              STA @lOPL3_R_SL_RR + $15
 .383aa9	c8		iny		              INY
 .383aaa	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 5 in Instrument Profile
-.383aac	8f f5 e7 af	sta $afe7f5	              STA @lOPL2_S_WAVE_SELECT + $15
+.383aac	8f f5 e6 af	sta $afe6f5	              STA @lOPL3_R_WAVE_SELECT + $15
 .383ab0	6b		rtl		              RTL
 .383ab1					Percussion_8
 .383ab1	e2 20		sep #$20	                SEP #$20        ; set A short
 .383ab3	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 1 in Instrument Profile
-.383ab5	8f 32 e7 af	sta $afe732	              STA @lOPL2_S_AM_VID_EG_KSR_MULT + $12
+.383ab5	8f 32 e6 af	sta $afe632	              STA @lOPL3_R_AM_VID_EG_KSR_MULT + $12
 .383ab9	c8		iny		              INY
 .383aba	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 2 in Instrument Profile
-.383abc	8f 52 e7 af	sta $afe752	              STA @lOPL2_S_KSL_TL + $12
+.383abc	8f 52 e6 af	sta $afe652	              STA @lOPL3_R_KSL_TL + $12
 .383ac0	c8		iny		              INY
 .383ac1	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 3 in Instrument Profile
-.383ac3	8f 72 e7 af	sta $afe772	              STA @lOPL2_S_AR_DR + $12
+.383ac3	8f 72 e6 af	sta $afe672	              STA @lOPL3_R_AR_DR + $12
 .383ac7	c8		iny		              INY
 .383ac8	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 4 in Instrument Profile
-.383aca	8f 92 e7 af	sta $afe792	              STA @lOPL2_S_SL_RR + $12
+.383aca	8f 92 e6 af	sta $afe692	              STA @lOPL3_R_SL_RR + $12
 .383ace	c8		iny		              INY
 .383acf	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 5 in Instrument Profile
-.383ad1	8f f2 e7 af	sta $afe7f2	              STA @lOPL2_S_WAVE_SELECT + $12
+.383ad1	8f f2 e6 af	sta $afe6f2	              STA @lOPL3_R_WAVE_SELECT + $12
 .383ad5	6b		rtl		              RTL
 .383ad6					Percussion_7
 .383ad6	e2 20		sep #$20	                SEP #$20        ; set A short
 .383ad8	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 1 in Instrument Profile
-.383ada	8f 34 e7 af	sta $afe734	              STA @lOPL2_S_AM_VID_EG_KSR_MULT + $14
+.383ada	8f 34 e6 af	sta $afe634	              STA @lOPL3_R_AM_VID_EG_KSR_MULT + $14
 .383ade	c8		iny		              INY
 .383adf	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 2 in Instrument Profile
-.383ae1	8f 54 e7 af	sta $afe754	              STA @lOPL2_S_KSL_TL + $14
+.383ae1	8f 54 e6 af	sta $afe654	              STA @lOPL3_R_KSL_TL + $14
 .383ae5	c8		iny		              INY
 .383ae6	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 3 in Instrument Profile
-.383ae8	8f 74 e7 af	sta $afe774	              STA @lOPL2_S_AR_DR + $14
+.383ae8	8f 74 e6 af	sta $afe674	              STA @lOPL3_R_AR_DR + $14
 .383aec	c8		iny		              INY
 .383aed	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 4 in Instrument Profile
-.383aef	8f 94 e7 af	sta $afe794	              STA @lOPL2_S_SL_RR + $14
+.383aef	8f 94 e6 af	sta $afe694	              STA @lOPL3_R_SL_RR + $14
 .383af3	c8		iny		              INY
 .383af4	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 5 in Instrument Profile
-.383af6	8f f4 e7 af	sta $afe7f4	              STA @lOPL2_S_WAVE_SELECT + $14
+.383af6	8f f4 e6 af	sta $afe6f4	              STA @lOPL3_R_WAVE_SELECT + $14
 .383afa	6b		rtl		              RTL
 .383afb					Percussion_6
 .383afb	e2 20		sep #$20	                SEP #$20        ; set A short
 .383afd	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 1 in Instrument Profile
-.383aff	8f 30 e7 af	sta $afe730	              STA @lOPL2_S_AM_VID_EG_KSR_MULT + $10
-.383b03	8f 33 e7 af	sta $afe733	              STA @lOPL2_S_AM_VID_EG_KSR_MULT + $13
+.383aff	8f 30 e6 af	sta $afe630	              STA @lOPL3_R_AM_VID_EG_KSR_MULT + $10
+.383b03	8f 33 e6 af	sta $afe633	              STA @lOPL3_R_AM_VID_EG_KSR_MULT + $13
 .383b07	c8		iny		              INY
 .383b08	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 2 in Instrument Profile
-.383b0a	8f 50 e7 af	sta $afe750	              STA @lOPL2_S_KSL_TL + $10
-.383b0e	8f 53 e7 af	sta $afe753	              STA @lOPL2_S_KSL_TL + $13
+.383b0a	8f 50 e6 af	sta $afe650	              STA @lOPL3_R_KSL_TL + $10
+.383b0e	8f 53 e6 af	sta $afe653	              STA @lOPL3_R_KSL_TL + $13
 .383b12	c8		iny		              INY
 .383b13	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 3 in Instrument Profile
-.383b15	8f 70 e7 af	sta $afe770	              STA @lOPL2_S_AR_DR + $10
-.383b19	8f 73 e7 af	sta $afe773	              STA @lOPL2_S_AR_DR + $13
+.383b15	8f 70 e6 af	sta $afe670	              STA @lOPL3_R_AR_DR + $10
+.383b19	8f 73 e6 af	sta $afe673	              STA @lOPL3_R_AR_DR + $13
 .383b1d	c8		iny		              INY
 .383b1e	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 4 in Instrument Profile
-.383b20	8f 90 e7 af	sta $afe790	              STA @lOPL2_S_SL_RR + $10
-.383b24	8f 93 e7 af	sta $afe793	              STA @lOPL2_S_SL_RR + $13
+.383b20	8f 90 e6 af	sta $afe690	              STA @lOPL3_R_SL_RR + $10
+.383b24	8f 93 e6 af	sta $afe693	              STA @lOPL3_R_SL_RR + $13
 .383b28	c8		iny		              INY
 .383b29	b7 08		lda [$08],y	              LDA [OPL2_ADDY_PTR_LO], Y ; Pointer Location 5 in Instrument Profile
-.383b2b	8f f0 e7 af	sta $afe7f0	              STA @lOPL2_S_WAVE_SELECT + $10
-.383b2f	8f f3 e7 af	sta $afe7f3	              STA @lOPL2_S_WAVE_SELECT + $13
+.383b2b	8f f0 e6 af	sta $afe6f0	              STA @lOPL3_R_WAVE_SELECT + $10
+.383b2f	8f f3 e6 af	sta $afe6f3	              STA @lOPL3_R_WAVE_SELECT + $13
 .383b33	6b		rtl		              RTL
 .383b34					OPL2_SET_REGISTER
 .383b34	48		pha		                PHA             ; begin setdp macro
@@ -3476,10 +3478,10 @@
 .383b3d	68		pla		                PLA             ; end setdp macro
 .383b3e	c2 20		rep #$20	                REP #$20        ; set A long
 .383b40	18		clc		              CLC
-.383b41	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.383b41	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .383b44	65 32		adc $32		              ADC OPL2_PARAMETER0
 .383b46	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383b48	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383b48	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383b4b	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383b4d	e2 20		sep #$20	                SEP #$20        ; set A short
 .383b4f	a5 33		lda $33		              LDA OPL2_PARAMETER1
@@ -3494,9 +3496,9 @@
 .383b5c	28		plp		                PLP
 .383b5d	68		pla		                PLA             ; end setdp macro
 .383b5e	c2 20		rep #$20	                REP #$20        ; set A long
-.383b60	a9 01 e7	lda #$e701	              LDA #<>OPL2_S_BASE + $0001
+.383b60	a9 01 e6	lda #$e601	              LDA #<>OPL3_R_BASE + $0001
 .383b63	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383b65	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383b65	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383b68	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383b6a	e2 20		sep #$20	                SEP #$20        ; set A short
 .383b6c	b0 07		bcs $383b75	              BCS OPL2_Set_WaveFormSelect_set
@@ -3971,10 +3973,10 @@
 .383e6d	85 2b		sta $2b		                STA OPL2_REG_OFFSET+1;
 .383e6f	c2 30		rep #$30	                REP #$30        ; set A&X long
 .383e71	18		clc		                CLC
-.383e72	a9 00 e7	lda #$e700	                LDA #<>OPL2_S_BASE
+.383e72	a9 00 e6	lda #$e600	                LDA #<>OPL3_R_BASE
 .383e75	65 2a		adc $2a		                ADC OPL2_REG_OFFSET
 .383e77	85 2c		sta $2c		                STA OPL2_IND_ADDY_LL
-.383e79	a9 af 00	lda #$00af	                LDA #`OPL2_S_BASE
+.383e79	a9 af 00	lda #$00af	                LDA #`OPL3_R_BASE
 .383e7c	85 2e		sta $2e		                STA OPL2_IND_ADDY_HL
 .383e7e	e2 20		sep #$20	                SEP #$20        ; set A short
 .383e80	a5 32		lda $32		                LDA OPL2_PARAMETER0     ; Load the first 8 Bits Value of FNumber
@@ -4009,10 +4011,10 @@
 .383eb1	85 2b		sta $2b		                STA OPL2_REG_OFFSET+1;
 .383eb3	c2 30		rep #$30	                REP #$30        ; set A&X long
 .383eb5	18		clc		                CLC
-.383eb6	a9 00 e7	lda #$e700	                LDA #<>OPL2_S_BASE
+.383eb6	a9 00 e6	lda #$e600	                LDA #<>OPL3_R_BASE
 .383eb9	65 2a		adc $2a		                ADC OPL2_REG_OFFSET
 .383ebb	85 2c		sta $2c		                STA OPL2_IND_ADDY_LL
-.383ebd	a9 af 00	lda #$00af	                LDA #`OPL2_S_BASE
+.383ebd	a9 af 00	lda #$00af	                LDA #`OPL3_R_BASE
 .383ec0	85 2e		sta $2e		                STA OPL2_IND_ADDY_HL
 .383ec2	e2 20		sep #$20	                SEP #$20        ; set A short
 .383ec4	a7 2c		lda [$2c]	                LDA [OPL2_IND_ADDY_LL]
@@ -4047,10 +4049,10 @@
 .383eef	85 2b		sta $2b		                STA OPL2_REG_OFFSET+1;
 .383ef1	c2 30		rep #$30	                REP #$30        ; set A&X long
 .383ef3	18		clc		                CLC
-.383ef4	a9 00 e7	lda #$e700	                LDA #<>OPL2_S_BASE
+.383ef4	a9 00 e6	lda #$e600	                LDA #<>OPL3_R_BASE
 .383ef7	65 2a		adc $2a		                ADC OPL2_REG_OFFSET
 .383ef9	85 2c		sta $2c		                STA OPL2_IND_ADDY_LL
-.383efb	a9 af 00	lda #$00af	                LDA #`OPL2_S_BASE
+.383efb	a9 af 00	lda #$00af	                LDA #`OPL3_R_BASE
 .383efe	85 2e		sta $2e		                STA OPL2_IND_ADDY_HL
 .383f00	e2 20		sep #$20	                SEP #$20        ; set A short
 .383f02	a5 31		lda $31		                LDA OPL2_OCTAVE
@@ -4081,10 +4083,10 @@
 .383f2a	85 2b		sta $2b		                STA OPL2_REG_OFFSET+1;
 .383f2c	c2 30		rep #$30	                REP #$30        ; set A&X long
 .383f2e	18		clc		                CLC
-.383f2f	a9 00 e7	lda #$e700	                LDA #<>OPL2_S_BASE
+.383f2f	a9 00 e6	lda #$e600	                LDA #<>OPL3_R_BASE
 .383f32	65 2a		adc $2a		                ADC OPL2_REG_OFFSET
 .383f34	85 2c		sta $2c		                STA OPL2_IND_ADDY_LL
-.383f36	a9 af 00	lda #$00af	                LDA #`OPL2_S_BASE
+.383f36	a9 af 00	lda #$00af	                LDA #`OPL3_R_BASE
 .383f39	85 2e		sta $2e		                STA OPL2_IND_ADDY_HL
 .383f3b	e2 20		sep #$20	                SEP #$20        ; set A short
 .383f3d	a5 32		lda $32		                LDA OPL2_PARAMETER0
@@ -4116,10 +4118,10 @@
 .383f67	85 2b		sta $2b		              STA OPL2_REG_OFFSET+1;
 .383f69	c2 30		rep #$30	                REP #$30        ; set A&X long
 .383f6b	18		clc		              CLC
-.383f6c	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.383f6c	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .383f6f	65 2a		adc $2a		              ADC OPL2_REG_OFFSET
 .383f71	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383f73	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383f73	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383f76	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383f78	e2 20		sep #$20	                SEP #$20        ; set A short
 .383f7a	a5 32		lda $32		              LDA OPL2_PARAMETER0
@@ -4150,10 +4152,10 @@
 .383fa2	85 2b		sta $2b		              STA OPL2_REG_OFFSET+1;
 .383fa4	c2 30		rep #$30	                REP #$30        ; set A&X long
 .383fa6	18		clc		              CLC
-.383fa7	a9 00 e7	lda #$e700	              LDA #<>OPL2_S_BASE
+.383fa7	a9 00 e6	lda #$e600	              LDA #<>OPL3_R_BASE
 .383faa	65 2a		adc $2a		              ADC OPL2_REG_OFFSET
 .383fac	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383fae	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383fae	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383fb1	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383fb3	28		plp		              PLP ; Pull the Carry out
 .383fb4	e2 20		sep #$20	                SEP #$20        ; set A short
@@ -4177,9 +4179,9 @@
 .383fcf	28		plp		                PLP
 .383fd0	68		pla		                PLA             ; end setdp macro
 .383fd1	c2 20		rep #$20	                REP #$20        ; set A long
-.383fd3	a9 bd e7	lda #$e7bd	              LDA #<>OPL2_S_BASE + $00BD
+.383fd3	a9 bd e6	lda #$e6bd	              LDA #<>OPL3_R_BASE + $00BD
 .383fd6	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.383fd8	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.383fd8	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .383fdb	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .383fdd	e2 20		sep #$20	                SEP #$20        ; set A short
 .383fdf	b0 08		bcs $383fe9	              BCS OPL2_Set_DeepTremolo_Set;
@@ -4202,9 +4204,9 @@
 .383ff8	28		plp		                PLP
 .383ff9	68		pla		                PLA             ; end setdp macro
 .383ffa	c2 20		rep #$20	                REP #$20        ; set A long
-.383ffc	a9 bd e7	lda #$e7bd	              LDA #<>OPL2_S_BASE + $00BD
+.383ffc	a9 bd e6	lda #$e6bd	              LDA #<>OPL3_R_BASE + $00BD
 .383fff	85 2c		sta $2c		              STA OPL2_IND_ADDY_LL
-.384001	a9 af 00	lda #$00af	              LDA #`OPL2_S_BASE
+.384001	a9 af 00	lda #$00af	              LDA #`OPL3_R_BASE
 .384004	85 2e		sta $2e		              STA OPL2_IND_ADDY_HL
 .384006	e2 20		sep #$20	                SEP #$20        ; set A short
 .384008	b0 08		bcs $384012	              BCS OPL2_Set_DeepVibrato_Set;
@@ -4227,9 +4229,9 @@
 .384021	28		plp		                PLP
 .384022	68		pla		                PLA             ; end setdp macro
 .384023	c2 20		rep #$20	                REP #$20        ; set A long
-.384025	a9 bd e7	lda #$e7bd	                LDA #<>OPL2_S_BASE + $00BD
+.384025	a9 bd e6	lda #$e6bd	                LDA #<>OPL3_R_BASE + $00BD
 .384028	85 2c		sta $2c		                STA OPL2_IND_ADDY_LL
-.38402a	a9 af 00	lda #$00af	                LDA #`OPL2_S_BASE
+.38402a	a9 af 00	lda #$00af	                LDA #`OPL3_R_BASE
 .38402d	85 2e		sta $2e		                STA OPL2_IND_ADDY_HL
 .38402f	e2 20		sep #$20	                SEP #$20        ; set A short
 .384031	b0 08		bcs $38403b	                BCS OPL2_Set_Percussion_Set;
@@ -4252,9 +4254,9 @@
 .38404a	28		plp		                PLP
 .38404b	68		pla		                PLA             ; end setdp macro
 .38404c	c2 20		rep #$20	                REP #$20        ; set A long
-.38404e	a9 bd e7	lda #$e7bd	                LDA #<>OPL2_S_BASE + $00BD
+.38404e	a9 bd e6	lda #$e6bd	                LDA #<>OPL3_R_BASE + $00BD
 .384051	85 2c		sta $2c		                STA OPL2_IND_ADDY_LL
-.384053	a9 af 00	lda #$00af	                LDA #`OPL2_S_BASE
+.384053	a9 af 00	lda #$00af	                LDA #`OPL3_R_BASE
 .384056	85 2e		sta $2e		                STA OPL2_IND_ADDY_HL
 .384058	e2 20		sep #$20	                SEP #$20        ; set A short
 .38405a	a5 32		lda $32		                LDA OPL2_PARAMETER0
@@ -4305,18 +4307,18 @@
 .3840ab	85 2b		sta $2b		                STA OPL2_REG_OFFSET+1;
 .3840ad	c2 30		rep #$30	                REP #$30        ; set A&X long
 .3840af	18		clc		                CLC
-.3840b0	a9 00 e7	lda #$e700	                LDA #<>OPL2_S_BASE
+.3840b0	a9 00 e6	lda #$e600	                LDA #<>OPL3_R_BASE
 .3840b3	65 2a		adc $2a		                ADC OPL2_REG_OFFSET
 .3840b5	65 28		adc $28		                ADC OPL2_REG_REGION ; Ex: $20, or $40, $60, $80 (in 16bits)
 .3840b7	85 2c		sta $2c		                STA OPL2_IND_ADDY_LL
-.3840b9	a9 af 00	lda #$00af	                LDA #`OPL2_S_BASE
+.3840b9	a9 af 00	lda #$00af	                LDA #`OPL3_R_BASE
 .3840bc	85 2e		sta $2e		                STA OPL2_IND_ADDY_HL
 .3840be	60		rts		                RTS
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\ide_library.asm
+;******  Processing file: src/ide_library.asm
 
 .0000					IDE_ID
 >0000	00 00				General_Config        .word $0000
@@ -4454,10 +4456,10 @@
 .384164	6b		rtl		              RTL
 .384165					IDE_DISPLAY_INFO
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\keyboard.asm
+;******  Processing file: src/keyboard.asm
 
 .384165					KEYBOARD_INTERRUPT
 .384165	48		pha		                PHA             ; begin setdp macro
@@ -4701,10 +4703,10 @@
 .384341	64 8d		stz $0f8d	                STZ KEY_BUFFER_WPOS     ; Reset the write index to the beginning
 .384343	80 f6		bra $38433b	                BRA done
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\uart.asm
+;******  Processing file: src/uart.asm
 
 =$af13f8				UART1_BASE = $AF13F8        ; Base address for UART 1 (COM1)
 =$af12f8				UART2_BASE = $AF12F8        ; Base address for UART 2 (COM2)
@@ -4851,6 +4853,7 @@
 .3843d6	28		plp		            PLP
 .3843d7	6b		rtl		            RTL
 .3843d8					UART_HASBYT
+.3843d8					UART_GETC
 .3843d8	08		php		            PHP
 .3843d9	0b		phd		            PHD
 .3843da	c2 30		rep #$30	                REP #$30        ; set A&X long
@@ -4863,18 +4866,15 @@
 .3843e5	68		pla		                PLA             ; end setdp macro
 .3843e6	e2 20		sep #$20	                SEP #$20        ; set A short
 .3843e8	a0 05 00	ldy #$0005	            LDY #UART_LSR           ; Check the receive FIFO
-.3843eb	b7 00		lda [$0700],y	wait_putc   LDA [CURRUART],Y
+.3843eb	b7 00		lda [$0700],y	wait_getc   LDA [CURRUART],Y
 .3843ed	29 01		and #$01	            AND #LSR_DATA_AVAIL
-.3843ef	d0 04		bne $3843f5	            BNE ret_true            ; If flag is set, return true
-.3843f1	2b		pld		ret_false   PLD                     ; Return false
-.3843f2	28		plp		            PLP
-.3843f3	18		clc		            CLC
-.3843f4	6b		rtl		            RTL
-.3843f5	2b		pld		ret_true    PLD                     ; Return true
-.3843f6	28		plp		            PLP
-.3843f7	38		sec		            SEC
+.3843ef	f0 fa		beq $3843eb	            BEQ wait_getc           ; If the flag is clear, wait
+.3843f1	a0 00 00	ldy #$0000	            LDY #UART_TRHB          ; Get the byte from the receive FIFO
+.3843f4	b7 00		lda [$0700],y	            LDA [CURRUART],Y
+.3843f6	2b		pld		            PLD
+.3843f7	28		plp		            PLP
 .3843f8	6b		rtl		            RTL
-.3843f9					UART_GETC
+.3843f9					UART_PUTC
 .3843f9	08		php		            PHP
 .3843fa	0b		phd		            PHD
 .3843fb	c2 30		rep #$30	                REP #$30        ; set A&X long
@@ -4886,111 +4886,81 @@
 .384405	28		plp		                PLP
 .384406	68		pla		                PLA             ; end setdp macro
 .384407	e2 20		sep #$20	                SEP #$20        ; set A short
-.384409	a0 05 00	ldy #$0005	            LDY #UART_LSR           ; Check the receive FIFO
-.38440c	b7 00		lda [$0700],y	wait_getc   LDA [CURRUART],Y
-.38440e	29 01		and #$01	            AND #LSR_DATA_AVAIL
-.384410	f0 fa		beq $38440c	            BEQ wait_getc           ; If the flag is clear, wait
-.384412	a0 00 00	ldy #$0000	            LDY #UART_TRHB          ; Get the byte from the receive FIFO
-.384415	b7 00		lda [$0700],y	            LDA [CURRUART],Y
-.384417	2b		pld		            PLD
-.384418	28		plp		            PLP
-.384419	6b		rtl		            RTL
-.38441a					UART_PUTC
-.38441a	08		php		            PHP
-.38441b	0b		phd		            PHD
-.38441c	c2 30		rep #$30	                REP #$30        ; set A&X long
-.38441e	48		pha		                PHA             ; begin setdp macro
-.38441f	08		php		                PHP
-.384420	c2 20		rep #$20	                REP #$20        ; set A long
-.384422	a9 00 07	lda #$0700	                LDA #CURRUART         ; set DP to page 0
-.384425	5b		tcd		                TCD
-.384426	28		plp		                PLP
-.384427	68		pla		                PLA             ; end setdp macro
-.384428	e2 20		sep #$20	                SEP #$20        ; set A short
-.38442a	48		pha		            PHA                     ; Wait for the transmit FIFO to free up
-.38442b	a0 05 00	ldy #$0005	            LDY #UART_LSR
-.38442e	b7 00		lda [$0700],y	wait_putc   LDA [CURRUART],Y
-.384430	29 20		and #$20	            AND #LSR_XMIT_EMPTY
-.384432	f0 fa		beq $38442e	            BEQ wait_putc
-.384434	68		pla		            PLA
-.384435	a0 00 00	ldy #$0000	            LDY #UART_TRHB
-.384438	97 00		sta [$0700],y	            STA [CURRUART],Y
-.38443a	2b		pld		            PLD
-.38443b	28		plp		            PLP
-.38443c	6b		rtl		            RTL
-.38443d					UART_PUTS
-.38443d	08		php		            PHP
-.38443e	e2 20		sep #$20	                SEP #$20        ; set A short
-.384440	bd 00 00	lda $380000,x	put_loop    LDA #0,B,X
-.384443	f0 07		beq $38444c	            BEQ done
-.384445	22 1a 44 38	jsl $38441a	            JSL UART_PUTC
-.384449	e8		inx		            INX
-.38444a	80 f4		bra $384440	            BRA put_loop
-.38444c	28		plp		done        PLP
-.38444d	6b		rtl		            RTL
+.384409	48		pha		            PHA                     ; Wait for the transmit FIFO to free up
+.38440a	a0 05 00	ldy #$0005	            LDY #UART_LSR
+.38440d	b7 00		lda [$0700],y	wait_putc   LDA [CURRUART],Y
+.38440f	29 20		and #$20	            AND #LSR_XMIT_EMPTY
+.384411	f0 fa		beq $38440d	            BEQ wait_putc
+.384413	68		pla		            PLA
+.384414	a0 00 00	ldy #$0000	            LDY #UART_TRHB
+.384417	97 00		sta [$0700],y	            STA [CURRUART],Y
+.384419	2b		pld		            PLD
+.38441a	28		plp		            PLP
+.38441b	6b		rtl		            RTL
+.38441c					UART_PUTS
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 
-;******  Processing file: src\joystick.asm
+;******  Processing file: src/joystick.asm
 
-.38444e					JOYSTICK_SET_NES_MODE
-.38444e	e2 20		sep #$20	                SEP #$20        ; set A short
-.384450	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.384454	29 fb		and #$fb	          AND #~NES_SNES_JOY  ; 0 = NES (8 bit shift)
-.384456	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
-.38445a	6b		rtl		          RTL
-.38445b					JOYSTICK_SET_SNES_MODE
-.38445b	e2 20		sep #$20	                SEP #$20        ; set A short
-.38445d	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.384461	29 fb		and #$fb	          AND #~NES_SNES_JOY
-.384463	09 04		ora #$04	          ORA #NES_SNES_JOY   ; 1 = SNES (12 Bit Shift)
-.384465	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
-.384469	6b		rtl		          RTL
-.38446a					JOYSTICK_ENABLE_NES_SNES_PORT0
-.38446a	e2 20		sep #$20	                SEP #$20        ; set A short
-.38446c	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.384470	29 fe		and #$fe	          AND #~NES_SNES_EN0
-.384472	09 01		ora #$01	          ORA #NES_SNES_EN0
-.384474	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
-.384478	6b		rtl		          RTL
-.384479					JOYSTICK_ENABLE_NES_SNES_PORT1
-.384479	e2 20		sep #$20	                SEP #$20        ; set A short
-.38447b	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.38447f	29 fd		and #$fd	          AND #~NES_SNES_EN1
-.384481	09 02		ora #$02	          ORA #NES_SNES_EN1
-.384483	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
-.384487	6b		rtl		          RTL
-.384488					JOYSTICK_DISABLE_NES_SNES_PORT0
-.384488	e2 20		sep #$20	                SEP #$20        ; set A short
-.38448a	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.38448e	29 fe		and #$fe	          AND #~NES_SNES_EN0
-.384490	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
-.384494	6b		rtl		          RTL
-.384495					JOYSTICK_DISABLE_NES_SNES_PORT1
-.384495	e2 20		sep #$20	                SEP #$20        ; set A short
-.384497	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.38449b	29 fd		and #$fd	          AND #~NES_SNES_EN1
-.38449d	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
-.3844a1	6b		rtl		          RTL
-.3844a2					JOYSTICK_NES_SNES_TRIG_WITH_POLL
-.3844a2	e2 20		sep #$20	                SEP #$20        ; set A short
-.3844a4	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.3844a8	29 03		and #$03	          AND #(NES_SNES_EN0 | NES_SNES_EN1)
-.3844aa	c9 00		cmp #$00	          CMP #$00
-.3844ac	f0 14		beq $3844c2	          BEQ END_OF_JOYSTICK_POLL
-.3844ae	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
-.3844b2	09 80		ora #$80	          ORA #NES_SNES_TRIG   ; Set to 1 (Will auto Clear)
-.3844b4	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
-.3844b8					JOYSTICK_POLLING_ISNOTOVER
-.3844b8	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE ;
-.3844bc	29 40		and #$40	          AND #NES_SNES_DONE
-.3844be	c9 40		cmp #$40	          CMP #NES_SNES_DONE
-.3844c0	d0 f6		bne $3844b8	          BNE JOYSTICK_POLLING_ISNOTOVER
-.3844c2					END_OF_JOYSTICK_POLL
-.3844c2	6b		rtl		          RTL
+.38441c					JOYSTICK_SET_NES_MODE
+.38441c	e2 20		sep #$20	                SEP #$20        ; set A short
+.38441e	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.384422	29 fb		and #$fb	          AND #~NES_SNES_JOY  ; 0 = NES (8 bit shift)
+.384424	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
+.384428	6b		rtl		          RTL
+.384429					JOYSTICK_SET_SNES_MODE
+.384429	e2 20		sep #$20	                SEP #$20        ; set A short
+.38442b	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.38442f	29 fb		and #$fb	          AND #~NES_SNES_JOY
+.384431	09 04		ora #$04	          ORA #NES_SNES_JOY   ; 1 = SNES (12 Bit Shift)
+.384433	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
+.384437	6b		rtl		          RTL
+.384438					JOYSTICK_ENABLE_NES_SNES_PORT0
+.384438	e2 20		sep #$20	                SEP #$20        ; set A short
+.38443a	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.38443e	29 fe		and #$fe	          AND #~NES_SNES_EN0
+.384440	09 01		ora #$01	          ORA #NES_SNES_EN0
+.384442	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
+.384446	6b		rtl		          RTL
+.384447					JOYSTICK_ENABLE_NES_SNES_PORT1
+.384447	e2 20		sep #$20	                SEP #$20        ; set A short
+.384449	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.38444d	29 fd		and #$fd	          AND #~NES_SNES_EN1
+.38444f	09 02		ora #$02	          ORA #NES_SNES_EN1
+.384451	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
+.384455	6b		rtl		          RTL
+.384456					JOYSTICK_DISABLE_NES_SNES_PORT0
+.384456	e2 20		sep #$20	                SEP #$20        ; set A short
+.384458	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.38445c	29 fe		and #$fe	          AND #~NES_SNES_EN0
+.38445e	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
+.384462	6b		rtl		          RTL
+.384463					JOYSTICK_DISABLE_NES_SNES_PORT1
+.384463	e2 20		sep #$20	                SEP #$20        ; set A short
+.384465	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.384469	29 fd		and #$fd	          AND #~NES_SNES_EN1
+.38446b	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
+.38446f	6b		rtl		          RTL
+.384470					JOYSTICK_NES_SNES_TRIG_WITH_POLL
+.384470	e2 20		sep #$20	                SEP #$20        ; set A short
+.384472	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.384476	29 03		and #$03	          AND #(NES_SNES_EN0 | NES_SNES_EN1)
+.384478	c9 00		cmp #$00	          CMP #$00
+.38447a	f0 14		beq $384490	          BEQ END_OF_JOYSTICK_POLL
+.38447c	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE
+.384480	09 80		ora #$80	          ORA #NES_SNES_TRIG   ; Set to 1 (Will auto Clear)
+.384482	8f 04 e8 af	sta $afe804	          STA JOYSTICK_MODE
+.384486					JOYSTICK_POLLING_ISNOTOVER
+.384486	af 04 e8 af	lda $afe804	          LDA JOYSTICK_MODE ;
+.38448a	29 40		and #$40	          AND #NES_SNES_DONE
+.38448c	c9 40		cmp #$40	          CMP #NES_SNES_DONE
+.38448e	d0 f6		bne $384486	          BNE JOYSTICK_POLLING_ISNOTOVER
+.384490					END_OF_JOYSTICK_POLL
+.384490	6b		rtl		          RTL
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 .390400					IBOOT
 .390400	18		clc		                CLC           ; clear the carry flag
@@ -5232,7 +5202,7 @@
 .39061c	38		sec		                SEC                 ; And return carry set
 .39061d	6b		rtl		                RTL
 .39061e	22 45 43 38	jsl $384345	getc_uart       JSL UART_SELECT     ; Select the correct COM port
-.390622	22 f9 43 38	jsl $3843f9	                JSL UART_GETC       ; Get the charater from the COM port
+.390622	22 d8 43 38	jsl $3843d8	                JSL UART_GETC       ; Get the charater from the COM port
 .390626	80 04		bra $39062c	                BRA done
 .390628	22 02 43 38	jsl $384302	getc_keyboard   JSL KBD_GETC        ; Get the character from the keyboard
 .39062c	28		plp		done            PLP
@@ -5288,7 +5258,7 @@
 .39067c	80 4f		bra $3906cd	                BRA done
 .39067e	22 45 43 38	jsl $384345	putc_uart       JSL UART_SELECT     ; Point to the correct UART
 .390682	68		pla		                PLA                 ; Recover the character to send
-.390683	22 1a 44 38	jsl $38441a	                JSL UART_PUTC       ; Send the character
+.390683	22 f9 43 38	jsl $3843f9	                JSL UART_PUTC       ; Send the character
 .390687	80 44		bra $3906cd	                BRA done
 .390689	68		pla		putc_screen     PLA                 ; Get the character to print
 .39068a	c9 0a		cmp #$0a	                CMP #CHAR_LF        ; Linefeed moves cursor down one line
@@ -6460,12 +6430,12 @@
 .391152					  BMP_LUT2_PICK
 .391152					  DONE_TRANSFER_LUT
 .391152	a5 56		lda $56		                LDA BMP_POSITION_Y
-.391154	8f 00 01 00	sta $000100	                STA @lM0_OPERAND_A
+.391154	8f 00 01 00	sta $000100	                STA @lUNSIGNED_MULT_A_LO
 .391158	a5 4e		lda $4e		                LDA SCRN_X_STRIDE
-.39115a	8f 02 01 00	sta $000102	                STA @lM0_OPERAND_B
-.39115e	af 04 01 00	lda $000104	                LDA @lM0_RESULT
+.39115a	8f 02 01 00	sta $000102	                STA @lUNSIGNED_MULT_B_LO
+.39115e	af 04 01 00	lda $000104	                LDA @lUNSIGNED_MULT_AL_LO
 .391162	8f 20 01 00	sta $000120	                STA @lADDER32_A_LL          ; Store in 32Bit Adder (A)
-.391166	af 06 01 00	lda $000106	                LDA @lM0_RESULT+2
+.391166	af 06 01 00	lda $000106	                LDA @lUNSIGNED_MULT_AL_LO+2
 .39116a	8f 22 01 00	sta $000122	                STA @lADDER32_A_HL          ; Store in 32Bit Adder (A)
 .39116e	a5 54		lda $54		                LDA BMP_POSITION_X
 .391170	8f 24 01 00	sta $000124	                STA @lADDER32_B_LL          ; Put the X Position Adder (B)
@@ -6724,12 +6694,12 @@
 >391460	66 6f 65 6e 69 78 2e 63 6f 6d 20 2d 20 4b 65 72
 >391470	6e 65 6c 20 44 61 74 65 3a 20
 
-;******  Processing file: src\version.asm
+;******  Processing file: src/version.asm
 
 >39147a	4a 61 6e 75 61 72 79 20		.text "January 08, 2020"
 >391482	30 38 2c 20 32 30 32 30
 
-;******  Return to file: src\kernel.asm
+;******  Return to file: src/kernel.asm
 
 >39148a	0d 00				                .text $0D,$00
 .39148c					old_pc_style_stat

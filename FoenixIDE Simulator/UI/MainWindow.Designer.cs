@@ -34,12 +34,12 @@ namespace FoenixIDE.UI
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripRevision = new System.Windows.Forms.ToolStripStatusLabel();
+            this.dipSwitch = new System.Windows.Forms.ToolStripStatusLabel();
             this.ModeText = new System.Windows.Forms.ToolStripStatusLabel();
             this.lastKeyPressed = new System.Windows.Forms.ToolStripStatusLabel();
             this.cpsPerf = new System.Windows.Forms.ToolStripStatusLabel();
             this.fpsPerf = new System.Windows.Forms.ToolStripStatusLabel();
             this.SDCardPath = new System.Windows.Forms.ToolStripStatusLabel();
-            this.dipSwitch = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOpenHexFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -104,6 +104,18 @@ namespace FoenixIDE.UI
             this.toolStripRevision.ToolTipText = "Board Version";
             this.toolStripRevision.Click += new System.EventHandler(this.ToolStripRevision_Click);
             // 
+            // dipSwitch
+            // 
+            this.dipSwitch.AutoSize = false;
+            this.dipSwitch.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.dipSwitch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.None;
+            this.dipSwitch.Name = "dipSwitch";
+            this.dipSwitch.Size = new System.Drawing.Size(129, 23);
+            this.dipSwitch.Text = "toolStripStatusLabel1";
+            this.dipSwitch.ToolTipText = "DIP Switches";
+            this.dipSwitch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DipSwitch_MouseDown);
+            this.dipSwitch.Paint += new System.Windows.Forms.PaintEventHandler(this.DipSwitch_Paint);
+            // 
             // ModeText
             // 
             this.ModeText.Name = "ModeText";
@@ -160,18 +172,6 @@ namespace FoenixIDE.UI
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.SDCardPath.Click += new System.EventHandler(this.SDCardToolStripMenuItem_Click);
-            // 
-            // dipSwitch
-            // 
-            this.dipSwitch.AutoSize = false;
-            this.dipSwitch.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.dipSwitch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.None;
-            this.dipSwitch.Name = "dipSwitch";
-            this.dipSwitch.Size = new System.Drawing.Size(129, 23);
-            this.dipSwitch.Text = "toolStripStatusLabel1";
-            this.dipSwitch.ToolTipText = "DIP Switches";
-            this.dipSwitch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DipSwitch_MouseDown);
-            this.dipSwitch.Paint += new System.Windows.Forms.PaintEventHandler(this.DipSwitch_Paint);
             // 
             // menuStrip1
             // 
@@ -249,31 +249,28 @@ namespace FoenixIDE.UI
             // uploaderToolStripMenuItem
             // 
             this.uploaderToolStripMenuItem.Name = "uploaderToolStripMenuItem";
-            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.uploaderToolStripMenuItem.Text = "&Uploader";
             this.uploaderToolStripMenuItem.Click += new System.EventHandler(this.UploaderToolStripMenuItem_Click);
             // 
             // loadImageToolStripMenuItem
             // 
-            this.loadImageToolStripMenuItem.Enabled = false;
             this.loadImageToolStripMenuItem.Name = "loadImageToolStripMenuItem";
-            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
-            this.loadImageToolStripMenuItem.Text = "&Load Image";
+            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadImageToolStripMenuItem.Text = "&Load Bin/Image";
             this.loadImageToolStripMenuItem.Click += new System.EventHandler(this.LoadImageToolStripMenuItem_Click);
             // 
             // sDCardToolStripMenuItem
             // 
-            this.sDCardToolStripMenuItem.Enabled = false;
             this.sDCardToolStripMenuItem.Name = "sDCardToolStripMenuItem";
-            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sDCardToolStripMenuItem.Text = "&SD Card";
             this.sDCardToolStripMenuItem.Click += new System.EventHandler(this.SDCardToolStripMenuItem_Click);
             // 
             // tileEditorToolStripMenuItem
             // 
-            this.tileEditorToolStripMenuItem.Enabled = false;
             this.tileEditorToolStripMenuItem.Name = "tileEditorToolStripMenuItem";
-            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.tileEditorToolStripMenuItem.Text = "&Tile Editor";
             this.tileEditorToolStripMenuItem.Click += new System.EventHandler(this.TileEditorToolStripMenuItem_Click);
             // 

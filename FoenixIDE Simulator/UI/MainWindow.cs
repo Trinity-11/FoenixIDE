@@ -34,7 +34,7 @@ namespace FoenixIDE.UI
         private ResourceChecker ResChecker = new ResourceChecker();
         private delegate void TransmitByteFunction(byte Value);
         private delegate void ShowFormFunction();
-        private string kernelFileName;
+        private String defaultKernel = @"roms\kernel.hex";
         private int jumpStartAddress;
         private bool disabledIRQs = false;
         private bool autoRun = false;
@@ -47,8 +47,6 @@ namespace FoenixIDE.UI
                 DecodeProgramArguments(programArgs);
             }
             InitializeComponent();
-            performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
-
         }
 
         private void DecodeProgramArguments(string[] args)
@@ -65,7 +63,7 @@ namespace FoenixIDE.UI
                         {
                             throw new Exception("You must specify a hex file.");
                         }
-                        kernelFileName = args[i+1];
+                        defaultKernel = args[i+1];
                         i++; // skip the next argument
                         break;
                     case "-j":
@@ -113,20 +111,18 @@ namespace FoenixIDE.UI
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-            kernel = new FoenixSystem(this.gpu, version);
+            kernel = new FoenixSystem(this.gpu, version, defaultKernel);
             terminal = new SerialTerminal();
-
-            if (kernelFileName != null)
-            {
-                kernel.ResetCPU(true, kernelFileName);
-            }
+            ShowDebugWindow();
+            ShowMemoryWindow();
+            gpu.StartOfFrame += SOF;
+            performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
 
             if (disabledIRQs)
             {
                 debugWindow.DisableIRQs(true);
             }
 
-            
             if (autoRun)
             {   
                 debugWindow.RunButton_Click(null, null);
@@ -140,7 +136,42 @@ namespace FoenixIDE.UI
                 this.Width = 1200;
             }
             this.Height = Convert.ToInt32(this.Width * 0.75);
+
+            SetDipSwitchMemory();
+            // Code is tightly coupled with memory manager
+            kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
+            kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
+            kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
+
             DisplayBoardVersion();
+            EnableMenuItems();
+            ResetSDCard();
+        }
+
+        private bool LoadHexFile(bool ResetMemory)
+        {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Hex Filed|*.hex",
+                CheckFileExists = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                debugWindow.Pause();
+                if (kernel.ResetCPU(ResetMemory, dialog.FileName))
+                {
+                    if (kernel.lstFile != null)
+                    {
+                        ShowDebugWindow();
+                        ShowMemoryWindow();
+                       
+                        return true;
+                    }
+                    ResetSDCard();
+                    debugWindow.ClearTrace();
+                }
+            }
+            return false;
         }
 
         private void ShowDebugWindow()
@@ -159,6 +190,7 @@ namespace FoenixIDE.UI
             } 
             else
             {
+                debugWindow.SetKernel(kernel);
                 debugWindow.BringToFront();
             }
         }
@@ -300,8 +332,14 @@ namespace FoenixIDE.UI
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             gpu.StartOfFrame = null;
-            debugWindow.Close();
-            memoryWindow.Close();
+            if (debugWindow != null)
+            {
+                debugWindow.Close();
+            }
+            if (memoryWindow != null)
+            {
+                memoryWindow.Close();
+            }
             this.Close();
         }
 
@@ -310,7 +348,7 @@ namespace FoenixIDE.UI
         DateTime previousTime = DateTime.Now;
         private void PerformanceTimer_Tick(object sender, EventArgs e)
         {
-            if (kernel != null  && kernel.CPU != null)
+            if (kernel != null  && kernel.CPU != null && !kernel.CPU.DebugPause)
             {
                 DateTime currentTime = DateTime.Now;
                 TimeSpan s = currentTime - previousTime;
@@ -365,43 +403,20 @@ namespace FoenixIDE.UI
          * Restart the CPU
          */
         private void RestartMenuItemClick(object sender, EventArgs e)
-        {
-            gpu.StartOfFrame = null;
-            debugWindow.Pause();
-            
+        {           
             previousCounter = 0;
-            if (kernel.ResetCPU(true, null))
+            debugWindow.Pause();
+            if (kernel.ResetCPU(false, null))
             {
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
-                gpu.StartOfFrame += SOF;
                 memoryWindow.Memory = kernel.CPU.Memory;
                 memoryWindow.UpdateMCRButtons();
 
                 // Restart the CPU
                 debugWindow.RunButton_Click(null, null);
             }
-
-            
-            // Code is tightly coupled with memory manager
-            //kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
-            //kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
-            //kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
-            //if (kernel.lstFile != null)
-            //{
-            //    ShowDebugWindow();
-            //    ShowMemoryWindow();
-            //    if (tileEditor != null && tileEditor.Visible)
-            //    {
-            //        tileEditor.SetMemory(kernel.MemMgr);
-            //    }
-            //    ResetSDCard();
-            //    EnableMenuItems();
-            //    performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
-                
-            //}
-
         }
         
         /** 
@@ -409,16 +424,13 @@ namespace FoenixIDE.UI
          */
         private void DebugToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            gpu.StartOfFrame = null;
-            debugWindow.Pause();
-            
             previousCounter = 0;
-            if (kernel.ResetCPU(true, null))
+            debugWindow.Pause();
+            if (kernel.ResetCPU(false, null))
             {
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
-                gpu.StartOfFrame += SOF;
                 memoryWindow.Memory = kernel.CPU.Memory;
                 memoryWindow.UpdateMCRButtons();
                 debugWindow.Refresh();
@@ -440,53 +452,6 @@ namespace FoenixIDE.UI
             }
         }
 
-        private bool LoadHexFile(bool ResetMemory)
-        {
-            gpu.StartOfFrame = null;
-            OpenFileDialog dialog = new OpenFileDialog
-            {
-                Filter = "Hex Filed|*.hex",
-                CheckFileExists = true
-            };
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                if (debugWindow != null)
-                {
-                    debugWindow.Close();
-                }
-                if (memoryWindow != null)
-                {
-                    memoryWindow.Close();
-                }
-                if (ResetMemory)
-                {
-                    kernel = new FoenixSystem(this.gpu, version);
-                }
-                if (kernel.ResetCPU(ResetMemory, dialog.FileName))
-                {
-                    SetDipSwitchMemory();
-                    // Code is tightly coupled with memory manager
-                    kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
-                    kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
-                    kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
-                    if (kernel.lstFile != null)
-                    {
-                        ShowDebugWindow();
-                        ShowMemoryWindow();
-                        if (tileEditor != null && tileEditor.Visible)
-                        {
-                            tileEditor.SetMemory(kernel.MemMgr);
-                        }
-                        ResetSDCard();
-                        EnableMenuItems();
-                        gpu.StartOfFrame += SOF;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
         private void MenuOpenHexFile_Click(object sender, EventArgs e)
         {
             LoadHexFile(true);
@@ -502,7 +467,6 @@ namespace FoenixIDE.UI
          */
         private void LoadFNXMLFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            gpu.StartOfFrame = null;
             OpenFileDialog dialog = new OpenFileDialog
             {
                 Title = "Load Project File",
@@ -521,18 +485,14 @@ namespace FoenixIDE.UI
                 }
 
                 // TODO - this code is so coupled - we need to set the version in the XML file too.
-                kernel = new FoenixSystem(this.gpu, version)
-                {
-                    Resources = ResChecker,
-                    Breakpoints = CPUWindow.Instance.breakpoints
-                };
+                kernel.Resources = ResChecker;
+                kernel.Breakpoints = CPUWindow.Instance.breakpoints;
                 if (kernel.ResetCPU(true, dialog.FileName))
                 {
                     SetDipSwitchMemory();
                     ShowDebugWindow();
                     ShowMemoryWindow();
                     EnableMenuItems();
-                    gpu.StartOfFrame += SOF;
                 }
             }
         }
@@ -552,8 +512,8 @@ namespace FoenixIDE.UI
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                FoeniXmlFile fnxml = new FoeniXmlFile(ResChecker, CPUWindow.Instance.breakpoints);
-                fnxml.Write(kernel.MemMgr, dialog.FileName, true);
+                FoeniXmlFile fnxml = new FoeniXmlFile(kernel.MemMgr.RAM, ResChecker, CPUWindow.Instance.breakpoints, CPUWindow.Instance.labels);
+                fnxml.Write(dialog.FileName, true);
             }
         }
 

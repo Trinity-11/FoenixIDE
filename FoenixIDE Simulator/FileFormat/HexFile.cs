@@ -1,13 +1,13 @@
-﻿using System;
+﻿using FoenixIDE.MemoryLocations;
+using System;
 using System.Windows.Forms;
 
 namespace FoenixIDE.Simulator.FileFormat
 {
     public class HexFile
     {
-        public byte[] buffer = new byte[0x40_0000];
 
-        public String Load(string Filename, int gabeAddressBank)
+        static public String Load(MemoryRAM ram, string Filename, int gabeAddressBank)
         {
             int bank = 0;
             int address = 0;
@@ -52,10 +52,11 @@ namespace FoenixIDE.Simulator.FileFormat
                             for (int i = 0; i < data.Length; i += 2)
                             {
                                 int b = GetByte(data, i, 1);
-                                buffer[bank + address] = (byte)b;
+                                ram.WriteByte(bank + address, (byte)b);
+                                // Copy bank $38 or $18 to page 0
                                 if (bank == gabeAddressBank)
                                 {
-                                    buffer[address] = (byte)b;
+                                    ram.WriteByte(address, (byte)b);
                                 }
                                 address++;
                             }
