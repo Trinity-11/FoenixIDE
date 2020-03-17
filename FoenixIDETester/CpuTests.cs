@@ -129,8 +129,11 @@ namespace FoenixIDETester
         }
 
         // XCE
-        // LDA #$800
+        // LDA #$234
         // TCS
+        // LDA #$123
+        // STA $237
+
         // LDA #$FE23
         // LDY #$10
         // STA (3,s),Y - writes $23 at $234 and $FE at $235
@@ -156,24 +159,34 @@ namespace FoenixIDETester
             cpu.ExecuteNext();
             Assert.AreEqual(0x234, cpu.S.Value);
 
+            // LDA #$123
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x123);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x123, cpu.A.Value);
+
+            // STA $237
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_Absolute);
+            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x237);
+            cpu.ExecuteNext();
+
+            // LDY #$10
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDY_Immediate);
+            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x10);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x10, cpu.Y.Value);
+
             // LDA #$FE23
             mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
             mgr.RAM.WriteWord(cpu.PC.Value + 1, 0xFE23);
             cpu.ExecuteNext();
             Assert.AreEqual(0xFE23, cpu.A.Value);
-
-            // LDY #$10
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDY_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x10);
-            cpu.ExecuteNext();
-            Assert.AreEqual(0x10, cpu.Y.Value);
-
             // STA (3,s),y - store
             mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_StackRelativeIndirectIndexedWithY);
             mgr.RAM.WriteByte(cpu.PC.Value + 1, 3);
             cpu.ExecuteNext();
-            Assert.AreEqual(0x23, mgr.RAM.ReadByte(0x234 + 3 + 0x10));
-            Assert.AreEqual(0xFE, mgr.RAM.ReadByte(0x235 + 3 + 0x10));
+            Assert.AreEqual(0x23, mgr.RAM.ReadByte(0x133));
+            Assert.AreEqual(0xFE, mgr.RAM.ReadByte(0x134));
         }
     }
 }

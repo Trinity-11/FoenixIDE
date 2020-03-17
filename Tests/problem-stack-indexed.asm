@@ -3,9 +3,12 @@
     CLC
     XCE
     setaxl
-    LDA #$800
+    LDA #$234
     TCS
+    LDA #$123
+    STA $237
+    
     LDA #$FE23
     LDY #$10
-    STA (3,s),Y ; writes $23 at $234 and $FE at $235
+    STA (3,s),Y ; writes $23 at $133 and $FE at $134
     BRK

@@ -742,7 +742,8 @@ namespace FoenixIDE.Processor
                 case AddressModes.StackRelative:
                     return cpu.Stack.Value + SignatureBytes;
                 case AddressModes.StackRelativeIndirectIndexedWithY:
-                    return cpu.Stack.Value + SignatureBytes + cpu.Y.Value;
+                    addr = Bank.GetLongAddress(cpu.Stack.Value + SignatureBytes);
+                    return cpu.Memory.ReadLong(addr) + cpu.Y.Value;
                 case AddressModes.StackProgramCounterRelativeLong:
                     return SignatureBytes;
 
