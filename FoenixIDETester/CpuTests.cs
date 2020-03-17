@@ -26,6 +26,8 @@ namespace FoenixIDETester
             };
             cpu = new CPU(mgr);
             cpu.SetEmulationMode();
+            Assert.AreEqual(1, cpu.A.Width);
+            Assert.AreEqual(1, cpu.X.Width);
         }
 
         // LDA #$99
@@ -40,6 +42,7 @@ namespace FoenixIDETester
             Assert.AreEqual(0x99, cpu.A.Value);
             Assert.AreEqual(PC + 2, cpu.GetLongPC());
         }
+        // CLC
         [TestMethod]
         public void ClearCarry()
         {
@@ -47,7 +50,10 @@ namespace FoenixIDETester
             cpu.ExecuteNext();
             Assert.IsFalse(cpu.Flags.Carry);
         }
-
+        // LDA #$99
+        // CLC
+        // ADC #$78
+        // -- overflow and carry are set
         [TestMethod]
         public void LoadCheckCarrySetForOverflowAbsolute()
         {
@@ -56,10 +62,14 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.ADC_Immediate);
             mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x78);
             cpu.ExecuteNext();
+            Assert.AreEqual(0x11, cpu.A.Value);
             Assert.IsTrue(cpu.Flags.oVerflow);
             Assert.IsTrue(cpu.Flags.Carry);
         }
-
+        // LDA #$99
+        // CLC
+        // ADC $56
+        // 
         [TestMethod]
         public void LoadCheckCarrySetForOverflowDirectPage()
         {
@@ -70,6 +80,7 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.ADC_DirectPage);
             mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x56);
             cpu.ExecuteNext();
+            Assert.AreEqual(0x11, cpu.A.Value);
             Assert.IsTrue(cpu.Flags.oVerflow);
             Assert.IsTrue(cpu.Flags.Carry);
         }
@@ -115,6 +126,54 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC.Value + 1, z_C);
             cpu.ExecuteNext();
             Assert.AreEqual(0, mgr.RAM.ReadByte(z_C));
+        }
+
+        // XCE
+        // LDA #$800
+        // TCS
+        // LDA #$FE23
+        // LDY #$10
+        // STA (3,s),Y - writes $23 at $234 and $FE at $235
+        [TestMethod]
+        public void RunStackIndirectWithIndex()
+        {
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.XCE_Implied);
+            cpu.ExecuteNext();
+            Assert.IsFalse(cpu.Flags.Emulation);
+            Assert.IsTrue(cpu.Flags.Carry);
+            Assert.AreEqual(2, cpu.A.Width);
+            Assert.AreEqual(2, cpu.X.Width);
+
+            // LDA #$234
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x234);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x234, cpu.A.Value);
+            Assert.AreEqual(0, cpu.S.Value);
+
+            // TCS - exchange accumulator with stack
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.TCS_Implied);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x234, cpu.S.Value);
+
+            // LDA #$FE23
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0xFE23);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0xFE23, cpu.A.Value);
+
+            // LDY #$10
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDY_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x10);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x10, cpu.Y.Value);
+
+            // STA (3,s),y - store
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_StackRelativeIndirectIndexedWithY);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 3);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x23, mgr.RAM.ReadByte(0x234 + 3 + 0x10));
+            Assert.AreEqual(0xFE, mgr.RAM.ReadByte(0x235 + 3 + 0x10));
         }
     }
 }

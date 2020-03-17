@@ -1,7 +1,7 @@
 Release 0.3.1.2
 ---------------
 Started to use the Multimedia Timer to improve drawing time.
-Updated the Bitmap loader to allow uploading of bin file directly anywhere in memory.
+Updated the Bitmap loader to allow uploading of bin files directly anywhere in memory.
 Tied the CPU thread to the CPU Window.  Not sure why this wasn't done before.
 Adjusted loading and starting of the system without re-initializing memory.
 Fixed slow GPU FPS (frames per second) when drawing tiles.
