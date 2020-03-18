@@ -170,6 +170,17 @@ namespace FoenixIDETester
             mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x237);
             cpu.ExecuteNext();
 
+            // LDA #$678
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x678);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x678, cpu.A.Value);
+
+            // STA $239
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_Absolute);
+            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x239);
+            cpu.ExecuteNext();
+
             // LDY #$10
             mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDY_Immediate);
             mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x10);

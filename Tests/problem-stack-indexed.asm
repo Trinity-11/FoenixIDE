@@ -7,6 +7,8 @@
     TCS
     LDA #$123
     STA $237
+    LDA #$678
+    STA $239
     
     LDA #$FE23
     LDY #$10
