@@ -16,11 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Manuals", "Manuals", "{7474
 		Manuals\65816 Programmanual.pdf = Manuals\65816 Programmanual.pdf
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Character Editor", "Character Editor\Character Editor.csproj", "{372968C7-3555-4B1D-B4C2-8374FD45F6B5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDE", "FoenixIDE Simulator\FoenixIDE.csproj", "{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharSet Manager", "CharSet Manager\CharSet\CharSet Manager.csproj", "{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDETester", "FoenixIDETester\FoenixIDETester.csproj", "{8A424125-D4DB-4EC4-A207-AC0A66F6424B}"
 EndProject
@@ -30,18 +26,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{372968C7-3555-4B1D-B4C2-8374FD45F6B5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C082F98-7BAD-47DE-97AA-382DF5C1F11B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Release|Any CPU.ActiveCfg = Release|Any CPU

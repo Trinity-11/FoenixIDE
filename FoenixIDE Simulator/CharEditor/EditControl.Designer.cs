@@ -1,4 +1,4 @@
-﻿namespace Nu64.CharEdit
+﻿namespace FoenixIDE.CharEditor
 {
     partial class EditControl
     {
@@ -38,6 +38,7 @@
             this.CopyButton = new System.Windows.Forms.Button();
             this.PasteButton = new System.Windows.Forms.Button();
             this.ClearButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.characterPanel)).BeginInit();
             this.SuspendLayout();
             // 
             // characterPanel
@@ -48,7 +49,8 @@
             this.characterPanel.Name = "characterPanel";
             this.characterPanel.Size = new System.Drawing.Size(256, 256);
             this.characterPanel.TabIndex = 0;
-            this.characterPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.characterPanel_Paint);
+            this.characterPanel.TabStop = false;
+            this.characterPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.CharacterPanel_Paint);
             this.characterPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.P_MouseDown);
             this.characterPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.P_MouseMove);
             this.characterPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.P_MouseUp);
@@ -159,7 +161,8 @@
             this.Controls.Add(this.characterPanel);
             this.Location = new System.Drawing.Point(4, 4);
             this.Name = "EditControl";
-            this.Size = new System.Drawing.Size(744, 416);
+            this.Size = new System.Drawing.Size(432, 268);
+            ((System.ComponentModel.ISupportInitialize)(this.characterPanel)).EndInit();
             this.ResumeLayout(false);
 
         }

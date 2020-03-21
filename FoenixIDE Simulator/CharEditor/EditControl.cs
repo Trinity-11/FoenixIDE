@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Nu64.CharEdit
+namespace FoenixIDE.CharEditor
 {
     public partial class EditControl : UserControl
     {
@@ -96,9 +96,11 @@ namespace Nu64.CharEdit
                 characterPanel.ClientRectangle.Width / Columns,
                 characterPanel.ClientRectangle.Height / Rows);
 
-            Point p = new Point();
-            p.X = location.X / pixel.Width;
-            p.Y = location.Y / pixel.Height;
+            Point p = new Point
+            {
+                X = location.X / pixel.Width,
+                Y = location.Y / pixel.Height
+            };
 
             return p;
         }
@@ -268,7 +270,7 @@ namespace Nu64.CharEdit
             Redraw();
         }
 
-        private void characterPanel_Paint(object sender, PaintEventArgs e)
+        private void CharacterPanel_Paint(object sender, PaintEventArgs e)
         {
             Rectangle pixel = new Rectangle(
                 0,

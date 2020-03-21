@@ -7,15 +7,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CharSet
+namespace FoenixIDE.CharEditor
 {
     public partial class CharViewer : UserControl
     {
         int CHARSET_SIZE = 4096;
+        
+        Brush textBrush = Brushes.LightGray;  //new SolidBrush(SystemColors.WindowText);
+        Brush selectedBrush = Brushes.Gray;
+        Pen pen = Pens.Gray;
 
-        Brush textBrush = null;  //new SolidBrush(SystemColors.WindowText);
-        Brush selectedBrush = null;
-        Pen pen = null;
         public int BitsPerRow = 8;
         public int BytesPerCharacter = 8;
 
@@ -26,10 +27,11 @@ namespace CharSet
         int CharacterWidth = 12;
         int CharacterHeight = 12;
 
-        int MouseAt = -1;
+        int HoveredChar = -1;
 
         public int SelectedIndex;
         public int SelectionLength = 1;
+        public bool ShowSelected = false;
 
         public delegate void CharacterSelectedEvent(object sender, EventArgs e);
         public event CharacterSelectedEvent CharacterSelected;
@@ -137,30 +139,22 @@ namespace CharSet
         {
         }
 
-        private void CharViewer_Paint(object sender, PaintEventArgs e)
-        {
-            DrawCharSet(FontData, e.Graphics, 0, 0);
-        }
-
-        internal void Clear()
-        {
-            FontData = new byte[CHARSET_SIZE];
-            Refresh();
-        }
-
         private void DrawCharSet(byte[] data, Graphics g, int StartX, int StartY)
         {
-            if (data == null)
-                return;
 
-            if (textBrush == null)
+        }
+
+        private void CharViewer_Paint(object sender, PaintEventArgs e)
+        {
+            int StartX = 0;
+            int StartY = 0;
+
+            if (FontData == null)
             {
-                textBrush = new SolidBrush(this.ForeColor);
-                selectedBrush = new SolidBrush(Color.Gray);
-                pen = new Pen(Color.Gray);
+                return;
             }
 
-            int characters = data.Length / BytesPerCharacter;
+            int characters = FontData.Length / BytesPerCharacter;
             int x0 = StartX;
             int x = x0;
             int y0 = StartY;
@@ -177,27 +171,30 @@ namespace CharSet
             //int[] cols = { StartX, StartX + 32, StartX + 28 };
             //int[] rows = { StartY, StartY + 24, StartY + 28 };
 
-            g.DrawString(MouseAt.ToString(), this.Font, textBrush, 0, 0);
+            if (ShowSelected)
+            {
+                e.Graphics.DrawString(SelectedIndex.ToString(), this.Font, textBrush, 0, 0);
+            }
 
             x = Col1X;
             y = StartY;
             for (int i = 0; i < Columns; i++)
             {
-                g.DrawLine(pen, x - 2, Row1Y - 4, x - 2, lastRow);
-                g.DrawString(" " + i.ToString("X"), this.Font, textBrush, x, y);
+                e.Graphics.DrawLine(pen, x - 2, Row1Y - 4, x - 2, lastRow);
+                e.Graphics.DrawString(" " + i.ToString("X"), this.Font, textBrush, x, y);
                 x += CharacterWidth;
             }
-            g.DrawLine(pen, x - 2, Row1Y - 4, x - 2, lastRow);
+            e.Graphics.DrawLine(pen, x - 2, Row1Y - 4, x - 2, lastRow);
 
             x = StartX;
             y = Row1Y;
             for (int i = 0; i < Rows; i++)
             {
-                g.DrawLine(pen, Col1X - 4, y - 2, lastCol, y - 2);
-                g.DrawString(i.ToString("X") + "0", this.Font, textBrush, x, y);
+                e.Graphics.DrawLine(pen, Col1X - 4, y - 2, lastCol, y - 2);
+                e.Graphics.DrawString(i.ToString("X") + "0", this.Font, textBrush, x, y);
                 y += CharacterHeight;
             }
-            g.DrawLine(pen, Col1X - 4, y - 2, lastCol, y - 2);
+            e.Graphics.DrawLine(pen, Col1X - 4, y - 2, lastCol, y - 2);
 
             x = Col1X;
             y = Row1Y;
@@ -206,19 +203,21 @@ namespace CharSet
                 x0 = x;
                 y0 = y;
                 if (i >= SelectedIndex && i < SelectedIndex + SelectionLength)
-                    g.FillRectangle(selectedBrush, x - 2, y - 2, CharacterWidth, CharacterHeight);
+                {
+                    e.Graphics.FillRectangle(selectedBrush, x - 2, y - 2, CharacterWidth, CharacterHeight);
+                }
 
                 for (int charRow = 0; charRow < BytesPerCharacter; charRow++)
                 {
                     int pos = i * BytesPerCharacter + charRow;
-                    if (pos < 0 || pos >= data.Length)
+                    if (pos < 0 || pos >= FontData.Length)
                         return;
 
-                    byte b = data[pos];
+                    byte b = FontData[pos];
                     for (int bit = 128; bit > 0;)
                     {
                         if ((b & bit) > 0)
-                            g.FillRectangle(textBrush, x, y, bitWidth, bitHeight);
+                            e.Graphics.FillRectangle(textBrush, x, y, bitWidth, bitHeight);
                         x += bitWidth;
                         bit = bit >> 1;
                     }
@@ -229,6 +228,12 @@ namespace CharSet
                 y = Row1Y + ((int)(i + 1) / Rows) * CharacterHeight;
 
             }
+        }
+
+        internal void Clear()
+        {
+            FontData = new byte[CHARSET_SIZE];
+            Refresh();
         }
 
         /// <summary>
@@ -293,10 +298,6 @@ namespace CharSet
         {
         }
 
-        private void CharViewer_Click(object sender, EventArgs e)
-        {
-        }
-
         private void NextButton_Click(object sender, EventArgs e)
         {
         }
@@ -306,7 +307,7 @@ namespace CharSet
             if (e.Button == MouseButtons.Left && e.Button == MouseButtons.Left)
             {
                 CharViewer_MouseMove(sender, e);
-                SelectionLength = MouseAt - SelectedIndex + 1;
+                SelectionLength = HoveredChar - SelectedIndex + 1;
                 Refresh();
                 OnCharacterSelected();
             }
@@ -315,17 +316,18 @@ namespace CharSet
 
         private void CharViewer_MouseMove(object sender, MouseEventArgs e)
         {
-            Point p = new Point();
-
-            p.X = (e.X - Col1X) / CharacterWidth;
-            p.Y = (e.Y - Row1Y) / CharacterHeight;
+            Point p = new Point
+            {
+                X = (e.X - Col1X) / CharacterWidth,
+                Y = (e.Y - Row1Y) / CharacterHeight
+            };
 
             if (p.X < 0 || p.X >= Columns)
-                MouseAt = -1;
+                HoveredChar = -1;
             else if (p.Y < 0 || p.Y >= Rows)
-                MouseAt = -1;
+                HoveredChar = -1;
             else
-                MouseAt = p.Y * Columns + p.X;
+                HoveredChar = p.Y * Columns + p.X;
         }
 
         private void CharViewer_MouseDown(object sender, MouseEventArgs e)
@@ -334,7 +336,7 @@ namespace CharSet
             {
                 this.MouseButton = e.Button;
                 CharViewer_MouseMove(sender, e);
-                SelectedIndex = MouseAt;
+                SelectedIndex = HoveredChar;
                 SelectionLength = 1;
                 Refresh();
             }

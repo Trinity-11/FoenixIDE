@@ -4,6 +4,7 @@ using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.Devices.SDCard;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
+using FoenixIDE.CharEditor;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,6 +25,7 @@ namespace FoenixIDE.UI
         public UploaderWindow uploaderWindow;
         private SDCardWindow sdCardWindow = new SDCardWindow();
         private TileEditor tileEditor;
+        private CharEditorWindow charEditor;
         public SerialTerminal terminal;
 
         // Local variables and events
@@ -555,7 +557,17 @@ namespace FoenixIDE.UI
             {
                 tileEditor.BringToFront();
             }
-    }
+        }
+
+
+        private void characterEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (charEditor == null)
+            {
+                charEditor = new CharEditorWindow();
+            }
+            charEditor.Show();
+        }
 
         private void Gpu_MouseMove(object sender, MouseEventArgs e)
         {
@@ -629,7 +641,7 @@ namespace FoenixIDE.UI
             if (kernel.MemMgr != null)
             {
                 sdCardWindow.SetPath(kernel.MemMgr.SDCARD.GetSDCardPath());
-                sdCardWindow.ShowDialog();
+                sdCardWindow.ShowDialog(this);
                 ResetSDCard();
             }
         }

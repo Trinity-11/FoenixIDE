@@ -1,4 +1,4 @@
-﻿namespace CharSet
+﻿namespace FoenixIDE.CharEditor
 {
     partial class CharViewer
     {
@@ -40,7 +40,6 @@
             this.Name = "CharViewer";
             this.Size = new System.Drawing.Size(572, 457);
             this.SizeChanged += new System.EventHandler(this.CharViewer_SizeChanged);
-            this.Click += new System.EventHandler(this.CharViewer_Click);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.CharViewer_Paint);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.CharViewer_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.CharViewer_MouseMove);

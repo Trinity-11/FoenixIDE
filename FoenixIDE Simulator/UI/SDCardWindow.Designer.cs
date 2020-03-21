@@ -35,15 +35,18 @@
             this.label1 = new System.Windows.Forms.Label();
             this.ButtonClose = new System.Windows.Forms.Button();
             this.FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.label2 = new System.Windows.Forms.Label();
+            this.CapacityText = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SDCardFolderText
             // 
-            this.SDCardFolderText.Location = new System.Drawing.Point(56, 44);
+            this.SDCardFolderText.Location = new System.Drawing.Point(68, 44);
             this.SDCardFolderText.Margin = new System.Windows.Forms.Padding(2);
             this.SDCardFolderText.Name = "SDCardFolderText";
             this.SDCardFolderText.ReadOnly = true;
-            this.SDCardFolderText.Size = new System.Drawing.Size(326, 20);
+            this.SDCardFolderText.Size = new System.Drawing.Size(314, 20);
             this.SDCardFolderText.TabIndex = 5;
             // 
             // FolderSelectButton
@@ -81,7 +84,7 @@
             // ButtonClose
             // 
             this.ButtonClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ButtonClose.Location = new System.Drawing.Point(176, 75);
+            this.ButtonClose.Location = new System.Drawing.Point(176, 94);
             this.ButtonClose.Name = "ButtonClose";
             this.ButtonClose.Size = new System.Drawing.Size(75, 23);
             this.ButtonClose.TabIndex = 8;
@@ -89,12 +92,44 @@
             this.ButtonClose.UseVisualStyleBackColor = true;
             this.ButtonClose.Click += new System.EventHandler(this.ButtonClose_Click);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 70);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(51, 13);
+            this.label2.TabIndex = 10;
+            this.label2.Text = "Capacity:";
+            // 
+            // CapacityText
+            // 
+            this.CapacityText.Enabled = false;
+            this.CapacityText.Location = new System.Drawing.Point(68, 67);
+            this.CapacityText.Margin = new System.Windows.Forms.Padding(2);
+            this.CapacityText.MaxLength = 4;
+            this.CapacityText.Name = "CapacityText";
+            this.CapacityText.Size = new System.Drawing.Size(58, 20);
+            this.CapacityText.TabIndex = 9;
+            this.CapacityText.Text = "64";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(130, 71);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(23, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "MB";
+            // 
             // SDCardWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonClose;
-            this.ClientSize = new System.Drawing.Size(425, 105);
+            this.ClientSize = new System.Drawing.Size(425, 129);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.CapacityText);
             this.Controls.Add(this.ButtonClose);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.SDCardEnabled);
@@ -117,5 +152,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button ButtonClose;
         private System.Windows.Forms.FolderBrowserDialog FolderDialog;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox CapacityText;
+        private System.Windows.Forms.Label label3;
     }
 }

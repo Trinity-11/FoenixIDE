@@ -52,6 +52,7 @@ namespace FoenixIDE.UI
             this.loadImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tileEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.characterEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.terminalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -241,7 +242,8 @@ namespace FoenixIDE.UI
             this.uploaderToolStripMenuItem,
             this.loadImageToolStripMenuItem,
             this.sDCardToolStripMenuItem,
-            this.tileEditorToolStripMenuItem});
+            this.tileEditorToolStripMenuItem,
+            this.characterEditorToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
@@ -273,6 +275,13 @@ namespace FoenixIDE.UI
             this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.tileEditorToolStripMenuItem.Text = "&Tile Editor";
             this.tileEditorToolStripMenuItem.Click += new System.EventHandler(this.TileEditorToolStripMenuItem_Click);
+            // 
+            // characterEditorToolStripMenuItem
+            // 
+            this.characterEditorToolStripMenuItem.Name = "characterEditorToolStripMenuItem";
+            this.characterEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.characterEditorToolStripMenuItem.Text = "&Character Editor";
+            this.characterEditorToolStripMenuItem.Click += new System.EventHandler(this.characterEditorToolStripMenuItem_Click);
             // 
             // windowsToolStripMenuItem
             // 
@@ -486,6 +495,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripStatusLabel toolStripRevision;
         private System.Windows.Forms.ToolStripStatusLabel dipSwitch;
         private System.Windows.Forms.ToolTip Tooltip;
+        private System.Windows.Forms.ToolStripMenuItem characterEditorToolStripMenuItem;
     }
 }
 

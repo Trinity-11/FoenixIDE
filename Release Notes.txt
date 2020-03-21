@@ -1,3 +1,9 @@
+Release 0.4.0.0
+---------------
+Added the Character Editor, under the Tools menu.
+This application allows for editing of font data for the C256 Foenix.
+CPU is now able to handle WAI opcode. When an interrupt is detected, continue at the next line.
+
 Release 0.3.1.2
 ---------------
 Started to use the Multimedia Timer to improve drawing time.

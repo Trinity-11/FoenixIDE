@@ -143,8 +143,7 @@ namespace FoenixIDE.Processor
         {
             if (Pins.Ready_)
                 return false;
-            if (Waiting)
-                return false;
+            
 
             if (this.Pins.GetInterruptPinActive)
             {
@@ -153,6 +152,12 @@ namespace FoenixIDE.Processor
                     return true;
                 }
             }
+
+            if (Waiting)
+            {
+                return false;
+            }
+
             int pc = GetLongPC();
             // TODO - if pc > RAM size, then throw an exception
             CurrentOpcode = opcodes[Memory.RAM.ReadByte(pc)];
@@ -202,6 +207,7 @@ namespace FoenixIDE.Processor
             Pins.IRQ = false;
             Pins.VectorPull = false;
             Memory.VectorPull = false;
+            Waiting = false;
         }
 
         /// <summary>
@@ -466,7 +472,7 @@ namespace FoenixIDE.Processor
                 default:
                     throw new Exception("Invalid interrupt type: " + T.ToString());
             }
-
+            Waiting = false;
             if (Flags.Emulation)
                 JumpVector(emuAddr);
             else

@@ -112,6 +112,12 @@
     <Compile Include="Display\Gpu.Designer.cs">
       <DependentUpon>Gpu.cs</DependentUpon>
     </Compile>
+    <Compile Include="CharEditor\CharEditorWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CharEditor\CharEditorWindow.Designer.cs">
+      <DependentUpon>CharEditorWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\CPUWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -123,6 +129,12 @@
     </Compile>
     <Compile Include="UI\About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CharEditor\EditControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CharEditor\EditControl.Designer.cs">
+      <DependentUpon>EditControl.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\SDCardWindow.cs">
       <SubType>Form</SubType>
@@ -187,14 +199,26 @@
     <Compile Include="UI\UploaderWindow.Designer.cs">
       <DependentUpon>UploaderWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="CharEditor\ViewControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CharEditor\ViewControl.designer.cs">
+      <DependentUpon>ViewControl.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Display\Gpu.resx">
       <DependentUpon>Gpu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CharEditor\CharEditorWindow.resx">
+      <DependentUpon>CharEditorWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\CPUWindow.resx">
       <DependentUpon>CPUWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\About.resx">
       <DependentUpon>About.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CharEditor\EditControl.resx">
+      <DependentUpon>EditControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
@@ -234,6 +258,9 @@
       <DependentUpon>UploaderWindow.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Basic\MultimediaTimer.cs" />
+    <EmbeddedResource Include="CharEditor\ViewControl.resx">
+      <DependentUpon>ViewControl.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -247,6 +274,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\C64_TrueType_v1.2-STYLE.zip" />
+    <None Include="Resources\CBM-ASCII_8x16.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\CBM-ASCII_8x8.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\FOENIX-CHARACTER-ASCII.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

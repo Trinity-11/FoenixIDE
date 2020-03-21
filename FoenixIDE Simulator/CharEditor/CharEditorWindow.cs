@@ -7,25 +7,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Nu64.CharEdit
+namespace FoenixIDE.CharEditor
 {
-    public partial class CharEditMain : Form
+    public partial class CharEditorWindow : Form
     {
 
-        public CharEditMain()
+        public CharEditorWindow()
         {
             InitializeComponent();
         }
 
-        private void clearrToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveFileDialog f = new SaveFileDialog();
-            f.Filter = "ROM file|*.bin|PNG Image|*.png|BMP Image|*.bmp|All Files|*.*";
+            SaveFileDialog f = new SaveFileDialog {
+                Filter = "ROM file|*.bin|PNG Image|*.png|BMP Image|*.bmp|All Files|*.*"
+            };
             if (f.ShowDialog() == DialogResult.OK)
             {
                 string ext = System.IO.Path.GetExtension(f.FileName).ToLower();
@@ -37,16 +33,19 @@ namespace Nu64.CharEdit
                     case ".png":
                     case ".bmp":
                         //charViewer1.InputData = charViewer1.LoadPNG(f.FileName);
+                        MessageBox.Show("Saving to PNG and BMP not implemented yet");
                         break;
                 }
                 charViewer1.Refresh();
             }
         }
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog f = new OpenFileDialog();
-            f.Filter = "PNG Image|*.png|BMP Image|*.bmp|ROM BIN file|*.bin|All Files|*.*";
+            OpenFileDialog f = new OpenFileDialog
+            {
+                Filter = "Image Files (*.BMP *.PNG *.BIN)|*.BMP;*.PNG;*.BIN|ROM file|*.bin|PNG Image|*.png|BMP Image|*.bmp|All Files|*.*"
+            };
             if (f.ShowDialog() == DialogResult.OK)
             {
                 string ext = System.IO.Path.GetExtension(f.FileName).ToLower();
@@ -75,9 +74,40 @@ namespace Nu64.CharEdit
             charViewer1.Refresh();
         }
 
+        /**
+         * This method is called when a cell is selected in the ViewControl
+         */
         private void CharViewer1_CharacterSelected(object sender, EventArgs e)
         {
-            editControl1.LoadCharacter(charViewer1.FontData, charViewer1.SelectedIndex, charViewer1.BytesPerCharacter);
+            int value = charViewer1.SelectedIndex;
+            SelectedIndexLabel.Text = "Dec:" + value + ", Hex: $" + value.ToString("X2") + ", Char: " + Convert.ToChar(value);
+            editControl1.LoadCharacter(charViewer1.FontData, value, charViewer1.BytesPerCharacter);
+        }
+
+        private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Hide();
+        }
+
+        private void CharEditorWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            Hide();
+        }
+
+        private void CopyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void PasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ClearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

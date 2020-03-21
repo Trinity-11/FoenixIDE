@@ -100,7 +100,7 @@ namespace FoenixIDE.UI
             {
                 Title = "Load Bitmap",
                 DefaultExt = ".bmp",
-                Filter = "Bitmap Files|*.bmp|Binary Files|*.bin|Any File|*.bmp;*.png"
+                Filter = "Images Files (*.bmp *.bin *.data)|*.bmp;*.bin;*.data|Binary Files|*.bin|Bitmap Files|*.bmp|Data Files|*.data|Any File|*.*"
             };
 
             // Load content of file in a TextBlock

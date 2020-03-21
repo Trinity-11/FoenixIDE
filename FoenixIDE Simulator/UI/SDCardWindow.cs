@@ -26,7 +26,6 @@ namespace FoenixIDE.Simulator.UI
             if (FolderDialog.ShowDialog() == DialogResult.OK) {
                 SDCardFolderText.Text = FolderDialog.SelectedPath;
                 SDCardEnabled.Checked = true;
-                Close();
             }
         }
 
@@ -56,10 +55,11 @@ namespace FoenixIDE.Simulator.UI
 
         private void SDCardEnabled_CheckedChanged(object sender, EventArgs e)
         {
-            FolderSelectButton.Enabled = SDCardEnabled.Checked;
+            CapacityText.Enabled = SDCardEnabled.Checked;
             if (!SDCardEnabled.Checked)
             {
                 SDCardFolderText.Text = "";
+                CapacityText.Text = "64";
             }
         }
     }

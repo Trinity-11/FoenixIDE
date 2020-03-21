@@ -70,7 +70,7 @@ namespace FoenixIDE.UI
 
         private void ThreadProc()
         {
-            while (!kernel.CPU.DebugPause && !kernel.CPU.Waiting)
+            while (!kernel.CPU.DebugPause)
             {
                 ExecuteStep();
             }
