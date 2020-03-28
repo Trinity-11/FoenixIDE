@@ -68,8 +68,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basic\Joystick.cs" />
     <Compile Include="Basic\ScanCodes.cs" />
     <Compile Include="Devices\BoardVersion.cs" />
+    <Compile Include="Devices\GabeRAM.cs" />
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
@@ -112,10 +114,10 @@
     <Compile Include="Display\Gpu.Designer.cs">
       <DependentUpon>Gpu.cs</DependentUpon>
     </Compile>
-    <Compile Include="CharEditor\CharEditorWindow.cs">
+    <Compile Include="UI\CharEditor\CharEditorWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CharEditor\CharEditorWindow.Designer.cs">
+    <Compile Include="UI\CharEditor\CharEditorWindow.Designer.cs">
       <DependentUpon>CharEditorWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\CPUWindow.cs">
@@ -130,11 +132,17 @@
     <Compile Include="UI\About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
     </Compile>
-    <Compile Include="CharEditor\EditControl.cs">
+    <Compile Include="UI\CharEditor\EditControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="CharEditor\EditControl.Designer.cs">
+    <Compile Include="UI\CharEditor\EditControl.Designer.cs">
       <DependentUpon>EditControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\JoystickForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\JoystickForm.Designer.cs">
+      <DependentUpon>JoystickForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\SDCardWindow.cs">
       <SubType>Form</SubType>
@@ -199,16 +207,16 @@
     <Compile Include="UI\UploaderWindow.Designer.cs">
       <DependentUpon>UploaderWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="CharEditor\ViewControl.cs">
+    <Compile Include="UI\CharEditor\ViewControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="CharEditor\ViewControl.designer.cs">
+    <Compile Include="UI\CharEditor\ViewControl.designer.cs">
       <DependentUpon>ViewControl.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Display\Gpu.resx">
       <DependentUpon>Gpu.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CharEditor\CharEditorWindow.resx">
+    <EmbeddedResource Include="UI\CharEditor\CharEditorWindow.resx">
       <DependentUpon>CharEditorWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\CPUWindow.resx">
@@ -217,8 +225,11 @@
     <EmbeddedResource Include="UI\About.resx">
       <DependentUpon>About.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CharEditor\EditControl.resx">
+    <EmbeddedResource Include="UI\CharEditor\EditControl.resx">
       <DependentUpon>EditControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\JoystickForm.resx">
+      <DependentUpon>JoystickForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
@@ -258,7 +269,7 @@
       <DependentUpon>UploaderWindow.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Basic\MultimediaTimer.cs" />
-    <EmbeddedResource Include="CharEditor\ViewControl.resx">
+    <EmbeddedResource Include="UI\CharEditor\ViewControl.resx">
       <DependentUpon>ViewControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">

@@ -199,5 +199,32 @@ namespace FoenixIDETester
             Assert.AreEqual(0x23, mgr.RAM.ReadByte(0x133));
             Assert.AreEqual(0xFE, mgr.RAM.ReadByte(0x134));
         }
+
+        /*
+         * LDY #$98
+         * CPY #0
+         * - check that N flag is 1
+         */
+        [TestMethod]
+        public void CompareIndexSetsNegative()
+        {
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDY_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x98);
+            cpu.ExecuteNext();
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.CPY_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0);
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Negative); // most significan bit is set
+            Assert.IsFalse(cpu.Flags.Zero);
+            Assert.IsTrue(cpu.Flags.Carry); // no borrow required
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.CPY_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x9A);
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Negative); // most significan bit is set
+            Assert.IsFalse(cpu.Flags.Zero);
+            Assert.IsFalse(cpu.Flags.Carry); // borrow required
+        }
     }
 }

@@ -42,11 +42,11 @@ namespace FoenixIDE
             }
             MemMgr = new MemoryManager
             {
-                //RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),                        // RAM: 2MB Rev B, 4MB Rev C
+                RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),                      // RAM: 2MB Rev B, 4MB Rev C
                 VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),       // 60K
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE),       // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE),       // 8MB RAM
-                BEATRIX = new MemoryRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE), // 4K 
+                BEATRIX = new GabeRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE),   // 4K 
 
                 // Special devices
                 MATH = new MathCoproRegisters(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
@@ -91,7 +91,15 @@ namespace FoenixIDE
                     break;
             }
         }
-       
+
+        public BoardVersion GetVersion()
+        {
+            return boardVersion;
+        }
+        public void SetVersion(BoardVersion rev)
+        {
+            boardVersion = rev;
+        }
         // return true if the CPU was reset and the program was loaded
         public bool ResetCPU(bool ResetMemory, string kernelFilename)
         {
@@ -175,16 +183,9 @@ namespace FoenixIDE
 
         public void ResetMemory()
         {
-            MemMgr.RAM = null; // help the garbage collector
-            int memSize = MemoryMap.RAM_SIZE;
-            if (boardVersion == BoardVersion.RevC)
-            {
-                memSize *= 2;
-            }
-            MemoryRAM ram = new MemoryRAM(MemoryMap.RAM_START, memSize);
-            MemMgr.RAM = ram;
-
-            gpu.RAM = MemMgr.RAM;
+            MemMgr.RAM.Zero();
+            MemMgr.VICKY.Zero();
+            MemMgr.VDMA.Zero();
         }
     }
 }

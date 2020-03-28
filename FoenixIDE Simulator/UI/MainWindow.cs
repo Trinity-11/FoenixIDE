@@ -12,6 +12,7 @@ using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FoenixIDE.Timers;
 
 namespace FoenixIDE.UI
 {
@@ -27,6 +28,7 @@ namespace FoenixIDE.UI
         private TileEditor tileEditor;
         private CharEditorWindow charEditor;
         public SerialTerminal terminal;
+        private JoystickForm joystickWindow = new JoystickForm();
 
         // Local variables and events
         private byte previousGraphicMode;
@@ -119,6 +121,7 @@ namespace FoenixIDE.UI
             ShowMemoryWindow();
             gpu.StartOfFrame += SOF;
             performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
+            joystickWindow.beatrix = kernel.MemMgr.BEATRIX;
 
             if (disabledIRQs)
             {
@@ -238,6 +241,7 @@ namespace FoenixIDE.UI
                 int top =  this.Top + (this.Height - uploaderWindow.Height) / 2;
                 uploaderWindow.Location = new Point(left, top);
                 uploaderWindow.kernel = kernel;
+                uploaderWindow.SetBoardVersion(version);
                 uploaderWindow.Show();
             }
             else
@@ -350,20 +354,25 @@ namespace FoenixIDE.UI
         DateTime previousTime = DateTime.Now;
         private void PerformanceTimer_Tick(object sender, EventArgs e)
         {
-            if (kernel != null  && kernel.CPU != null && !kernel.CPU.DebugPause)
+            if (kernel != null  && kernel.CPU != null)
             {
                 DateTime currentTime = DateTime.Now;
-                TimeSpan s = currentTime - previousTime;
-                int currentCounter = kernel.CPU.CycleCounter;
-                int currentFrame = gpu.paintCycle;
-                double cps = (currentCounter - previousCounter) / s.TotalSeconds;
-                double fps = (currentFrame - previousFrame) / s.TotalSeconds;
 
-                previousCounter = currentCounter;
-                previousTime = currentTime;
-                previousFrame = currentFrame;
-                cpsPerf.Text = "CPS: " + cps.ToString("N0");
-                fpsPerf.Text = "FPS: " + fps.ToString("N0");
+                if (!kernel.CPU.DebugPause)
+                {
+                    
+                    TimeSpan s = currentTime - previousTime;
+                    int currentCounter = kernel.CPU.CycleCounter;
+                    int currentFrame = gpu.paintCycle;
+                    double cps = (currentCounter - previousCounter) / s.TotalSeconds;
+                    double fps = (currentFrame - previousFrame) / s.TotalSeconds;
+
+                    previousCounter = currentCounter;
+                    previousTime = currentTime;
+                    previousFrame = currentFrame;
+                    cpsPerf.Text = "CPS: " + cps.ToString("N0");
+                    fpsPerf.Text = "FPS: " + fps.ToString("N0");
+                }
                 // write the time to memory - values are BCD
                 kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Second));
                 kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Minute));
@@ -685,6 +694,11 @@ namespace FoenixIDE.UI
             {
                 version = BoardVersion.RevB;
             }
+            kernel.SetVersion(version);
+            if (uploaderWindow != null)
+            {
+                uploaderWindow.SetBoardVersion(version);
+            }
             DisplayBoardVersion();
             // TODO - Reset the memory and reload the program?
         }
@@ -791,6 +805,11 @@ namespace FoenixIDE.UI
         {
             switches[6] = gamma;
             dipSwitch.Invalidate();
+        }
+
+        private void joystickSimulatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            joystickWindow.Show();
         }
     }
 }

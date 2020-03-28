@@ -1057,10 +1057,10 @@ namespace FoenixIDE.Processor
             {
                 val = val & 0xFF;
             }
-
-            cpu.Flags.Zero = Reg.Value == val;
+            int subResult = Reg.Value - val;
+            cpu.Flags.Zero = subResult == 0;
             cpu.Flags.Carry = Reg.Value >= val;
-            cpu.Flags.Negative = Reg.Value < val;
+            cpu.Flags.Negative = Reg.Width == 1 ? (subResult & 0x80) == 0x80 : (subResult & 0x8000) == 0x8000;
         }
 
         /// <summary>

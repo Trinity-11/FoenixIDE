@@ -648,7 +648,7 @@ namespace FoenixIDE.Display
                             pixelIndex = VRAM.ReadByte(spriteAddress + col + line * 32);
                             if (pixelIndex != 0)
                             {
-                                value = (int)graphicsLUT[lutIndex * 256 + pixelIndex];
+                                value = (int)graphicsLUT[(lutIndex + 1) * 256 + pixelIndex];
                                 if (gammaCorrection != null)
                                 {
                                     //value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);

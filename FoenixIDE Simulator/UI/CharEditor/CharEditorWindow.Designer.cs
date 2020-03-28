@@ -33,6 +33,11 @@ namespace FoenixIDE.CharEditor
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CharEditorWindow));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.charViewer1 = new FoenixIDE.CharEditor.CharViewer();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.SelectedIndexLabel = new System.Windows.Forms.Label();
+            this.SelectedLabel = new System.Windows.Forms.Label();
+            this.editControl1 = new FoenixIDE.CharEditor.EditControl();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,17 +48,12 @@ namespace FoenixIDE.CharEditor
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.charViewer1 = new FoenixIDE.CharEditor.CharViewer();
-            this.editControl1 = new FoenixIDE.CharEditor.EditControl();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.SelectedIndexLabel = new System.Windows.Forms.Label();
-            this.SelectedLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -74,6 +74,50 @@ namespace FoenixIDE.CharEditor
             this.splitContainer1.Size = new System.Drawing.Size(837, 379);
             this.splitContainer1.SplitterDistance = 401;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // charViewer1
+            // 
+            this.charViewer1.BackColor = System.Drawing.Color.DarkBlue;
+            this.charViewer1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.charViewer1.Location = new System.Drawing.Point(9, 6);
+            this.charViewer1.Name = "charViewer1";
+            this.charViewer1.Size = new System.Drawing.Size(371, 367);
+            this.charViewer1.TabIndex = 0;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.SelectedIndexLabel);
+            this.panel1.Controls.Add(this.SelectedLabel);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(432, 31);
+            this.panel1.TabIndex = 2;
+            // 
+            // SelectedIndexLabel
+            // 
+            this.SelectedIndexLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SelectedIndexLabel.Location = new System.Drawing.Point(96, 4);
+            this.SelectedIndexLabel.Name = "SelectedIndexLabel";
+            this.SelectedIndexLabel.Size = new System.Drawing.Size(324, 22);
+            this.SelectedIndexLabel.TabIndex = 1;
+            this.SelectedIndexLabel.Text = "N/A";
+            // 
+            // SelectedLabel
+            // 
+            this.SelectedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SelectedLabel.Location = new System.Drawing.Point(4, 4);
+            this.SelectedLabel.Name = "SelectedLabel";
+            this.SelectedLabel.Size = new System.Drawing.Size(86, 22);
+            this.SelectedLabel.TabIndex = 0;
+            this.SelectedLabel.Text = "Selected:";
+            // 
+            // editControl1
+            // 
+            this.editControl1.Location = new System.Drawing.Point(3, 60);
+            this.editControl1.Name = "editControl1";
+            this.editControl1.Size = new System.Drawing.Size(429, 317);
+            this.editControl1.TabIndex = 0;
             // 
             // menuStrip1
             // 
@@ -149,50 +193,6 @@ namespace FoenixIDE.CharEditor
             this.clearToolStripMenuItem.Text = "Cl&ear Block";
             this.clearToolStripMenuItem.Click += new System.EventHandler(this.ClearToolStripMenuItem_Click);
             // 
-            // charViewer1
-            // 
-            this.charViewer1.BackColor = System.Drawing.Color.DarkBlue;
-            this.charViewer1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.charViewer1.Location = new System.Drawing.Point(9, 6);
-            this.charViewer1.Name = "charViewer1";
-            this.charViewer1.Size = new System.Drawing.Size(371, 367);
-            this.charViewer1.TabIndex = 0;
-            // 
-            // editControl1
-            // 
-            this.editControl1.Location = new System.Drawing.Point(3, 60);
-            this.editControl1.Name = "editControl1";
-            this.editControl1.Size = new System.Drawing.Size(429, 317);
-            this.editControl1.TabIndex = 0;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.SelectedIndexLabel);
-            this.panel1.Controls.Add(this.SelectedLabel);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(432, 31);
-            this.panel1.TabIndex = 2;
-            // 
-            // SelectedIndexLabel
-            // 
-            this.SelectedIndexLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SelectedIndexLabel.Location = new System.Drawing.Point(96, 4);
-            this.SelectedIndexLabel.Name = "SelectedIndexLabel";
-            this.SelectedIndexLabel.Size = new System.Drawing.Size(324, 22);
-            this.SelectedIndexLabel.TabIndex = 1;
-            this.SelectedIndexLabel.Text = "N/A";
-            // 
-            // SelectedLabel
-            // 
-            this.SelectedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SelectedLabel.Location = new System.Drawing.Point(4, 4);
-            this.SelectedLabel.Name = "SelectedLabel";
-            this.SelectedLabel.Size = new System.Drawing.Size(86, 22);
-            this.SelectedLabel.TabIndex = 0;
-            this.SelectedLabel.Text = "Selected:";
-            // 
             // CharEditorWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -202,6 +202,7 @@ namespace FoenixIDE.CharEditor
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "CharEditorWindow";
@@ -209,13 +210,14 @@ namespace FoenixIDE.CharEditor
             this.Text = "Character Editor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CharEditorWindow_FormClosing);
             this.Load += new System.EventHandler(this.CharEdWindow_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CharEditorWindow_KeyDown);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

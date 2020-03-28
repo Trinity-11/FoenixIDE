@@ -1,3 +1,12 @@
+Release 0.4.0.1
+---------------
+Added the random number generator at address: $AF:E884.
+Started to code the joystick implementation using multimedia library instead of virtual joystick.
+Tweaked the GPU to emulate the LUT bug in Vicky (i.e. LUT0 is not used).
+Fixed the emulated CPU compare method to properly handle the Negative flag (thanks to gadget for reporting the issue).
+Stop the CPU when the next instruction would exceed the RAM bounds.
+Added a capacity dropdown to the SDCard form.
+
 Release 0.4.0.0
 ---------------
 Added the Character Editor, under the Tools menu.

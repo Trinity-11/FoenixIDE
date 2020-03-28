@@ -15,6 +15,7 @@ namespace FoenixIDE.Simulator.UI
         public SDCardWindow()
         {
             InitializeComponent();
+            CapacityCombo.SelectedIndex = 3;
         }
 
         private void BrowseFileButton_Click(object sender, EventArgs e)
@@ -55,11 +56,11 @@ namespace FoenixIDE.Simulator.UI
 
         private void SDCardEnabled_CheckedChanged(object sender, EventArgs e)
         {
-            CapacityText.Enabled = SDCardEnabled.Checked;
+            CapacityCombo.Enabled = SDCardEnabled.Checked;
             if (!SDCardEnabled.Checked)
             {
                 SDCardFolderText.Text = "";
-                CapacityText.Text = "64";
+                CapacityCombo.SelectedIndex = 3;
             }
         }
     }

@@ -10,6 +10,8 @@ namespace FoenixIDE.MemoryLocations
     {
         #region Beatrix Memory Map
 
+        public const int OPL2_S_BASE = 0xAF_E700;   // Start of OPL2 Stereo range
+
         // Joystick Ports
         public const int JOYSTICK0 = 0xAF_E800; // (R) Joystick 0 - J7(Next to Buzzer)
         public const int JOYSTICK1 = 0xAF_E801; // (R) Joystick 1 - J8
@@ -35,10 +37,51 @@ namespace FoenixIDE.MemoryLocations
         public const int CODEC_SIZE = 0x04;           // Size of CODEC memory range
         public const int CODEC_WR_CTRL = 0xAF_E822;   // codec write address
 
+        // GABE
+        /* 
+            GABE_CTRL_PWR_LED   = $01     ; Controls the LED in the Front of the case (Next to the reset button)
+            GABE_CTRL_SDC_LED   = $02     ; Controls the LED in the Front of the Case (Next to SDCard)
+            GABE_CTRL_BUZZER    = $10     ; Controls the Buzzer
+            GABE_CTRL_WRM_RST   = $80     ; Warm Reset (needs to Setup other registers)
+        */
+        public const int GABE_MSTR_CTRL = 0xAFE_880;
+        public const int GABE_NOTUSED = 0xAF_E881;  // Reserved for future use
+        public const int GABE_RST_AUTH0 = 0xAF_E882; // Must Contain the BYTE $AD for Reset to Activate
+        public const int GABE_RST_AUTH1 = 0xAF_E883; // Must Contain the BYTE $DE for Reset to Activate
+
+        // READ
+        public const int GABE_RNG_DAT_LO = 0xAF_E884 ; // Low Part of 16Bit RNG Generator
+        public const int GABE_RNG_DAT_HI = 0xAF_E885 ; // High Part of 16Bit RNG Generator
+
+        // WRITE
+        public const int GABE_RNG_SEED_LO = 0xAF_E884 ; // Low Part of 16Bit RNG Generator
+        public const int GABE_RNG_SEED_HI = 0xAF_E885 ; // High Part of 16Bit RNG Generator
+
+        // READ
+        //GABE_RNG_LFSR_DONE  = $80     ; indicates that Output = SEED Database
+        public const int GABE_RNG_STAT = 0xAF_E886 ;
+
+
+        // WRITE
+        /*
+          GABE_RNG_CTRL_EN    = $01     ; Enable the LFSR BLOCK_LEN
+          GABE_RNG_CTRL_DV    = $02     ; After Setting the Seed Value, Toggle that Bit for it be registered
+        */
+        public const int GABE_RNG_CTRL = 0xAF_E886 ;
+
+        /*
+            GABE_SYS_STAT_MID0  = $01     ; Machine ID -- LSB
+            GABE_SYS_STAT_MID1 = $02     ; Machine ID -- MSB
+            GABE_SYS_STAT_EXP = $08     ; if Zero, there is an Expansion Card Preset
+            GABE_SYS_STAT_CPUA  = $40     ; Indicates the(8bit/16bit) Size of the Accumulator
+            GABE_SYS_STAT_CPUX  = $80     ; Indicates the(8bit/16bit) Size of the Accumulator
+        */
+        public const int GABE_SYS_STAT = 0xAF_E887 ;
+
         public const int CODEC_START_FMX = 0xAF_E900;    // Start of CODEC for FMX
         public const int CODEC_WR_CTRL_FMX = 0xAF_E902;  // codec write address for FMX
 
-        public const int OPL2_S_BASE = 0xAF_E700;   // Start of OPL2 Stereo range
+        
 
         #endregion
     }

@@ -36,8 +36,8 @@
             this.ButtonClose = new System.Windows.Forms.Button();
             this.FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.label2 = new System.Windows.Forms.Label();
-            this.CapacityText = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.CapacityCombo = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // SDCardFolderText
@@ -101,17 +101,6 @@
             this.label2.TabIndex = 10;
             this.label2.Text = "Capacity:";
             // 
-            // CapacityText
-            // 
-            this.CapacityText.Enabled = false;
-            this.CapacityText.Location = new System.Drawing.Point(68, 67);
-            this.CapacityText.Margin = new System.Windows.Forms.Padding(2);
-            this.CapacityText.MaxLength = 4;
-            this.CapacityText.Name = "CapacityText";
-            this.CapacityText.Size = new System.Drawing.Size(58, 20);
-            this.CapacityText.TabIndex = 9;
-            this.CapacityText.Text = "64";
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -121,15 +110,30 @@
             this.label3.TabIndex = 11;
             this.label3.Text = "MB";
             // 
+            // CapacityCombo
+            // 
+            this.CapacityCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CapacityCombo.FormattingEnabled = true;
+            this.CapacityCombo.Items.AddRange(new object[] {
+            "8",
+            "16",
+            "32",
+            "64",
+            "256"});
+            this.CapacityCombo.Location = new System.Drawing.Point(68, 67);
+            this.CapacityCombo.Name = "CapacityCombo";
+            this.CapacityCombo.Size = new System.Drawing.Size(56, 21);
+            this.CapacityCombo.TabIndex = 12;
+            // 
             // SDCardWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonClose;
             this.ClientSize = new System.Drawing.Size(425, 129);
+            this.Controls.Add(this.CapacityCombo);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.CapacityText);
             this.Controls.Add(this.ButtonClose);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.SDCardEnabled);
@@ -153,7 +157,7 @@
         private System.Windows.Forms.Button ButtonClose;
         private System.Windows.Forms.FolderBrowserDialog FolderDialog;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox CapacityText;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox CapacityCombo;
     }
 }

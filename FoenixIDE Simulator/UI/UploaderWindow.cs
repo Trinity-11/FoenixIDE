@@ -28,6 +28,20 @@ namespace FoenixIDE.UI
         SerialPort serial = new SerialPort();
         private Queue<byte> recievedData = new Queue<byte>();
 
+        public void SetBoardVersion(BoardVersion ver)
+        {
+            boardVersion = ver;
+            switch (ver)
+            {
+                case BoardVersion.RevB:
+                    RevModeLabel.Text = "Mode: RevB";
+                    break;
+                case BoardVersion.RevC:
+                    RevModeLabel.Text = "Mode: RevC";
+                    break;
+            }
+        }
+
         public UploaderWindow()
         {
             InitializeComponent();

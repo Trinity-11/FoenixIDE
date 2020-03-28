@@ -237,22 +237,6 @@ namespace FoenixIDE.Processor
         }
 
         /// <summary>
-        /// Retrieves the next byte from the instruction stream. 
-        /// Set offset=0 for the first byte after the executing opcode.
-        /// </summary>
-        /// <param name="offset"></param>
-        /// <returns></returns>
-        private int GetNextWord(int offset)
-        {
-            return Memory.ReadWord(GetLongPC() + offset + 1);
-        }
-
-        private int GetNextLong(int offset)
-        {
-            return Memory.ReadLong(GetLongPC() + offset + 1);
-        }
-
-        /// <summary>
         /// Clock cycles used for performance counte This will be periodically reset to zero
         /// as the throttling routine adjusts the system performance. 
         /// </summary>
@@ -304,17 +288,6 @@ namespace FoenixIDE.Processor
             if (Index != null)
                 addr += Index.Value;
             return DataBank.GetLongAddress(Memory.ReadWord(addr));
-        }
-
-        /// <summary>
-        /// Returns a value from the stack. 
-        /// </summary>
-        /// <param name="Offset">Number of bytes below stack pointer to read.</param>
-        /// <returns></returns>
-        private int GetStackValue(int Offset = 0)
-        {
-            int addr = Stack.Value - Offset;
-            return Memory.ReadWord(addr);
         }
 
         #endregion

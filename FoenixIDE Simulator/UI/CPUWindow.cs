@@ -36,6 +36,7 @@ namespace FoenixIDE.UI
         private int TopLineIndex = 0; // this is to help us track which line is the current one being executed
 
         Point position = new Point();
+        private int MemoryLimit = 0;
 
         public CPUWindow()
         {
@@ -46,8 +47,16 @@ namespace FoenixIDE.UI
         public void SetKernel(FoenixSystem kernel)
         {
             this.kernel = kernel;
+            MemoryLimit = kernel.MemMgr.RAM.Length;
             registerDisplay1.CPU = kernel.CPU;
             UpdateQueue();
+            int pc = kernel.CPU.GetLongPC();
+            DebugLine line = GetExecutionInstruction(pc);
+            if (line == null)
+            {
+                GenerateNextInstruction(pc);
+            }
+            DebugPanel.Refresh();
         }
 
         public void UpdateQueue()
@@ -346,27 +355,6 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void StepOverButton_Click(object sender, EventArgs e)
-        {
-            if (position.X > 0 && position.Y > 0)
-            {
-                int row = position.Y / ROW_HEIGHT;
-                DebugLine line = queue[TopLineIndex + row];
-                // Set a breakpoint to the next address
-                int nextAddress = line.PC + line.commandLength;
-                int newValue = breakpoints.Add(nextAddress.ToString("X"));
-
-                if (newValue != -1)
-                {
-                    // Run the CPU until the breakpoint is reached
-                    RunButton_Click(null, null);
-
-                    // Ensure the breakpoint is removed
-                    isStepOver = true;
-                }
-            }
-        }
-
         public void RunButton_Click(object sender, EventArgs e)
         {
             DebugPanel_Leave(sender, e);
@@ -400,9 +388,37 @@ namespace FoenixIDE.UI
             RunButton.Tag = "0";
         }
 
+        private void StepOverButton_Click(object sender, EventArgs e)
+        {
+            if (position.X > 0 && position.Y > 0)
+            {
+                int row = position.Y / ROW_HEIGHT;
+                DebugLine line = queue[TopLineIndex + row];
+                // Set a breakpoint to the next address
+                int nextAddress = line.PC + line.commandLength;
+                int newValue = breakpoints.Add(nextAddress.ToString("X"));
+
+                if (newValue != -1)
+                {
+                    // Run the CPU until the breakpoint is reached
+                    RunButton_Click(null, null);
+
+                    // Ensure the breakpoint is removed
+                    isStepOver = true;
+                }
+            }
+        }
+
         private void StepOver_Click(object sender, EventArgs e)
         {
             int pc = kernel.CPU.GetLongPC();
+            if (pc > MemoryLimit)
+            {
+                string errorMessage = "PC exceeds memory limit.";
+                lastLine.Text = errorMessage;
+                registerDisplay1.PC.BackColor = Color.Red;
+                return;
+            }
             DebugLine line = GetExecutionInstruction(pc);
 
             // Set a breakpoint to the next address
@@ -508,13 +524,27 @@ namespace FoenixIDE.UI
         public void ExecuteStep()
         {
             StepCounter++;
-
-            int currentPC = kernel.CPU.GetLongPC();
             DebugLine line = null;
+            int previousPC = kernel.CPU.GetLongPC();
             if (!kernel.CPU.ExecuteNext())
             {
                 
                 int nextPC = kernel.CPU.GetLongPC();
+                if (nextPC > MemoryLimit)
+                {
+                    UpdateTraceTimer.Enabled = false;
+                    kernel.CPU.DebugPause = true;
+                    string errorMessage = "PC exceeds memory limit.  Calling instruction at address: $" + previousPC.ToString("X6");
+                    if (lastLine.InvokeRequired)
+                    {
+                        lastLine.Invoke(new lastLineDelegate(ShowLastLine), new object[] { errorMessage });
+                    }
+                    else
+                    {
+                        lastLine.Text = errorMessage;
+                    }
+                    return;
+                }
                 if (breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && ((kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) || kernel.CPU.CurrentOpcode.Value == 0)))
                 {
                     if (UpdateTraceTimer.Enabled || kernel.CPU.CurrentOpcode.Value == 0)
@@ -622,7 +652,12 @@ namespace FoenixIDE.UI
             int pc = breakpoints.GetIntFromHex(locationInput.Text);
             kernel.CPU.SetLongPC(pc);
             ClearTrace();
-            kernel.CPU.ExecuteNext();
+            DebugLine line = GetExecutionInstruction(pc);
+            if (line == null)
+            {
+                GenerateNextInstruction(pc);
+            }
+            Invalidate();
         }
 
         private void ClearTraceButton_Click(object sender, EventArgs e)

@@ -259,7 +259,6 @@
         private global::System.Windows.Forms.GroupBox groupBox1;
         private UI.RegisterControl A;
         private global::System.Windows.Forms.Panel panel1;
-        private UI.RegisterControl PC;
         private UI.RegisterControl DBR;
         private global::System.Windows.Forms.Panel panel5;
         private UI.RegisterControl Stack;
@@ -274,5 +273,6 @@
         private global::System.Windows.Forms.Panel panel6;
         private global::System.Windows.Forms.Panel panel8;
         private global::System.Windows.Forms.Timer timer1;
+        public UI.RegisterControl PC;
     }
 }

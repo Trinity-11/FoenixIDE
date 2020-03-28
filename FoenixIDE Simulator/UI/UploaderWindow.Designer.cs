@@ -59,6 +59,7 @@
             this.DebugModeCheckbox = new System.Windows.Forms.CheckBox();
             this.ReflashCheckbox = new System.Windows.Forms.CheckBox();
             this.CountdownLabel = new System.Windows.Forms.Label();
+            this.RevModeLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // ConnectButton
@@ -411,12 +412,22 @@
             this.CountdownLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.CountdownLabel.Visible = false;
             // 
+            // RevModeLabel
+            // 
+            this.RevModeLabel.AutoSize = true;
+            this.RevModeLabel.Location = new System.Drawing.Point(235, 18);
+            this.RevModeLabel.Name = "RevModeLabel";
+            this.RevModeLabel.Size = new System.Drawing.Size(67, 13);
+            this.RevModeLabel.TabIndex = 30;
+            this.RevModeLabel.Text = "Mode: RevB";
+            // 
             // UploaderWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(472, 193);
+            this.Controls.Add(this.RevModeLabel);
             this.Controls.Add(this.CountdownLabel);
             this.Controls.Add(this.ReflashCheckbox);
             this.Controls.Add(this.DebugModeCheckbox);
@@ -496,5 +507,6 @@
         private System.Windows.Forms.CheckBox DebugModeCheckbox;
         private System.Windows.Forms.CheckBox ReflashCheckbox;
         private System.Windows.Forms.Label CountdownLabel;
+        private System.Windows.Forms.Label RevModeLabel;
     }
 }

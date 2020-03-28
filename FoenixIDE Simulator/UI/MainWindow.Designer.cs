@@ -69,6 +69,7 @@ namespace FoenixIDE.UI
             this.panel4 = new System.Windows.Forms.Panel();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.gpu = new FoenixIDE.Display.Gpu();
+            this.joystickSimulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -243,7 +244,8 @@ namespace FoenixIDE.UI
             this.loadImageToolStripMenuItem,
             this.sDCardToolStripMenuItem,
             this.tileEditorToolStripMenuItem,
-            this.characterEditorToolStripMenuItem});
+            this.characterEditorToolStripMenuItem,
+            this.joystickSimulatorToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
@@ -422,6 +424,13 @@ namespace FoenixIDE.UI
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
             // 
+            // joystickSimulatorToolStripMenuItem
+            // 
+            this.joystickSimulatorToolStripMenuItem.Name = "joystickSimulatorToolStripMenuItem";
+            this.joystickSimulatorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.joystickSimulatorToolStripMenuItem.Text = "Joystick Simulator";
+            this.joystickSimulatorToolStripMenuItem.Click += new System.EventHandler(this.joystickSimulatorToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -496,6 +505,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripStatusLabel dipSwitch;
         private System.Windows.Forms.ToolTip Tooltip;
         private System.Windows.Forms.ToolStripMenuItem characterEditorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem joystickSimulatorToolStripMenuItem;
     }
 }
 

@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MemoryWindow));
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.SaveButton = new System.Windows.Forms.Button();
             this.AddressCombo = new System.Windows.Forms.ComboBox();
             this.PreviousButton = new System.Windows.Forms.Button();
             this.NextButton = new System.Windows.Forms.Button();
@@ -52,7 +53,6 @@
             this.MasterControlLabel = new System.Windows.Forms.Label();
             this.HighlightPanel = new System.Windows.Forms.TextBox();
             this.PositionLabel = new System.Windows.Forms.Label();
-            this.SaveButton = new System.Windows.Forms.Button();
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
             this.HeaderPanel.SuspendLayout();
             this.FooterPanel.SuspendLayout();
@@ -74,6 +74,17 @@
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(568, 25);
             this.HeaderPanel.TabIndex = 0;
+            // 
+            // SaveButton
+            // 
+            this.SaveButton.Location = new System.Drawing.Point(490, 1);
+            this.SaveButton.Name = "SaveButton";
+            this.SaveButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveButton.TabIndex = 11;
+            this.SaveButton.Text = "Save";
+            this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Visible = false;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
             // AddressCombo
             // 
@@ -349,17 +360,6 @@
             this.PositionLabel.TabIndex = 10;
             this.PositionLabel.Text = "Position Label";
             this.PositionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // SaveButton
-            // 
-            this.SaveButton.Location = new System.Drawing.Point(490, 1);
-            this.SaveButton.Name = "SaveButton";
-            this.SaveButton.Size = new System.Drawing.Size(75, 23);
-            this.SaveButton.TabIndex = 11;
-            this.SaveButton.Text = "Save";
-            this.SaveButton.UseVisualStyleBackColor = true;
-            this.SaveButton.Visible = false;
-            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
             // SaveDialog
             // 
