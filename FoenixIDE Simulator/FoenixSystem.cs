@@ -31,14 +31,17 @@ namespace FoenixIDE
 
             int memSize = MemoryMap.RAM_SIZE;
             CodecRAM codec = null;
+            SDCardDevice sdcard = null;
             if (boardVersion == BoardVersion.RevC)
             {
                 memSize *= 2;
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_FMX, 2);  // This register is only a single byte but we allow writing a word
+                sdcard = new GabeSDController(MemoryMap.GABE_SDC_CTRL_START, MemoryMap.GABE_SDC_CTRL_SIZE);
             } 
             else
             {
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 2);  // This register is only a single byte but we allow writing a word
+                sdcard = new CH376SRegister(MemoryMap.SDCARD_DATA, MemoryMap.SDCARD_SIZE);
             }
             MemMgr = new MemoryManager
             {
@@ -51,7 +54,7 @@ namespace FoenixIDE
                 // Special devices
                 MATH = new MathCoproRegisters(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
                 KEYBOARD = new KeyboardRegister(MemoryMap.KBD_DATA_BUF, 5),
-                SDCARD = new SDCardRegister(MemoryMap.SDCARD_DATA, MemoryMap.SDCARD_SIZE),
+                SDCARD = sdcard,
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
                 UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
                 UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),

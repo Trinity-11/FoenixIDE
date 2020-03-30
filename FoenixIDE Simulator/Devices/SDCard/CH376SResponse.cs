@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices.SDCard
 {
-    public enum SDCardResponse
+    public enum CH376SResponse
     {
         CMD_STAT_SUCCESS = 0x14,
         CMD_RET_SUCCESS = 0x51,

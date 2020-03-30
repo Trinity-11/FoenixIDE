@@ -283,7 +283,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        public void SDCardInterrupt(SDCardInterrupt irq)
+        public void SDCardInterrupt(CH376SInterrupt irq)
         {
             // Check if the Keyboard interrupt is allowed
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
@@ -650,6 +650,7 @@ namespace FoenixIDE.UI
             if (kernel.MemMgr != null)
             {
                 sdCardWindow.SetPath(kernel.MemMgr.SDCARD.GetSDCardPath());
+                sdCardWindow.SetCapacity(kernel.MemMgr.SDCARD.GetCapacity());
                 sdCardWindow.ShowDialog(this);
                 ResetSDCard();
             }
@@ -658,6 +659,7 @@ namespace FoenixIDE.UI
         private void ResetSDCard()
         {
             string path = sdCardWindow.GetPath();
+            int capacity = sdCardWindow.GetCapacity();
             kernel.MemMgr.SDCARD.SetSDCardPath(path);
             byte sdCardStat = 0;
             if (path == null || path.Length == 0)
@@ -670,8 +672,12 @@ namespace FoenixIDE.UI
                 SDCardPath.Text = "SDC: " + path;
                 sdCardStat = 1;
                 kernel.MemMgr.SDCARD.isPresent = true;
+                kernel.MemMgr.SDCARD.SetCapacity(capacity);
             }
-            kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.SDCARD_STAT, sdCardStat);
+            if (typeof(CH376SRegister) == kernel.MemMgr.SDCARD.GetType())
+            {
+                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.SDCARD_STAT, sdCardStat);
+            }
         }
 
         private void DisplayBoardVersion()

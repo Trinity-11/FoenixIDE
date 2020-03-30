@@ -34,7 +34,7 @@ namespace FoenixIDE.Simulator.UI
         {
             Close();
         }
-
+        // Virtual SD Card Path
         public void SetPath(string path)
         {
             if (path != null && path.Length > 0)
@@ -54,6 +54,20 @@ namespace FoenixIDE.Simulator.UI
             return SDCardEnabled.Checked ? SDCardFolderText.Text : null;
         }
 
+        // Virtual SD Card Capacity
+        public void SetCapacity(int value)
+        {
+            int index = CapacityCombo.Items.IndexOf(value);
+            if (index != -1)
+            {
+                CapacityCombo.SelectedIndex = index;
+            }
+        }
+        public int GetCapacity()
+        {
+            return Convert.ToInt32(CapacityCombo.SelectedItem);
+        }
+
         private void SDCardEnabled_CheckedChanged(object sender, EventArgs e)
         {
             CapacityCombo.Enabled = SDCardEnabled.Checked;
@@ -63,5 +77,7 @@ namespace FoenixIDE.Simulator.UI
                 CapacityCombo.SelectedIndex = 3;
             }
         }
+
+
     }
 }

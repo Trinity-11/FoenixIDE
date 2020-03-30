@@ -75,13 +75,14 @@
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
+    <Compile Include="Devices\SDCard\GabeSDController.cs" />
     <Compile Include="Devices\VDMA.cs" />
     <Compile Include="Devices\MPU401.cs" />
     <Compile Include="Devices\OPL2.cs" />
-    <Compile Include="Devices\SDCard\SDCardCommand.cs" />
-    <Compile Include="Devices\SDCard\SDCardInterrupt.cs" />
-    <Compile Include="Devices\SDCard\SDCardRegister.cs" />
-    <Compile Include="Devices\SDCard\SDCardResponse.cs" />
+    <Compile Include="Devices\SDCard\CH376SCommand.cs" />
+    <Compile Include="Devices\SDCard\CH376SInterrupt.cs" />
+    <Compile Include="Devices\SDCard\CH376SRegister.cs" />
+    <Compile Include="Devices\SDCard\CH376SResponse.cs" />
     <Compile Include="Devices\UART.cs" />
     <Compile Include="FileFormat\DebugLine.cs" />
     <Compile Include="FileFormat\FoenixmlFile.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="FileFormat\ListFile.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="Devices\MathCoproRegisters.cs" />
+    <Compile Include="Devices\SDCard\SDCardDevice.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Beatrix.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Blocks.cs" />

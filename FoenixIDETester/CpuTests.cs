@@ -226,5 +226,43 @@ namespace FoenixIDETester
             Assert.IsFalse(cpu.Flags.Zero);
             Assert.IsFalse(cpu.Flags.Carry); // borrow required
         }
+
+        /*
+         * LDA #$E9
+         * SEC
+         * SBC #$39
+         * - carry should not be set
+         * 
+         * SEC
+         * SBC #$C0
+         * - carry should be set
+         */
+        [TestMethod]
+        public void Substract()
+        {
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0xE9);
+            cpu.ExecuteNext();
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Carry);
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x39);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0xE9 - 0x39, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry);
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Carry);
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0xc0);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0xF0, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry);
+        }
     }
 }

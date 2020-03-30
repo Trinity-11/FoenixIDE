@@ -28,7 +28,7 @@ namespace FoenixIDE.MemoryLocations
         public MathCoproRegisters MATH = null;
         public CodecRAM CODEC = null;
         public KeyboardRegister KEYBOARD = null;
-        public SDCardRegister SDCARD = null;
+        public SDCardDevice SDCARD = null;
         public InterruptController INTERRUPT = null;
         public UART UART1 = null;
         public UART UART2 = null;
@@ -129,10 +129,10 @@ namespace FoenixIDE.MemoryLocations
                 DeviceAddress = Address - MPU401.StartAddress;
                 return;
             }
-            if (Address >= MemoryMap.SDCARD_DATA && Address <= MemoryMap.SDCARD_CMD)
+            if (Address >= SDCARD.StartAddress && Address <= SDCARD.EndAddress)
             {
                 Device = SDCARD;
-                DeviceAddress = Address - MemoryMap.SDCARD_DATA;
+                DeviceAddress = Address - SDCARD.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.VDMA_START && Address < MemoryMap.VDMA_START + MemoryMap.VDMA_SIZE)

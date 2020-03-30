@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices.SDCard
 {
-    public enum SDCardInterrupt
+    public enum CH376SInterrupt
     {
         USB_INT_NONE = 0x00,
         USB_INT_SUCCESS = 0x14,

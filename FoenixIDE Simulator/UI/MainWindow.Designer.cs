@@ -53,6 +53,7 @@ namespace FoenixIDE.UI
             this.sDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tileEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.characterEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.joystickSimulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.terminalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,7 +70,6 @@ namespace FoenixIDE.UI
             this.panel4 = new System.Windows.Forms.Panel();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.gpu = new FoenixIDE.Display.Gpu();
-            this.joystickSimulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -121,8 +121,8 @@ namespace FoenixIDE.UI
             // ModeText
             // 
             this.ModeText.Name = "ModeText";
-            this.ModeText.Size = new System.Drawing.Size(64, 23);
-            this.ModeText.Text = "Immediate";
+            this.ModeText.Size = new System.Drawing.Size(26, 23);
+            this.ModeText.Text = "Key";
             // 
             // lastKeyPressed
             // 
@@ -168,11 +168,15 @@ namespace FoenixIDE.UI
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.SDCardPath.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.SDCardPath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
-            this.SDCardPath.Size = new System.Drawing.Size(105, 23);
+            this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
+            this.SDCardPath.Size = new System.Drawing.Size(246, 23);
+            this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.SDCardPath.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.SDCardPath.Click += new System.EventHandler(this.SDCardToolStripMenuItem_Click);
             // 
             // menuStrip1
@@ -253,37 +257,44 @@ namespace FoenixIDE.UI
             // uploaderToolStripMenuItem
             // 
             this.uploaderToolStripMenuItem.Name = "uploaderToolStripMenuItem";
-            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.uploaderToolStripMenuItem.Text = "&Uploader";
             this.uploaderToolStripMenuItem.Click += new System.EventHandler(this.UploaderToolStripMenuItem_Click);
             // 
             // loadImageToolStripMenuItem
             // 
             this.loadImageToolStripMenuItem.Name = "loadImageToolStripMenuItem";
-            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.loadImageToolStripMenuItem.Text = "&Load Bin/Image";
             this.loadImageToolStripMenuItem.Click += new System.EventHandler(this.LoadImageToolStripMenuItem_Click);
             // 
             // sDCardToolStripMenuItem
             // 
             this.sDCardToolStripMenuItem.Name = "sDCardToolStripMenuItem";
-            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.sDCardToolStripMenuItem.Text = "&SD Card";
             this.sDCardToolStripMenuItem.Click += new System.EventHandler(this.SDCardToolStripMenuItem_Click);
             // 
             // tileEditorToolStripMenuItem
             // 
             this.tileEditorToolStripMenuItem.Name = "tileEditorToolStripMenuItem";
-            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.tileEditorToolStripMenuItem.Text = "&Tile Editor";
             this.tileEditorToolStripMenuItem.Click += new System.EventHandler(this.TileEditorToolStripMenuItem_Click);
             // 
             // characterEditorToolStripMenuItem
             // 
             this.characterEditorToolStripMenuItem.Name = "characterEditorToolStripMenuItem";
-            this.characterEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.characterEditorToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.characterEditorToolStripMenuItem.Text = "&Character Editor";
             this.characterEditorToolStripMenuItem.Click += new System.EventHandler(this.characterEditorToolStripMenuItem_Click);
+            // 
+            // joystickSimulatorToolStripMenuItem
+            // 
+            this.joystickSimulatorToolStripMenuItem.Name = "joystickSimulatorToolStripMenuItem";
+            this.joystickSimulatorToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.joystickSimulatorToolStripMenuItem.Text = "Joystick Simulator";
+            this.joystickSimulatorToolStripMenuItem.Click += new System.EventHandler(this.joystickSimulatorToolStripMenuItem_Click);
             // 
             // windowsToolStripMenuItem
             // 
@@ -423,13 +434,6 @@ namespace FoenixIDE.UI
             this.gpu.MouseEnter += new System.EventHandler(this.Gpu_MouseEnter);
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
-            // 
-            // joystickSimulatorToolStripMenuItem
-            // 
-            this.joystickSimulatorToolStripMenuItem.Name = "joystickSimulatorToolStripMenuItem";
-            this.joystickSimulatorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.joystickSimulatorToolStripMenuItem.Text = "Joystick Simulator";
-            this.joystickSimulatorToolStripMenuItem.Click += new System.EventHandler(this.joystickSimulatorToolStripMenuItem_Click);
             // 
             // MainWindow
             // 

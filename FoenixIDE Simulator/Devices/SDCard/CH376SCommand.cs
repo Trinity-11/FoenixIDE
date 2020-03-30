@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices.SDCard
 {
-    public enum SDCardCommand : byte
+    public enum CH376SCommand : byte
     {
         GET_IC_VER = 0x01,
         SET_BAUDRATE = 0x02,
