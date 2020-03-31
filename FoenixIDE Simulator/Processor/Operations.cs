@@ -107,14 +107,14 @@ namespace FoenixIDE.Processor
         /// <param name="isCode">Assume the address is code and uses the Program Bank Register. 
         /// Otherwise uses the Data Bank Register, if appropriate.</param>
         /// <returns></returns>
-        public int GetValue(AddressModes mode, int signatureBytes, int bytes)
+        public int GetValue(AddressModes mode, int signatureBytes, int width)
         {
             switch (mode)
             {
                 case AddressModes.Accumulator:
                     return cpu.A.Value;
                 case AddressModes.Absolute:
-                    return GetAbsolute(signatureBytes, cpu.DataBank, bytes);
+                    return GetAbsolute(signatureBytes, cpu.DataBank, width);
                 case AddressModes.AbsoluteLong:
                     return GetAbsoluteLong(signatureBytes);
                 case AddressModes.JmpAbsoluteIndirect:
@@ -137,7 +137,7 @@ namespace FoenixIDE.Processor
                 case AddressModes.AbsoluteLongIndexedWithY:
                     return GetAbsoluteLongIndexed(signatureBytes, cpu.Y);
                 case AddressModes.DirectPage:
-                    return GetAbsolute(signatureBytes, cpu.DirectPage, bytes);
+                    return GetAbsolute(signatureBytes, cpu.DirectPage, width);
                 case AddressModes.DirectPageIndexedWithX:
                     return GetIndexed(signatureBytes, cpu.DirectPage, cpu.X);
                 case AddressModes.DirectPageIndexedWithY:
@@ -196,10 +196,7 @@ namespace FoenixIDE.Processor
 
             // This effective address can overflow into the next bank.
             int ptr = cpu.Memory.ReadLong(addr) + Y.Value;
-            if (cpu.A.Width == 1)
-                return cpu.Memory.ReadByte(ptr);
-            else
-                return cpu.Memory.ReadWord(ptr);
+            return (cpu.A.Width == 1) ? cpu.Memory.ReadByte(ptr) : cpu.Memory.ReadWord(ptr);
         }
 
         /// <summary>
@@ -215,7 +212,7 @@ namespace FoenixIDE.Processor
 
             int ptr = cpu.Memory.ReadWord(addr) + Y.Value;
             ptr = cpu.DataBank.GetLongAddress(ptr);
-            return cpu.Memory.ReadWord(ptr);               
+            return (cpu.A.Width == 1) ? cpu.Memory.ReadByte(ptr) : cpu.Memory.ReadWord(ptr);               
         }
 
         /// <summary>
@@ -229,7 +226,7 @@ namespace FoenixIDE.Processor
             int addr = cpu.DirectPage.GetLongAddress(Address + X.Value);
             int ptr = cpu.Memory.ReadWord(addr);
             ptr = cpu.DataBank.GetLongAddress(ptr);
-            return cpu.Memory.ReadWord(ptr);
+            return (cpu.A.Width == 1) ? cpu.Memory.ReadByte(ptr) : cpu.Memory.ReadWord(ptr);
         }
 
         private int GetAbsoluteLong(int Address)
@@ -249,9 +246,9 @@ namespace FoenixIDE.Processor
         /// <param name="Address"></param>
         /// <param name="bank"></param>
         /// <returns></returns>
-        private int GetAbsolute(int Address, Register bank, int bytes)
+        private int GetAbsolute(int Address, Register bank, int width)
         {
-            return (bytes == 1) ? cpu.Memory.ReadByte(bank.GetLongAddress(Address)) : cpu.Memory.ReadWord(bank.GetLongAddress(Address));
+            return (width == 1) ? cpu.Memory.ReadByte(bank.GetLongAddress(Address)) : cpu.Memory.ReadWord(bank.GetLongAddress(Address));
         }
 
         /// <summary>
@@ -266,7 +263,7 @@ namespace FoenixIDE.Processor
             int addr = Address;
             addr = bank.GetLongAddress(Address);
             addr = addr + Index.Value;
-            return cpu.Memory.ReadWord(addr);
+            return (cpu.A.Width == 1) ? cpu.Memory.ReadByte(addr) : cpu.Memory.ReadWord(addr);
         }
 
         /// <summary>
@@ -1053,10 +1050,7 @@ namespace FoenixIDE.Processor
         public void Compare(AddressModes addressMode, int signature, Register Reg)
         {
             int val = GetValue(addressMode, signature, Reg.Width);
-            if (Reg.Width == 1 && val > 255)
-            {
-                val = val & 0xFF;
-            }
+            val = (Reg.Width == 1) ? val & 0xFF : val;
             int subResult = Reg.Value - val;
             cpu.Flags.Zero = subResult == 0;
             cpu.Flags.Carry = Reg.Value >= val;

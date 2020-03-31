@@ -49,7 +49,13 @@ namespace FoenixIDE
             foreach (object c in this.groupBox1.Controls)
             {
                 if (c is UI.RegisterControl rc)
+                {
                     rc.UpdateValue();
+                }
+                else if (c is UI.AccumulatorControl ac)
+                {
+                    ac.UpdateValue();
+                }
             }
         }
     }

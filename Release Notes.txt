@@ -1,3 +1,9 @@
+Release 0.4.1.1
+---------------
+Fixed a problem with absolute indexed values reading two bytes even when the register width is 1.
+Added the split Accumulator Control to the CPU window.  This allows us to see the value of B even when the 
+accumulator width is 1.
+
 Release 0.4.1.0
 ---------------
 Starting the Virtual SD Card.

@@ -264,5 +264,47 @@ namespace FoenixIDETester
             Assert.AreEqual(0xF0, cpu.A.Value);
             Assert.IsFalse(cpu.Flags.Carry);
         }
+
+        /*
+         * .asxs
+             ldx #0
+             lda #$e9
+             sec
+             sbc _foo,x
+             bcc _clear
+             lda #'s'
+             bra _do
+            _clear lda #'c'
+            _do sta $afa100
+             bra _do
+            _foo .byte $39
+            */
+        [TestMethod]
+        public void SubstractIndexed()
+        {
+            byte foo = 0x39;
+            byte bar = 0x93;
+            // This is a page 0 address
+            byte foo_address = 0xA0;
+            mgr.RAM.WriteByte(foo_address, foo);
+            mgr.RAM.WriteByte(foo_address + 1, bar);
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDX_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0);
+            cpu.ExecuteNext();
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0xE9);
+            cpu.ExecuteNext();
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Carry);
+
+            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SBC_AbsoluteIndexedWithX);
+            mgr.RAM.WriteByte(cpu.PC.Value + 1, foo_address);
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Carry);
+        }
     }
 }

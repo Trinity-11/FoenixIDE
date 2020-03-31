@@ -42,7 +42,7 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.X = new FoenixIDE.UI.RegisterControl();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.A = new FoenixIDE.UI.RegisterControl();
+            this.A = new FoenixIDE.UI.AccumulatorControl();
             this.panel1 = new System.Windows.Forms.Panel();
             this.PC = new FoenixIDE.UI.RegisterControl();
             this.panel8 = new System.Windows.Forms.Panel();
@@ -81,7 +81,7 @@
             this.Flags.Bank = null;
             this.Flags.Caption = "Flags";
             this.Flags.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Flags.Location = new System.Drawing.Point(277, 16);
+            this.Flags.Location = new System.Drawing.Point(283, 16);
             this.Flags.Name = "Flags";
             this.Flags.Register = null;
             this.Flags.Size = new System.Drawing.Size(76, 34);
@@ -91,7 +91,7 @@
             // panel7
             // 
             this.panel7.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel7.Location = new System.Drawing.Point(273, 16);
+            this.panel7.Location = new System.Drawing.Point(279, 16);
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(4, 34);
             this.panel7.TabIndex = 13;
@@ -101,7 +101,7 @@
             this.D.Bank = null;
             this.D.Caption = "Direct";
             this.D.Dock = System.Windows.Forms.DockStyle.Left;
-            this.D.Location = new System.Drawing.Point(240, 16);
+            this.D.Location = new System.Drawing.Point(246, 16);
             this.D.Name = "D";
             this.D.Register = null;
             this.D.Size = new System.Drawing.Size(33, 34);
@@ -111,7 +111,7 @@
             // panel6
             // 
             this.panel6.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel6.Location = new System.Drawing.Point(236, 16);
+            this.panel6.Location = new System.Drawing.Point(242, 16);
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(4, 34);
             this.panel6.TabIndex = 11;
@@ -121,7 +121,7 @@
             this.DBR.Bank = null;
             this.DBR.Caption = "DBR";
             this.DBR.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DBR.Location = new System.Drawing.Point(203, 16);
+            this.DBR.Location = new System.Drawing.Point(209, 16);
             this.DBR.Name = "DBR";
             this.DBR.Register = null;
             this.DBR.Size = new System.Drawing.Size(33, 34);
@@ -131,7 +131,7 @@
             // panel5
             // 
             this.panel5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel5.Location = new System.Drawing.Point(199, 16);
+            this.panel5.Location = new System.Drawing.Point(205, 16);
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(4, 34);
             this.panel5.TabIndex = 9;
@@ -141,7 +141,7 @@
             this.Stack.Bank = null;
             this.Stack.Caption = "S";
             this.Stack.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Stack.Location = new System.Drawing.Point(166, 16);
+            this.Stack.Location = new System.Drawing.Point(172, 16);
             this.Stack.Name = "Stack";
             this.Stack.Register = null;
             this.Stack.Size = new System.Drawing.Size(33, 34);
@@ -151,7 +151,7 @@
             // panel4
             // 
             this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel4.Location = new System.Drawing.Point(162, 16);
+            this.panel4.Location = new System.Drawing.Point(168, 16);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(4, 34);
             this.panel4.TabIndex = 7;
@@ -161,7 +161,7 @@
             this.Y.Bank = null;
             this.Y.Caption = "Y";
             this.Y.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Y.Location = new System.Drawing.Point(129, 16);
+            this.Y.Location = new System.Drawing.Point(135, 16);
             this.Y.Name = "Y";
             this.Y.Register = null;
             this.Y.Size = new System.Drawing.Size(33, 34);
@@ -171,7 +171,7 @@
             // panel3
             // 
             this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel3.Location = new System.Drawing.Point(125, 16);
+            this.panel3.Location = new System.Drawing.Point(131, 16);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(4, 34);
             this.panel3.TabIndex = 5;
@@ -181,7 +181,7 @@
             this.X.Bank = null;
             this.X.Caption = "X";
             this.X.Dock = System.Windows.Forms.DockStyle.Left;
-            this.X.Location = new System.Drawing.Point(92, 16);
+            this.X.Location = new System.Drawing.Point(98, 16);
             this.X.Name = "X";
             this.X.Register = null;
             this.X.Size = new System.Drawing.Size(33, 34);
@@ -191,20 +191,19 @@
             // panel2
             // 
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel2.Location = new System.Drawing.Point(88, 16);
+            this.panel2.Location = new System.Drawing.Point(94, 16);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(4, 34);
             this.panel2.TabIndex = 3;
             // 
             // A
             // 
-            this.A.Bank = null;
             this.A.Caption = "A";
             this.A.Dock = System.Windows.Forms.DockStyle.Left;
             this.A.Location = new System.Drawing.Point(55, 16);
             this.A.Name = "A";
             this.A.Register = null;
-            this.A.Size = new System.Drawing.Size(33, 34);
+            this.A.Size = new System.Drawing.Size(39, 34);
             this.A.TabIndex = 2;
             this.A.Value = "0000";
             // 
@@ -257,7 +256,7 @@
         #endregion
 
         private global::System.Windows.Forms.GroupBox groupBox1;
-        private UI.RegisterControl A;
+        private UI.AccumulatorControl A;
         private global::System.Windows.Forms.Panel panel1;
         private UI.RegisterControl DBR;
         private global::System.Windows.Forms.Panel panel5;

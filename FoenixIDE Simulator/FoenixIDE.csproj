@@ -116,6 +116,12 @@
     <Compile Include="Display\Gpu.Designer.cs">
       <DependentUpon>Gpu.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\AccumulatorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\AccumulatorControl.Designer.cs">
+      <DependentUpon>AccumulatorControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\CharEditor\CharEditorWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -218,6 +224,9 @@
     <EmbeddedResource Include="Display\Gpu.resx">
       <DependentUpon>Gpu.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\AccumulatorControl.resx">
+      <DependentUpon>AccumulatorControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\CharEditor\CharEditorWindow.resx">
       <DependentUpon>CharEditorWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -303,6 +312,7 @@
   <ItemGroup>
     <Content Include="icon.ico" />
     <None Include="Resources\foenix-96x96.png" />
+    <Content Include="Release Notes.txt" />
     <Content Include="Resources\PET-ASCII.png" />
   </ItemGroup>
   <ItemGroup>

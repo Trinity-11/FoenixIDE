@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Data;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -9,17 +11,16 @@ using FoenixIDE.Processor;
 
 namespace FoenixIDE.UI
 {
-    public partial class RegisterControl : UserControl
+    public partial class AccumulatorControl : UserControl
     {
-        public RegisterControl()
+        public AccumulatorControl()
         {
             InitializeComponent();
         }
 
         string _caption;
         string _value;
-        FoenixIDE.Processor.Register _register = null;
-        FoenixIDE.Processor.RegisterBankNumber _bank = null;
+        FoenixIDE.Processor.RegisterAccumulator _register = null;
 
         public string Caption
         {
@@ -41,12 +42,23 @@ namespace FoenixIDE.UI
             set
             {
                 this._value = value;
-                this.textBox1.Text = value;
+                if (_register == null || _register.Width == 1)
+                {
+                    regB.ForeColor = SystemColors.Info;
+                    regB.BackColor = SystemColors.InfoText;
+                }
+                else
+                {
+                    regB.ForeColor = SystemColors.WindowText;
+                    regB.BackColor = SystemColors.Window;
+                }
+                this.regB.Text = value.Substring(0, 2);
+                this.regA.Text = value.Substring(2, 2);
             }
         }
 
         [Browsable(false)]
-        public Register Register
+        public RegisterAccumulator Register
         {
             get
             {
@@ -60,29 +72,15 @@ namespace FoenixIDE.UI
                 {
                     UpdateValue();
                 }
-                
+
             }
         }
 
         public void UpdateValue()
         {
-            if (Bank != null && Register != null)
+            if (Register != null)
             {
-                this.Value = Bank.Value.ToString("X2") + this._register.Value.ToString("X4");
-            }
-            else if (Register != null)
-            {
-                this.Value = _register.ToString();
-            }
-        }
-
-        public RegisterBankNumber Bank
-        {
-            get { return this._bank; }
-            set
-            {
-                this._bank = value;
-                UpdateValue();
+                this.Value = _register.Value16.ToString("X4");
             }
         }
     }
