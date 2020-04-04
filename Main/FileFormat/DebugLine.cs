@@ -19,16 +19,25 @@ namespace FoenixIDE.Simulator.FileFormat
         public bool StepOver = false;
         public bool isLabel = false;
         private string evaled = null;
-        private static byte[] BranchJmpOpcodes = { OpcodeList.BCC_ProgramCounterRelative,
+        private static byte[] BranchJmpOpcodes = {
+            OpcodeList.BCC_ProgramCounterRelative,
             OpcodeList.BCS_ProgramCounterRelative,
-            OpcodeList.BEQ_ProgramCounterRelative, OpcodeList.BMI_ProgramCounterRelative,
-            OpcodeList.BNE_ProgramCounterRelative, OpcodeList.BPL_ProgramCounterRelative,
-            OpcodeList.BRA_ProgramCounterRelative, OpcodeList.BRL_ProgramCounterRelativeLong,
+            OpcodeList.BEQ_ProgramCounterRelative,
+            OpcodeList.BMI_ProgramCounterRelative,
+            OpcodeList.BNE_ProgramCounterRelative,
+            OpcodeList.BPL_ProgramCounterRelative,
+            OpcodeList.BRA_ProgramCounterRelative,
+            OpcodeList.BRL_ProgramCounterRelativeLong,
             OpcodeList.BVC_ProgramCounterRelative,
             OpcodeList.BVS_ProgramCounterRelative,
-            OpcodeList.JMP_Absolute, OpcodeList.JMP_AbsoluteIndexedIndirectWithX,
-            OpcodeList.JMP_AbsoluteIndirect, OpcodeList.JMP_AbsoluteIndirectLong, OpcodeList.JMP_AbsoluteLong,
-            OpcodeList.JSR_Absolute, OpcodeList.JSR_AbsoluteIndexedIndirectWithX, OpcodeList.JSR_AbsoluteLong
+            OpcodeList.JMP_Absolute,
+            OpcodeList.JMP_AbsoluteIndexedIndirectWithX,
+            OpcodeList.JMP_AbsoluteIndirect,
+            OpcodeList.JMP_AbsoluteIndirectLong,
+            OpcodeList.JMP_AbsoluteLong,
+            OpcodeList.JSR_Absolute,
+            OpcodeList.JSR_AbsoluteIndexedIndirectWithX,
+            OpcodeList.JSR_AbsoluteLong
         };
 
         public int PC;
@@ -45,8 +54,6 @@ namespace FoenixIDE.Simulator.FileFormat
                     else
                         c.Append("   ");
                 }
-                //String OpCodes = opcodes + new string(' ', 14 - opcodes.Length);
-                //String state = FormatSnapshot();
                 evaled = string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), opcodes, null);
             }
             return evaled;

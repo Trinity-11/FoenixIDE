@@ -106,7 +106,6 @@
     <Compile Include="Processor\SimulatorCommands.cs" />
     <Compile Include="Processor\CPU.cs" />
     <Compile Include="Processor\CPU_Registers.cs" />
-    <Compile Include="Processor\CPU_Support.cs" />
     <Compile Include="Processor\Flags.cs" />
     <Compile Include="Display\CharacterSet.cs" />
     <Compile Include="EventHandlers.cs" />

@@ -271,7 +271,6 @@ namespace FoenixIDE.Processor
         public const int SBC_AbsoluteLongIndexedWithX = 0xFF;
 
         #endregion constants
-
         
         public OpcodeList(Operations operations, CPU CPU)
         {
