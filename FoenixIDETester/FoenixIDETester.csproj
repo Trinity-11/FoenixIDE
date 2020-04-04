@@ -56,7 +56,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FoenixIDE Simulator\FoenixIDE.csproj">
+    <ProjectReference Include="..\Main\FoenixIDE.csproj">
       <Project>{ebc67780-0386-4b97-a8dc-82ed73cbf0a0}</Project>
       <Name>FoenixIDE</Name>
     </ProjectReference>
