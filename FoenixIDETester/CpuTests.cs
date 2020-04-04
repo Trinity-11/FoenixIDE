@@ -35,18 +35,18 @@ namespace FoenixIDETester
         public void LoadAccumulatorWith99()
         {
             // By default the CPU must be in 6502 emulation mode
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate); // LDA Immediate
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x99); // #$99
-            int PC = cpu.PC.Value;
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate); // LDA Immediate
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x99); // #$99
+            int PC = cpu.PC;
             cpu.ExecuteNext();
             Assert.AreEqual(0x99, cpu.A.Value);
-            Assert.AreEqual(PC + 2, cpu.GetLongPC());
+            Assert.AreEqual(PC + 2, cpu.PC);
         }
         // CLC
         [TestMethod]
         public void ClearCarry()
         {
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.CLC_Implied);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CLC_Implied);
             cpu.ExecuteNext();
             Assert.IsFalse(cpu.Flags.Carry);
         }
@@ -59,8 +59,8 @@ namespace FoenixIDETester
         {
             LoadAccumulatorWith99();
             ClearCarry();
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.ADC_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x78);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x78);
             cpu.ExecuteNext();
             Assert.AreEqual(0x11, cpu.A.Value);
             Assert.IsTrue(cpu.Flags.oVerflow);
@@ -77,8 +77,8 @@ namespace FoenixIDETester
             // Write a value that will cause an overflow in the addition - A is $99
             mgr.RAM.WriteByte(0x56, 0x78);
             ClearCarry();
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.ADC_DirectPage);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x56);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_DirectPage);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x56);
             cpu.ExecuteNext();
             Assert.AreEqual(0x11, cpu.A.Value);
             Assert.IsTrue(cpu.Flags.oVerflow);
@@ -98,32 +98,32 @@ namespace FoenixIDETester
         [TestMethod]
         public void RunCarrySetTest()
         {
-            cpu.SetLongPC(0);
+            cpu.PC = 0;
             // lda #1
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate); // LDA Immediate
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 1); // #1
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate); // LDA Immediate
+            mgr.RAM.WriteByte(cpu.PC + 1, 1); // #1
             cpu.ExecuteNext();
             // sta z_B
             byte z_B = 0x20;
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_DirectPage);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, z_B);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.STA_DirectPage);
+            mgr.RAM.WriteByte(cpu.PC + 1, z_B);
             cpu.ExecuteNext();
             // lda #255
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate); // LDA Immediate
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 255); // #255
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate); // LDA Immediate
+            mgr.RAM.WriteByte(cpu.PC + 1, 255); // #255
             cpu.ExecuteNext();
             
             // adc z_B
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.ADC_DirectPage);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, z_B);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_DirectPage);
+            mgr.RAM.WriteByte(cpu.PC + 1, z_B);
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Zero);
             Assert.IsTrue(cpu.Flags.Carry);
 
             // sta z_C
             byte z_C = 0x21;
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_DirectPage);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, z_C);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.STA_DirectPage);
+            mgr.RAM.WriteByte(cpu.PC + 1, z_C);
             cpu.ExecuteNext();
             Assert.AreEqual(0, mgr.RAM.ReadByte(z_C));
         }
@@ -140,7 +140,7 @@ namespace FoenixIDETester
         [TestMethod]
         public void RunStackIndirectWithIndex()
         {
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.XCE_Implied);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.XCE_Implied);
             cpu.ExecuteNext();
             Assert.IsFalse(cpu.Flags.Emulation);
             Assert.IsTrue(cpu.Flags.Carry);
@@ -148,53 +148,53 @@ namespace FoenixIDETester
             Assert.AreEqual(2, cpu.X.Width);
 
             // LDA #$234
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
-            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x234);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x234);
             cpu.ExecuteNext();
             Assert.AreEqual(0x234, cpu.A.Value);
             Assert.AreEqual(0, cpu.S.Value);
 
             // TCS - exchange accumulator with stack
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.TCS_Implied);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.TCS_Implied);
             cpu.ExecuteNext();
             Assert.AreEqual(0x234, cpu.S.Value);
 
             // LDA #$123
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
-            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x123);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x123);
             cpu.ExecuteNext();
             Assert.AreEqual(0x123, cpu.A.Value);
 
             // STA $237
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_Absolute);
-            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x237);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.STA_Absolute);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x237);
             cpu.ExecuteNext();
 
             // LDA #$678
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
-            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x678);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x678);
             cpu.ExecuteNext();
             Assert.AreEqual(0x678, cpu.A.Value);
 
             // STA $239
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_Absolute);
-            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x239);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.STA_Absolute);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x239);
             cpu.ExecuteNext();
 
             // LDY #$10
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDY_Immediate);
-            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0x10);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDY_Immediate);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x10);
             cpu.ExecuteNext();
             Assert.AreEqual(0x10, cpu.Y.Value);
 
             // LDA #$FE23
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
-            mgr.RAM.WriteWord(cpu.PC.Value + 1, 0xFE23);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0xFE23);
             cpu.ExecuteNext();
             Assert.AreEqual(0xFE23, cpu.A.Value);
             // STA (3,s),y - store
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.STA_StackRelativeIndirectIndexedWithY);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 3);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.STA_StackRelativeIndirectIndexedWithY);
+            mgr.RAM.WriteByte(cpu.PC + 1, 3);
             cpu.ExecuteNext();
             Assert.AreEqual(0x23, mgr.RAM.ReadByte(0x133));
             Assert.AreEqual(0xFE, mgr.RAM.ReadByte(0x134));
@@ -208,19 +208,19 @@ namespace FoenixIDETester
         [TestMethod]
         public void CompareIndexSetsNegative()
         {
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDY_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x98);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDY_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x98);
             cpu.ExecuteNext();
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.CPY_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CPY_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0);
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Negative); // most significan bit is set
             Assert.IsFalse(cpu.Flags.Zero);
             Assert.IsTrue(cpu.Flags.Carry); // no borrow required
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.CPY_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x9A);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CPY_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x9A);
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Negative); // most significan bit is set
             Assert.IsFalse(cpu.Flags.Zero);
@@ -240,26 +240,26 @@ namespace FoenixIDETester
         [TestMethod]
         public void Substract()
         {
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0xE9);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0xE9);
             cpu.ExecuteNext();
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SEC_Implied);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Carry);
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SBC_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0x39);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x39);
             cpu.ExecuteNext();
             Assert.AreEqual(0xE9 - 0x39, cpu.A.Value);
             Assert.IsTrue(cpu.Flags.Carry);
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SEC_Implied);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Carry);
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SBC_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0xc0);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0xc0);
             cpu.ExecuteNext();
             Assert.AreEqual(0xF0, cpu.A.Value);
             Assert.IsFalse(cpu.Flags.Carry);
@@ -289,20 +289,20 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(foo_address, foo);
             mgr.RAM.WriteByte(foo_address + 1, bar);
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDX_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDX_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0);
             cpu.ExecuteNext();
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.LDA_Immediate);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, 0xE9);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0xE9);
             cpu.ExecuteNext();
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SEC_Implied);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Carry);
 
-            mgr.RAM.WriteByte(cpu.PC.Value, OpcodeList.SBC_AbsoluteIndexedWithX);
-            mgr.RAM.WriteByte(cpu.PC.Value + 1, foo_address);
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_AbsoluteIndexedWithX);
+            mgr.RAM.WriteByte(cpu.PC + 1, foo_address);
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Carry);
         }

@@ -40,7 +40,7 @@ namespace FoenixIDE.Simulator.FileFormat
             OpcodeList.JSR_AbsoluteLong
         };
 
-        public int PC;
+        public int ProgCntr;
         // Only expand when it's going to be displayed
         override public string ToString()
         {
@@ -54,7 +54,7 @@ namespace FoenixIDE.Simulator.FileFormat
                     else
                         c.Append("   ");
                 }
-                evaled = string.Format(">{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), opcodes, null);
+                evaled = string.Format(">{0}  {1} {2}  {3}", ProgCntr.ToString("X6"), c.ToString(), opcodes, null);
             }
             return evaled;
         }
@@ -64,7 +64,7 @@ namespace FoenixIDE.Simulator.FileFormat
         /// </summary>
         public DebugLine(int pc, byte[] cmd, String oc, int[] cpuSnapshot)
         {
-            PC = pc;
+            ProgCntr = pc;
             command = cmd;
             if (cmd != null)
             {
@@ -117,7 +117,7 @@ namespace FoenixIDE.Simulator.FileFormat
         {
             for (int i=0;i<commandLength;i++)
             {
-                if (ram.ReadByte(PC + i) != command[i])
+                if (ram.ReadByte(ProgCntr + i) != command[i])
                 {
                     return false;
                 }

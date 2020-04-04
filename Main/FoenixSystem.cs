@@ -168,10 +168,10 @@ namespace FoenixIDE
                 List<DebugLine> tempLines = new List<DebugLine>();
                 foreach (DebugLine line in lstFile.Lines)
                 {
-                    if (line.PC >= BasePageAddress && line.PC < BasePageAddress + 0x1_0000)
+                    if (line != null && line.ProgCntr >= BasePageAddress && line.ProgCntr < BasePageAddress + 0x1_0000)
                     {
                         DebugLine dl = (DebugLine)line.Clone();
-                        dl.PC -= BasePageAddress;
+                        dl.ProgCntr -= BasePageAddress;
                         copiedLines.Add(dl);
                     }
                 }

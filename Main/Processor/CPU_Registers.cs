@@ -22,11 +22,12 @@ namespace FoenixIDE.Processor
         /// <summary>
         /// Program Bank Register
         /// </summary>
-        public RegisterBankNumber ProgramBank = new RegisterBankNumber();
+        //public RegisterBankNumber ProgramBank = new RegisterBankNumber();
         /// <summary>
         /// Program Counter
         /// </summary>
-        public Register16 PC = new Register16();
+        //public Register16 PC = new Register16();
+        public int PC = 0;
         /// <summary>
         /// Processor Status Register
         /// </summary>
@@ -61,10 +62,10 @@ namespace FoenixIDE.Processor
         /// <summary>
         /// program banK register
         /// </summary>
-        public Register8 K
-        {
-            get { return ProgramBank; }
-        }
+        //public Register8 K
+        //{
+        //    get { return ProgramBank; }
+        //}
         /// <summary>
         /// Processor status register (P)
         /// </summary>
@@ -86,17 +87,6 @@ namespace FoenixIDE.Processor
             {
                 return DateTime.Now - checkStartTime;
             }
-        }
-
-        public void SetLongPC(int address)
-        {
-            ProgramBank.Value = (address & 0xff0000) >> 16;
-            PC.Value = (address & 0xffff);
-        }
-
-        public int GetLongPC()
-        {
-            return ProgramBank.GetLongAddress(PC);
         }
 
     }

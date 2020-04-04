@@ -32,8 +32,6 @@ namespace FoenixIDE
         {
             if (_cpu != null)
             {
-                this.PC.Register = _cpu.PC;
-                this.PC.Bank = _cpu.ProgramBank;
                 this.A.Register = _cpu.A;
                 this.X.Register = _cpu.X;
                 this.Y.Register = _cpu.Y;
@@ -46,6 +44,7 @@ namespace FoenixIDE
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
+            PC.Value = _cpu.PC.ToString("X6");
             foreach (object c in this.groupBox1.Controls)
             {
                 if (c is UI.RegisterControl rc)

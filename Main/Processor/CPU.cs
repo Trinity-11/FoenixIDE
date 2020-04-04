@@ -79,7 +79,7 @@ namespace FoenixIDE.Processor
             get
             {
                 int[] snapshot = new int[8];
-                snapshot[0] = GetLongPC();
+                snapshot[0] = PC;
                 snapshot[1] = A.Value;
                 snapshot[2] = X.Value;
                 snapshot[3] = Y.Value;
@@ -114,12 +114,6 @@ namespace FoenixIDE.Processor
                 default:
                     break;
             }
-        }
-
-        public void JumpTo(int Address, int newDataBank)
-        {
-            this.DataBank.Value = newDataBank;
-            SetLongPC(Address);
         }
 
         /// <summary>
@@ -158,14 +152,13 @@ namespace FoenixIDE.Processor
                 return false;
             }
 
-            int pc = GetLongPC();
             // TODO - if pc > RAM size, then throw an exception
-            CurrentOpcode = opcodes[Memory.RAM.ReadByte(pc)];
+            CurrentOpcode = opcodes[Memory.RAM.ReadByte(PC)];
             OpcodeLength = CurrentOpcode.Length;
             OpcodeCycles = 1;
-            SignatureBytes = ReadSignature(OpcodeLength, pc);
+            SignatureBytes = ReadSignature(OpcodeLength, PC);
 
-            PC.Value += OpcodeLength;
+            PC += OpcodeLength;
             CurrentOpcode.Execute(SignatureBytes);
             clockCyles += OpcodeCycles;
             return false;
@@ -199,9 +192,9 @@ namespace FoenixIDE.Processor
             Stack.Reset();
             DataBank.Value = 0;
             DirectPage.Value = 0;
-            ProgramBank.Value = 0;
+            //ProgramBank.Value = 0;
 
-            PC.Value = Memory.ReadWord(MemoryMap.VECTOR_ERESET);
+            PC = Memory.ReadWord(MemoryMap.VECTOR_ERESET);
 
             Flags.IrqDisable = true;
             Pins.IRQ = false;
@@ -244,7 +237,7 @@ namespace FoenixIDE.Processor
         /// </summary>
         public OpCode PreFetch()
         {
-            return opcodes[Memory[GetLongPC()]];
+            return opcodes[Memory[PC]];
         }
 
         public int ReadSignature(int length, int pc)
@@ -324,7 +317,7 @@ namespace FoenixIDE.Processor
         /// <param name="addr"></param>
         public void JumpShort(int addr)
         {
-            PC.Value = addr;
+            PC = (PC & 0xFF_0000) + (addr & 0xFFFF);
         }
 
         /// <summary>
@@ -333,15 +326,17 @@ namespace FoenixIDE.Processor
         /// <param name="addr"></param>
         public void JumpLong(int addr)
         {
-            ProgramBank.Value = addr >> 16;
-            PC.Value = addr;
+            //ProgramBank.Value = addr >> 16;
+            // PC.Value = addr;
+            PC = addr;
         }
 
         public void JumpVector(int VectorAddress)
         {
             int addr = Memory.ReadWord(VectorAddress);
-            ProgramBank.Value = 0;
-            PC.Value = addr;
+            //ProgramBank.Value = 0;
+            //PC.Value = addr;
+            PC = addr;
         }
 
         public byte GetByte(int Value, int Offset)
@@ -381,6 +376,7 @@ namespace FoenixIDE.Processor
                 throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
 
             int ret = Memory.Read(Stack.Value + 1, bytes);
+            
             Stack.Value += bytes;
             return ret;
         }
@@ -388,6 +384,7 @@ namespace FoenixIDE.Processor
         public void PullInto(Register Register)
         {
             Register.Value = Pull(Register.Width);
+            Flags.SetNZ(Register);
         }
 
         /// <summary>
@@ -432,8 +429,13 @@ namespace FoenixIDE.Processor
             //DebugPause = true;
 
             if (!Flags.Emulation)
-                Push(ProgramBank);
-            Push(PC);
+            {
+                Push(PC & 0xFF_FFFF, 3);
+            }
+            else
+            {
+                Push(PC & 0xFFFF, 2);
+            }
             
             Push(Flags);
 

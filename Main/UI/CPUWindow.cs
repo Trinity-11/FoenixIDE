@@ -50,7 +50,7 @@ namespace FoenixIDE.UI
             MemoryLimit = kernel.MemMgr.RAM.Length;
             registerDisplay1.CPU = kernel.CPU;
             UpdateQueue();
-            int pc = kernel.CPU.GetLongPC();
+            int pc = kernel.CPU.PC;
             DebugLine line = GetExecutionInstruction(pc);
             if (line == null)
             {
@@ -68,7 +68,7 @@ namespace FoenixIDE.UI
             else
             {
                 queue = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
-                GenerateNextInstruction(kernel.CPU.GetLongPC());
+                GenerateNextInstruction(kernel.CPU.PC);
             }
         }
 
@@ -121,7 +121,7 @@ namespace FoenixIDE.UI
         private void DebugPanel_Paint(object sender, PaintEventArgs e)
         {
             bool paint = false;
-            int currentPC = kernel.CPU.GetLongPC();
+            int currentPC = kernel.CPU.PC;
             //if ((kernel.CPU.DebugPause))
             if (true && queue !=null)
             {
@@ -142,7 +142,7 @@ namespace FoenixIDE.UI
                 {
                     if (line != null)
                     {
-                        if (line.PC == currentPC)
+                        if (line.ProgCntr == currentPC)
                         {
                             paint = true;
                             TopLineIndex = index;
@@ -155,11 +155,11 @@ namespace FoenixIDE.UI
                                     for (int c = 5; c > 0; c--)
                                     {
                                         DebugLine q0 = queue[index - c];
-                                        if (q0.PC == IRQPC)
+                                        if (q0.ProgCntr == IRQPC)
                                         {
                                             e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
-                                        if (breakpoints.ContainsKey(q0.PC))
+                                        if (breakpoints.ContainsKey(q0.ProgCntr))
                                         {
                                             e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
@@ -183,7 +183,7 @@ namespace FoenixIDE.UI
                                 }
                                 offsetPrinted = true;
                             }
-                            e.Graphics.FillRectangle(line.PC == IRQPC ? orangeBrush : lightBlueBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            e.Graphics.FillRectangle(line.ProgCntr == IRQPC ? orangeBrush : lightBlueBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                         }
                         if (painted > 26)
                         {
@@ -192,11 +192,11 @@ namespace FoenixIDE.UI
                         }
                         if (paint)
                         {
-                            if (breakpoints.ContainsKey(line.PC))
+                            if (breakpoints.ContainsKey(line.ProgCntr))
                             {
                                 e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            if (line.PC == IRQPC)
+                            if (line.ProgCntr == IRQPC)
                             {
                                 e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
@@ -205,7 +205,7 @@ namespace FoenixIDE.UI
                             {
                                 e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            if (line.PC == currentPC || !line.isLabel)
+                            if (line.ProgCntr == currentPC || !line.isLabel)
                             {
                                 e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
                             }
@@ -293,7 +293,7 @@ namespace FoenixIDE.UI
                 if (queue.Count > TopLineIndex + row)
                 {
                     DebugLine line = queue[TopLineIndex + row];
-                    string value = line.PC.ToString("X6");
+                    string value = line.ProgCntr.ToString("X6");
                     BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     AddBPButton_Click(null, null);
                 }
@@ -308,7 +308,7 @@ namespace FoenixIDE.UI
                 if (queue.Count > TopLineIndex + row)
                 {
                     DebugLine line = queue[TopLineIndex + row];
-                    string value = line.PC.ToString("X6");
+                    string value = line.ProgCntr.ToString("X6");
                     BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     DeleteBPButton_Click(null, null);
                 }
@@ -350,7 +350,7 @@ namespace FoenixIDE.UI
             {
                 int row = position.Y / ROW_HEIGHT;
                 DebugLine line = queue[TopLineIndex + row];
-                MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
+                MemoryWindow.Instance.GotoAddress(line.ProgCntr & 0xFF_FF00);
                 MemoryWindow.Instance.BringToFront();
             }
         }
@@ -395,7 +395,7 @@ namespace FoenixIDE.UI
                 int row = position.Y / ROW_HEIGHT;
                 DebugLine line = queue[TopLineIndex + row];
                 // Set a breakpoint to the next address
-                int nextAddress = line.PC + line.commandLength;
+                int nextAddress = line.ProgCntr + line.commandLength;
                 int newValue = breakpoints.Add(nextAddress.ToString("X"));
 
                 if (newValue != -1)
@@ -411,7 +411,7 @@ namespace FoenixIDE.UI
 
         private void StepOver_Click(object sender, EventArgs e)
         {
-            int pc = kernel.CPU.GetLongPC();
+            int pc = kernel.CPU.PC;
             if (pc > MemoryLimit)
             {
                 string errorMessage = "PC exceeds memory limit.";
@@ -525,11 +525,11 @@ namespace FoenixIDE.UI
         {
             StepCounter++;
             DebugLine line = null;
-            int previousPC = kernel.CPU.GetLongPC();
+            int previousPC = kernel.CPU.PC;
             if (!kernel.CPU.ExecuteNext())
             {
                 
-                int nextPC = kernel.CPU.GetLongPC();
+                int nextPC = kernel.CPU.PC;
                 if (nextPC > MemoryLimit)
                 {
                     UpdateTraceTimer.Enabled = false;
@@ -555,7 +555,7 @@ namespace FoenixIDE.UI
                     }
                     if (kernel.CPU.Pins.GetInterruptPinActive && !kernel.CPU.Flags.IrqDisable)
                     {
-                        IRQPC = kernel.CPU.GetLongPC();
+                        IRQPC = kernel.CPU.PC;
                     }
                     if (line == null)
                     {
@@ -572,10 +572,11 @@ namespace FoenixIDE.UI
             // Print the next instruction on lastLine
             if (!UpdateTraceTimer.Enabled && line == null)
             {
-                line = GetExecutionInstruction(kernel.CPU.GetLongPC());
+                int pc = kernel.CPU.PC;
+                line = GetExecutionInstruction(pc);
                 if (line == null)
                 {
-                    GenerateNextInstruction(kernel.CPU.GetLongPC());
+                    GenerateNextInstruction(pc);
                 }
             }
         }
@@ -590,7 +591,7 @@ namespace FoenixIDE.UI
         {
             foreach (DebugLine l in queue)
             {
-                if (l !=null &&  l.PC == PC)
+                if (l !=null &&  l.ProgCntr == PC)
                 {
                     return l;
                 }
@@ -627,7 +628,7 @@ namespace FoenixIDE.UI
             for (index = 0; index < queue.Count; index++)
             {
                 DebugLine l = queue[index];
-                if (l.PC > pc)
+                if (l.ProgCntr > pc)
                 {
                     break;
                 }
@@ -650,7 +651,7 @@ namespace FoenixIDE.UI
         private void JumpButton_Click(object sender, EventArgs e)
         {
             int pc = breakpoints.GetIntFromHex(locationInput.Text);
-            kernel.CPU.SetLongPC(pc);
+            kernel.CPU.PC = pc;
             ClearTrace();
             DebugLine line = GetExecutionInstruction(pc);
             if (line == null)

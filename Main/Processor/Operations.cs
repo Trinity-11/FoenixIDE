@@ -36,10 +36,10 @@ namespace FoenixIDE.Processor
             cpu.Flags.Reset();
             cpu.DataBank.Reset();
             cpu.DirectPage.Reset();
-            cpu.ProgramBank.Reset();
-            cpu.PC.Reset();
+            //cpu.ProgramBank.Reset();
+            //cpu.PC.Reset();
 
-            cpu.PC.Value = cpu.Memory.ReadWord(MemoryMap.VECTOR_RESET);
+            cpu.PC = cpu.Memory.ReadWord(MemoryMap.VECTOR_RESET);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace FoenixIDE.Processor
         public void BranchNear(byte b)
         {
             int offset = MakeSignedByte(b);
-            cpu.PC.Value += offset;
+            cpu.PC += offset;
         }
 
         public sbyte MakeSignedByte(byte b)
@@ -119,13 +119,14 @@ namespace FoenixIDE.Processor
                     return GetAbsoluteLong(signatureBytes);
                 case AddressModes.JmpAbsoluteIndirect:
                     // JMP (addr)
-                    return GetAbsoluteIndirectAddress(signatureBytes, cpu.ProgramBank);
+                    //return GetAbsoluteIndirectAddress(signatureBytes, cpu.ProgramBank);
+                    return GetAbsoluteIndirectAddressLong((cpu.PC & 0xFF_0000) + signatureBytes);
                 case AddressModes.JmpAbsoluteIndirectLong:
                     // JMP [addr] - jumps to a 24-bit address pointed to by addr in direct page.
                     return GetAbsoluteIndirectAddressLong(signatureBytes);
                 case AddressModes.JmpAbsoluteIndexedIndirectWithX:
                     // JMP (addr,X)
-                    return GetJumpAbsoluteIndexedIndirect(signatureBytes, cpu.ProgramBank, cpu.X);
+                    return GetJumpAbsoluteIndexedIndirect(signatureBytes, cpu.X);
                 case AddressModes.AbsoluteIndexedWithX:
                     // LDA $2000,X
                     return GetIndexed(signatureBytes, cpu.DataBank, cpu.X);
@@ -156,9 +157,9 @@ namespace FoenixIDE.Processor
                 case AddressModes.DirectPageIndirectLongIndexedWithY:
                     return GetDirectPageIndirectIndexedLong(signatureBytes, cpu.Y);
                 case AddressModes.ProgramCounterRelative:
-                    return cpu.PC.Value + 2 + MakeSignedByte((byte)signatureBytes);
+                    return cpu.PC + 2 + MakeSignedByte((byte)signatureBytes);
                 case AddressModes.ProgramCounterRelativeLong:
-                    return cpu.PC.Value + 3 + MakeSignedWord((UInt16)signatureBytes);
+                    return cpu.PC + 3 + MakeSignedWord((UInt16)signatureBytes);
                 case AddressModes.StackImplied:
                     return cpu.Stack.Value;
                 //case AddressModes.StackAbsolute:
@@ -274,7 +275,7 @@ namespace FoenixIDE.Processor
         /// <param name="Address">Address of pointer. Final value is address pointer references.</param>
         /// <param name="block"></param>
         /// <returns></returns>
-        public int GetAbsoluteIndirectAddress(int Address, Register bank)
+        public int GetAbsoluteIndirectAddress3(int Address, Register bank)
         {
             int ptr = cpu.Memory.ReadWord(Address);
             return bank.GetLongAddress(ptr);
@@ -293,14 +294,14 @@ namespace FoenixIDE.Processor
         /// in the current Program Bank (PBR + ($1200,X))
         /// </summary>
         /// <param name="Address">Address of pointer</param>
-        /// <param name="bank">Program Bank</param>
         /// <param name="Index">Offset of address</param>
         /// <returns></returns>
-        private int GetJumpAbsoluteIndexedIndirect(int Address, Register bank, Register Index)
+        private int GetJumpAbsoluteIndexedIndirect(int Address, Register Index)
         {
             int addr = Address + Index.Value;
             int ptr = cpu.Memory.ReadWord(addr);
-            return cpu.ProgramBank.GetLongAddress(ptr);
+            //return cpu.ProgramBank.GetLongAddress(ptr);
+            return (cpu.PC & 0xFF_0000) + ptr;
         }
 
         /// <summary>
@@ -481,7 +482,7 @@ namespace FoenixIDE.Processor
                     cpu.PullInto(cpu.DirectPage);
                     break;
                 case OpcodeList.PHK_StackImplied:
-                    cpu.Push(cpu.ProgramBank);
+                    cpu.Push(cpu.PC >> 16, 1);
                     break;
                 case OpcodeList.PHP_StackImplied:
                     cpu.Push(cpu.Flags);
@@ -500,7 +501,7 @@ namespace FoenixIDE.Processor
                     cpu.Push(cpu.Memory.ReadWord(addr), 2);
                     break;
                 case OpcodeList.PER_StackProgramCounterRelativeLong:
-                    int effRelAddr = cpu.PC.Value + signature & 0xFFFF;
+                    int effRelAddr = (cpu.PC + signature) & 0xFFFF;
                     cpu.Push(effRelAddr, 2);
                     break;
                 default:
@@ -543,7 +544,7 @@ namespace FoenixIDE.Processor
                 case OpcodeList.BRL_ProgramCounterRelativeLong:
                     takeBranch = false;  // we are actually always taking this branch, but the offset is a word
                     int offset = MakeSignedWord((UInt16)signature);
-                    cpu.PC.Value += offset;
+                    cpu.PC += offset;
                     break;
                 default:
                     throw new NotImplementedException("ExecuteBranch() opcode not implemented: " + instruction.ToString("X2"));
@@ -706,7 +707,8 @@ namespace FoenixIDE.Processor
                 case AddressModes.DirectPageIndexedIndirectWithX:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes) + cpu.X.Value;
                     ptr = cpu.Memory.ReadWord(addr);
-                    return cpu.ProgramBank.GetLongAddress(ptr);
+                    //return cpu.ProgramBank.GetLongAddress(ptr);
+                    return (cpu.PC & 0xFF_0000) + ptr;
                 case AddressModes.DirectPageIndirect:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.Memory.ReadWord(addr);
@@ -714,7 +716,8 @@ namespace FoenixIDE.Processor
                 case AddressModes.DirectPageIndirectIndexedWithY:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.Memory.ReadWord(addr) + cpu.Y.Value;
-                    return cpu.ProgramBank.GetLongAddress(ptr);
+                    //return cpu.ProgramBank.GetLongAddress(ptr);
+                    return (cpu.PC & 0xFF_0000) + ptr;
                 case AddressModes.DirectPageIndirectLong:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.Memory.ReadLong(addr);
@@ -725,11 +728,11 @@ namespace FoenixIDE.Processor
                     return ptr;
                 case AddressModes.ProgramCounterRelative:
                     ptr = MakeSignedByte((byte)SignatureBytes);
-                    addr = cpu.PC.Value + ptr;
+                    addr = cpu.PC + ptr;
                     return addr;
                 case AddressModes.ProgramCounterRelativeLong:
                     ptr = MakeSignedInt((UInt16)SignatureBytes);
-                    addr = cpu.PC.Value + ptr;
+                    addr = cpu.PC + ptr;
                     return addr;
                 case AddressModes.StackImplied:
                     //case AddressModes.StackAbsolute:
@@ -749,15 +752,18 @@ namespace FoenixIDE.Processor
                 case AddressModes.JmpAbsoluteIndirect:
                     addr = SignatureBytes;
                     ptr = cpu.Memory.ReadWord(addr);
-                    return cpu.ProgramBank.GetLongAddress(ptr);
+                    //return cpu.ProgramBank.GetLongAddress(ptr);
+                    return (cpu.PC & 0xFF_0000) + ptr;
                 case AddressModes.JmpAbsoluteIndirectLong:
                     addr = SignatureBytes;
                     ptr = cpu.Memory.ReadLong(addr);
                     return ptr;
                 case AddressModes.JmpAbsoluteIndexedIndirectWithX:
                     addr = SignatureBytes + cpu.X.Value;
-                    ptr = cpu.Memory.ReadWord(cpu.ProgramBank.GetLongAddress(addr));
-                    return cpu.ProgramBank.GetLongAddress(ptr);
+                    //ptr = cpu.Memory.ReadWord(cpu.ProgramBank.GetLongAddress(addr));
+                    ptr = cpu.Memory.ReadWord((cpu.PC & 0xFF_0000) + addr);
+                    //return cpu.ProgramBank.GetLongAddress(ptr);
+                    return (cpu.PC & 0xFF_0000) + ptr;
                 case AddressModes.Accumulator:
                     return 0; 
                 default:
@@ -814,17 +820,20 @@ namespace FoenixIDE.Processor
 
         public void ExecuteJumpReturn(byte instruction, AddressModes addressMode, int signature)
         {
-            int addr = GetAddress(addressMode, signature, cpu.ProgramBank);
+            RegisterBankNumber fakeBank = new RegisterBankNumber
+            {
+                Value = cpu.PC >> 16
+            };
+            int addr = GetAddress(addressMode, signature, fakeBank);
             switch (instruction)
             {
                 case OpcodeList.JSR_Absolute:
                 case OpcodeList.JSR_AbsoluteIndexedIndirectWithX:
-                    cpu.Push(cpu.PC, -1);
-                    cpu.JumpShort(addr);
+                    cpu.Push(cpu.PC - 1, 2);
+                    cpu.JumpLong(addr);
                     return;
                 case OpcodeList.JSR_AbsoluteLong:
-                    cpu.Push(cpu.ProgramBank);
-                    cpu.Push(cpu.PC, -1);
+                    cpu.Push(cpu.PC - 1, 3);
                     cpu.JumpLong(addr);
                     return;
                 case OpcodeList.JMP_Absolute:
@@ -834,9 +843,8 @@ namespace FoenixIDE.Processor
                 case OpcodeList.JMP_AbsoluteIndirectLong:
                     cpu.JumpLong(addr);
                     return;
-                case OpcodeList.RTS_StackImplied:
-                    cpu.JumpShort(cpu.Pull(2) + 1);
-                    return;
+                
+                // RTS, RTL, RTI
                 case OpcodeList.RTI_StackImplied:
                     cpu.Flags.SetFlags(cpu.Pull(1));
                     int address = cpu.Pull(2);
@@ -847,6 +855,9 @@ namespace FoenixIDE.Processor
                     }
                     cpu.JumpLong(address);
                     cpu.SyncFlags();
+                    return;
+                case OpcodeList.RTS_StackImplied:
+                    cpu.JumpShort(cpu.Pull(2) + 1);
                     return;
                 case OpcodeList.RTL_StackImplied:
                     addr = cpu.Pull(3);
