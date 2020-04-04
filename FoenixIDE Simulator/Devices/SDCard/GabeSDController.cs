@@ -14,10 +14,17 @@ namespace FoenixIDE.Simulator.Devices
         READ_BLK = 2,
         WRITE_BLK = 3
     }
+    class FileEntry
+    {
+        public String name;
+        public int cluster;
+        public int size;
+    }
     public class GabeSDController : SDCardDevice
     {
         private byte[] mbr = new byte[512];
         private byte[] boot_sector = new byte[512];
+        private byte[] fat = new byte[512];
         private byte[] block;
         private byte[] root = new byte[32 * 512]; // root dir is always 32 sectors, except FAT32, which omits it.
         private int blockPtr = 0;
@@ -30,8 +37,10 @@ namespace FoenixIDE.Simulator.Devices
         private int ROOT_SIZE = 0;
         private int DATA_SIZE = 0;
         private int logicalSectorSize = 512;
-        private Dictionary<int, string> FAT = new Dictionary<int, string>();
+        byte sectors_per_cluster = 1;
+        private Dictionary<int, FileEntry> FAT = new Dictionary<int, FileEntry>();
         private string spaces = "\0\0\0\0\0\0\0\0";
+        private bool fat12 = false;
 
         private GabeCtrlCommand currentCommand = GabeCtrlCommand.DIRECT;
 
@@ -93,6 +102,10 @@ namespace FoenixIDE.Simulator.Devices
                             else if (address >= FAT_OFFSET_START && address <= FAT_OFFSET_START + FAT_SIZE -1)
                             {
                                 // read the fat table
+                                blockPtr = 0;
+                                int fatPage = (address - FAT_OFFSET_START) / 512;
+                                BuildFatPage(fatPage);
+                                block = fat;
                             }
                             else if (address >= ROOT_OFFSET_START && address <= ROOT_OFFSET_START + ROOT_SIZE -1)
                             {
@@ -103,6 +116,9 @@ namespace FoenixIDE.Simulator.Devices
                             else if (address >= DATA_OFFSET_START && address <= DATA_OFFSET_START + DATA_SIZE -1)
                             {
                                 // read the data
+                                int dataPage = (address - DATA_OFFSET_START) / 512;
+                                block = GetData(dataPage);
+                                blockPtr = 0;
                             }
                             if (block != null)
                             {
@@ -137,8 +153,8 @@ namespace FoenixIDE.Simulator.Devices
             Array.Clear(mbr, 0, mbr.Length);
             // Zero the boot sector
             Array.Clear(boot_sector, 0, boot_sector.Length);
-            byte sectors_per_cluster = 1;
-            bool fat12 = false;
+            sectors_per_cluster = 1;
+            fat12 = false;
             byte reserved_sectors = 2;
             int small_sectors = 0;
             int large_sectors = 0;
@@ -271,18 +287,30 @@ namespace FoenixIDE.Simulator.Devices
             }
             foreach (string file in files)
             {
-                FAT.Add(currentCluster, file);
+                
                 FileInfo info = new FileInfo(file);
                 int size = (int)info.Length;
                 int clusters = size / logicalSectorSize + 1;
                 string extension = info.Extension.ToUpper().Substring(1);
                 string filename = info.Name.ToUpper();
+                int dot = filename.IndexOf(".");
+                if (dot > -1)
+                {
+                    filename = filename.Substring(0, dot - 1);
+                }
 
                 if (filename.Length < 8)
                 {
                     filename += spaces.Substring(8 - filename.Length);
                 }
+                FileEntry entry = new FileEntry()
+                {
+                    name = file,
+                    cluster = clusters,
+                    size = size
+                };
 
+                FAT.Add(currentCluster, entry);
                 Array.Copy(Encoding.ASCII.GetBytes(filename), 0, root, pointer, 8);
                 Array.Copy(Encoding.ASCII.GetBytes(extension), 0, root, pointer +8, 3);
                 // cluster number
@@ -293,10 +321,163 @@ namespace FoenixIDE.Simulator.Devices
                 root[pointer + 0x1d] = (byte)((size & 0xFF00) >> 8);
                 root[pointer + 0x1e] = (byte)((size & 0xFF_0000) >> 16);
                 root[pointer + 0x1f] = (byte)((size & 0xFF00_0000) >> 24);
-                currentCluster += clusters;
+                currentCluster += clusters + 1;
                 pointer += 32;
             }
         }
         
+        private void BuildFatPage(int page)
+        {
+            Array.Clear(fat, 0, 512);
+            // Determine how many entries are in FAT sector
+            int fatCount = 512 / 2; // 256
+            int byteOffset = 0;
+            if (fat12)
+            {
+                fatCount = 513 / 3 * 2; //341
+                if (page % 3 != 0)
+                {
+                    byteOffset = (page % 3) - 3;
+                }
+            }
+
+            if (page == 0)
+            {
+                if (fat12)
+                {
+                    fat[0] = 0xF8;
+                    fat[1] = 0xFF;
+                    fat[2] = 0xFF;
+                    fat[3] = 0xFF;
+                    fat[4] = 0xFF;
+                    fat[5] = 0xFF;
+                }
+                else
+                {
+                    fat[0] = 0xF8;
+                    fat[1] = 0xFF;
+                    fat[2] = 0xFF;
+                    fat[3] = 0xFF;
+                    fat[4] = 0xFF;
+                    fat[5] = 0xFF;
+                    fat[6] = 0xFF;
+                    fat[7] = 0xFF;
+                }
+            }
+            // scan the FAT entries
+            foreach (int key in FAT.Keys)
+            {
+                FileEntry entry = FAT[key];
+                if (key > page * fatCount && key < (page +1) * fatCount ||
+                    key + entry.cluster >= page * fatCount && key < (page + 1) * fatCount)
+                {
+                    int pageOffset = key % fatCount;
+                    int startOffset = 0;
+                    if (key < page * fatCount)
+                    {
+                        startOffset = page * fatCount - key + byteOffset;
+                        pageOffset = 0;
+                    }
+                    if (fat12)
+                    {
+                        
+                        // even numbers start at the boundary - odd numbers are at half byte
+                        for (int i = startOffset; i < entry.cluster; i++)
+                        {
+                            int position = (pageOffset + i - startOffset) >> 1;
+                            if ((pageOffset - startOffset + i) % 2 == 0)
+                            {
+                                if (position * 3 + byteOffset >= 0 && position * 3 + byteOffset < 512)
+                                {
+                                    fat[position * 3 + byteOffset] = (byte)((key + i + 1) & 0xFF);
+                                }
+                                if ((position * 3) + 1 + byteOffset >= 0 && (position * 3) + 1 + byteOffset < 512)
+                                {
+                                    fat[(position * 3) + 1 + byteOffset] = (byte)(((key + i + 1) & 0xF00) >> 8);
+                                }
+                            }
+                            else
+                            {
+                                if ((position * 3) + 1 + byteOffset >= 0)
+                                {
+                                    int existingNibble = fat[position * 3 + 1 + byteOffset];
+                                    fat[position * 3 + 1 + byteOffset] = (byte)((((key + i + 1) & 0xF) << 4) + existingNibble);
+                                }
+                                if (position * 3 + 2 + byteOffset >= 0 && position * 3 + 2 < 512)
+                                {
+                                    fat[position * 3 + 2 + byteOffset] = (byte)(((key + i + 1) & 0xFF0) >> 4);
+                                }
+                            }
+                            
+                            if ((pageOffset + i - startOffset + 1) > fatCount)
+                            {
+                                return;
+                            }
+                        }
+                        // write the end cluster
+                        if (pageOffset + entry.cluster - startOffset < fatCount)
+                        {
+                            int position = (pageOffset + entry.cluster - startOffset) >> 1;
+                            if ((pageOffset + entry.cluster - startOffset) % 2 == 0)
+                            {
+                                fat[position * 3 + byteOffset] = 0xFF;
+                                fat[(position * 3) + 1 + byteOffset] = 0xF;
+                            }
+                            else
+                            {
+                                int existingNibble = fat[position * 3 + 1 + byteOffset];
+                                fat[position * 3 + 1 + byteOffset] = (byte)(0xF0 + existingNibble);
+                                fat[position * 3 + 2 + byteOffset] = 0xFF;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = startOffset; i < entry.cluster; i ++)
+                        {
+                            fat[(pageOffset + i - startOffset) * 2] = (byte)((key + i + 1) & 0xFF);
+                            fat[(pageOffset + i - startOffset) * 2 + 1] = (byte)(((key + i + 1) & 0xFF00) >> 8);
+                            if ((pageOffset + i - startOffset + 1) >= fatCount)
+                            {
+                                return;
+                            }
+                        }
+                        // write the end cluster
+                        if (pageOffset + entry.cluster - startOffset < fatCount)
+                        {
+                            fat[(pageOffset + entry.cluster - startOffset) * 2] = 0xFF;
+                            fat[(pageOffset + entry.cluster - startOffset) * 2 + 1] = 0xFF;
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+         * Return a sector of data from files.
+         * Cluster 2 is the first sector.
+         */
+        private byte[] GetData(int page)
+        {
+            foreach (int key in FAT.Keys)
+            {
+                FileEntry entry = FAT[key];
+                if (page >= ( key - 2 ) * sectors_per_cluster && page < (key - 2 + entry.cluster) * sectors_per_cluster)
+                {
+                    byte[] buffer = new byte[512];
+                    FileStream stream = new FileStream(entry.name, FileMode.Open, FileAccess.Read);
+                    try
+                    {
+                        stream.Read(buffer, (page - key * sectors_per_cluster )* 512, 512);
+                        return buffer;
+                    }
+                    catch(Exception e)
+                    {
+                        System.Console.WriteLine(e.ToString());
+                    }
+                }
+            }
+            return null;
+        }
     }
 }

@@ -134,6 +134,7 @@ namespace FoenixIDE.Display
             
             if (drawing)
             {
+                // drop the frame
                 return;
             }
             drawing = true;

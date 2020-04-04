@@ -600,13 +600,13 @@ namespace FoenixIDE.UI
         private void GenerateNextInstruction(int pc)
         {
             OpCode oc = kernel.CPU.PreFetch();
-            int cmdLength = oc.Length;
-            byte[] command = new byte[cmdLength];
-            for (int i = 0; i < cmdLength; i++)
+            int ocLength = oc.Length;
+            byte[] command = new byte[ocLength];
+            for (int i = 0; i < ocLength; i++)
             {
                 command[i] = kernel.MemMgr.RAM.ReadByte(pc + i);
             }
-            string opcodes = oc.ToString(kernel.CPU.ReadSignature(oc, pc));
+            string opcodes = oc.ToString(kernel.CPU.ReadSignature(ocLength, pc));
             //string status = "";
             DebugLine line = new DebugLine(pc, command, opcodes, null);
             if (!lastLine.InvokeRequired)

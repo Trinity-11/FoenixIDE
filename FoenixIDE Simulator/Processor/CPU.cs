@@ -163,7 +163,7 @@ namespace FoenixIDE.Processor
             CurrentOpcode = opcodes[Memory.RAM.ReadByte(pc)];
             OpcodeLength = CurrentOpcode.Length;
             OpcodeCycles = 1;
-            SignatureBytes = ReadSignature(CurrentOpcode, pc);
+            SignatureBytes = ReadSignature(OpcodeLength, pc);
 
             PC.Value += OpcodeLength;
             CurrentOpcode.Execute(SignatureBytes);
@@ -218,19 +218,16 @@ namespace FoenixIDE.Processor
             return opcodes[Memory[GetLongPC()]];
         }
 
-        public int ReadSignature(OpCode oc, int pc)
+        public int ReadSignature(int length, int pc)
         {
-            if (oc.Length == 2)
+            switch (length)
             {
-                return Memory.RAM.ReadByte(pc + 1);
-            }
-            else if (oc.Length == 3)
-            {
-                return Memory.RAM.ReadWord(pc + 1);
-            }
-            else if (oc.Length == 4)
-            { 
-                return Memory.RAM.ReadLong(pc + 1);
+                case 2:
+                    return Memory.RAM.ReadByte(pc + 1);
+                case 3:
+                    return Memory.RAM.ReadWord(pc + 1);
+                case 4:
+                    return Memory.RAM.ReadLong(pc + 1);
             }
 
             return 0;
