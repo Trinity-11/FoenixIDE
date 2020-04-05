@@ -4,6 +4,7 @@ using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Ports;
@@ -268,8 +269,7 @@ namespace FoenixIDE.UI
                         // values between BaseBank + FF00 to BaseBank + FFFF
                         // BaseBank on RevB is $18
                         // BaseBank on RevC is $38
-                        byte[] pageFF = new byte[256];
-                        PreparePacket2Read(pageFF, 0xFF00, 0, 255);
+                        byte[] pageFF = PreparePacket2Read(0xFF00, 0x100);
                         // If send HEX files, each time we encounter a "bank" change - record 04 - send a new data block
                         string[] lines = System.IO.File.ReadAllLines(FileNameTextBox.Text);
                         int bank = 0;
@@ -503,6 +503,8 @@ namespace FoenixIDE.UI
         private bool FetchData(byte[] buffer, int startAddress, int size, bool debugMode)
         {
             bool success = false;
+            byte[] partialBuffer;
+            
             try
             {
                 if (serial.IsOpen)
@@ -514,7 +516,8 @@ namespace FoenixIDE.UI
                     
                     if (size < 2048)
                     {
-                        PreparePacket2Read(buffer, startAddress, 0, size);
+                        partialBuffer = PreparePacket2Read(startAddress, size);
+                        Array.Copy(partialBuffer, 0, buffer, 0, size);
                         UploadProgressBar.Increment(size);
                     }
                     else
@@ -524,14 +527,17 @@ namespace FoenixIDE.UI
 
                         for (int j = 0; j < Loop; j++)
                         {
-                            PreparePacket2Read(buffer, startAddress, j * BufferSize, BufferSize);
+                            partialBuffer = PreparePacket2Read(startAddress, BufferSize);
+                            Array.Copy(partialBuffer, 0, buffer, j * BufferSize, BufferSize);
+                            partialBuffer = null;
                             startAddress += BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
                             UploadProgressBar.Increment(BufferSize);
                         }
                         BufferSize = (size % BufferSize);
                         if (BufferSize > 0)
                         {
-                            PreparePacket2Read(buffer, startAddress, size - BufferSize, BufferSize);
+                            partialBuffer = PreparePacket2Read(startAddress, BufferSize);
+                            Array.Copy(partialBuffer, 0, buffer, size - BufferSize, BufferSize);
                             UploadProgressBar.Increment(BufferSize);
                         }
                     }
@@ -625,7 +631,7 @@ namespace FoenixIDE.UI
             SendMessage(commandBuffer, null);   // Tx the requested Payload Size (Plus Header and LRC), No Payload to be received aside of the Status.
         }
 
-        public void PreparePacket2Read(byte[] receiveBuffer, int address, int offset, int size)
+        public byte[] PreparePacket2Read(int address, int size)
         {
             if (size > 0)
             {
@@ -641,15 +647,16 @@ namespace FoenixIDE.UI
 
                 byte[] partialBuffer = new byte[size];
                 SendMessage(commandBuffer, partialBuffer);
-                Array.Copy(partialBuffer, 0, receiveBuffer, offset, size);
+                return partialBuffer;
             }
+            return null;
         }
 
         public void SendMessage(byte[] command, byte[] data, int delay = 0)
         {
             //            int dwStartTime = System.Environment.TickCount;
             byte byte_buffer;
-
+            Stopwatch stopWatch = new Stopwatch();
             serial.Write(command, 0, command.Length);
 
             Stat0 = 0;
@@ -675,32 +682,37 @@ namespace FoenixIDE.UI
                 while (System.DateTimeOffset.Now.ToUnixTimeMilliseconds() - StartTime < delay);
                 CountdownLabel.Text = label + " - Done!";
             }
+
+            stopWatch.Start();
             do
             {
                 byte_buffer = (byte)serial.ReadByte();
             }
             while (byte_buffer != 0xAA);
+            stopWatch.Stop();
+            TimeSpan tsReady = stopWatch.Elapsed;
             if (delay > 2000)
             {
                 serial.ReadTimeout = 2000;
             }
 
+            // reset the stop watch
+            stopWatch.Reset();
+            stopWatch.Start();
             if (byte_buffer == 0xAA)
             {
                 Stat0 = (byte)serial.ReadByte();
                 Stat1 = (byte)serial.ReadByte();
                 if (data != null)
                 {
-                    for (int i = 0; i < data.Length; i++)
-                    {
-                        data[i] = (byte)serial.ReadByte();
-                    }
+                    serial.Read(data, 0, data.Length);
                 }
                 LRC = (byte)serial.ReadByte();
             }
-
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+            Console.WriteLine("Ready: " + tsReady.Milliseconds + ", Receive Data LRC:" + RxLRC + ", Time: " + ts.Milliseconds + "ms");
             RxProcessLRC(data);
-            Console.WriteLine("Receive Data LRC:" + RxLRC);
         }
 
         public int TxProcessLRC(byte[] buffer)

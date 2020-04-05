@@ -1,3 +1,11 @@
+Release 0.4.1.2
+---------------
+Optimized the Program Counter, as GetLongPC was using 5% or more of the CPU.
+Added more Gabe SD Card emulation.
+Added NZ flags to Pull operations.
+Added Drag'n'drop operation of Hex files into the main window.
+Fixed Fetch function.  For large datasets, this was very very slow.
+
 Release 0.4.1.1
 ---------------
 Fixed a problem with absolute indexed values reading two bytes even when the register width is 1.

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Timers;
+using System.IO;
 
 namespace FoenixIDE.UI
 {
@@ -153,30 +154,19 @@ namespace FoenixIDE.UI
             ResetSDCard();
         }
 
-        private bool LoadHexFile(bool ResetMemory)
+        private void LoadHexFile(string Filename, bool ResetMemory)
         {
-            OpenFileDialog dialog = new OpenFileDialog
+            debugWindow.Pause();
+            if (kernel.ResetCPU(ResetMemory, Filename))
             {
-                Filter = "Hex Filed|*.hex",
-                CheckFileExists = true
-            };
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                debugWindow.Pause();
-                if (kernel.ResetCPU(ResetMemory, dialog.FileName))
+                if (kernel.lstFile != null)
                 {
-                    if (kernel.lstFile != null)
-                    {
-                        ShowDebugWindow();
-                        ShowMemoryWindow();
-                       
-                        return true;
-                    }
-                    ResetSDCard();
-                    debugWindow.ClearTrace();
+                    ShowDebugWindow();
+                    ShowMemoryWindow();
                 }
+                ResetSDCard();
+                debugWindow.ClearTrace();
             }
-            return false;
         }
 
         private void ShowDebugWindow()
@@ -465,12 +455,16 @@ namespace FoenixIDE.UI
 
         private void MenuOpenHexFile_Click(object sender, EventArgs e)
         {
-            LoadHexFile(true);
-        }
-
-        private void OpenHexFileWoZeroingToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadHexFile(false);
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Hex Filed|*.hex",
+                CheckFileExists = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                LoadHexFile(dialog.FileName, sender.Equals(menuOpenHexFile));
+            }
+            
         }
 
         /*
@@ -816,6 +810,35 @@ namespace FoenixIDE.UI
         private void joystickSimulatorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             joystickWindow.Show();
+        }
+
+        private void MainWindow_DragEnter(object sender, DragEventArgs e)
+        {
+            // Allow if the file is Hex
+            string[] obj = (string[])e.Data.GetData("FileName");
+            if (obj != null && obj.Length > 0)
+            {
+                FileInfo info = new FileInfo(obj[0]);
+                if (info.Extension.ToUpper().Equals(".HEX"))
+                {
+                    e.Effect = DragDropEffects.Copy;
+                    return;
+                }
+            }
+            e.Effect = DragDropEffects.None;
+        }
+
+        private void MainWindow_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] obj = (string[])e.Data.GetData("FileName");
+            if (obj != null && obj.Length > 0)
+            {
+                FileInfo info = new FileInfo(obj[0]);
+                if (info.Extension.ToUpper().Equals(".HEX"))
+                {
+                    LoadHexFile(obj[0], false);
+                }
+            }
         }
     }
 }

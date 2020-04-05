@@ -172,7 +172,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(246, 23);
+            this.SDCardPath.Size = new System.Drawing.Size(277, 23);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -218,7 +218,7 @@ namespace FoenixIDE.UI
             this.openHexFileWoZeroingToolStripMenuItem.Name = "openHexFileWoZeroingToolStripMenuItem";
             this.openHexFileWoZeroingToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.openHexFileWoZeroingToolStripMenuItem.Text = "Open Hex File w/o &Zeroing";
-            this.openHexFileWoZeroingToolStripMenuItem.Click += new System.EventHandler(this.OpenHexFileWoZeroingToolStripMenuItem_Click);
+            this.openHexFileWoZeroingToolStripMenuItem.Click += new System.EventHandler(this.MenuOpenHexFile_Click);
             // 
             // loadFNXMLFileToolStripMenuItem
             // 
@@ -437,6 +437,7 @@ namespace FoenixIDE.UI
             // 
             // MainWindow
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(686, 610);
@@ -459,6 +460,8 @@ namespace FoenixIDE.UI
             this.Text = "Foenix IDE";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.Load += new System.EventHandler(this.BasicWindow_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainWindow_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainWindow_DragEnter);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.BasicWindow_KeyUp);
             this.statusStrip1.ResumeLayout(false);
