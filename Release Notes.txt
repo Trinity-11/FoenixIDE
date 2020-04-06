@@ -2,7 +2,7 @@ Release 0.4.1.3
 ---------------
 Optimizing graphics rendering.  Removing unneeded Bitmap.Locks.  
 Passing the BitmapData structure by reference.
-Fixed LDY 0,b,X
+Fixed LDY 0,b,X to return data of the correct register width.
 
 Release 0.4.1.2
 ---------------
