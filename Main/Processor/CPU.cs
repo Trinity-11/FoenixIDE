@@ -384,7 +384,6 @@ namespace FoenixIDE.Processor
         public void PullInto(Register Register)
         {
             Register.Value = Pull(Register.Width);
-            Flags.SetNZ(Register);
         }
 
         /// <summary>

@@ -443,30 +443,35 @@ namespace FoenixIDE.Processor
                     break;
                 case OpcodeList.PLA_StackImplied:
                     cpu.PullInto(cpu.A);
+                    cpu.Flags.SetNZ(cpu.A);
                     break;
                 case OpcodeList.PHX_StackImplied:
                     cpu.Push(cpu.X);
                     break;
                 case OpcodeList.PLX_StackImplied:
                     cpu.PullInto(cpu.X);
+                    cpu.Flags.SetNZ(cpu.X);
                     break;
                 case OpcodeList.PHY_StackImplied:
                     cpu.Push(cpu.Y);
                     break;
                 case OpcodeList.PLY_StackImplied:
                     cpu.PullInto(cpu.Y);
+                    cpu.Flags.SetNZ(cpu.Y);
                     break;
                 case OpcodeList.PHB_StackImplied:
                     cpu.Push(cpu.DataBank);
                     break;
                 case OpcodeList.PLB_StackImplied:
                     cpu.PullInto(cpu.DataBank);
+                    cpu.Flags.SetNZ(cpu.DataBank);
                     break;
                 case OpcodeList.PHD_StackImplied:
                     cpu.Push(cpu.DirectPage);
                     break;
                 case OpcodeList.PLD_StackImplied:
                     cpu.PullInto(cpu.DirectPage);
+                    cpu.Flags.SetNZ(cpu.DirectPage);
                     break;
                 case OpcodeList.PHK_StackImplied:
                     cpu.Push(cpu.PC >> 16, 1);
@@ -834,14 +839,15 @@ namespace FoenixIDE.Processor
                 // RTS, RTL, RTI
                 case OpcodeList.RTI_StackImplied:
                     cpu.Flags.SetFlags(cpu.Pull(1));
-                    int address = cpu.Pull(2);
-                    if (!cpu.Flags.Emulation)
-                    {
-                        cpu.DataBank.Value = cpu.Pull(1);
-                        address += (cpu.DataBank.Value << 16);
-                    }
-                    cpu.JumpLong(address);
                     cpu.SyncFlags();
+                    if (cpu.Flags.Emulation)
+                    {
+                        cpu.JumpShort(cpu.Pull(2));
+                    }
+                    else
+                    {
+                        cpu.JumpLong(cpu.Pull(3));
+                    }
                     return;
                 case OpcodeList.RTS_StackImplied:
                     cpu.JumpShort(cpu.Pull(2) + 1);
