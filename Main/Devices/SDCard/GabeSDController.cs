@@ -55,9 +55,11 @@ namespace FoenixIDE.Simulator.Devices
             switch (Address)
             {
                 case MemoryMap.GABE_SDC_TRANS_STATUS_REG - MemoryMap.GABE_SDC_CTRL_START:
+                    // fake the wait time
                     return (isPresent && (waitCounter-- > 0)) ? (byte)1 : (byte)0;
                 case MemoryMap.GABE_SDC_TRANS_ERROR_REG - MemoryMap.GABE_SDC_CTRL_START:
-                    return isPresent ? (byte)0 : (byte)1;
+                    // return 
+                    return isPresent ? data[5] : (byte)1;
                 case MemoryMap.GABE_SDC_RX_FIFO_DATA_REG - MemoryMap.GABE_SDC_CTRL_START:
                     return isPresent ? (block != null ? block[blockPtr++] : (byte)0xEF) : (byte)0;
             }
@@ -66,6 +68,7 @@ namespace FoenixIDE.Simulator.Devices
 
         public override void WriteByte(int Address, byte Value)
         {
+            // Clear the error status
             data[Address] = Value;
             switch (Address)
             {
@@ -73,11 +76,14 @@ namespace FoenixIDE.Simulator.Devices
                 case MemoryMap.GABE_SDC_CONTROL_REG - MemoryMap.GABE_SDC_CTRL_START:
                     blockPtr = 0;
                     ResetMbrBootSector();
+                    data[5] = 0;
                     break;
                 case MemoryMap.GABE_SDC_TRANS_TYPE_REG - MemoryMap.GABE_SDC_CTRL_START:
                     currentCommand = (GabeCtrlCommand)Value;
+                    data[5] = 0;
                     break;
                 case MemoryMap.GABE_SDC_TRANS_CONTROL_REG - MemoryMap.GABE_SDC_CTRL_START:
+                    data[5] = 0;
                     switch (currentCommand)
                     {
                         case  GabeCtrlCommand.INIT:
@@ -125,11 +131,19 @@ namespace FoenixIDE.Simulator.Devices
                                 // tell the reader that we've got 512 bytes
                                 data[0x12] = 2;
                                 data[0x13] = 0;
+                                // clear the error status
+                                data[5] = 0;
+                            }
+                            else
+                            {
+                                // the controller returns an error
+                                data[5] = 1;
                             }
                             break;
                     }
                     break;
                 case MemoryMap.GABE_SDC_RX_FIFO_CTRL_REG - MemoryMap.GABE_SDC_CTRL_START:
+                    data[5] = 0;
                     if (Value == 1)
                     {
                         data[0x12] = 0;
@@ -468,12 +482,20 @@ namespace FoenixIDE.Simulator.Devices
                     FileStream stream = new FileStream(entry.name, FileMode.Open, FileAccess.Read);
                     try
                     {
-                        stream.Read(buffer, (page - key * sectors_per_cluster )* 512, 512);
+                        stream.Seek((page - key) * 512, SeekOrigin.Begin);
+                        stream.Read(buffer, 0, 512);
                         return buffer;
                     }
                     catch(Exception e)
                     {
+                        // controller error
+                        data[5] = 1;
                         System.Console.WriteLine(e.ToString());
+                        return null;
+                    }
+                    finally
+                    {
+                        stream.Close();
                     }
                 }
             }

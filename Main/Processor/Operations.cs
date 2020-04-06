@@ -129,20 +129,20 @@ namespace FoenixIDE.Processor
                     return GetJumpAbsoluteIndexedIndirect(signatureBytes, cpu.X);
                 case AddressModes.AbsoluteIndexedWithX:
                     // LDA $2000,X
-                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.X);
+                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.X, width);
                 case AddressModes.AbsoluteLongIndexedWithX:
                     // LDA $12D080,X
                     return GetAbsoluteLongIndexed(signatureBytes, cpu.X);
                 case AddressModes.AbsoluteIndexedWithY:
-                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.Y);
+                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.Y, width);
                 case AddressModes.AbsoluteLongIndexedWithY:
                     return GetAbsoluteLongIndexed(signatureBytes, cpu.Y);
                 case AddressModes.DirectPage:
                     return GetAbsolute(signatureBytes, cpu.DirectPage, width);
                 case AddressModes.DirectPageIndexedWithX:
-                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.X);
+                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.X, width);
                 case AddressModes.DirectPageIndexedWithY:
-                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.Y);
+                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.Y, width);
                 case AddressModes.DirectPageIndexedIndirectWithX:
                     //LDA(dp, X)
                     return GetDirectIndexedIndirect(signatureBytes, cpu.X);
@@ -204,7 +204,7 @@ namespace FoenixIDE.Processor
         /// LDA (D),Y - returns value pointed to by (D),Y, where D is in Direct page. Final value will be in Data bank. 
         /// </summary>
         /// <param name="Address">Address in direct page</param>
-        /// <param name="X">Register to index</param>
+        /// <param name="Y">Register to index</param>
         /// <returns></returns>
         private int GetDirectPageIndirectIndexed(int Address, Register Y)
         {
@@ -257,28 +257,15 @@ namespace FoenixIDE.Processor
         /// </summary>
         /// <param name="Address"></param>
         /// <param name="bank"></param>
-        /// <param name="Index"></param>
+        /// <param name="Index">The Index register - maybe short or long.</param>
+        /// <param name="width">The width of the register requesting data</param>
         /// <returns></returns>
-        private int GetIndexed(int Address, Register bank, Register Index)
+        private int GetIndexed(int Address, Register bank, Register Index, int width)
         {
             int addr = Address;
             addr = bank.GetLongAddress(Address);
             addr = addr + Index.Value;
-            return (cpu.A.Width == 1) ? cpu.Memory.ReadByte(addr) : cpu.Memory.ReadWord(addr);
-        }
-
-        /// <summary>
-        /// Returns a pointer from memory. 
-        /// JMP ($xxxx) reads a two-byte address from bank 0. It jumps to that address in the current
-        /// program bank (meaning it adds PBR to get the final address.) 
-        /// </summary>
-        /// <param name="Address">Address of pointer. Final value is address pointer references.</param>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public int GetAbsoluteIndirectAddress3(int Address, Register bank)
-        {
-            int ptr = cpu.Memory.ReadWord(Address);
-            return bank.GetLongAddress(ptr);
+            return (width == 1) ? cpu.Memory.ReadByte(addr) : cpu.Memory.ReadWord(addr);
         }
 
         public int GetAbsoluteIndirectAddressLong(int Address)

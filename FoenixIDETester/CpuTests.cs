@@ -20,7 +20,7 @@ namespace FoenixIDETester
         {
             mgr = new MemoryManager
             {
-                RAM = new MemoryRAM(0, 1024),  // Only setup 1K of RAM - this should be tons to test our CPU
+                RAM = new MemoryRAM(0, 3 * 0x1_0000),  // Only setup 3K of RAM - this should be tons to test our CPU
                 CODEC = new CodecRAM(1025,1),
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4)
             };
@@ -306,5 +306,55 @@ namespace FoenixIDETester
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Carry);
         }
+
+        /*
+         * Store $EE55 at effective address $2_0203 + $125 = $2:0328
+         * LDA #2
+         * PHA
+         * PLB
+         * REP #$10 ; setxl
+         * LDX #$125
+         * LDY $203,b,X
+         */
+        [TestMethod]
+        public void AbsoluteIndexedByBank()
+        {
+            mgr.RAM.WriteWord(0x2_0328, 0xEE55);
+
+            // Go native
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.XCE_Implied);
+            cpu.ExecuteNext();
+            Assert.IsFalse(cpu.Flags.Emulation);
+
+            // Set A short (X is long)
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEP_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x20);
+            cpu.ExecuteNext();
+            Assert.AreEqual(1, cpu.A.Width);
+            Assert.AreEqual(2, cpu.X.Width);
+
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 2);
+            cpu.ExecuteNext();
+            Assert.AreEqual(2, cpu.A.Value);
+
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.PHA_StackImplied);
+            cpu.ExecuteNext();
+
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.PLB_StackImplied);
+            cpu.ExecuteNext();
+            Assert.AreEqual(2, cpu.DataBank.Value);
+
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDX_Immediate);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x125);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x125, cpu.X.Value);
+
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDY_AbsoluteIndexedWithX);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0x203);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0xEE55, cpu.Y.Value);
+        }
+
     }
 }
