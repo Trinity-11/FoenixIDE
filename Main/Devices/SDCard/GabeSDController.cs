@@ -16,8 +16,9 @@ namespace FoenixIDE.Simulator.Devices
     }
     class FileEntry
     {
-        public String name;
-        public int cluster;
+        public string fqpn;
+        public string shortname;
+        public int clusters;
         public int size;
     }
     public class GabeSDController : SDCardDevice
@@ -264,13 +265,23 @@ namespace FoenixIDE.Simulator.Devices
                 // DATA offset
                 DATA_OFFSET_START = ROOT_OFFSET_START + 0x20 * 512; // the root area is always 32 sectors
                 DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;
-
                 
             }
         }
 
         public void PrepareRootArea()
         {
+            bool AlreadyExists(string fn)
+            {
+                foreach (FileEntry entry in FAT.Values)
+                {
+                    if (entry.shortname.Equals(fn))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
             Array.Clear(root, 0, root.Length);
             Array.Copy(Encoding.ASCII.GetBytes("FOENIXIDE  "), root, 11);
             root[11] = 8; // volume type
@@ -292,7 +303,7 @@ namespace FoenixIDE.Simulator.Devices
                 string dirname = info.Name.ToUpper();
                 if (dirname.Length < 8)
                 {
-                    dirname += spaces.Substring(8 - dirname.Length);
+                    dirname += spaces.Substring(0, 8 - dirname.Length);
                 }
                 
                 Array.Copy(Encoding.ASCII.GetBytes(dirname), 0, root, pointer, 8);
@@ -304,23 +315,35 @@ namespace FoenixIDE.Simulator.Devices
                 
                 FileInfo info = new FileInfo(file);
                 int size = (int)info.Length;
-                int clusters = size / logicalSectorSize + 1;
+                int clusters = size / logicalSectorSize;
                 string extension = info.Extension.ToUpper().Substring(1);
                 string filename = info.Name.ToUpper();
                 int dot = filename.IndexOf(".");
                 if (dot > -1)
                 {
-                    filename = filename.Substring(0, dot - 1);
+                    filename = filename.Substring(0, dot);
                 }
-
+                // Truncate long file names - until we start supporting long file names
+                if (filename.Length > 8)
+                {
+                    int count = 1;
+                    string shortFilename = null;
+                    do
+                    {
+                        shortFilename = filename.Substring(0, 6) + "~" + count++;
+                    }
+                    while (AlreadyExists(shortFilename) && count < 10);
+                    filename = shortFilename;                    
+                }
                 if (filename.Length < 8)
                 {
-                    filename += spaces.Substring(8 - filename.Length);
+                    filename += spaces.Substring(0, 8 - filename.Length);
                 }
                 FileEntry entry = new FileEntry()
                 {
-                    name = file,
-                    cluster = clusters,
+                    fqpn = file,
+                    shortname = filename,
+                    clusters = clusters,
                     size = size
                 };
 
@@ -383,7 +406,7 @@ namespace FoenixIDE.Simulator.Devices
             {
                 FileEntry entry = FAT[key];
                 if (key > page * fatCount && key < (page +1) * fatCount ||
-                    key + entry.cluster >= page * fatCount && key < (page + 1) * fatCount)
+                    key + entry.clusters >= page * fatCount && key < (page + 1) * fatCount)
                 {
                     int pageOffset = key % fatCount;
                     int startOffset = 0;
@@ -396,7 +419,7 @@ namespace FoenixIDE.Simulator.Devices
                     {
                         
                         // even numbers start at the boundary - odd numbers are at half byte
-                        for (int i = startOffset; i < entry.cluster; i++)
+                        for (int i = startOffset; i < entry.clusters; i++)
                         {
                             int position = (pageOffset + i - startOffset) >> 1;
                             if ((pageOffset - startOffset + i) % 2 == 0)
@@ -429,10 +452,10 @@ namespace FoenixIDE.Simulator.Devices
                             }
                         }
                         // write the end cluster
-                        if (pageOffset + entry.cluster - startOffset < fatCount)
+                        if (pageOffset + entry.clusters - startOffset < fatCount)
                         {
-                            int position = (pageOffset + entry.cluster - startOffset) >> 1;
-                            if ((pageOffset + entry.cluster - startOffset) % 2 == 0)
+                            int position = (pageOffset + entry.clusters - startOffset) >> 1;
+                            if ((pageOffset + entry.clusters - startOffset) % 2 == 0)
                             {
                                 fat[position * 3 + byteOffset] = 0xFF;
                                 fat[(position * 3) + 1 + byteOffset] = 0xF;
@@ -447,7 +470,7 @@ namespace FoenixIDE.Simulator.Devices
                     }
                     else
                     {
-                        for (int i = startOffset; i < entry.cluster; i ++)
+                        for (int i = startOffset; i < entry.clusters; i ++)
                         {
                             fat[(pageOffset + i - startOffset) * 2] = (byte)((key + i + 1) & 0xFF);
                             fat[(pageOffset + i - startOffset) * 2 + 1] = (byte)(((key + i + 1) & 0xFF00) >> 8);
@@ -457,10 +480,10 @@ namespace FoenixIDE.Simulator.Devices
                             }
                         }
                         // write the end cluster
-                        if (pageOffset + entry.cluster - startOffset < fatCount)
+                        if (pageOffset + entry.clusters - startOffset < fatCount)
                         {
-                            fat[(pageOffset + entry.cluster - startOffset) * 2] = 0xFF;
-                            fat[(pageOffset + entry.cluster - startOffset) * 2 + 1] = 0xFF;
+                            fat[(pageOffset + entry.clusters - startOffset) * 2] = 0xFF;
+                            fat[(pageOffset + entry.clusters - startOffset) * 2 + 1] = 0xFF;
                         }
                     }
                 }
@@ -476,13 +499,13 @@ namespace FoenixIDE.Simulator.Devices
             foreach (int key in FAT.Keys)
             {
                 FileEntry entry = FAT[key];
-                if (page >= ( key - 2 ) * sectors_per_cluster && page < (key - 2 + entry.cluster) * sectors_per_cluster)
+                if (page >= ( key - 2 ) * sectors_per_cluster && page < (key - 2 + entry.clusters) * sectors_per_cluster)
                 {
                     byte[] buffer = new byte[512];
-                    FileStream stream = new FileStream(entry.name, FileMode.Open, FileAccess.Read);
+                    FileStream stream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
                     try
                     {
-                        stream.Seek((page - key) * 512, SeekOrigin.Begin);
+                        stream.Seek((page - (key -2 ) * sectors_per_cluster) * 512, SeekOrigin.Begin);
                         stream.Read(buffer, 0, 512);
                         return buffer;
                     }

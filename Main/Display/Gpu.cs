@@ -124,6 +124,8 @@ namespace FoenixIDE.Display
                 e.Graphics.DrawString("RAM Not Initialized", this.Font, TextBrush, 0, 0);
                 return;
             }
+            int top = 0; // top gets modified if error messages are displayed
+            Graphics g = Graphics.FromImage(frameBuffer);
             // Read the Master Control Register
             byte MCRegister = VICKY.ReadByte(0); // Reading address $AF:0000
             if (MCRegister == 0 || (MCRegister & 0x80) == 0x80)
@@ -131,7 +133,20 @@ namespace FoenixIDE.Display
                 e.Graphics.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
                 return;
             }
-            
+            else if ((MCRegister & 0x1) == 0x1)
+            {
+                if (ColumnsVisible < 1 || ColumnsVisible > MAX_TEXT_COLS)
+                {
+                    DrawTextWithBackground("ColumnsVisible invalid:" + ColumnsVisible.ToString(), g, Color.Black, 0, top);
+                    top += 12;
+                }
+                if (LinesVisible < 1 || LinesVisible > MAX_TEXT_LINES)
+                {
+                    DrawTextWithBackground("LinesVisible invalid:" + LinesVisible.ToString(), g, Color.Black, 0, top);
+                    top += 12;
+                }
+            }
+
             if (drawing)
             {
                 // drop the frame
@@ -149,7 +164,6 @@ namespace FoenixIDE.Display
             {
                 StartOfFrame?.Invoke();
             }
-            Graphics g = Graphics.FromImage(frameBuffer);
 
             // Determine if we display a border
             int border_register = VICKY.ReadByte(4);
@@ -236,17 +250,6 @@ namespace FoenixIDE.Display
 
             if ((MCRegister & 0x1) == 0x1)
             {
-                int top = 0;
-                if (ColumnsVisible < 1 || ColumnsVisible > MAX_TEXT_COLS)
-                {
-                    DrawTextWithBackground("ColumnsVisible invalid:" + ColumnsVisible.ToString(), g, Color.Black, 0, top);
-                    top += 12;
-                }
-                if (LinesVisible < 1 || LinesVisible > MAX_TEXT_LINES)
-                {
-                    DrawTextWithBackground("LinesVisible invalid:" + LinesVisible.ToString(), g, Color.Black, 0, top);
-                    top += 12;
-                }
                 if (top == 0)
                 {
                     DrawBitmapText(ref bitmapData, colOffset, rowOffset);
