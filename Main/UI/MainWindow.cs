@@ -734,7 +734,9 @@ namespace FoenixIDE.UI
                 int dipHeight = (bankHeight - 5) / 2;
 
                 int offset = 2;
-                e.Graphics.FillRectangle(Brushes.Red, new Rectangle(0, 0, Width, Height));
+                int width = ((ToolStripLabel)sender).Width;
+                int height = ((ToolStripLabel)sender).Height;
+                e.Graphics.FillRectangle(Brushes.Red, new Rectangle(0, 0, width, height));
                 e.Graphics.DrawString("OFF", SystemFonts.SmallCaptionFont, Brushes.White, 0, 9);
                 e.Graphics.DrawString("ON", SystemFonts.SmallCaptionFont, Brushes.White, 2, -2);
 
