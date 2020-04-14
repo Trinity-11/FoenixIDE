@@ -114,6 +114,7 @@ namespace FoenixIDE.UI
             // Register 2
             Tooltip.SetToolTip(OPL2RCheckbox, "Break on OPL2 Right Interrupts");
             Tooltip.SetToolTip(OPL2LCheckbox, "Break on OPL2 Left Interrupts");
+            DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(DebugPanel_Paint);
         }
 
 

@@ -292,7 +292,6 @@
             this.DebugPanel.Size = new System.Drawing.Size(605, 367);
             this.DebugPanel.TabIndex = 6;
             this.DebugPanel.TabStop = false;
-            this.DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DebugPanel_Paint);
             this.DebugPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseMove);
             // 
             // PlusButton
