@@ -16,6 +16,7 @@ namespace FoenixIDE.UI
     {
         private int StepCounter = 0;
         private bool isStepOver = false;
+        private const int LABEL_WIDTH = 100;
 
         public Processor.Breakpoints breakpoints = new Processor.Breakpoints();
         public SortedList<int, string> labels = new SortedList<int, string>();
@@ -24,12 +25,6 @@ namespace FoenixIDE.UI
         private FoenixSystem kernel = null;
 
         List<DebugLine> queue = null;
-        private Brush labelBrush = new SolidBrush(Color.White);
-        private Brush debugBrush = new SolidBrush(Color.Black);
-        private Brush yellowBrush = new SolidBrush(Color.Yellow);
-        private Brush orangeBrush = new SolidBrush(Color.Orange);
-        private Brush redBrush = new SolidBrush(Color.Red);
-        private Brush lightBlueBrush = new SolidBrush(Color.LightBlue);
 
         const int ROW_HEIGHT = 13;
         private int IRQPC = 0; // we only keep track of a single interrupt
@@ -63,7 +58,11 @@ namespace FoenixIDE.UI
         {
             if (kernel.lstFile.Lines.Count > 0)
             {
-                queue = kernel.lstFile.Lines;
+                queue = new List<DebugLine>(kernel.lstFile.Lines.Count);
+                foreach (DebugLine line in kernel.lstFile.Lines.Values)
+                {
+                    queue.Add(line);
+                }
             }
             else
             {
@@ -88,7 +87,7 @@ namespace FoenixIDE.UI
         private void CPUWindow_Load(object sender, EventArgs e)
         {
             
-            HeaderTextbox.Text = " PC      OPCODES      INSTRUCTION      PC     A    X    Y    SP   DBR DP   NVMXDIZC";
+            HeaderTextbox.Text = "LABEL          PC      OPCODES      SOURCE";
             ClearTrace();
             RefreshStatus();
             Tooltip.SetToolTip(PlusButton, "Add Breakpoint");
@@ -134,7 +133,7 @@ namespace FoenixIDE.UI
                 {
                     int row = position.Y / ROW_HEIGHT;
                     int col = 12;
-                    e.Graphics.FillRectangle(lightBlueBrush, col, row * ROW_HEIGHT, 7 * 6, 14);
+                    e.Graphics.FillRectangle(Brushes.LightBlue, col, row * ROW_HEIGHT, 7 * 6, 14);
                 }
 
                 bool offsetPrinted = false;
@@ -142,7 +141,7 @@ namespace FoenixIDE.UI
                 {
                     if (line != null)
                     {
-                        if (line.ProgCntr == currentPC)
+                        if (line.PC == currentPC)
                         {
                             paint = true;
                             TopLineIndex = index;
@@ -155,65 +154,63 @@ namespace FoenixIDE.UI
                                     for (int c = 5; c > 0; c--)
                                     {
                                         DebugLine q0 = queue[index - c];
-                                        if (q0.ProgCntr == IRQPC)
+                                        if (q0.PC == IRQPC)
                                         {
-                                            e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                            e.Graphics.FillRectangle(Brushes.Orange, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
-                                        if (breakpoints.ContainsKey(q0.ProgCntr))
+                                        if (breakpoints.ContainsKey(q0.PC))
                                         {
-                                            e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                            e.Graphics.FillRectangle(Brushes.Yellow, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
                                         // Check if the memory still matches the opcodes
                                         if (!q0.CheckOpcodes(kernel.MemMgr.RAM))
                                         {
-                                            e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                            e.Graphics.FillRectangle(Brushes.Red, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
-                                        if (!q0.isLabel)
+                                        e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, Brushes.Black, 102, painted * ROW_HEIGHT);
+                                        // Draw the label as a black box with white text
+                                        if (q0.label != null)
                                         {
-                                            e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                                            //e.Graphics.FillEllipse(Brushes.Blue, 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
+                                            e.Graphics.FillRectangle(Brushes.Blue, 1, painted * ROW_HEIGHT, LABEL_WIDTH + 2, ROW_HEIGHT + 2);
+                                            //e.Graphics.FillEllipse(Brushes.Blue, LABEL_WIDTH * 0.9f + 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
+                                            e.Graphics.DrawString(q0.label, HeaderTextbox.Font, Brushes.Yellow, 2, painted * ROW_HEIGHT);
                                         }
-                                        else
-                                        {
-                                            e.Graphics.FillRectangle(debugBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
-                                            e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, labelBrush, 2, painted * ROW_HEIGHT);
-                                        }
-                                        
                                         painted++;
                                     }
                                 }
                                 offsetPrinted = true;
                             }
-                            e.Graphics.FillRectangle(line.ProgCntr == IRQPC ? orangeBrush : lightBlueBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            e.Graphics.FillRectangle(line.PC == IRQPC ? Brushes.Orange : Brushes.LightBlue, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                         }
-                        if (painted > 26)
+                        if (painted > 27)
                         {
                             paint = false;
                             break;
                         }
                         if (paint)
                         {
-                            if (breakpoints.ContainsKey(line.ProgCntr))
+                            if (breakpoints.ContainsKey(line.PC))
                             {
-                                e.Graphics.FillRectangle(yellowBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                e.Graphics.FillRectangle(Brushes.Yellow, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            if (line.ProgCntr == IRQPC)
+                            if (line.PC == IRQPC)
                             {
-                                e.Graphics.FillRectangle(orangeBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                e.Graphics.FillRectangle(Brushes.Orange, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
                             // Check if the memory still matches the opcodes
                             if (!line.CheckOpcodes(kernel.MemMgr.RAM))
                             {
-                                e.Graphics.FillRectangle(redBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                e.Graphics.FillRectangle(Brushes.Red, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            if (line.ProgCntr == currentPC || !line.isLabel)
+                            if (line.label != null)
                             {
-                                e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, debugBrush, 2, painted * ROW_HEIGHT);
+                                //e.Graphics.FillEllipse(Brushes.Blue, 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
+                                e.Graphics.FillRectangle(Brushes.Blue, 1, painted * ROW_HEIGHT, LABEL_WIDTH + 2, ROW_HEIGHT + 2);
+                                //e.Graphics.FillEllipse(Brushes.Blue, LABEL_WIDTH * 0.9f + 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
+                                e.Graphics.DrawString(line.label, HeaderTextbox.Font, Brushes.Yellow, 2, painted * ROW_HEIGHT);
                             }
-                            else
-                            {
-                                e.Graphics.FillRectangle(debugBrush, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
-                                e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, labelBrush, 2, painted * ROW_HEIGHT);
-                            }
+                            e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, Brushes.Black, 102, painted * ROW_HEIGHT);
                             painted++;
                         }
                     }
@@ -222,8 +219,8 @@ namespace FoenixIDE.UI
             }
             else
             {
-                e.Graphics.FillRectangle(lightBlueBrush, 0, 0, this.Width, this.Height);
-                e.Graphics.DrawString("Running code real fast ... no time to write!", HeaderTextbox.Font, debugBrush, 8, DebugPanel.Height / 2);
+                e.Graphics.FillRectangle(Brushes.LightBlue, 0, 0, this.Width, this.Height);
+                e.Graphics.DrawString("Running code real fast ... no time to write!", HeaderTextbox.Font, Brushes.Black, 8, DebugPanel.Height / 2);
             }
         }
 
@@ -231,10 +228,10 @@ namespace FoenixIDE.UI
         {
             if (kernel.CPU.DebugPause)
             {
-                if (e.X > 12 && e.X < 12 + 7 * 6)
+                if (e.X > 2 && e.X < 2 + LABEL_WIDTH)
                 {
                     int top = e.Y / ROW_HEIGHT * ROW_HEIGHT;
-                    if ( (e.Y / ROW_HEIGHT != position.Y / ROW_HEIGHT || position.Y == -1) )
+                    if ( (e.Y / ROW_HEIGHT != position.Y / ROW_HEIGHT || position.Y == -1) && e.Y / ROW_HEIGHT < 28 )
                     {
                         position.X = e.X;
                         position.Y = e.Y;
@@ -244,7 +241,7 @@ namespace FoenixIDE.UI
                         InspectButton.Top = DebugPanel.Top + top - 1;
                         StepOverButton.Top = DebugPanel.Top + top - 1;
 
-                        PlusButton.Left = 13;
+                        PlusButton.Left = 3;
                         MinusButton.Left = PlusButton.Left + PlusButton.Width;
                         InspectButton.Left = MinusButton.Left + MinusButton.Width;
                         StepOverButton.Left = InspectButton.Left + InspectButton.Width;
@@ -293,7 +290,7 @@ namespace FoenixIDE.UI
                 if (queue.Count > TopLineIndex + row)
                 {
                     DebugLine line = queue[TopLineIndex + row];
-                    string value = line.ProgCntr.ToString("X6");
+                    string value = line.PC.ToString("X6");
                     BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     AddBPButton_Click(null, null);
                 }
@@ -308,7 +305,7 @@ namespace FoenixIDE.UI
                 if (queue.Count > TopLineIndex + row)
                 {
                     DebugLine line = queue[TopLineIndex + row];
-                    string value = line.ProgCntr.ToString("X6");
+                    string value = line.PC.ToString("X6");
                     BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     DeleteBPButton_Click(null, null);
                 }
@@ -324,7 +321,7 @@ namespace FoenixIDE.UI
                 {
                     BPCombo.Text = breakpoints.Format(newValue.ToString("X"));
                     UpdateDebugLines(newValue, true);
-                    BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
+                    BPLabel.Text = breakpoints.Count.ToString() + " BP";
                 }
             }
         }
@@ -341,7 +338,7 @@ namespace FoenixIDE.UI
                 BPCombo.Text = "";
             else
                 BPCombo.Text = breakpoints.Values[0];
-            BPLabel.Text = breakpoints.Count.ToString() + " Breakpoints";
+            BPLabel.Text = breakpoints.Count.ToString() + " BP";
         }
 
         private void InspectButton_Click(object sender, EventArgs e)
@@ -350,7 +347,7 @@ namespace FoenixIDE.UI
             {
                 int row = position.Y / ROW_HEIGHT;
                 DebugLine line = queue[TopLineIndex + row];
-                MemoryWindow.Instance.GotoAddress(line.ProgCntr & 0xFF_FF00);
+                MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
                 MemoryWindow.Instance.BringToFront();
             }
         }
@@ -395,7 +392,7 @@ namespace FoenixIDE.UI
                 int row = position.Y / ROW_HEIGHT;
                 DebugLine line = queue[TopLineIndex + row];
                 // Set a breakpoint to the next address
-                int nextAddress = line.ProgCntr + line.commandLength;
+                int nextAddress = line.PC + line.commandLength;
                 int newValue = breakpoints.Add(nextAddress.ToString("X"));
 
                 if (newValue != -1)
@@ -589,14 +586,7 @@ namespace FoenixIDE.UI
 
         private DebugLine GetExecutionInstruction(int PC)
         {
-            foreach (DebugLine l in queue)
-            {
-                if (l !=null &&  l.ProgCntr == PC)
-                {
-                    return l;
-                }
-            }
-            return null;
+            return kernel.lstFile.Lines[PC];
         }
         private void GenerateNextInstruction(int pc)
         {
@@ -609,7 +599,9 @@ namespace FoenixIDE.UI
             }
             string opcodes = oc.ToString(kernel.CPU.ReadSignature(ocLength, pc));
             //string status = "";
-            DebugLine line = new DebugLine(pc, command, opcodes, null);
+            DebugLine line = new DebugLine(pc);
+            line.SetOpcodes(command);
+            line.SetMnemonic(opcodes);
             if (!lastLine.InvokeRequired)
             {
                 lastLine.Text = line.ToString();
@@ -628,12 +620,12 @@ namespace FoenixIDE.UI
             for (index = 0; index < queue.Count; index++)
             {
                 DebugLine l = queue[index];
-                if (l.ProgCntr > pc)
+                if (l.PC > pc)
                 {
                     break;
                 }
             }
-            queue.Insert(index, line);
+            queue.Add(line);
         }
 
         private void UpdateDebugLines(int newDebugLine, bool state)

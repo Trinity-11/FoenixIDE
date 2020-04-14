@@ -12,12 +12,12 @@ namespace FoenixIDE.Simulator.FileFormat
     class DebugLine: ICloneable
     {
         //public bool isBreakpoint = false;
+        public int PC;
         byte[] command;
-        public int commandLength;
-        private String opcodes;
-        readonly int[] cpu;
+        public int commandLength = 0;
+        private string source;
         public bool StepOver = false;
-        public bool isLabel = false;
+        public string label;
         private string evaled = null;
         private static byte[] BranchJmpOpcodes = {
             OpcodeList.BCC_ProgramCounterRelative,
@@ -40,7 +40,7 @@ namespace FoenixIDE.Simulator.FileFormat
             OpcodeList.JSR_AbsoluteLong
         };
 
-        public int ProgCntr;
+        
         // Only expand when it's going to be displayed
         override public string ToString()
         {
@@ -54,70 +54,54 @@ namespace FoenixIDE.Simulator.FileFormat
                     else
                         c.Append("   ");
                 }
-                evaled = string.Format(">{0}  {1} {2}  {3}", ProgCntr.ToString("X6"), c.ToString(), opcodes, null);
+                evaled = string.Format("{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), source, null);
             }
             return evaled;
         }
 
-        /// <summary>
-        /// One and only constructor 
-        /// </summary>
-        public DebugLine(int pc, byte[] cmd, String oc, int[] cpuSnapshot)
+        public DebugLine(int pc)
         {
-            ProgCntr = pc;
+            PC = pc;
+        }
+        public void SetOpcodes(byte[] cmd)
+        {
+            commandLength = cmd.Length;
             command = cmd;
-            if (cmd != null)
-            {
-                commandLength = cmd.Length;
-                StepOver = (Array.Exists(BranchJmpOpcodes, element => element == command[0]));
-            }
-            else
-            {
-                commandLength = 0;
-                isLabel = true;
-            }
-            oc = oc.Trim(new char[] { ' ' });
+            StepOver = (Array.Exists(BranchJmpOpcodes, element => element == command[0]));
+        }
+        public void SetLabel(string value)
+        {
+            label = value;
+        }
+        public void SetMnemonic(string value)
+        {
+            value = value.Trim(new char[] { ' ' });
             // Detect if the lines contains a label
-            if (!isLabel)
+            string[] tokens = value.Split();
+            if (tokens.Length > 0)
             {
-                string[] tokens = oc.Split();
-                if (tokens.Length > 0)
+                if (tokens[0].Length > 3)
                 {
-                    isLabel = (tokens[0].Length > 3);
+                    label = tokens[0];
+                    // Remove the first item
+                    source = value.Substring(label.Length).Trim();
+                }
+                else
+                {
+                    source = value;
                 }
             }
-            opcodes = oc;
-            cpu = cpuSnapshot;
-        }
-
-        private String FormatSnapshot()
-        {
-            if (cpu != null)
-            {
-                StringBuilder s = new StringBuilder(47);
-                s.Append(';')
-                 .Append(cpu[0].ToString("X6")).Append(' ')
-                 .Append(cpu[1].ToString("X4")).Append(' ')
-                 .Append(cpu[2].ToString("X4")).Append(' ')
-                 .Append(cpu[3].ToString("X4")).Append(' ')
-                 .Append(cpu[4].ToString("X4")).Append(' ')
-                 .Append(cpu[5].ToString("X2")).Append(' ').Append(' ')
-                 .Append(cpu[6].ToString("X4")).Append(' ');
-                Processor.Flags localFlags = new Processor.Flags();
-                localFlags.SetFlags(cpu[7]);
-                s.Append(localFlags);
-                return s.ToString();
-            }
             else
             {
-                return "";
+                source = value;
             }
         }
+
         public bool CheckOpcodes(MemoryLocations.MemoryRAM ram)
         {
             for (int i=0;i<commandLength;i++)
             {
-                if (ram.ReadByte(ProgCntr + i) != command[i])
+                if (ram.ReadByte(PC + i) != command[i])
                 {
                     return false;
                 }

@@ -12,9 +12,9 @@ namespace FoenixIDE.Simulator.FileFormat
     /// </summary>
     public class ListFile
     {
-        private List<DebugLine> DbgLines = new List<DebugLine>();
+        private Dictionary<int, DebugLine> DbgLines = new Dictionary<int, DebugLine>();
 
-        internal List<DebugLine> Lines
+        internal Dictionary<int, DebugLine> Lines
         {
             get => DbgLines;
         }
@@ -38,16 +38,27 @@ namespace FoenixIDE.Simulator.FileFormat
                         if (tokens.Length > 2)
                         {
                             pc = Convert.ToInt32(tokens[0].Replace(".",""), 16);
-                            string[] commands = tokens[CommandOffset].Split(new char[] { ' ' });
-                            if (commands[0].Length == 0)
+
+                            // check if a match already exists
+                            DebugLine match;
+                            DbgLines.TryGetValue(pc, out match);
+                            if (match == null)
                             {
-                                DbgLines.Add(new DebugLine(pc, null, tokens[tokens.Length - 1], null));
+                                match = new DebugLine(pc);
+                                DbgLines.Add(pc, match);
+                            }
+                            string[] strOpcodes = tokens[CommandOffset].Split(new char[] { ' ' });
+                            if (strOpcodes[0].Length == 0)
+                            {
+                                match.SetLabel(tokens[tokens.Length - 1]);
                             }
                             else
                             {
-                                byte[] bytes = Array.ConvertAll(commands, value => Convert.ToByte(value, 16));
-                                DbgLines.Add(new DebugLine(pc, bytes, tokens[tokens.Length - 1], null));
+                                byte[] opcodes = Array.ConvertAll(strOpcodes, value => Convert.ToByte(value, 16));
+                                match.SetOpcodes(opcodes);
+                                match.SetMnemonic(tokens[tokens.Length - 1]);
                             }
+                            
                         }
                     } 
                     else if (line.StartsWith(";Offset"))

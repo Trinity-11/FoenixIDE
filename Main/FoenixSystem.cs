@@ -150,7 +150,14 @@ namespace FoenixIDE
                     {
                         // TODO: We should really ensure that there are no duplicated PC in the list
                         ListFile tempList = new ListFile(LoadedKernel);
-                        lstFile.Lines.InsertRange(0, tempList.Lines);
+                        foreach (DebugLine line in tempList.Lines.Values)
+                        {
+                            if (lstFile.Lines.ContainsKey(line.PC))
+                            {
+                                lstFile.Lines.Remove(line.PC);
+                            }
+                            lstFile.Lines.Add(line.PC, line);
+                        }
                     }
                 }
                 else
@@ -159,26 +166,30 @@ namespace FoenixIDE
                 }
             }
 
-
-            
             // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block for RevB or 0x38_0000 to 0x38_FFFF block for Rev C
             List<DebugLine> copiedLines = new List<DebugLine>();
             if (lstFile.Lines.Count > 0)
             {
-                List<DebugLine> tempLines = new List<DebugLine>();
-                foreach (DebugLine line in lstFile.Lines)
+                foreach (DebugLine line in lstFile.Lines.Values)
                 {
-                    if (line != null && line.ProgCntr >= BasePageAddress && line.ProgCntr < BasePageAddress + 0x1_0000)
+                    if (line != null && line.PC >= BasePageAddress && line.PC < BasePageAddress + 0x1_0000)
                     {
                         DebugLine dl = (DebugLine)line.Clone();
-                        dl.ProgCntr -= BasePageAddress;
+                        dl.PC -= BasePageAddress;
                         copiedLines.Add(dl);
                     }
                 }
             }
             if (copiedLines.Count > 0)
             {
-                lstFile.Lines.InsertRange(0, copiedLines);
+                foreach (DebugLine line in copiedLines)
+                {
+                    if (lstFile.Lines.ContainsKey(line.PC))
+                    {
+                        lstFile.Lines.Remove(line.PC);
+                    }
+                    lstFile.Lines.Add(line.PC, line);
+                }
             }
             CPU.Reset();
             return true;

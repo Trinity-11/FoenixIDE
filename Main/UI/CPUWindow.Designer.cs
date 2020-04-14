@@ -133,16 +133,16 @@
             // 
             // BPCombo
             // 
-            this.BPCombo.Dock = System.Windows.Forms.DockStyle.Right;
+            this.BPCombo.Dock = System.Windows.Forms.DockStyle.None;
             this.BPCombo.FormattingEnabled = true;
-            this.BPCombo.Location = new System.Drawing.Point(439, 0);
+            this.BPCombo.Location = new System.Drawing.Point(439, 2);
             this.BPCombo.Name = "BPCombo";
             this.BPCombo.Size = new System.Drawing.Size(121, 21);
             this.BPCombo.TabIndex = 6;
             // 
             // AddBPButton
             // 
-            this.AddBPButton.Dock = System.Windows.Forms.DockStyle.Right;
+            this.AddBPButton.Dock = System.Windows.Forms.DockStyle.None;
             this.AddBPButton.Location = new System.Drawing.Point(560, 0);
             this.AddBPButton.Name = "AddBPButton";
             this.AddBPButton.Size = new System.Drawing.Size(24, 24);
@@ -153,7 +153,7 @@
             // 
             // DeleteBPButton
             // 
-            this.DeleteBPButton.Dock = System.Windows.Forms.DockStyle.Right;
+            this.DeleteBPButton.Dock = System.Windows.Forms.DockStyle.None;
             this.DeleteBPButton.Location = new System.Drawing.Point(584, 0);
             this.DeleteBPButton.Name = "DeleteBPButton";
             this.DeleteBPButton.Size = new System.Drawing.Size(24, 24);
@@ -286,10 +286,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.DebugPanel.Location = new System.Drawing.Point(0, 130);
+            this.DebugPanel.Location = new System.Drawing.Point(0, 126);
             this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
             this.DebugPanel.Name = "DebugPanel";
-            this.DebugPanel.Size = new System.Drawing.Size(605, 363);
+            this.DebugPanel.Size = new System.Drawing.Size(605, 367);
             this.DebugPanel.TabIndex = 6;
             this.DebugPanel.TabStop = false;
             this.DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DebugPanel_Paint);
@@ -373,7 +373,7 @@
             this.HeaderTextbox.Margin = new System.Windows.Forms.Padding(0);
             this.HeaderTextbox.Name = "HeaderTextbox";
             this.HeaderTextbox.Padding = new System.Windows.Forms.Padding(2, 3, 2, 2);
-            this.HeaderTextbox.Size = new System.Drawing.Size(603, 26);
+            this.HeaderTextbox.Size = new System.Drawing.Size(603, 22);
             this.HeaderTextbox.TabIndex = 11;
             this.HeaderTextbox.UseCompatibleTextRendering = true;
             this.HeaderTextbox.UseMnemonic = false;
