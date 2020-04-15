@@ -40,8 +40,7 @@ namespace FoenixIDE.Simulator.FileFormat
                             pc = Convert.ToInt32(tokens[0].Replace(".",""), 16);
 
                             // check if a match already exists
-                            DebugLine match;
-                            DbgLines.TryGetValue(pc, out match);
+                            DbgLines.TryGetValue(pc, out DebugLine match);
                             if (match == null)
                             {
                                 match = new DebugLine(pc);

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -114,11 +112,11 @@ namespace FoenixIDE.UI
             // Register 2
             Tooltip.SetToolTip(OPL2RCheckbox, "Break on OPL2 Right Interrupts");
             Tooltip.SetToolTip(OPL2LCheckbox, "Break on OPL2 Left Interrupts");
-            DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(DebugPanel_Paint);
+            //DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(DebugPanel_Paint);
         }
 
 
-        private void DebugPanel_Paint(object sender, PaintEventArgs e)
+        private void DebugPanel_Paint2(object sender, PaintEventArgs e)
         {
             bool paint = false;
             int currentPC = kernel.CPU.PC;
@@ -155,34 +153,34 @@ namespace FoenixIDE.UI
                                     for (int c = 5; c > 0; c--)
                                     {
                                         DebugLine q0 = queue[index - c];
+                                        // Draw the label as a black box with white text
+                                        if (q0.label != null)
+                                        {
+                                            e.Graphics.FillRectangle(Brushes.Blue, 1, painted * ROW_HEIGHT, LABEL_WIDTH + 2, ROW_HEIGHT + 2);
+                                            e.Graphics.DrawString(q0.label, HeaderTextbox.Font, Brushes.Yellow, 2, painted * ROW_HEIGHT);
+                                        }
                                         if (q0.PC == IRQPC)
                                         {
                                             e.Graphics.FillRectangle(Brushes.Orange, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
                                         if (breakpoints.ContainsKey(q0.PC))
                                         {
-                                            e.Graphics.FillRectangle(Brushes.Yellow, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                            e.Graphics.DrawEllipse(Pens.White, LABEL_WIDTH - ROW_HEIGHT - 1, painted * ROW_HEIGHT, ROW_HEIGHT+1, ROW_HEIGHT+1);
+                                            e.Graphics.FillEllipse(Brushes.DarkRed, LABEL_WIDTH - ROW_HEIGHT, painted * ROW_HEIGHT + 1, ROW_HEIGHT, ROW_HEIGHT);
                                         }
                                         // Check if the memory still matches the opcodes
                                         if (!q0.CheckOpcodes(kernel.MemMgr.RAM))
                                         {
-                                            e.Graphics.FillRectangle(Brushes.Red, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                            e.Graphics.FillRectangle(Brushes.Red, LABEL_WIDTH + 3, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
                                         e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, Brushes.Black, 102, painted * ROW_HEIGHT);
-                                        // Draw the label as a black box with white text
-                                        if (q0.label != null)
-                                        {
-                                            //e.Graphics.FillEllipse(Brushes.Blue, 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
-                                            e.Graphics.FillRectangle(Brushes.Blue, 1, painted * ROW_HEIGHT, LABEL_WIDTH + 2, ROW_HEIGHT + 2);
-                                            //e.Graphics.FillEllipse(Brushes.Blue, LABEL_WIDTH * 0.9f + 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
-                                            e.Graphics.DrawString(q0.label, HeaderTextbox.Font, Brushes.Yellow, 2, painted * ROW_HEIGHT);
-                                        }
+                                        
                                         painted++;
                                     }
                                 }
                                 offsetPrinted = true;
                             }
-                            e.Graphics.FillRectangle(line.PC == IRQPC ? Brushes.Orange : Brushes.LightBlue, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            e.Graphics.FillRectangle(line.PC == IRQPC ? Brushes.Orange : Brushes.LightBlue, LABEL_WIDTH + 1, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                         }
                         if (painted > 27)
                         {
@@ -191,9 +189,15 @@ namespace FoenixIDE.UI
                         }
                         if (paint)
                         {
+                            if (line.label != null)
+                            {
+                                e.Graphics.FillRectangle(Brushes.Blue, 1, painted * ROW_HEIGHT, LABEL_WIDTH + 2, ROW_HEIGHT + 2);
+                                e.Graphics.DrawString(line.label, HeaderTextbox.Font, Brushes.Yellow, 2, painted * ROW_HEIGHT);
+                            }
                             if (breakpoints.ContainsKey(line.PC))
                             {
-                                e.Graphics.FillRectangle(Brushes.Yellow, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                                e.Graphics.DrawEllipse(Pens.White, LABEL_WIDTH - ROW_HEIGHT - 1, painted * ROW_HEIGHT, ROW_HEIGHT + 1, ROW_HEIGHT + 1);
+                                e.Graphics.FillEllipse(Brushes.DarkRed, LABEL_WIDTH - ROW_HEIGHT, painted * ROW_HEIGHT + 1, ROW_HEIGHT, ROW_HEIGHT);
                             }
                             if (line.PC == IRQPC)
                             {
@@ -204,13 +208,7 @@ namespace FoenixIDE.UI
                             {
                                 e.Graphics.FillRectangle(Brushes.Red, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            if (line.label != null)
-                            {
-                                //e.Graphics.FillEllipse(Brushes.Blue, 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
-                                e.Graphics.FillRectangle(Brushes.Blue, 1, painted * ROW_HEIGHT, LABEL_WIDTH + 2, ROW_HEIGHT + 2);
-                                //e.Graphics.FillEllipse(Brushes.Blue, LABEL_WIDTH * 0.9f + 1, painted * ROW_HEIGHT - 1, LABEL_WIDTH * 0.1f, ROW_HEIGHT + 2);
-                                e.Graphics.DrawString(line.label, HeaderTextbox.Font, Brushes.Yellow, 2, painted * ROW_HEIGHT);
-                            }
+                            
                             e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, Brushes.Black, 102, painted * ROW_HEIGHT);
                             painted++;
                         }
@@ -587,7 +585,8 @@ namespace FoenixIDE.UI
 
         private DebugLine GetExecutionInstruction(int PC)
         {
-            return kernel.lstFile.Lines[PC];
+            kernel.lstFile.Lines.TryGetValue(PC, out DebugLine dl);
+            return dl;
         }
         private void GenerateNextInstruction(int pc)
         {

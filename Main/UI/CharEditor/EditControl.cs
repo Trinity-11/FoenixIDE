@@ -127,14 +127,16 @@ namespace FoenixIDE.CharEditor
 
         private void P_Click(object sender, EventArgs e)
         {
-            Panel p = sender as Panel;
-            if (p == null)
-                return;
+            if (sender is Panel p)
+            {
+                if (p.BackColor == Color0)
+                    p.BackColor = characterPanel.ForeColor;
+                else
+                    p.BackColor = Color0;
+            }
+            
 
-            if (p.BackColor == Color0)
-                p.BackColor = characterPanel.ForeColor;
-            else
-                p.BackColor = Color0;
+            
         }
 
         private void Save_Click(object sender, EventArgs e)
