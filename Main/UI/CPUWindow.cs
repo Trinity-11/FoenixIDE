@@ -112,11 +112,11 @@ namespace FoenixIDE.UI
             // Register 2
             Tooltip.SetToolTip(OPL2RCheckbox, "Break on OPL2 Right Interrupts");
             Tooltip.SetToolTip(OPL2LCheckbox, "Break on OPL2 Left Interrupts");
-            //DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(DebugPanel_Paint);
+            DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(DebugPanel_Paint);
         }
 
 
-        private void DebugPanel_Paint2(object sender, PaintEventArgs e)
+        private void DebugPanel_Paint(object sender, PaintEventArgs e)
         {
             bool paint = false;
             int currentPC = kernel.CPU.PC;
@@ -366,6 +366,7 @@ namespace FoenixIDE.UI
                 kernel.CPU.CPUThread.Start();
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
+                registerDisplay1.updateRegisterTimer.Enabled = true;
             }
             else
             {
@@ -382,6 +383,7 @@ namespace FoenixIDE.UI
             RefreshStatus();
             RunButton.Text = "Run (F5)";
             RunButton.Tag = "0";
+            registerDisplay1.updateRegisterTimer.Enabled = true;
         }
 
         private void StepOverButton_Click(object sender, EventArgs e)
@@ -416,20 +418,27 @@ namespace FoenixIDE.UI
                 return;
             }
             DebugLine line = GetExecutionInstruction(pc);
-
-            // Set a breakpoint to the next address
-            int nextAddress = pc + line.commandLength;
-            int newValue = breakpoints.Add(nextAddress.ToString("X"));
-
-            if (newValue != -1)
+            if (line.StepOver)
             {
-                // Run the CPU until the breakpoint is reached
-                RunButton_Click(null, null);
+                // Set a breakpoint to the next address
+                int nextAddress = pc + line.commandLength;
+                int newValue = breakpoints.Add(nextAddress.ToString("X"));
 
-                // Ensure the breakpoint is removed
-                isStepOver = true;
-                RunButton.Text = "Run (F5)";
-                RunButton.Tag = "0";
+                if (newValue != -1)
+                {
+                    // Run the CPU until the breakpoint is reached
+                    RunButton_Click(null, null);
+
+                    // Ensure the breakpoint is removed
+                    isStepOver = true;
+                    RunButton.Text = "Run (F5)";
+                    RunButton.Tag = "0";
+                }
+            }
+            else
+            {
+                ExecuteStep();
+                RefreshStatus();
             }
         }
 
@@ -442,12 +451,7 @@ namespace FoenixIDE.UI
             RunButton.Tag = "0";
             UpdateTraceTimer.Enabled = false;
             RunButton.Enabled = true;
-            int.TryParse(stepsInput.Text, out int steps);
-            while (steps-- > 0)
-            {
-                ExecuteStep();
-            }
-
+            ExecuteStep();
             RefreshStatus();
             kernel.CPU.DebugPause = true;
         }
@@ -457,6 +461,7 @@ namespace FoenixIDE.UI
             this.Text = "Debug: " + StepCounter.ToString();
             DebugPanel.Refresh();
             UpdateStackDisplay();
+            registerDisplay1.UpdateRegisters();
         }
 
         public void UpdateStackDisplay()

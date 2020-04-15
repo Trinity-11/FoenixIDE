@@ -133,7 +133,6 @@
             // 
             // BPCombo
             // 
-            this.BPCombo.Dock = System.Windows.Forms.DockStyle.None;
             this.BPCombo.FormattingEnabled = true;
             this.BPCombo.Location = new System.Drawing.Point(439, 2);
             this.BPCombo.Name = "BPCombo";
@@ -142,7 +141,6 @@
             // 
             // AddBPButton
             // 
-            this.AddBPButton.Dock = System.Windows.Forms.DockStyle.None;
             this.AddBPButton.Location = new System.Drawing.Point(560, 0);
             this.AddBPButton.Name = "AddBPButton";
             this.AddBPButton.Size = new System.Drawing.Size(24, 24);
@@ -153,7 +151,6 @@
             // 
             // DeleteBPButton
             // 
-            this.DeleteBPButton.Dock = System.Windows.Forms.DockStyle.None;
             this.DeleteBPButton.Location = new System.Drawing.Point(584, 0);
             this.DeleteBPButton.Name = "DeleteBPButton";
             this.DeleteBPButton.Size = new System.Drawing.Size(24, 24);

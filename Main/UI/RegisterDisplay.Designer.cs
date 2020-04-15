@@ -46,7 +46,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.PC = new FoenixIDE.UI.RegisterControl();
             this.panel8 = new System.Windows.Forms.Panel();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.updateRegisterTimer = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -235,11 +235,10 @@
             this.panel8.Size = new System.Drawing.Size(4, 34);
             this.panel8.TabIndex = 15;
             // 
-            // timer1
+            // updateRegisterTimer
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
+            this.updateRegisterTimer.Interval = 1000;
+            this.updateRegisterTimer.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // RegisterDisplay
             // 
@@ -271,7 +270,7 @@
         private UI.RegisterControl D;
         private global::System.Windows.Forms.Panel panel6;
         private global::System.Windows.Forms.Panel panel8;
-        private global::System.Windows.Forms.Timer timer1;
         public UI.RegisterControl PC;
+        public System.Windows.Forms.Timer updateRegisterTimer;
     }
 }

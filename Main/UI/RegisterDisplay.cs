@@ -42,7 +42,7 @@ namespace FoenixIDE
             }
         }
 
-        private void Timer1_Tick(object sender, EventArgs e)
+        public void UpdateRegisters()
         {
             PC.Value = _cpu.PC.ToString("X6");
             foreach (object c in this.groupBox1.Controls)
@@ -56,6 +56,10 @@ namespace FoenixIDE
                     ac.UpdateValue();
                 }
             }
+        }
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+            UpdateRegisters();
         }
     }
 }
