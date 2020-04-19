@@ -7,6 +7,7 @@ namespace FoenixIDE.Simulator.Devices
     {
         public bool isPresent = false;
         private string SDCardPath = "";
+        private bool ISOMode = false;
         private int capacity = 8; // Capacity in MB
         protected string sdCurrentPath = "";
         public delegate void SDCardInterruptEvent(CH376SInterrupt irq);
@@ -31,6 +32,14 @@ namespace FoenixIDE.Simulator.Devices
         public virtual void SetCapacity(int value)
         {
             capacity = value;
+        }
+        public bool GetISOMode()
+        {
+            return ISOMode;
+        }
+        public virtual void SetISOMode(bool mode)
+        {
+            ISOMode = mode;
         }
     }
 }

@@ -78,6 +78,14 @@ namespace FoenixIDE.Simulator.UI
             }
         }
 
+        private void Iso_sellection_CheckedChanged(object sender, EventArgs e)
+        {
 
+        }
+
+        public bool GetISOMode()
+        {
+            return Iso_sellection.Checked ? true : false;
+        }
     }
 }

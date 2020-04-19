@@ -16,9 +16,8 @@ namespace FoenixIDE.Simulator.Devices
     }
     class FileEntry
     {
-        public string fqpn;
-        public string shortname;
-        public int clusters;
+        public String name;
+        public int cluster;
         public int size;
     }
     public class GabeSDController : SDCardDevice
@@ -97,35 +96,42 @@ namespace FoenixIDE.Simulator.Devices
                             blockPtr = 0;
                             block = null;
                             int address = ReadWord(7) + ( ReadWord(9) << 16 ) ;
-                            if (address == 0)
+                            if (GetISOMode() == true)
                             {
-                                block = mbr;
-                                
+                                block = GetData_ISO(address / 512);
                             }
-                            else if (address == BOOT_SECTOR_ADDR)
+                            else
                             {
-                                block = boot_sector;
-                            }
-                            else if (address >= FAT_OFFSET_START && address <= FAT_OFFSET_START + FAT_SIZE -1)
-                            {
-                                // read the fat table
-                                blockPtr = 0;
-                                int fatPage = (address - FAT_OFFSET_START) / 512;
-                                BuildFatPage(fatPage);
-                                block = fat;
-                            }
-                            else if (address >= ROOT_OFFSET_START && address <= ROOT_OFFSET_START + ROOT_SIZE -1)
-                            {
-                                // read the root table
-                                block = root;
-                                blockPtr = address - ROOT_OFFSET_START;
-                            }
-                            else if (address >= DATA_OFFSET_START && address <= DATA_OFFSET_START + DATA_SIZE -1)
-                            {
-                                // read the data
-                                int dataPage = (address - DATA_OFFSET_START) / 512;
-                                block = GetData(dataPage);
-                                blockPtr = 0;
+                                if (address == 0)
+                                {
+                                    block = mbr;
+
+                                }
+                                else if (address == BOOT_SECTOR_ADDR)
+                                {
+                                    block = boot_sector;
+                                }
+                                else if (address >= FAT_OFFSET_START && address <= FAT_OFFSET_START + FAT_SIZE - 1)
+                                {
+                                    // read the fat table
+                                    blockPtr = 0;
+                                    int fatPage = (address - FAT_OFFSET_START) / 512;
+                                    BuildFatPage(fatPage);
+                                    block = fat;
+                                }
+                                else if (address >= ROOT_OFFSET_START && address <= ROOT_OFFSET_START + ROOT_SIZE - 1)
+                                {
+                                    // read the root table
+                                    block = root;
+                                    blockPtr = address - ROOT_OFFSET_START;
+                                }
+                                else if (address >= DATA_OFFSET_START && address <= DATA_OFFSET_START + DATA_SIZE - 1)
+                                {
+                                    // read the data
+                                    int dataPage = (address - DATA_OFFSET_START) / 512;
+                                    block = GetData(dataPage);
+                                    blockPtr = 0;
+                                }
                             }
                             if (block != null)
                             {
@@ -141,6 +147,18 @@ namespace FoenixIDE.Simulator.Devices
                                 data[5] = 1;
                             }
                             break;
+                        case GabeCtrlCommand.WRITE_BLK:
+                            waitCounter = 10; // the write operation will be a little longer
+                            // determine which block to write
+                            blockPtr = 0;
+                            
+                            int address_WR = ReadWord(7) + (ReadWord(9) << 16);
+                            if (GetISOMode() == true)
+                            {
+                                SetData_ISO(address_WR / 512, block); // write the 512 Byte buffer
+                                block = null;
+                            }
+                            break;
                     }
                     break;
                 case MemoryMap.GABE_SDC_RX_FIFO_CTRL_REG - MemoryMap.GABE_SDC_CTRL_START:
@@ -150,6 +168,19 @@ namespace FoenixIDE.Simulator.Devices
                         data[0x12] = 0;
                         data[0x13] = 0;
                     }
+                    break;
+                case MemoryMap.GABE_SDC_TX_FIFO_CTRL_REG - MemoryMap.GABE_SDC_CTRL_START:
+                    data[5] = 0;
+                    if (Value == 1)
+                    {
+                        blockPtr = 0;
+                        block = new byte[512];
+                        data[0x12] = 0;
+                        data[0x13] = 0;
+                    }
+                    break;
+                case MemoryMap.GABE_SDC_TX_FIFO_DATA_REG - MemoryMap.GABE_SDC_CTRL_START:
+                    block[blockPtr++] = Value;
                     break;
             }
         }
@@ -162,126 +193,126 @@ namespace FoenixIDE.Simulator.Devices
             ResetMbrBootSector();
         }
 
+        public override void SetISOMode(bool value)
+        {
+            // set the SDcard module to use an iso file instead of a folder content
+            base.SetISOMode(value);
+            ResetMbrBootSector();
+        }
+
         public void ResetMbrBootSector()
         {
-            // Zero the master boot record
-            Array.Clear(mbr, 0, mbr.Length);
-            // Zero the boot sector
-            Array.Clear(boot_sector, 0, boot_sector.Length);
-            sectors_per_cluster = 1;
-            fat12 = false;
-            byte reserved_sectors = 2;
-            int small_sectors = 0;
-            int large_sectors = 0;
-            byte sectors_per_fat = 0;
-            switch (GetCapacity())
+            if (GetISOMode() == false)
             {
-                case 8:
-                    sectors_per_cluster = 4;
-                    fat12 = true;
-                    small_sectors = 0x3397;
-                    sectors_per_fat = 0xA;
-                    
-                    break;
-                case 16:
-                    sectors_per_cluster = 8;
-                    small_sectors = 0x3397;
-                    fat12 = true;
-                    sectors_per_fat = 0xA;
-                    break;
-                case 32:
-                    sectors_per_cluster = 1;
-                    small_sectors = 0xF460;
-                    sectors_per_fat = 0xF3;
-                    break;
-                case 64:
-                    sectors_per_cluster = 2;
-                    large_sectors = 0x1DBD9;
-                    sectors_per_fat = 0xED;
-                    break;
-                case 2048:
-                    sectors_per_cluster = 64;
-                    large_sectors = 0x3C9307;
-                    sectors_per_fat = 0xF3;
-                    break;
-            }
-            logicalSectorSize = sectors_per_cluster * 512; // this is used to calculate clusters off of filesizes
-            if (isPresent)
-            {
-                // Assign default values to the MBR
-                mbr[0x1FE] = 0x55;
-                mbr[0x1FF] = 0xAA;
-                waitCounter = 4;
-                // write parition table, with boot sector offset $29
-                byte[] partition = new byte[16]
+                // Zero the master boot record
+                Array.Clear(mbr, 0, mbr.Length);
+                // Zero the boot sector
+                Array.Clear(boot_sector, 0, boot_sector.Length);
+                sectors_per_cluster = 1;
+                fat12 = false;
+                byte reserved_sectors = 2;
+                int small_sectors = 0;
+                int large_sectors = 0;
+                byte sectors_per_fat = 0;
+                switch (GetCapacity())
                 {
-                0x80, 0x01, 0x0a, 0x00, 0x0e, 0x01, 0x20, 0xce,
-                0x29, 0x00, 0x00, 0x00, 0x97, 0x33, 0x00, 0x00
-                };
-                Array.Copy(partition, 0, mbr, 446, 16);
+                    case 8:
+                        sectors_per_cluster = 4;
+                        fat12 = true;
+                        small_sectors = 0x3397;
+                        sectors_per_fat = 0xA;
 
-                // Assign default values to the boot sector
-                boot_sector[0] = 0xEB;
-                boot_sector[1] = 0x3C;
-                boot_sector[2] = 0x90;
-                Array.Copy(Encoding.ASCII.GetBytes("MSDOS5.0"), 0, boot_sector, 3, 8);
-                boot_sector[0xC] = 0x2; // 512 bytes per sector
-                boot_sector[0xD] = sectors_per_cluster; // must be a factor of 2 
-                boot_sector[0xE] = reserved_sectors;
-                boot_sector[0x10] = 0x2; // Number of FATs
-                boot_sector[0x12] = 0x2; // 512 Root Entries
-                boot_sector[0x13] = (byte)(small_sectors & 0xFF);
-                boot_sector[0x14] = (byte)((small_sectors & 0xFF00) >> 8);
-                boot_sector[0x15] = 0xF8; // media type
-                boot_sector[0x16] = sectors_per_fat;
-                boot_sector[0x1C] = 0x29; // hidden sectors
-                boot_sector[0x20] = (byte)(large_sectors & 0xFF);
-                boot_sector[0x21] = (byte)((large_sectors & 0xFF00) >> 8);
-                boot_sector[0x22] = (byte)((large_sectors & 0xFF_0000) >> 16);
-                boot_sector[0x23] = (byte)((large_sectors & 0xFF00_0000) >> 24);
-
-                // volume label
-                Array.Copy(Encoding.ASCII.GetBytes("NO NAME    "), 0, boot_sector, 0x2B, 11);
-                // system id
-                if (fat12)
-                {
-                    Array.Copy(Encoding.ASCII.GetBytes("FAT12   "), 0, boot_sector, 0x36, 8);
+                        break;
+                    case 16:
+                        sectors_per_cluster = 8;
+                        small_sectors = 0x3397;
+                        fat12 = true;
+                        sectors_per_fat = 0xA;
+                        break;
+                    case 32:
+                        sectors_per_cluster = 1;
+                        small_sectors = 0xF460;
+                        sectors_per_fat = 0xF3;
+                        break;
+                    case 64:
+                        sectors_per_cluster = 2;
+                        large_sectors = 0x1DBD9;
+                        sectors_per_fat = 0xED;
+                        break;
+                    case 2048:
+                        sectors_per_cluster = 64;
+                        large_sectors = 0x3C9307;
+                        sectors_per_fat = 0xF3;
+                        break;
                 }
-                else
+                logicalSectorSize = sectors_per_cluster * 512; // this is used to calculate clusters off of filesizes
+                if (isPresent)
                 {
-                    Array.Copy(Encoding.ASCII.GetBytes("FAT16   "), 0, boot_sector, 0x36, 8);
-                }
-                // marker
-                boot_sector[0x1FE] = 0x55;
-                boot_sector[0x1FF] = 0xAA;
-                // FAT offset
-                FAT_OFFSET_START = BOOT_SECTOR_ADDR + reserved_sectors * 512;
-                FAT_SIZE = 2 * sectors_per_fat * 512;
-                // ROOT offset
-                ROOT_OFFSET_START = FAT_OFFSET_START + FAT_SIZE;
-                ROOT_SIZE = 0x20 * 512;
-                PrepareRootArea();
+                    // Assign default values to the MBR
+                    mbr[0x1FE] = 0x55;
+                    mbr[0x1FF] = 0xAA;
+                    waitCounter = 4;
+                    // write parition table, with boot sector offset $29
+                    byte[] partition = new byte[16]
+                    {
+                    0x80, 0x01, 0x0a, 0x00, 0x0e, 0x01, 0x20, 0xce,
+                    0x29, 0x00, 0x00, 0x00, 0x97, 0x33, 0x00, 0x00
+                    };
+                    Array.Copy(partition, 0, mbr, 446, 16);
 
-                // DATA offset
-                DATA_OFFSET_START = ROOT_OFFSET_START + 0x20 * 512; // the root area is always 32 sectors
-                DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;
-                
+                    // Assign default values to the boot sector
+                    boot_sector[0] = 0xEB;
+                    boot_sector[1] = 0x3C;
+                    boot_sector[2] = 0x90;
+                    Array.Copy(Encoding.ASCII.GetBytes("MSDOS5.0"), 0, boot_sector, 3, 8);
+                    boot_sector[0xC] = 0x2; // 512 bytes per sector
+                    boot_sector[0xD] = sectors_per_cluster; // must be a factor of 2 
+                    boot_sector[0xE] = reserved_sectors;
+                    boot_sector[0x10] = 0x2; // Number of FATs
+                    boot_sector[0x12] = 0x2; // 512 Root Entries
+                    boot_sector[0x13] = (byte)(small_sectors & 0xFF);
+                    boot_sector[0x14] = (byte)((small_sectors & 0xFF00) >> 8);
+                    boot_sector[0x15] = 0xF8; // media type
+                    boot_sector[0x16] = sectors_per_fat;
+                    boot_sector[0x1C] = 0x29; // hidden sectors
+                    boot_sector[0x20] = (byte)(large_sectors & 0xFF);
+                    boot_sector[0x21] = (byte)((large_sectors & 0xFF00) >> 8);
+                    boot_sector[0x22] = (byte)((large_sectors & 0xFF_0000) >> 16);
+                    boot_sector[0x23] = (byte)((large_sectors & 0xFF00_0000) >> 24);
+
+                    // volume label
+                    Array.Copy(Encoding.ASCII.GetBytes("NO NAME    "), 0, boot_sector, 0x2B, 11);
+                    // system id
+                    if (fat12)
+                    {
+                        Array.Copy(Encoding.ASCII.GetBytes("FAT12   "), 0, boot_sector, 0x36, 8);
+                    }
+                    else
+                    {
+                        Array.Copy(Encoding.ASCII.GetBytes("FAT16   "), 0, boot_sector, 0x36, 8);
+                    }
+                    // marker
+                    boot_sector[0x1FE] = 0x55;
+                    boot_sector[0x1FF] = 0xAA;
+                    // FAT offset
+                    FAT_OFFSET_START = BOOT_SECTOR_ADDR + reserved_sectors * 512;
+                    FAT_SIZE = 2 * sectors_per_fat * 512;
+                    // ROOT offset
+                    ROOT_OFFSET_START = FAT_OFFSET_START + FAT_SIZE;
+                    ROOT_SIZE = 0x20 * 512;
+                    PrepareRootArea();
+
+                    // DATA offset
+                    DATA_OFFSET_START = ROOT_OFFSET_START + 0x20 * 512; // the root area is always 32 sectors
+                    DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;
+
+
+                }
             }
         }
 
         public void PrepareRootArea()
         {
-            bool AlreadyExists(string fn)
-            {
-                foreach (FileEntry entry in FAT.Values)
-                {
-                    if (entry.shortname.Equals(fn))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
             Array.Clear(root, 0, root.Length);
             Array.Copy(Encoding.ASCII.GetBytes("FOENIXIDE  "), root, 11);
             root[11] = 8; // volume type
@@ -303,7 +334,7 @@ namespace FoenixIDE.Simulator.Devices
                 string dirname = info.Name.ToUpper();
                 if (dirname.Length < 8)
                 {
-                    dirname += spaces.Substring(0, 8 - dirname.Length);
+                    dirname += spaces.Substring(8 - dirname.Length);
                 }
                 
                 Array.Copy(Encoding.ASCII.GetBytes(dirname), 0, root, pointer, 8);
@@ -315,35 +346,23 @@ namespace FoenixIDE.Simulator.Devices
                 
                 FileInfo info = new FileInfo(file);
                 int size = (int)info.Length;
-                int clusters = size / logicalSectorSize;
+                int clusters = size / logicalSectorSize + 1;
                 string extension = info.Extension.ToUpper().Substring(1);
                 string filename = info.Name.ToUpper();
                 int dot = filename.IndexOf(".");
                 if (dot > -1)
                 {
-                    filename = filename.Substring(0, dot);
+                    filename = filename.Substring(0, dot - 1);
                 }
-                // Truncate long file names - until we start supporting long file names
-                if (filename.Length > 8)
-                {
-                    int count = 1;
-                    string shortFilename = null;
-                    do
-                    {
-                        shortFilename = filename.Substring(0, 6) + "~" + count++;
-                    }
-                    while (AlreadyExists(shortFilename) && count < 10);
-                    filename = shortFilename;                    
-                }
+
                 if (filename.Length < 8)
                 {
-                    filename += spaces.Substring(0, 8 - filename.Length);
+                    filename += spaces.Substring(8 - filename.Length);
                 }
                 FileEntry entry = new FileEntry()
                 {
-                    fqpn = file,
-                    shortname = filename,
-                    clusters = clusters,
+                    name = file,
+                    cluster = clusters,
                     size = size
                 };
 
@@ -406,7 +425,7 @@ namespace FoenixIDE.Simulator.Devices
             {
                 FileEntry entry = FAT[key];
                 if (key > page * fatCount && key < (page +1) * fatCount ||
-                    key + entry.clusters >= page * fatCount && key < (page + 1) * fatCount)
+                    key + entry.cluster >= page * fatCount && key < (page + 1) * fatCount)
                 {
                     int pageOffset = key % fatCount;
                     int startOffset = 0;
@@ -419,7 +438,7 @@ namespace FoenixIDE.Simulator.Devices
                     {
                         
                         // even numbers start at the boundary - odd numbers are at half byte
-                        for (int i = startOffset; i < entry.clusters; i++)
+                        for (int i = startOffset; i < entry.cluster; i++)
                         {
                             int position = (pageOffset + i - startOffset) >> 1;
                             if ((pageOffset - startOffset + i) % 2 == 0)
@@ -452,10 +471,10 @@ namespace FoenixIDE.Simulator.Devices
                             }
                         }
                         // write the end cluster
-                        if (pageOffset + entry.clusters - startOffset < fatCount)
+                        if (pageOffset + entry.cluster - startOffset < fatCount)
                         {
-                            int position = (pageOffset + entry.clusters - startOffset) >> 1;
-                            if ((pageOffset + entry.clusters - startOffset) % 2 == 0)
+                            int position = (pageOffset + entry.cluster - startOffset) >> 1;
+                            if ((pageOffset + entry.cluster - startOffset) % 2 == 0)
                             {
                                 fat[position * 3 + byteOffset] = 0xFF;
                                 fat[(position * 3) + 1 + byteOffset] = 0xF;
@@ -470,7 +489,7 @@ namespace FoenixIDE.Simulator.Devices
                     }
                     else
                     {
-                        for (int i = startOffset; i < entry.clusters; i ++)
+                        for (int i = startOffset; i < entry.cluster; i ++)
                         {
                             fat[(pageOffset + i - startOffset) * 2] = (byte)((key + i + 1) & 0xFF);
                             fat[(pageOffset + i - startOffset) * 2 + 1] = (byte)(((key + i + 1) & 0xFF00) >> 8);
@@ -480,10 +499,10 @@ namespace FoenixIDE.Simulator.Devices
                             }
                         }
                         // write the end cluster
-                        if (pageOffset + entry.clusters - startOffset < fatCount)
+                        if (pageOffset + entry.cluster - startOffset < fatCount)
                         {
-                            fat[(pageOffset + entry.clusters - startOffset) * 2] = 0xFF;
-                            fat[(pageOffset + entry.clusters - startOffset) * 2 + 1] = 0xFF;
+                            fat[(pageOffset + entry.cluster - startOffset) * 2] = 0xFF;
+                            fat[(pageOffset + entry.cluster - startOffset) * 2 + 1] = 0xFF;
                         }
                     }
                 }
@@ -499,13 +518,13 @@ namespace FoenixIDE.Simulator.Devices
             foreach (int key in FAT.Keys)
             {
                 FileEntry entry = FAT[key];
-                if (page >= ( key - 2 ) * sectors_per_cluster && page < (key - 2 + entry.clusters) * sectors_per_cluster)
+                if (page >= ( key - 2 ) * sectors_per_cluster && page < (key - 2 + entry.cluster) * sectors_per_cluster)
                 {
                     byte[] buffer = new byte[512];
-                    FileStream stream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
+                    FileStream stream = new FileStream(entry.name, FileMode.Open, FileAccess.Read);
                     try
                     {
-                        stream.Seek((page - (key -2 ) * sectors_per_cluster) * 512, SeekOrigin.Begin);
+                        stream.Seek((page - key) * 512, SeekOrigin.Begin);
                         stream.Read(buffer, 0, 512);
                         return buffer;
                     }
@@ -523,6 +542,65 @@ namespace FoenixIDE.Simulator.Devices
                 }
             }
             return null;
+        }
+
+        /*
+         * Return a sector of data from files.
+         * by block of 512 Byte
+         */
+        private byte[] GetData_ISO(int page)
+        {
+            if ((page >= 0)  && (page < 512*4096)) // test if we are with in 256MB
+            {
+                byte[] buffer = new byte[512];
+                string path = GetSDCardPath();
+                FileStream stream = new FileStream(path + "\\SD.img", FileMode.Open, FileAccess.Read);
+                try
+                {
+                    stream.Seek((page) * 512, SeekOrigin.Begin);
+                    stream.Read(buffer, 0, 512);
+                    return buffer;
+                }
+                catch (Exception e)
+                {
+                    // controller error
+                    data[5] = 1;
+                    System.Console.WriteLine(e.ToString());
+                    return null;
+                }
+                finally
+                {
+                    stream.Close();
+                }
+            }
+            return null;
+        }
+
+        private void SetData_ISO(int page, byte[] buffer)
+        {
+            if ((page >= 0) && (page < 512 * 4096)) // test if we are with in 256MB
+            {
+                string path = GetSDCardPath();
+                FileStream stream = new FileStream(path + "\\SD.img", FileMode.Open, FileAccess.Write);
+                try
+                {
+                    stream.Seek((page) * 512, SeekOrigin.Begin);
+                    stream.Write(buffer, 0, 512);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    // controller error
+                    data[5] = 1;
+                    System.Console.WriteLine(e.ToString());
+                    return;
+                }
+                finally
+                {
+                    stream.Close();
+                }
+            }
+            return;
         }
     }
 }

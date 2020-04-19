@@ -654,6 +654,7 @@ namespace FoenixIDE.UI
         {
             string path = sdCardWindow.GetPath();
             int capacity = sdCardWindow.GetCapacity();
+            bool ISOMode = sdCardWindow.GetISOMode();
             kernel.MemMgr.SDCARD.SetSDCardPath(path);
             byte sdCardStat = 0;
             if (path == null || path.Length == 0)
@@ -663,7 +664,16 @@ namespace FoenixIDE.UI
             }
             else
             {
-                SDCardPath.Text = "SDC: " + path;
+                if (ISOMode == false)
+                {
+                    SDCardPath.Text = "SDC: " + path;
+                    kernel.MemMgr.SDCARD.SetISOMode(false);
+                }
+                else
+                {
+                    SDCardPath.Text = "SDC: " + path + "/SD.img";
+                    kernel.MemMgr.SDCARD.SetISOMode(true);
+                }
                 sdCardStat = 1;
                 kernel.MemMgr.SDCARD.isPresent = true;
                 kernel.MemMgr.SDCARD.SetCapacity(capacity);
@@ -734,9 +744,7 @@ namespace FoenixIDE.UI
                 int dipHeight = (bankHeight - 5) / 2;
 
                 int offset = 2;
-                int width = ((ToolStripLabel)sender).Width;
-                int height = ((ToolStripLabel)sender).Height;
-                e.Graphics.FillRectangle(Brushes.Red, new Rectangle(0, 0, width, height));
+                e.Graphics.FillRectangle(Brushes.Red, new Rectangle(0, 0, Width, Height));
                 e.Graphics.DrawString("OFF", SystemFonts.SmallCaptionFont, Brushes.White, 0, 9);
                 e.Graphics.DrawString("ON", SystemFonts.SmallCaptionFont, Brushes.White, 2, -2);
 
