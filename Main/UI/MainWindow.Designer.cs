@@ -161,7 +161,7 @@ namespace FoenixIDE.UI
             this.fpsPerf.Size = new System.Drawing.Size(55, 23);
             this.fpsPerf.Text = "FPS: 0";
             this.fpsPerf.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.fpsPerf.ToolTipText = "Frames Per Seond";
+            this.fpsPerf.ToolTipText = "Frames Per Second";
             // 
             // SDCardPath
             // 
