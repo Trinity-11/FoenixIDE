@@ -25,6 +25,7 @@ namespace FoenixIDE.UI
         public UI.CPUWindow debugWindow;
         public MemoryWindow memoryWindow;
         public UploaderWindow uploaderWindow;
+        private WatchForm watchWindow;
         private SDCardWindow sdCardWindow = new SDCardWindow();
         private TileEditor tileEditor;
         private CharEditorWindow charEditor;
@@ -44,6 +45,7 @@ namespace FoenixIDE.UI
         private bool disabledIRQs = false;
         private bool autoRun = false;
         private BoardVersion version = BoardVersion.RevC;
+        public static MainWindow Instance = null;
 
         public MainWindow(string[] programArgs)
         {
@@ -52,11 +54,12 @@ namespace FoenixIDE.UI
                 DecodeProgramArguments(programArgs);
             }
             InitializeComponent();
+            Instance = this;
         }
 
         private void DecodeProgramArguments(string[] args)
         {
-            for (int i=0;i<args.Length;i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 switch(args[i].Trim())
                 {
@@ -240,6 +243,23 @@ namespace FoenixIDE.UI
             }
         }
 
+        private void WatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (watchWindow == null || watchWindow.IsDisposed)
+            {
+                watchWindow = new WatchForm();
+                int left = this.Left + (this.Width - watchWindow.Width) / 2;
+                int top = this.Top + (this.Height - watchWindow.Height) / 2;
+                watchWindow.Location = new Point(left, top);
+                watchWindow.memoryMgr = kernel.MemMgr;
+                watchWindow.Show();
+            }
+            else
+            {
+                watchWindow.BringToFront();
+            }
+        }
+
         private void NewTileLoaded(int layer)
         {
             tileEditor?.SelectLayer(layer);
@@ -403,7 +423,7 @@ namespace FoenixIDE.UI
         /**
          * Restart the CPU
          */
-        private void RestartMenuItemClick(object sender, EventArgs e)
+        public void RestartMenuItemClick(object sender, EventArgs e)
         {           
             previousCounter = 0;
             debugWindow.Pause();
@@ -517,7 +537,7 @@ namespace FoenixIDE.UI
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                FoeniXmlFile fnxml = new FoeniXmlFile(kernel.MemMgr.RAM, ResChecker, CPUWindow.Instance.breakpoints, CPUWindow.Instance.labels);
+                FoeniXmlFile fnxml = new FoeniXmlFile(kernel.MemMgr.RAM, ResChecker, CPUWindow.Instance, watchWindow);
                 fnxml.Write(dialog.FileName, true);
             }
         }
@@ -563,7 +583,7 @@ namespace FoenixIDE.UI
         }
 
 
-        private void characterEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CharacterEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (charEditor == null)
             {
@@ -809,7 +829,7 @@ namespace FoenixIDE.UI
             dipSwitch.Invalidate();
         }
 
-        private void joystickSimulatorToolStripMenuItem_Click(object sender, EventArgs e)
+        private void JoystickSimulatorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             joystickWindow.Show();
         }

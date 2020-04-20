@@ -4,6 +4,7 @@ CharSet Manager/.vs/CharSet Manager/v15/.suo
 /.vs/Nu64/v15
 *.pdb
 *.suo
+*.user
 .vs
 Tests/*.hex
 Tests/*.lst

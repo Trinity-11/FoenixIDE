@@ -129,7 +129,7 @@ namespace FoenixIDE
             if (LoadedKernel.EndsWith(".fnxml", true, null))
             {
                 this.ResetMemory();
-                FoeniXmlFile fnxml = new FoeniXmlFile(MemMgr.RAM, Resources, CPUWindow.Instance.breakpoints, CPUWindow.Instance.labels);
+                FoeniXmlFile fnxml = new FoeniXmlFile(MemMgr.RAM, Resources, CPUWindow.Instance, WatchForm.Instance);
                 fnxml.Load(LoadedKernel);
                 boardVersion = fnxml.Version;
             }
@@ -148,7 +148,7 @@ namespace FoenixIDE
                     }
                     else
                     {
-                        // TODO: We should really ensure that there are no duplicated PC in the list
+                        // TODO: This results in lines of code to be shown in incorrect order - Fix
                         ListFile tempList = new ListFile(LoadedKernel);
                         foreach (DebugLine line in tempList.Lines.Values)
                         {
@@ -157,6 +157,14 @@ namespace FoenixIDE
                                 lstFile.Lines.Remove(line.PC);
                             }
                             lstFile.Lines.Add(line.PC, line);
+                            for (int i=1; i < line.commandLength; i++)
+                            {
+                                if (lstFile.Lines.ContainsKey(line.PC+i))
+                                {
+                                    lstFile.Lines.Remove(line.PC+i);
+                                }
+                            }
+                            
                         }
                     }
                 }

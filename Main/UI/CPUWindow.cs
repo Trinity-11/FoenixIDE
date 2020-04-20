@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Processor;
 using FoenixIDE.Simulator.FileFormat;
+using Microsoft.VisualBasic;
 
 namespace FoenixIDE.UI
 {
@@ -17,12 +18,12 @@ namespace FoenixIDE.UI
         private const int LABEL_WIDTH = 100;
 
         public Processor.Breakpoints breakpoints = new Processor.Breakpoints();
-        public SortedList<int, string> labels = new SortedList<int, string>();
+        public List<DebugLine> codeList = null;
 
         public static CPUWindow Instance = null;
         private FoenixSystem kernel = null;
 
-        List<DebugLine> queue = null;
+        
 
         const int ROW_HEIGHT = 13;
         private int IRQPC = 0; // we only keep track of a single interrupt
@@ -56,15 +57,15 @@ namespace FoenixIDE.UI
         {
             if (kernel.lstFile.Lines.Count > 0)
             {
-                queue = new List<DebugLine>(kernel.lstFile.Lines.Count);
+                codeList = new List<DebugLine>(kernel.lstFile.Lines.Count);
                 foreach (DebugLine line in kernel.lstFile.Lines.Values)
                 {
-                    queue.Add(line);
+                    codeList.Add(line);
                 }
             }
             else
             {
-                queue = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
+                codeList = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
                 GenerateNextInstruction(kernel.CPU.PC);
             }
         }
@@ -88,10 +89,10 @@ namespace FoenixIDE.UI
             HeaderTextbox.Text = "LABEL          PC      OPCODES      SOURCE";
             ClearTrace();
             RefreshStatus();
-            Tooltip.SetToolTip(PlusButton, "Add Breakpoint");
-            Tooltip.SetToolTip(MinusButton, "Remove Breakpoint");
-            Tooltip.SetToolTip(InspectButton, "Browse Memory");
-            Tooltip.SetToolTip(StepOverButton, "Step Over");
+            Tooltip.SetToolTip(AddBPOverlayButton, "Add Breakpoint");
+            Tooltip.SetToolTip(DeleteBPOverlayButton, "Remove Breakpoint");
+            Tooltip.SetToolTip(InspectOverlayButton, "Browse Memory");
+            Tooltip.SetToolTip(StepOverOverlayButton, "Step Over");
             // Register 0
             Tooltip.SetToolTip(SOFCheckbox, "Break on SOF Interrupts");
             Tooltip.SetToolTip(SOLCheckbox, "Break on SOL Interrupts");
@@ -121,9 +122,9 @@ namespace FoenixIDE.UI
             bool paint = false;
             int currentPC = kernel.CPU.PC;
             //if ((kernel.CPU.DebugPause))
-            if (true && queue !=null)
+            if (true && codeList !=null)
             {
-                int queueLength = queue.Count;
+                int queueLength = codeList.Count;
                 int painted = 0;
                 int index = 0;
 
@@ -136,7 +137,7 @@ namespace FoenixIDE.UI
                 }
 
                 bool offsetPrinted = false;
-                foreach (DebugLine line in queue)
+                foreach (DebugLine line in codeList)
                 {
                     if (line != null)
                     {
@@ -152,7 +153,7 @@ namespace FoenixIDE.UI
                                     TopLineIndex -= 5;
                                     for (int c = 5; c > 0; c--)
                                     {
-                                        DebugLine q0 = queue[index - c];
+                                        DebugLine q0 = codeList[index - c];
                                         // Draw the label as a black box with white text
                                         if (q0.label != null)
                                         {
@@ -235,25 +236,29 @@ namespace FoenixIDE.UI
                         position.X = e.X;
                         position.Y = e.Y;
 
-                        PlusButton.Top = DebugPanel.Top + top - 1;
-                        MinusButton.Top = DebugPanel.Top + top - 1;
-                        InspectButton.Top = DebugPanel.Top + top - 1;
-                        StepOverButton.Top = DebugPanel.Top + top - 1;
+                        AddBPOverlayButton.Top = DebugPanel.Top + top - 1;
+                        DeleteBPOverlayButton.Top = DebugPanel.Top + top - 1;
+                        InspectOverlayButton.Top = DebugPanel.Top + top - 1;
+                        StepOverOverlayButton.Top = DebugPanel.Top + top - 1;
+                        LabelOverlayButton.Top = DebugPanel.Top + top - 1;
 
-                        PlusButton.Left = 3;
-                        MinusButton.Left = PlusButton.Left + PlusButton.Width;
-                        InspectButton.Left = MinusButton.Left + MinusButton.Width;
-                        StepOverButton.Left = InspectButton.Left + InspectButton.Width;
+                        AddBPOverlayButton.Left = 3;
+                        DeleteBPOverlayButton.Left = AddBPOverlayButton.Left + AddBPOverlayButton.Width;
+                        InspectOverlayButton.Left = DeleteBPOverlayButton.Left + DeleteBPOverlayButton.Width;
+                        LabelOverlayButton.Left = InspectOverlayButton.Left + InspectOverlayButton.Width;
+                        StepOverOverlayButton.Left = LabelOverlayButton.Left + LabelOverlayButton.Width;
 
-                        PlusButton.Visible = true;
-                        MinusButton.Visible = true;
-                        InspectButton.Visible = true;
+                        AddBPOverlayButton.Visible = true;
+                        DeleteBPOverlayButton.Visible = true;
+                        InspectOverlayButton.Visible = true;
+                        LabelOverlayButton.Visible = true;
+
                         int row = position.Y / ROW_HEIGHT;
                         // Only show the Step Over button for Jump and Branch commands
-                        if (queue != null && queue.Count > TopLineIndex + row)
+                        if (codeList != null && codeList.Count > TopLineIndex + row)
                         {
-                            DebugLine line = queue[TopLineIndex + row];
-                            StepOverButton.Visible = line.StepOver;
+                            DebugLine line = codeList[TopLineIndex + row];
+                            StepOverOverlayButton.Visible = line.StepOver;
                         }
                     }
                 }
@@ -261,10 +266,11 @@ namespace FoenixIDE.UI
                 {
                     position.X = -1;
                     position.Y = -1;
-                    PlusButton.Visible = false;
-                    MinusButton.Visible = false;
-                    InspectButton.Visible = false;
-                    StepOverButton.Visible = false;
+                    AddBPOverlayButton.Visible = false;
+                    DeleteBPOverlayButton.Visible = false;
+                    InspectOverlayButton.Visible = false;
+                    StepOverOverlayButton.Visible = false;
+                    LabelOverlayButton.Visible = false;
                 }
                 DebugPanel.Refresh();
             }
@@ -274,10 +280,10 @@ namespace FoenixIDE.UI
         {
             position.X = -1;
             position.Y = -1;
-            PlusButton.Visible = false;
-            MinusButton.Visible = false;
-            InspectButton.Visible = false;
-            StepOverButton.Visible = false;
+            AddBPOverlayButton.Visible = false;
+            DeleteBPOverlayButton.Visible = false;
+            InspectOverlayButton.Visible = false;
+            StepOverOverlayButton.Visible = false;
             DebugPanel.Refresh();
         }
 
@@ -286,9 +292,9 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                if (queue.Count > TopLineIndex + row)
+                if (codeList.Count > TopLineIndex + row)
                 {
-                    DebugLine line = queue[TopLineIndex + row];
+                    DebugLine line = codeList[TopLineIndex + row];
                     string value = line.PC.ToString("X6");
                     BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     AddBPButton_Click(null, null);
@@ -301,12 +307,28 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                if (queue.Count > TopLineIndex + row)
+                if (codeList.Count > TopLineIndex + row)
                 {
-                    DebugLine line = queue[TopLineIndex + row];
+                    DebugLine line = codeList[TopLineIndex + row];
                     string value = line.PC.ToString("X6");
                     BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
                     DeleteBPButton_Click(null, null);
+                }
+            }
+        }
+
+        private void LabelOverlayButton_Click(object sender, EventArgs e)
+        {
+            if (position.X > 0 && position.Y > 0)
+            {
+                int row = position.Y / ROW_HEIGHT;
+                if (codeList.Count > TopLineIndex + row)
+                {
+                    DebugLine line = codeList[TopLineIndex + row];
+                    string oldValue = line.label;
+                    string value = Interaction.InputBox("Enter Label for Address: $" + line.PC.ToString("X6").Insert(2, ":"), "Label Dialog", oldValue, Left + LabelOverlayButton.Left + LabelOverlayButton.Width, Top + LabelOverlayButton.Top);
+                    line.label = value;
+                    DebugPanel.Invalidate();
                 }
             }
         }
@@ -345,7 +367,7 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                DebugLine line = queue[TopLineIndex + row];
+                DebugLine line = codeList[TopLineIndex + row];
                 MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
                 MemoryWindow.Instance.BringToFront();
             }
@@ -386,12 +408,12 @@ namespace FoenixIDE.UI
             registerDisplay1.updateRegisterTimer.Enabled = true;
         }
 
-        private void StepOverButton_Click(object sender, EventArgs e)
+        private void StepOverOverlayButton_Click(object sender, EventArgs e)
         {
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                DebugLine line = queue[TopLineIndex + row];
+                DebugLine line = codeList[TopLineIndex + row];
                 // Set a breakpoint to the next address
                 int nextAddress = line.PC + line.commandLength;
                 int newValue = breakpoints.Add(nextAddress.ToString("X"));
@@ -407,7 +429,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void StepOver_Click(object sender, EventArgs e)
+        private void StepOverButton_Click(object sender, EventArgs e)
         {
             int pc = kernel.CPU.PC;
             if (pc > MemoryLimit)
@@ -622,15 +644,15 @@ namespace FoenixIDE.UI
             }
             // find the proper place to insert the line, based on the PC
             int index = 0;
-            for (index = 0; index < queue.Count; index++)
+            for (index = 0; index < codeList.Count; index++)
             {
-                DebugLine l = queue[index];
+                DebugLine l = codeList[index];
                 if (l.PC > pc)
                 {
                     break;
                 }
             }
-            queue.Add(line);
+            codeList.Add(line);
         }
 
         private void UpdateDebugLines(int newDebugLine, bool state)
@@ -709,7 +731,7 @@ namespace FoenixIDE.UI
 
                 case Keys.F7:
                     StepOverButton.Focus();
-                    StepOver_Click(sender, null);
+                    StepOverButton_Click(sender, null);
                     break;
             }
         }
@@ -770,6 +792,11 @@ namespace FoenixIDE.UI
                 return true;
             }
             return false;
+        }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            MainWindow.Instance.RestartMenuItemClick(sender, e);
         }
     }
 }

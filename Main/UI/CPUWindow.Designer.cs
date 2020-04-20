@@ -31,13 +31,12 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CPUWindow));
             this.HeaderPanel = new System.Windows.Forms.Panel();
-            this.StepOver = new System.Windows.Forms.Button();
+            this.ResetButton = new System.Windows.Forms.Button();
+            this.StepOverButton = new System.Windows.Forms.Button();
             this.BPLabel = new System.Windows.Forms.Label();
-            this.stepsInput = new System.Windows.Forms.TextBox();
             this.BPCombo = new System.Windows.Forms.ComboBox();
             this.AddBPButton = new System.Windows.Forms.Button();
             this.DeleteBPButton = new System.Windows.Forms.Button();
-            this.stepsLabel = new System.Windows.Forms.Label();
             this.StepButton = new System.Windows.Forms.Button();
             this.RunButton = new System.Windows.Forms.Button();
             this.locationLabel = new System.Windows.Forms.Label();
@@ -50,10 +49,10 @@
             this.ClearTraceButton = new System.Windows.Forms.Button();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.DebugPanel = new System.Windows.Forms.PictureBox();
-            this.PlusButton = new System.Windows.Forms.Button();
-            this.MinusButton = new System.Windows.Forms.Button();
-            this.InspectButton = new System.Windows.Forms.Button();
-            this.StepOverButton = new System.Windows.Forms.Button();
+            this.AddBPOverlayButton = new System.Windows.Forms.Button();
+            this.DeleteBPOverlayButton = new System.Windows.Forms.Button();
+            this.InspectOverlayButton = new System.Windows.Forms.Button();
+            this.StepOverOverlayButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.SDCardCheckBox = new System.Windows.Forms.CheckBox();
@@ -75,6 +74,7 @@
             this.KeyboardCheckBox = new System.Windows.Forms.CheckBox();
             this.SOFCheckbox = new System.Windows.Forms.CheckBox();
             this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
+            this.LabelOverlayButton = new System.Windows.Forms.Button();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
@@ -84,13 +84,12 @@
             // 
             // HeaderPanel
             // 
-            this.HeaderPanel.Controls.Add(this.StepOver);
+            this.HeaderPanel.Controls.Add(this.ResetButton);
+            this.HeaderPanel.Controls.Add(this.StepOverButton);
             this.HeaderPanel.Controls.Add(this.BPLabel);
-            this.HeaderPanel.Controls.Add(this.stepsInput);
             this.HeaderPanel.Controls.Add(this.BPCombo);
             this.HeaderPanel.Controls.Add(this.AddBPButton);
             this.HeaderPanel.Controls.Add(this.DeleteBPButton);
-            this.HeaderPanel.Controls.Add(this.stepsLabel);
             this.HeaderPanel.Controls.Add(this.StepButton);
             this.HeaderPanel.Controls.Add(this.RunButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -99,15 +98,27 @@
             this.HeaderPanel.Size = new System.Drawing.Size(608, 24);
             this.HeaderPanel.TabIndex = 2;
             // 
-            // StepOver
+            // ResetButton
             // 
-            this.StepOver.Location = new System.Drawing.Point(149, 0);
-            this.StepOver.Name = "StepOver";
-            this.StepOver.Size = new System.Drawing.Size(87, 24);
-            this.StepOver.TabIndex = 10;
-            this.StepOver.Text = "Step Over (F7)";
-            this.StepOver.UseVisualStyleBackColor = true;
-            this.StepOver.Click += new System.EventHandler(this.StepOver_Click);
+            this.ResetButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.ResetButton.Location = new System.Drawing.Point(235, 0);
+            this.ResetButton.Name = "ResetButton";
+            this.ResetButton.Size = new System.Drawing.Size(70, 24);
+            this.ResetButton.TabIndex = 11;
+            this.ResetButton.Text = "Reset";
+            this.ResetButton.UseVisualStyleBackColor = true;
+            this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
+            // 
+            // StepOverButton
+            // 
+            this.StepOverButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.StepOverButton.Location = new System.Drawing.Point(145, 0);
+            this.StepOverButton.Name = "StepOverButton";
+            this.StepOverButton.Size = new System.Drawing.Size(90, 24);
+            this.StepOverButton.TabIndex = 10;
+            this.StepOverButton.Text = "Step Over (F7)";
+            this.StepOverButton.UseVisualStyleBackColor = true;
+            this.StepOverButton.Click += new System.EventHandler(this.StepOverButton_Click);
             // 
             // BPLabel
             // 
@@ -119,17 +130,6 @@
             this.BPLabel.TabIndex = 9;
             this.BPLabel.Text = "Breakpoint";
             this.BPLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // stepsInput
-            // 
-            this.stepsInput.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.stepsInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.stepsInput.Location = new System.Drawing.Point(333, 1);
-            this.stepsInput.Name = "stepsInput";
-            this.stepsInput.Size = new System.Drawing.Size(33, 23);
-            this.stepsInput.TabIndex = 3;
-            this.stepsInput.Text = "1";
-            this.stepsInput.Enter += new System.EventHandler(this.StepsInput_Enter);
             // 
             // BPCombo
             // 
@@ -159,22 +159,12 @@
             this.DeleteBPButton.UseVisualStyleBackColor = true;
             this.DeleteBPButton.Click += new System.EventHandler(this.DeleteBPButton_Click);
             // 
-            // stepsLabel
-            // 
-            this.stepsLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.stepsLabel.Location = new System.Drawing.Point(248, 0);
-            this.stepsLabel.Name = "stepsLabel";
-            this.stepsLabel.Padding = new System.Windows.Forms.Padding(10, 4, 0, 0);
-            this.stepsLabel.Size = new System.Drawing.Size(79, 24);
-            this.stepsLabel.TabIndex = 4;
-            this.stepsLabel.Text = "Steps (dec)";
-            // 
             // StepButton
             // 
             this.StepButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.StepButton.Location = new System.Drawing.Point(77, 0);
+            this.StepButton.Location = new System.Drawing.Point(75, 0);
             this.StepButton.Name = "StepButton";
-            this.StepButton.Size = new System.Drawing.Size(72, 24);
+            this.StepButton.Size = new System.Drawing.Size(70, 24);
             this.StepButton.TabIndex = 2;
             this.StepButton.Text = "Step (F6)";
             this.StepButton.UseVisualStyleBackColor = true;
@@ -185,7 +175,7 @@
             this.RunButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.RunButton.Location = new System.Drawing.Point(0, 0);
             this.RunButton.Name = "RunButton";
-            this.RunButton.Size = new System.Drawing.Size(77, 24);
+            this.RunButton.Size = new System.Drawing.Size(75, 24);
             this.RunButton.TabIndex = 1;
             this.RunButton.Tag = "0";
             this.RunButton.Text = "Run (F5)";
@@ -263,7 +253,7 @@
             this.SecondPanel.Controls.Add(this.ClearTraceButton);
             this.SecondPanel.Location = new System.Drawing.Point(0, 25);
             this.SecondPanel.Name = "SecondPanel";
-            this.SecondPanel.Size = new System.Drawing.Size(316, 24);
+            this.SecondPanel.Size = new System.Drawing.Size(366, 24);
             this.SecondPanel.TabIndex = 5;
             // 
             // ClearTraceButton
@@ -291,70 +281,70 @@
             this.DebugPanel.TabStop = false;
             this.DebugPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseMove);
             // 
-            // PlusButton
+            // AddBPOverlayButton
             // 
-            this.PlusButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.PlusButton.FlatAppearance.BorderSize = 0;
-            this.PlusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.PlusButton.Location = new System.Drawing.Point(99, 200);
-            this.PlusButton.Margin = new System.Windows.Forms.Padding(2);
-            this.PlusButton.Name = "PlusButton";
-            this.PlusButton.Size = new System.Drawing.Size(18, 18);
-            this.PlusButton.TabIndex = 7;
-            this.PlusButton.TabStop = false;
-            this.PlusButton.Text = "+";
-            this.PlusButton.UseVisualStyleBackColor = false;
-            this.PlusButton.Visible = false;
-            this.PlusButton.Click += new System.EventHandler(this.PlusButton_Click);
+            this.AddBPOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.AddBPOverlayButton.FlatAppearance.BorderSize = 0;
+            this.AddBPOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.AddBPOverlayButton.Location = new System.Drawing.Point(99, 200);
+            this.AddBPOverlayButton.Margin = new System.Windows.Forms.Padding(2);
+            this.AddBPOverlayButton.Name = "AddBPOverlayButton";
+            this.AddBPOverlayButton.Size = new System.Drawing.Size(18, 18);
+            this.AddBPOverlayButton.TabIndex = 7;
+            this.AddBPOverlayButton.TabStop = false;
+            this.AddBPOverlayButton.Text = "+";
+            this.AddBPOverlayButton.UseVisualStyleBackColor = false;
+            this.AddBPOverlayButton.Visible = false;
+            this.AddBPOverlayButton.Click += new System.EventHandler(this.PlusButton_Click);
             // 
-            // MinusButton
+            // DeleteBPOverlayButton
             // 
-            this.MinusButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.MinusButton.FlatAppearance.BorderSize = 0;
-            this.MinusButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.MinusButton.Location = new System.Drawing.Point(118, 200);
-            this.MinusButton.Margin = new System.Windows.Forms.Padding(2);
-            this.MinusButton.Name = "MinusButton";
-            this.MinusButton.Size = new System.Drawing.Size(18, 18);
-            this.MinusButton.TabIndex = 8;
-            this.MinusButton.TabStop = false;
-            this.MinusButton.Text = "-";
-            this.MinusButton.UseVisualStyleBackColor = false;
-            this.MinusButton.Visible = false;
-            this.MinusButton.Click += new System.EventHandler(this.MinusButton_Click);
+            this.DeleteBPOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.DeleteBPOverlayButton.FlatAppearance.BorderSize = 0;
+            this.DeleteBPOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.DeleteBPOverlayButton.Location = new System.Drawing.Point(118, 200);
+            this.DeleteBPOverlayButton.Margin = new System.Windows.Forms.Padding(2);
+            this.DeleteBPOverlayButton.Name = "DeleteBPOverlayButton";
+            this.DeleteBPOverlayButton.Size = new System.Drawing.Size(18, 18);
+            this.DeleteBPOverlayButton.TabIndex = 8;
+            this.DeleteBPOverlayButton.TabStop = false;
+            this.DeleteBPOverlayButton.Text = "-";
+            this.DeleteBPOverlayButton.UseVisualStyleBackColor = false;
+            this.DeleteBPOverlayButton.Visible = false;
+            this.DeleteBPOverlayButton.Click += new System.EventHandler(this.MinusButton_Click);
             // 
-            // InspectButton
+            // InspectOverlayButton
             // 
-            this.InspectButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.InspectButton.FlatAppearance.BorderSize = 0;
-            this.InspectButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.InspectButton.Location = new System.Drawing.Point(137, 200);
-            this.InspectButton.Margin = new System.Windows.Forms.Padding(1);
-            this.InspectButton.Name = "InspectButton";
-            this.InspectButton.Size = new System.Drawing.Size(38, 18);
-            this.InspectButton.TabIndex = 9;
-            this.InspectButton.TabStop = false;
-            this.InspectButton.Text = "Mem";
-            this.InspectButton.UseVisualStyleBackColor = false;
-            this.InspectButton.Visible = false;
-            this.InspectButton.Click += new System.EventHandler(this.InspectButton_Click);
+            this.InspectOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.InspectOverlayButton.FlatAppearance.BorderSize = 0;
+            this.InspectOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.InspectOverlayButton.Location = new System.Drawing.Point(137, 200);
+            this.InspectOverlayButton.Margin = new System.Windows.Forms.Padding(1);
+            this.InspectOverlayButton.Name = "InspectOverlayButton";
+            this.InspectOverlayButton.Size = new System.Drawing.Size(38, 18);
+            this.InspectOverlayButton.TabIndex = 9;
+            this.InspectOverlayButton.TabStop = false;
+            this.InspectOverlayButton.Text = "Mem";
+            this.InspectOverlayButton.UseVisualStyleBackColor = false;
+            this.InspectOverlayButton.Visible = false;
+            this.InspectOverlayButton.Click += new System.EventHandler(this.InspectButton_Click);
             // 
-            // StepOverButton
+            // StepOverOverlayButton
             // 
-            this.StepOverButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.StepOverButton.FlatAppearance.BorderSize = 0;
-            this.StepOverButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.StepOverButton.Font = new System.Drawing.Font("Arial Narrow", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StepOverButton.Location = new System.Drawing.Point(176, 200);
-            this.StepOverButton.Margin = new System.Windows.Forms.Padding(1);
-            this.StepOverButton.Name = "StepOverButton";
-            this.StepOverButton.Size = new System.Drawing.Size(21, 18);
-            this.StepOverButton.TabIndex = 10;
-            this.StepOverButton.TabStop = false;
-            this.StepOverButton.Text = "►";
-            this.StepOverButton.UseVisualStyleBackColor = false;
-            this.StepOverButton.Visible = false;
-            this.StepOverButton.Click += new System.EventHandler(this.StepOverButton_Click);
+            this.StepOverOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.StepOverOverlayButton.FlatAppearance.BorderSize = 0;
+            this.StepOverOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.StepOverOverlayButton.Font = new System.Drawing.Font("Arial Narrow", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.StepOverOverlayButton.Location = new System.Drawing.Point(176, 200);
+            this.StepOverOverlayButton.Margin = new System.Windows.Forms.Padding(1);
+            this.StepOverOverlayButton.Name = "StepOverOverlayButton";
+            this.StepOverOverlayButton.Size = new System.Drawing.Size(21, 18);
+            this.StepOverOverlayButton.TabIndex = 10;
+            this.StepOverOverlayButton.TabStop = false;
+            this.StepOverOverlayButton.Text = "►";
+            this.StepOverOverlayButton.UseVisualStyleBackColor = false;
+            this.StepOverOverlayButton.Visible = false;
+            this.StepOverOverlayButton.Click += new System.EventHandler(this.StepOverOverlayButton_Click);
             // 
             // HeaderTextbox
             // 
@@ -590,6 +580,22 @@
             this.BreakOnIRQCheckBox.UseVisualStyleBackColor = true;
             this.BreakOnIRQCheckBox.CheckedChanged += new System.EventHandler(this.BreakOnIRQCheckBox_CheckedChanged);
             // 
+            // LabelOverlayButton
+            // 
+            this.LabelOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.LabelOverlayButton.FlatAppearance.BorderSize = 0;
+            this.LabelOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.LabelOverlayButton.Location = new System.Drawing.Point(198, 200);
+            this.LabelOverlayButton.Margin = new System.Windows.Forms.Padding(2);
+            this.LabelOverlayButton.Name = "LabelOverlayButton";
+            this.LabelOverlayButton.Size = new System.Drawing.Size(18, 18);
+            this.LabelOverlayButton.TabIndex = 13;
+            this.LabelOverlayButton.TabStop = false;
+            this.LabelOverlayButton.Text = "L";
+            this.LabelOverlayButton.UseVisualStyleBackColor = false;
+            this.LabelOverlayButton.Visible = false;
+            this.LabelOverlayButton.Click += new System.EventHandler(this.LabelOverlayButton_Click);
+            // 
             // registerDisplay1
             // 
             this.registerDisplay1.CPU = null;
@@ -605,12 +611,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(758, 517);
+            this.Controls.Add(this.LabelOverlayButton);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.HeaderTextbox);
-            this.Controls.Add(this.StepOverButton);
-            this.Controls.Add(this.InspectButton);
-            this.Controls.Add(this.MinusButton);
-            this.Controls.Add(this.PlusButton);
+            this.Controls.Add(this.StepOverOverlayButton);
+            this.Controls.Add(this.InspectOverlayButton);
+            this.Controls.Add(this.DeleteBPOverlayButton);
+            this.Controls.Add(this.AddBPOverlayButton);
             this.Controls.Add(this.DebugPanel);
             this.Controls.Add(this.registerDisplay1);
             this.Controls.Add(this.SecondPanel);
@@ -633,7 +640,6 @@
             this.Load += new System.EventHandler(this.CPUWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CPUWindow_KeyDown);
             this.HeaderPanel.ResumeLayout(false);
-            this.HeaderPanel.PerformLayout();
             this.SecondPanel.ResumeLayout(false);
             this.SecondPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).EndInit();
@@ -655,8 +661,6 @@
         private global::System.Windows.Forms.TextBox lastLine;
         private global::System.Windows.Forms.TextBox stackText;
         private global::System.Windows.Forms.Label locationLabel;
-        private global::System.Windows.Forms.Label stepsLabel;
-        private global::System.Windows.Forms.TextBox stepsInput;
         private global::System.Windows.Forms.Timer UpdateTraceTimer;
         private global::System.Windows.Forms.ComboBox BPCombo;
         private global::System.Windows.Forms.Button AddBPButton;
@@ -665,10 +669,10 @@
         private global::System.Windows.Forms.Button ClearTraceButton;
         private System.Windows.Forms.ToolTip Tooltip;
         private System.Windows.Forms.PictureBox DebugPanel;
-        private System.Windows.Forms.Button PlusButton;
-        private System.Windows.Forms.Button MinusButton;
-        private System.Windows.Forms.Button InspectButton;
-        private System.Windows.Forms.Button StepOverButton;
+        private System.Windows.Forms.Button AddBPOverlayButton;
+        private System.Windows.Forms.Button DeleteBPOverlayButton;
+        private System.Windows.Forms.Button InspectOverlayButton;
+        private System.Windows.Forms.Button StepOverOverlayButton;
         private System.Windows.Forms.Label HeaderTextbox;
         private System.Windows.Forms.Label BPLabel;
         private System.Windows.Forms.Panel panel1;
@@ -691,6 +695,8 @@
         private System.Windows.Forms.CheckBox OPL2LCheckbox;
         private System.Windows.Forms.CheckBox OPL2RCheckbox;
         private System.Windows.Forms.CheckBox SDCardCheckBox;
-        private System.Windows.Forms.Button StepOver;
+        private System.Windows.Forms.Button StepOverButton;
+        private System.Windows.Forms.Button LabelOverlayButton;
+        private System.Windows.Forms.Button ResetButton;
     }
 }

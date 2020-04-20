@@ -89,6 +89,7 @@
     <Compile Include="FileFormat\HexFile.cs" />
     <Compile Include="Devices\CodecRAM.cs" />
     <Compile Include="FileFormat\ListFile.cs" />
+    <Compile Include="FileFormat\WatchedMemory.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="Devices\MathCoproRegisters.cs" />
     <Compile Include="Devices\SDCard\SDCardDevice.cs" />
@@ -220,6 +221,12 @@
     <Compile Include="UI\CharEditor\ViewControl.designer.cs">
       <DependentUpon>ViewControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\WatchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\WatchForm.Designer.cs">
+      <DependentUpon>WatchForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Display\Gpu.resx">
       <DependentUpon>Gpu.cs</DependentUpon>
     </EmbeddedResource>
@@ -282,6 +289,9 @@
     <EmbeddedResource Include="UI\CharEditor\ViewControl.resx">
       <DependentUpon>ViewControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\WatchForm.resx">
+      <DependentUpon>WatchForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -310,7 +320,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="UI\Images\delete-btn.png" />
     <None Include="Resources\foenix-96x96.png" />
+    <None Include="Resources\DeleteButton.png" />
     <Content Include="Resources\PET-ASCII.png" />
   </ItemGroup>
   <ItemGroup>

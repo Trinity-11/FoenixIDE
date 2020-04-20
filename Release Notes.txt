@@ -1,3 +1,9 @@
+Release 0.4.1.8
+---------------
+Added the Memory Watch window.
+Removed the Step input box from the CPU Window and replaced with the Reset button.
+Added the Label Overlay button - to allow users to add labels on-demand.
+
 Release 0.4.1.7
 ---------------
 Updated the look of the virtual joystick.

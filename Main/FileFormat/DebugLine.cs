@@ -9,7 +9,7 @@ namespace FoenixIDE.Simulator.FileFormat
     /// <summary>
     /// Container to hold one line of 65C816 code debugging data
     /// </summary>
-    class DebugLine: ICloneable
+    public class DebugLine: ICloneable
     {
         //public bool isBreakpoint = false;
         public int PC;
@@ -19,7 +19,8 @@ namespace FoenixIDE.Simulator.FileFormat
         public bool StepOver = false;
         public string label;
         private string evaled = null;
-        private static byte[] BranchJmpOpcodes = {
+
+        private static readonly byte[] BranchJmpOpcodes = {
             OpcodeList.BCC_ProgramCounterRelative,
             OpcodeList.BCS_ProgramCounterRelative,
             OpcodeList.BEQ_ProgramCounterRelative,
@@ -68,6 +69,19 @@ namespace FoenixIDE.Simulator.FileFormat
             commandLength = cmd.Length;
             command = cmd;
             StepOver = (Array.Exists(BranchJmpOpcodes, element => element == command[0]));
+        }
+        public string GetOpcodes()
+        {
+            StringBuilder c = new StringBuilder();
+            for (int i = 0; i < commandLength; i++)
+            {
+                c.Append(command[i].ToString("X2")).Append(",");
+            }
+            return c.ToString();
+        }
+        public string GetSource()
+        {
+            return source;
         }
         public void SetLabel(string value)
         {
