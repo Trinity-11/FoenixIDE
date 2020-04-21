@@ -12,9 +12,9 @@ namespace FoenixIDE.Simulator.FileFormat
     /// </summary>
     public class ListFile
     {
-        private Dictionary<int, DebugLine> DbgLines = new Dictionary<int, DebugLine>();
+        private SortedList<int, DebugLine> DbgLines = new SortedList<int, DebugLine>();
 
-        internal Dictionary<int, DebugLine> Lines
+        internal SortedList<int, DebugLine> Lines
         {
             get => DbgLines;
         }
@@ -49,7 +49,7 @@ namespace FoenixIDE.Simulator.FileFormat
                             string[] strOpcodes = tokens[CommandOffset].Split(new char[] { ' ' });
                             if (strOpcodes[0].Length == 0)
                             {
-                                match.SetLabel(tokens[tokens.Length - 1]);
+                                match.SetLabel(tokens[tokens.Length - 1].Trim());
                             }
                             else
                             {

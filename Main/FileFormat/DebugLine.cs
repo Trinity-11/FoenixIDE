@@ -70,6 +70,20 @@ namespace FoenixIDE.Simulator.FileFormat
             command = cmd;
             StepOver = (Array.Exists(BranchJmpOpcodes, element => element == command[0]));
         }
+        public void SetOpcodes(string cmd)
+        {
+            string[] ops = cmd.Split(',');
+            commandLength = ops.Length-1;
+            command = new byte[commandLength];
+            for (int i = 0; i < commandLength; i++)
+            {
+                command[i] = Convert.ToByte(ops[i], 16);
+            }
+            if (commandLength > 0)
+            {
+                StepOver = (Array.Exists(BranchJmpOpcodes, element => element == command[0]));
+            }
+        }
         public string GetOpcodes()
         {
             StringBuilder c = new StringBuilder();
@@ -94,7 +108,7 @@ namespace FoenixIDE.Simulator.FileFormat
             string[] tokens = value.Split();
             if (tokens.Length > 0)
             {
-                if (tokens[0].Length > 3)
+                if (tokens[0].Length > 3 && !tokens[0].StartsWith(";"))
                 {
                     label = tokens[0];
                     // Remove the first item

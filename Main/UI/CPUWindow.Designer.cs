@@ -76,6 +76,7 @@
             this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.LabelOverlayButton = new System.Windows.Forms.Button();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
+            this.WatchButton = new System.Windows.Forms.Button();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
@@ -84,6 +85,7 @@
             // 
             // HeaderPanel
             // 
+            this.HeaderPanel.Controls.Add(this.WatchButton);
             this.HeaderPanel.Controls.Add(this.ResetButton);
             this.HeaderPanel.Controls.Add(this.StepOverButton);
             this.HeaderPanel.Controls.Add(this.BPLabel);
@@ -104,7 +106,7 @@
             this.ResetButton.Location = new System.Drawing.Point(235, 0);
             this.ResetButton.Name = "ResetButton";
             this.ResetButton.Size = new System.Drawing.Size(70, 24);
-            this.ResetButton.TabIndex = 11;
+            this.ResetButton.TabIndex = 4;
             this.ResetButton.Text = "Reset";
             this.ResetButton.UseVisualStyleBackColor = true;
             this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
@@ -115,7 +117,7 @@
             this.StepOverButton.Location = new System.Drawing.Point(145, 0);
             this.StepOverButton.Name = "StepOverButton";
             this.StepOverButton.Size = new System.Drawing.Size(90, 24);
-            this.StepOverButton.TabIndex = 10;
+            this.StepOverButton.TabIndex = 3;
             this.StepOverButton.Text = "Step Over (F7)";
             this.StepOverButton.UseVisualStyleBackColor = true;
             this.StepOverButton.Click += new System.EventHandler(this.StepOverButton_Click);
@@ -123,7 +125,7 @@
             // BPLabel
             // 
             this.BPLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BPLabel.Location = new System.Drawing.Point(375, 1);
+            this.BPLabel.Location = new System.Drawing.Point(379, 2);
             this.BPLabel.Name = "BPLabel";
             this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.BPLabel.Size = new System.Drawing.Size(58, 17);
@@ -185,7 +187,7 @@
             // locationLabel
             // 
             this.locationLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.locationLabel.Location = new System.Drawing.Point(160, 0);
+            this.locationLabel.Location = new System.Drawing.Point(145, 0);
             this.locationLabel.Name = "locationLabel";
             this.locationLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.locationLabel.Size = new System.Drawing.Size(64, 24);
@@ -196,7 +198,7 @@
             // 
             this.locationInput.Dock = System.Windows.Forms.DockStyle.Left;
             this.locationInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.locationInput.Location = new System.Drawing.Point(224, 0);
+            this.locationInput.Location = new System.Drawing.Point(209, 0);
             this.locationInput.Name = "locationInput";
             this.locationInput.Size = new System.Drawing.Size(64, 23);
             this.locationInput.TabIndex = 10;
@@ -206,10 +208,10 @@
             // JumpButton
             // 
             this.JumpButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.JumpButton.Location = new System.Drawing.Point(96, 0);
+            this.JumpButton.Location = new System.Drawing.Point(75, 0);
             this.JumpButton.Name = "JumpButton";
-            this.JumpButton.Size = new System.Drawing.Size(64, 24);
-            this.JumpButton.TabIndex = 11;
+            this.JumpButton.Size = new System.Drawing.Size(70, 24);
+            this.JumpButton.TabIndex = 10;
             this.JumpButton.Text = "Jump";
             this.JumpButton.UseVisualStyleBackColor = true;
             this.JumpButton.Click += new System.EventHandler(this.JumpButton_Click);
@@ -261,8 +263,8 @@
             this.ClearTraceButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.ClearTraceButton.Location = new System.Drawing.Point(0, 0);
             this.ClearTraceButton.Name = "ClearTraceButton";
-            this.ClearTraceButton.Size = new System.Drawing.Size(96, 24);
-            this.ClearTraceButton.TabIndex = 12;
+            this.ClearTraceButton.Size = new System.Drawing.Size(75, 24);
+            this.ClearTraceButton.TabIndex = 9;
             this.ClearTraceButton.Text = "Clear Trace";
             this.ClearTraceButton.UseVisualStyleBackColor = true;
             this.ClearTraceButton.Click += new System.EventHandler(this.ClearTraceButton_Click);
@@ -606,6 +608,17 @@
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 
+            // WatchButton
+            // 
+            this.WatchButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.WatchButton.Location = new System.Drawing.Point(305, 0);
+            this.WatchButton.Name = "WatchButton";
+            this.WatchButton.Size = new System.Drawing.Size(75, 24);
+            this.WatchButton.TabIndex = 5;
+            this.WatchButton.Text = "Watch";
+            this.WatchButton.UseVisualStyleBackColor = true;
+            this.WatchButton.Click += new System.EventHandler(this.WatchButton_Click);
+            // 
             // CPUWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -698,5 +711,6 @@
         private System.Windows.Forms.Button StepOverButton;
         private System.Windows.Forms.Button LabelOverlayButton;
         private System.Windows.Forms.Button ResetButton;
+        private System.Windows.Forms.Button WatchButton;
     }
 }

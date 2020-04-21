@@ -69,7 +69,7 @@
             this.WatchGrid.ShowEditingIcon = false;
             this.WatchGrid.ShowRowErrors = false;
             this.WatchGrid.Size = new System.Drawing.Size(348, 422);
-            this.WatchGrid.TabIndex = 0;
+            this.WatchGrid.TabIndex = 3;
             this.WatchGrid.VirtualMode = true;
             this.WatchGrid.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.WatchGrid_CellClick);
             // 
@@ -131,7 +131,7 @@
             this.AddButton.Location = new System.Drawing.Point(271, 3);
             this.AddButton.Name = "AddButton";
             this.AddButton.Size = new System.Drawing.Size(75, 23);
-            this.AddButton.TabIndex = 1;
+            this.AddButton.TabIndex = 2;
             this.AddButton.Text = "Add";
             this.AddButton.UseVisualStyleBackColor = true;
             this.AddButton.Click += new System.EventHandler(this.AddButton_Click);
@@ -142,7 +142,7 @@
             this.NameText.MaxLength = 32;
             this.NameText.Name = "NameText";
             this.NameText.Size = new System.Drawing.Size(121, 20);
-            this.NameText.TabIndex = 2;
+            this.NameText.TabIndex = 0;
             // 
             // AddressText
             // 
@@ -150,7 +150,7 @@
             this.AddressText.MaxLength = 6;
             this.AddressText.Name = "AddressText";
             this.AddressText.Size = new System.Drawing.Size(76, 20);
-            this.AddressText.TabIndex = 3;
+            this.AddressText.TabIndex = 1;
             // 
             // WatchForm
             // 
@@ -168,6 +168,7 @@
             this.Name = "WatchForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Watch List";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WatchForm_FormClosing);
             this.Load += new System.EventHandler(this.Watch_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.WatchForm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.WatchGrid)).EndInit();

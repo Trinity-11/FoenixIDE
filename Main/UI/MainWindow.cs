@@ -25,7 +25,7 @@ namespace FoenixIDE.UI
         public UI.CPUWindow debugWindow;
         public MemoryWindow memoryWindow;
         public UploaderWindow uploaderWindow;
-        private WatchForm watchWindow;
+        private WatchForm watchWindow = new WatchForm();
         private SDCardWindow sdCardWindow = new SDCardWindow();
         private TileEditor tileEditor;
         private CharEditorWindow charEditor;
@@ -152,6 +152,11 @@ namespace FoenixIDE.UI
             kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
             kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
 
+            int left = this.Left + (this.Width - watchWindow.Width) / 2;
+            int top = this.Top + (this.Height - watchWindow.Height) / 2;
+            watchWindow.Location = new Point(left, top);
+            watchWindow.kernel = kernel;
+
             DisplayBoardVersion();
             EnableMenuItems();
             ResetSDCard();
@@ -243,15 +248,10 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void WatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        public void WatchListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (watchWindow == null || watchWindow.IsDisposed)
+            if (!watchWindow.Visible)
             {
-                watchWindow = new WatchForm();
-                int left = this.Left + (this.Width - watchWindow.Width) / 2;
-                int top = this.Top + (this.Height - watchWindow.Height) / 2;
-                watchWindow.Location = new Point(left, top);
-                watchWindow.memoryMgr = kernel.MemMgr;
                 watchWindow.Show();
             }
             else
@@ -500,18 +500,8 @@ namespace FoenixIDE.UI
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                if (debugWindow != null)
-                {
-                    debugWindow.Close();
-                }
-                if (memoryWindow != null)
-                {
-                    memoryWindow.Close();
-                }
-
                 // TODO - this code is so coupled - we need to set the version in the XML file too.
                 kernel.Resources = ResChecker;
-                kernel.Breakpoints = CPUWindow.Instance.breakpoints;
                 if (kernel.ResetCPU(true, dialog.FileName))
                 {
                     SetDipSwitchMemory();
@@ -537,7 +527,7 @@ namespace FoenixIDE.UI
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                FoeniXmlFile fnxml = new FoeniXmlFile(kernel.MemMgr.RAM, ResChecker, CPUWindow.Instance, watchWindow);
+                FoeniXmlFile fnxml = new FoeniXmlFile(kernel, ResChecker);
                 fnxml.Write(dialog.FileName, true);
             }
         }

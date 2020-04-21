@@ -14,8 +14,7 @@ namespace FoenixIDE.UI
 {
     public partial class WatchForm : Form
     {
-        public SortedList<int, WatchedMemory> watchList = new SortedList<int, WatchedMemory>();
-        public MemoryManager memoryMgr;
+        public FoenixSystem kernel;
         private Image DeleteImage;
         public static WatchForm Instance;
 
@@ -27,14 +26,9 @@ namespace FoenixIDE.UI
 
         private void Watch_Load(object sender, EventArgs e)
         {
-            // Add some sample entries to the data store. 
-            watchList.Add(0x13, new WatchedMemory("LINES_VISIBLE", 0x13, 0, 0));
-            watchList.Add(0x11, new WatchedMemory("COLS_PER_LINE", 0x11, 0, 0));
-
-            // Set the row count, including the row for new records.
-            WatchGrid.RowCount = 2;
             WatchGrid.CellValueNeeded += WatchGrid_CellValueNeeded;
             DeleteImage = Simulator.Properties.Resources.delete_btn;
+            WatchGrid.RowCount = kernel.WatchList.Count;
         }
 
         /**
@@ -42,11 +36,11 @@ namespace FoenixIDE.UI
          */
         private void WatchUpdateTimer_Tick(object sender, EventArgs e)
         {
-            foreach (KeyValuePair<int, WatchedMemory> kvp in watchList)
+            foreach (KeyValuePair<int, WatchedMemory> kvp in kernel.WatchList)
             {
                 WatchedMemory mem = kvp.Value;
-                mem.val8bit = memoryMgr.ReadByte(mem.address);
-                mem.val16bit = memoryMgr.ReadWord(mem.address);
+                mem.val8bit = kernel.MemMgr.ReadByte(mem.address);
+                mem.val16bit = kernel.MemMgr.ReadWord(mem.address);
             }
             WatchGrid.Invalidate();
         }
@@ -55,7 +49,7 @@ namespace FoenixIDE.UI
         {
             try
             {
-                KeyValuePair<int, WatchedMemory> kvp = watchList.ElementAt(e.RowIndex);
+                KeyValuePair<int, WatchedMemory> kvp = kernel.WatchList.ElementAt(e.RowIndex);
                 switch (e.ColumnIndex)
                 {
                     case 0:
@@ -88,10 +82,10 @@ namespace FoenixIDE.UI
             if (e.ColumnIndex == 4)
             {
                 // Get the address for the RowIndex
-                KeyValuePair<int, WatchedMemory> kvp = watchList.ElementAt(e.RowIndex);
+                KeyValuePair<int, WatchedMemory> kvp = kernel.WatchList.ElementAt(e.RowIndex);
                 NameText.Text = kvp.Value.name;
                 AddressText.Text = "$" + kvp.Value.address.ToString("X6");
-                watchList.Remove(kvp.Key);
+                kernel.WatchList.Remove(kvp.Key);
                 WatchGrid.RowCount -= 1;
             }
         }
@@ -103,16 +97,16 @@ namespace FoenixIDE.UI
                 int addressVal = Convert.ToInt32(AddressText.Text.Replace("$", "").Replace(":", ""), 16);
                 if (NameText.Text.Length > 0 && addressVal > 0)
                 {
-                    if (watchList.ContainsKey(addressVal))
+                    if (kernel.WatchList.ContainsKey(addressVal))
                     {
-                        watchList.Remove(addressVal);
+                        kernel.WatchList.Remove(addressVal);
                     }
                     WatchedMemory mem = new WatchedMemory(NameText.Text, addressVal,
-                        memoryMgr.ReadByte(addressVal),
-                        memoryMgr.ReadWord(addressVal)
+                        kernel.MemMgr.ReadByte(addressVal),
+                        kernel.MemMgr.ReadWord(addressVal)
                     );
-                    watchList.Add(addressVal, mem);
-                    WatchGrid.RowCount = watchList.Count;
+                    kernel.WatchList.Add(addressVal, mem);
+                    WatchGrid.RowCount = kernel.WatchList.Count;
                     NameText.Text = "";
                     AddressText.Text = "";
                 }
@@ -123,8 +117,14 @@ namespace FoenixIDE.UI
         {
             if (e.KeyCode == Keys.Escape)
             {
-                this.Dispose();
+                this.Close();
             }
+        }
+
+        private void WatchForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            Hide();
         }
     }
 }

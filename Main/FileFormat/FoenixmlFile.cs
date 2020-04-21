@@ -15,31 +15,26 @@ namespace FoenixIDE.Simulator.FileFormat
         private ResourceChecker Resources;
         private const int PHRASE_LENGTH = 16;
         private Processor.Breakpoints BreakPoints;
-        private List<DebugLine> codeList;
-        private MemoryRAM ram;
+        private SortedList<int, DebugLine> codeList;
+        private FoenixSystem kernel;
         private SortedList<int, WatchedMemory> watchList;
-        public BoardVersion Version = BoardVersion.RevB;
+        public BoardVersion Version;
 
         private FoeniXmlFile() { }
 
-        public FoeniXmlFile(MemoryRAM ram, ResourceChecker resources, CPUWindow cpuWindow, WatchForm watchWindow)
+        public FoeniXmlFile(FoenixSystem kernel, ResourceChecker resources)
         {
-            this.ram = ram;
+            this.kernel = kernel;
             this.Resources = resources;
-            if (cpuWindow != null)
-            {
-                this.BreakPoints = cpuWindow.breakpoints;
-                this.codeList = cpuWindow.codeList;
-            }
-            if (watchWindow != null)
-            {
-                watchList = watchWindow.watchList;
-            }
+            this.codeList = kernel.lstFile.Lines;
+            this.BreakPoints = kernel.Breakpoints;
+            watchList = kernel.WatchList;
         }
 
         public void Write(String filename, bool compact)
         {
             XmlWriter xmlWriter = XmlWriter.Create(filename);
+            string tabs = "\t\t\t\t\t\t\t\t";
             xmlWriter.WriteStartDocument();
             xmlWriter.WriteRaw("\r");
             xmlWriter.WriteComment("Export of FoenixIDE for C256.  All values are in hexadecimal form");
@@ -47,14 +42,16 @@ namespace FoenixIDE.Simulator.FileFormat
 
 
             xmlWriter.WriteStartElement("project");
-            xmlWriter.WriteAttributeString("version", Version.ToString());
+            xmlWriter.WriteAttributeString("version", kernel.GetVersion().ToString());
             xmlWriter.WriteRaw("\r");
 
             // Write resources
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteStartElement("resources");
             xmlWriter.WriteRaw("\r");
             foreach (ResourceChecker.Resource res in Resources.Items)
             {
+                xmlWriter.WriteRaw(tabs.Substring(0, 2));
                 xmlWriter.WriteStartElement("resource");
                 xmlWriter.WriteAttributeString("name", res.Name);
                 xmlWriter.WriteAttributeString("source", res.SourceFile);
@@ -63,60 +60,77 @@ namespace FoenixIDE.Simulator.FileFormat
                 xmlWriter.WriteEndElement();  // end resource
                 xmlWriter.WriteRaw("\r");
             }
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteEndElement(); // end resources
             xmlWriter.WriteRaw("\r");
 
-            // Write breakpoints
-            xmlWriter.WriteStartElement("breakpoints");
-            xmlWriter.WriteRaw("\r");
-            foreach (string bp in BreakPoints.Values)
+
+            if (BreakPoints != null)
             {
-                xmlWriter.WriteStartElement("breakpoint");
-                xmlWriter.WriteAttributeString("address", bp);
-                xmlWriter.WriteEndElement();  // end resource
+                // Write breakpoints
+                xmlWriter.WriteRaw(tabs.Substring(0, 1));
+                xmlWriter.WriteStartElement("breakpoints");
+                xmlWriter.WriteRaw("\r");
+
+
+                foreach (string bp in BreakPoints.Values)
+                {
+                    xmlWriter.WriteRaw(tabs.Substring(0, 2));
+                    xmlWriter.WriteStartElement("breakpoint");
+                    xmlWriter.WriteAttributeString("address", bp);
+                    xmlWriter.WriteEndElement();  // end resource
+                    xmlWriter.WriteRaw("\r");
+                }
+                xmlWriter.WriteRaw(tabs.Substring(0, 1));
+                xmlWriter.WriteEndElement(); // end breakpoints
                 xmlWriter.WriteRaw("\r");
             }
-            xmlWriter.WriteEndElement(); // end breakpoints
-            xmlWriter.WriteRaw("\r");
 
             // Write code listing
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteStartElement("listing");
             xmlWriter.WriteRaw("\r");
 
-            foreach (DebugLine code in codeList)
+            foreach (DebugLine code in codeList.Values)
             {
+                xmlWriter.WriteRaw(tabs.Substring(0, 2));
                 xmlWriter.WriteStartElement("code");
+                xmlWriter.WriteAttributeString("address", "$" + code.PC.ToString("X6"));
+                xmlWriter.WriteAttributeString("command", code.GetOpcodes());
+                xmlWriter.WriteAttributeString("source", code.GetSource());
                 if (code.label != null)
                 {
                     xmlWriter.WriteAttributeString("label", code.label);
                 }
-                xmlWriter.WriteAttributeString("address", code.PC.ToString("X6"));
-                xmlWriter.WriteAttributeString("command", code.GetOpcodes());
-                xmlWriter.WriteAttributeString("source", code.GetSource());
                 xmlWriter.WriteEndElement();  // end resource
                 xmlWriter.WriteRaw("\r");
             }
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteEndElement(); // end code listing
             xmlWriter.WriteRaw("\r");
 
             if (watchList != null)
             {
                 // Write watch list
+                xmlWriter.WriteRaw(tabs.Substring(0, 1));
                 xmlWriter.WriteStartElement("watches");
                 xmlWriter.WriteRaw("\r");
 
                 foreach (KeyValuePair<int, WatchedMemory> nvp in watchList)
                 {
+                    xmlWriter.WriteRaw(tabs.Substring(0, 2));
                     xmlWriter.WriteStartElement("watch");
                     xmlWriter.WriteAttributeString("address", nvp.Key.ToString("X6"));
                     xmlWriter.WriteAttributeString("label", nvp.Value.name);
                     xmlWriter.WriteEndElement();  // end resource
                     xmlWriter.WriteRaw("\r");
                 }
+                xmlWriter.WriteRaw(tabs.Substring(0, 1));
                 xmlWriter.WriteEndElement(); // end watch list
                 xmlWriter.WriteRaw("\r");
             }
             // Write pages
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteStartElement("pages");
             if (compact)
             {
@@ -132,22 +146,30 @@ namespace FoenixIDE.Simulator.FileFormat
             // We don't need to scan $FFFF pages, only scan the ones we know are gettings used
             // Scan each of the banks and pages and save to an XML file
             // If a page is blank, don't export it.
-            for (int i = 0; i < ram.Length; i = i + 256)
+            int RamLength = kernel.MemMgr.RAM.Length;
+            for (int i = 0; i < RamLength; i = i + 256)
             {
                 if (PageChecksum(i) != 0)
                 {
                     WriteData(i, xmlWriter, compact);
                 }
             }
-
-            //for (int i = 0xAF_0000; i < 0xF0_0000; i = i + 256)
-            //{
-            //    if (PageChecksum(i) != 0)
-            //    {
-            //        WriteData(i, xmlWriter, compact);
-            //    }
-            //}
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteEndElement(); // end pages
+
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
+            xmlWriter.WriteStartElement("vicky");
+            xmlWriter.WriteRaw("\r");
+            for (int i = 0xAF_0000; i < 0xB0_0000; i = i + 256)
+            {
+                if (PageChecksum(i) != 0)
+                {
+                    WriteData(i, xmlWriter, compact);
+                }
+            }
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
+            xmlWriter.WriteEndElement(); // end vicky
+            xmlWriter.WriteRaw("\r");
             xmlWriter.WriteEndElement(); // end project
 
             xmlWriter.WriteEndDocument();
@@ -179,7 +201,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 writer.WriteAttributeString("address", "$" + (startAddress).ToString("X6"));
                 for (int i = 0; i < PHRASE_LENGTH; i++)
                 {
-                    writer.WriteString(ram.ReadByte(startAddress + i).ToString("X2") + " ");
+                    writer.WriteString(kernel.MemMgr.ReadByte(startAddress + i).ToString("X2") + " ");
                 }
                 writer.WriteEndElement();
                 writer.WriteRaw("\r");
@@ -192,7 +214,7 @@ namespace FoenixIDE.Simulator.FileFormat
             int sum = 0;
             for (int i = 0; i < 255; i++)
             {
-                sum += ram.ReadByte(startAddress + i);
+                sum += kernel.MemMgr.ReadByte(startAddress + i);
             }
             return sum;
         }
@@ -203,7 +225,7 @@ namespace FoenixIDE.Simulator.FileFormat
             int sum = 0;
             for (int i = 0; i < PHRASE_LENGTH; i++)
             {
-                sum += ram.ReadByte(startAddress + i);
+                sum += kernel.MemMgr.ReadByte(startAddress + i);
             }
             return sum;
         }
@@ -246,15 +268,24 @@ namespace FoenixIDE.Simulator.FileFormat
                     }
                     if (reader.Name.Equals("code"))
                     {
-                        int address = Convert.ToInt32(reader.GetAttribute("address"), 16);
-                        string label = reader.GetAttribute("label");
-                        string source = reader.GetAttribute("source");
-                        string command = reader.GetAttribute("command");
-                        DebugLine code = new DebugLine(address);
-                        code.SetLabel(label);
-                        code.SetMnemonic(source);
-                        //code.SetOpcodes();
-                        codeList.Add(code);
+                        string addrStr = reader.GetAttribute("address");
+                        if (addrStr.Length > 0)
+                        {
+                            int address = Convert.ToInt32(addrStr.Replace("$", ""), 16);
+                            string label = reader.GetAttribute("label");
+                            string source = reader.GetAttribute("source");
+                            string command = reader.GetAttribute("command");
+                            DebugLine code = new DebugLine(address);
+                            code.SetLabel(label);
+                            code.SetMnemonic(source);
+                            code.SetOpcodes(command);
+                            if (codeList.ContainsKey(address))
+                            {
+                                codeList.Remove(address);
+                            }
+                            codeList.Add(address, code);
+                         
+                        }
                         continue;
                     }
                     if (reader.Name.Equals("breakpoint"))
@@ -277,6 +308,10 @@ namespace FoenixIDE.Simulator.FileFormat
                         int address = Convert.ToInt32(reader.GetAttribute("address"), 16);
                         string name = reader.GetAttribute("label");
                         WatchedMemory mem = new WatchedMemory(name, address, 0, 0);
+                        if (watchList.ContainsKey(address))
+                        {
+                            watchList.Remove(address);
+                        }
                         watchList.Add(address, mem);
                     }
                 }
@@ -292,7 +327,7 @@ namespace FoenixIDE.Simulator.FileFormat
             {
                 for (int i = 0; i < values.Length / 3; i++)
                 {
-                    ram.WriteByte(addr++, Convert.ToByte(values.Substring(i * 3, 2), 16));
+                    kernel.MemMgr.WriteByte(addr++, Convert.ToByte(values.Substring(i * 3, 2), 16));
                 }
             }
         }

@@ -19,9 +19,10 @@ namespace FoenixIDE
         public Gpu gpu = null;
 
         public ResourceChecker Resources;
-        public Processor.Breakpoints Breakpoints;
+        public Processor.Breakpoints Breakpoints = new Processor.Breakpoints();
         public ListFile lstFile;
         private BoardVersion boardVersion;
+        public SortedList<int, WatchedMemory> WatchList = new SortedList<int, WatchedMemory>();
         private string LoadedKernel;
 
         public FoenixSystem(Gpu gpu, BoardVersion version, string DefaultKernel)
@@ -129,7 +130,7 @@ namespace FoenixIDE
             if (LoadedKernel.EndsWith(".fnxml", true, null))
             {
                 this.ResetMemory();
-                FoeniXmlFile fnxml = new FoeniXmlFile(MemMgr.RAM, Resources, CPUWindow.Instance, WatchForm.Instance);
+                FoeniXmlFile fnxml = new FoeniXmlFile(this, Resources);
                 fnxml.Load(LoadedKernel);
                 boardVersion = fnxml.Version;
             }
