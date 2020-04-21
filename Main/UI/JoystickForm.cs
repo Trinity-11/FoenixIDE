@@ -62,9 +62,11 @@ namespace FoenixIDE.Simulator.UI
                     UpButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.Q:
+                    value = 0x8F;
                     Fire1Button.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.E:
+                    value = 0x1F;
                     Fire2Button.BackColor = SystemColors.ControlDark;
                     break;
             }
