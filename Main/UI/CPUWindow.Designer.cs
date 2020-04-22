@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CPUWindow));
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.WatchButton = new System.Windows.Forms.Button();
             this.ResetButton = new System.Windows.Forms.Button();
             this.StepOverButton = new System.Windows.Forms.Button();
             this.BPLabel = new System.Windows.Forms.Label();
@@ -76,7 +77,6 @@
             this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.LabelOverlayButton = new System.Windows.Forms.Button();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
-            this.WatchButton = new System.Windows.Forms.Button();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
@@ -99,6 +99,17 @@
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(608, 24);
             this.HeaderPanel.TabIndex = 2;
+            // 
+            // WatchButton
+            // 
+            this.WatchButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.WatchButton.Location = new System.Drawing.Point(305, 0);
+            this.WatchButton.Name = "WatchButton";
+            this.WatchButton.Size = new System.Drawing.Size(75, 24);
+            this.WatchButton.TabIndex = 5;
+            this.WatchButton.Text = "Watch";
+            this.WatchButton.UseVisualStyleBackColor = true;
+            this.WatchButton.Click += new System.EventHandler(this.WatchButton_Click);
             // 
             // ResetButton
             // 
@@ -281,6 +292,7 @@
             this.DebugPanel.Size = new System.Drawing.Size(605, 367);
             this.DebugPanel.TabIndex = 6;
             this.DebugPanel.TabStop = false;
+            this.DebugPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseClick);
             this.DebugPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseMove);
             // 
             // AddBPOverlayButton
@@ -607,17 +619,6 @@
             this.registerDisplay1.Size = new System.Drawing.Size(366, 49);
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
-            // 
-            // WatchButton
-            // 
-            this.WatchButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.WatchButton.Location = new System.Drawing.Point(305, 0);
-            this.WatchButton.Name = "WatchButton";
-            this.WatchButton.Size = new System.Drawing.Size(75, 24);
-            this.WatchButton.TabIndex = 5;
-            this.WatchButton.Text = "Watch";
-            this.WatchButton.UseVisualStyleBackColor = true;
-            this.WatchButton.Click += new System.EventHandler(this.WatchButton_Click);
             // 
             // CPUWindow
             // 

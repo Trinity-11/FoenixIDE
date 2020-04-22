@@ -176,6 +176,60 @@ namespace FoenixIDE.Simulator.FileFormat
             xmlWriter.Close();
         }
 
+        public  void WriteWatches(string filename)
+        {
+            XmlWriter xmlWriter = XmlWriter.Create(filename);
+            string tabs = "\t\t\t\t\t\t\t\t";
+            xmlWriter.WriteStartDocument();
+            xmlWriter.WriteRaw("\r");
+            xmlWriter.WriteComment("Export of Watch List for C256 Foenix IDE");
+            xmlWriter.WriteRaw("\r");
+
+            if (watchList != null)
+            {
+                // Write watch list
+                xmlWriter.WriteRaw(tabs.Substring(0, 1));
+                xmlWriter.WriteStartElement("watches");
+
+                foreach (KeyValuePair<int, WatchedMemory> nvp in watchList)
+                {
+                    xmlWriter.WriteRaw(tabs.Substring(0, 1));
+                    xmlWriter.WriteStartElement("watch");
+                    xmlWriter.WriteAttributeString("address", nvp.Key.ToString("X6"));
+                    xmlWriter.WriteAttributeString("label", nvp.Value.name);
+                    xmlWriter.WriteEndElement();  // end resource
+                    xmlWriter.WriteRaw("\r");
+                }
+                xmlWriter.WriteEndElement(); // end watch list
+                xmlWriter.WriteRaw("\r");
+            }
+
+            xmlWriter.WriteEndDocument();
+            xmlWriter.Close();
+        }
+
+        public void ReadWatches(string filename)
+        {
+            XmlReader reader = XmlReader.Create(filename);
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name.Equals("watch"))
+                    {
+                        int address = Convert.ToInt32(reader.GetAttribute("address"), 16);
+                        string name = reader.GetAttribute("label");
+                        WatchedMemory mem = new WatchedMemory(name, address, 0, 0);
+                        if (watchList.ContainsKey(address))
+                        {
+                            watchList.Remove(address);
+                        }
+                        watchList.Add(address, mem);
+                    }
+                }
+            }
+        }
+
         private void WriteData(int startAddress, XmlWriter writer, bool compact)
         {
             writer.WriteStartElement("page");

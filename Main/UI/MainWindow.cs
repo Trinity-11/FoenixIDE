@@ -155,7 +155,7 @@ namespace FoenixIDE.UI
             int left = this.Left + (this.Width - watchWindow.Width) / 2;
             int top = this.Top + (this.Height - watchWindow.Height) / 2;
             watchWindow.Location = new Point(left, top);
-            watchWindow.kernel = kernel;
+            watchWindow.SetKernel(kernel);
 
             DisplayBoardVersion();
             EnableMenuItems();
@@ -529,6 +529,39 @@ namespace FoenixIDE.UI
             {
                 FoeniXmlFile fnxml = new FoeniXmlFile(kernel, ResChecker);
                 fnxml.Write(dialog.FileName, true);
+            }
+        }
+
+        private void saveWatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Pick the file to create
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Title = "Save Watch List File",
+                CheckPathExists = true,
+                Filter = "Foenix Watch List File| *.wlxml"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                FoeniXmlFile xmlFile = new FoeniXmlFile(kernel, null);
+                xmlFile.WriteWatches(dialog.FileName);
+            }
+        }
+
+        private void loadWatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Title = "Load Watch List File",
+                Filter = "Foenix Watch List File|*.wlxml",
+                CheckFileExists = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                FoeniXmlFile xmlFile = new FoeniXmlFile(kernel, null);
+                xmlFile.ReadWatches(dialog.FileName);
+                watchWindow.SetKernel(kernel);
             }
         }
 

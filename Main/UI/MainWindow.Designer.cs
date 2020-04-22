@@ -58,6 +58,7 @@ namespace FoenixIDE.UI
             this.terminalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.memoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.watchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RestartMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.DebugMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,7 +71,8 @@ namespace FoenixIDE.UI
             this.panel4 = new System.Windows.Forms.Panel();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.gpu = new FoenixIDE.Display.Gpu();
-            this.watchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -202,6 +204,8 @@ namespace FoenixIDE.UI
             this.openHexFileWoZeroingToolStripMenuItem,
             this.loadFNXMLFileToolStripMenuItem,
             this.saveProjectToolStripMenuItem,
+            this.saveWatchListToolStripMenuItem,
+            this.loadWatchListToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -311,7 +315,7 @@ namespace FoenixIDE.UI
             // terminalToolStripMenuItem
             // 
             this.terminalToolStripMenuItem.Name = "terminalToolStripMenuItem";
-            this.terminalToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.terminalToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.terminalToolStripMenuItem.Text = "&Terminal";
             this.terminalToolStripMenuItem.Click += new System.EventHandler(this.TerminalToolStripMenuItem_Click);
             // 
@@ -319,7 +323,7 @@ namespace FoenixIDE.UI
             // 
             this.cPUToolStripMenuItem.Enabled = false;
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.CPUToolStripMenuItem_Click);
             // 
@@ -327,9 +331,16 @@ namespace FoenixIDE.UI
             // 
             this.memoryToolStripMenuItem.Enabled = false;
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.MemoryToolStripMenuItem_Click);
+            // 
+            // watchListToolStripMenuItem
+            // 
+            this.watchListToolStripMenuItem.Name = "watchListToolStripMenuItem";
+            this.watchListToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.watchListToolStripMenuItem.Text = "Watch List";
+            this.watchListToolStripMenuItem.Click += new System.EventHandler(this.WatchListToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
@@ -437,12 +448,19 @@ namespace FoenixIDE.UI
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
             // 
-            // watchListToolStripMenuItem
+            // saveWatchListToolStripMenuItem
             // 
-            this.watchListToolStripMenuItem.Name = "watchListToolStripMenuItem";
-            this.watchListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.watchListToolStripMenuItem.Text = "Watch List";
-            this.watchListToolStripMenuItem.Click += new System.EventHandler(this.WatchListToolStripMenuItem_Click);
+            this.saveWatchListToolStripMenuItem.Name = "saveWatchListToolStripMenuItem";
+            this.saveWatchListToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.saveWatchListToolStripMenuItem.Text = "Save Watch List...";
+            this.saveWatchListToolStripMenuItem.Click += new System.EventHandler(this.saveWatchListToolStripMenuItem_Click);
+            // 
+            // loadWatchListToolStripMenuItem
+            // 
+            this.loadWatchListToolStripMenuItem.Name = "loadWatchListToolStripMenuItem";
+            this.loadWatchListToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.loadWatchListToolStripMenuItem.Text = "Load Watch List...";
+            this.loadWatchListToolStripMenuItem.Click += new System.EventHandler(this.loadWatchListToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -523,6 +541,8 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem characterEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem joystickSimulatorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem watchListToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveWatchListToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadWatchListToolStripMenuItem;
     }
 }
 

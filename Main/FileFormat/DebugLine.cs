@@ -41,6 +41,23 @@ namespace FoenixIDE.Simulator.FileFormat
             OpcodeList.JSR_AbsoluteLong
         };
 
+        private static readonly byte[] NonImmediateOpcodes = {
+            OpcodeList.LDA_Absolute,
+            OpcodeList.LDA_AbsoluteIndexedWithX,
+            OpcodeList.LDA_AbsoluteIndexedWithY,
+            OpcodeList.LDA_AbsoluteLong,
+            OpcodeList.LDA_AbsoluteLongIndexedWithX,
+            OpcodeList.LDA_DirectPage,
+            OpcodeList.LDA_DirectPageIndirect,
+
+            OpcodeList.STA_Absolute,
+            OpcodeList.STA_AbsoluteIndexedWithX,
+            OpcodeList.STA_AbsoluteIndexedWithY,
+            OpcodeList.STA_AbsoluteLong,
+            OpcodeList.STA_AbsoluteLongIndexedWithX,
+            OpcodeList.STA_DirectPage,
+            OpcodeList.STA_DirectPageIndirect
+        };
         
         // Only expand when it's going to be displayed
         override public string ToString()
@@ -140,6 +157,43 @@ namespace FoenixIDE.Simulator.FileFormat
         public object Clone()
         {
             return this.MemberwiseClone();
+        }
+
+        /*
+         * Return true if the line has a non-immediate LDA/STA opcode
+         */
+        public bool HasAddress()
+        {
+            return commandLength > 0 && Array.Exists(NonImmediateOpcodes, element => element == command[0]);
+        }
+
+        /*
+         * Return the name of the address in this line.
+         * The format is STA/LDA $123456 or like it.
+         */
+        public string GetAddressName()
+        {
+            string mnemonic = source.Substring(4);
+            int colon = mnemonic.IndexOf(';');
+            if (colon > -1)
+            {
+                mnemonic = mnemonic.Substring(0, colon - 1).Trim();
+            }
+            return mnemonic;
+        }
+
+        /*
+         * Return the address of this line
+         */
+        public int GetAddress()
+        {
+            // Read the opcodes in reverse
+            int address = 0;
+            for (int i = 1; i < commandLength; i++)
+            {
+                address += command[i] * (int)Math.Pow(256, i - 1);
+            }
+            return address;
         }
     }
 }

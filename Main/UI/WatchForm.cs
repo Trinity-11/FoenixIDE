@@ -14,7 +14,7 @@ namespace FoenixIDE.UI
 {
     public partial class WatchForm : Form
     {
-        public FoenixSystem kernel;
+        private FoenixSystem kernel_ref;
         private Image DeleteImage;
         public static WatchForm Instance;
 
@@ -22,13 +22,14 @@ namespace FoenixIDE.UI
         {
             InitializeComponent();
             Instance = this;
+            WatchGrid.CellValueNeeded += WatchGrid_CellValueNeeded;
         }
 
-        private void Watch_Load(object sender, EventArgs e)
+        public void SetKernel(FoenixSystem krnl)
         {
-            WatchGrid.CellValueNeeded += WatchGrid_CellValueNeeded;
-            DeleteImage = Simulator.Properties.Resources.delete_btn;
-            WatchGrid.RowCount = kernel.WatchList.Count;
+            kernel_ref = krnl;
+            WatchGrid.RowCount = kernel_ref.WatchList.Count;
+            WatchUpdateTimer.Enabled = true;
         }
 
         /**
@@ -36,12 +37,13 @@ namespace FoenixIDE.UI
          */
         private void WatchUpdateTimer_Tick(object sender, EventArgs e)
         {
-            foreach (KeyValuePair<int, WatchedMemory> kvp in kernel.WatchList)
+            foreach (KeyValuePair<int, WatchedMemory> kvp in kernel_ref.WatchList)
             {
                 WatchedMemory mem = kvp.Value;
-                mem.val8bit = kernel.MemMgr.ReadByte(mem.address);
-                mem.val16bit = kernel.MemMgr.ReadWord(mem.address);
+                mem.val8bit = kernel_ref.MemMgr.ReadByte(mem.address);
+                mem.val16bit = kernel_ref.MemMgr.ReadWord(mem.address);
             }
+            WatchGrid.RowCount = kernel_ref.WatchList.Count;
             WatchGrid.Invalidate();
         }
 
@@ -49,7 +51,7 @@ namespace FoenixIDE.UI
         {
             try
             {
-                KeyValuePair<int, WatchedMemory> kvp = kernel.WatchList.ElementAt(e.RowIndex);
+                KeyValuePair<int, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
                 switch (e.ColumnIndex)
                 {
                     case 0:
@@ -64,9 +66,6 @@ namespace FoenixIDE.UI
                     case 3:
                         e.Value = kvp.Value.val16bit.ToString("X4");
                         break;
-                    case 4:
-                        e.Value = DeleteImage;
-                        break;
                 }
                 
             }
@@ -78,15 +77,22 @@ namespace FoenixIDE.UI
 
         private void WatchGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Delete the row, but copy the values into our input boxes
-            if (e.ColumnIndex == 4)
+            // Get the address for the RowIndex
+            KeyValuePair<int, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
+            switch (e.ColumnIndex)
             {
-                // Get the address for the RowIndex
-                KeyValuePair<int, WatchedMemory> kvp = kernel.WatchList.ElementAt(e.RowIndex);
-                NameText.Text = kvp.Value.name;
-                AddressText.Text = "$" + kvp.Value.address.ToString("X6");
-                kernel.WatchList.Remove(kvp.Key);
-                WatchGrid.RowCount -= 1;
+                // Browse this page in the Memory Window
+                case 4:
+                    MemoryWindow.Instance.GotoAddress(kvp.Key & 0xFFFF00);
+                    break;
+                // Delete the row, but copy the values into our input boxes
+                case 5:
+                    
+                    NameText.Text = kvp.Value.name;
+                    AddressText.Text = "$" + kvp.Value.address.ToString("X6");
+                    kernel_ref.WatchList.Remove(kvp.Key);
+                    WatchGrid.RowCount -= 1;
+                    break;
             }
         }
 
@@ -97,16 +103,16 @@ namespace FoenixIDE.UI
                 int addressVal = Convert.ToInt32(AddressText.Text.Replace("$", "").Replace(":", ""), 16);
                 if (NameText.Text.Length > 0 && addressVal > 0)
                 {
-                    if (kernel.WatchList.ContainsKey(addressVal))
+                    if (kernel_ref.WatchList.ContainsKey(addressVal))
                     {
-                        kernel.WatchList.Remove(addressVal);
+                        kernel_ref.WatchList.Remove(addressVal);
                     }
                     WatchedMemory mem = new WatchedMemory(NameText.Text, addressVal,
-                        kernel.MemMgr.ReadByte(addressVal),
-                        kernel.MemMgr.ReadWord(addressVal)
+                        kernel_ref.MemMgr.ReadByte(addressVal),
+                        kernel_ref.MemMgr.ReadWord(addressVal)
                     );
-                    kernel.WatchList.Add(addressVal, mem);
-                    WatchGrid.RowCount = kernel.WatchList.Count;
+                    kernel_ref.WatchList.Add(addressVal, mem);
+                    WatchGrid.RowCount = kernel_ref.WatchList.Count;
                     NameText.Text = "";
                     AddressText.Text = "";
                 }
@@ -125,6 +131,11 @@ namespace FoenixIDE.UI
         {
             e.Cancel = true;
             Hide();
+        }
+
+        private void WatchForm_Resize(object sender, EventArgs e)
+        {
+            WatchGrid.Columns[0].Width = Width - 274;
         }
     }
 }

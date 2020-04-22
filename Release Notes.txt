@@ -1,3 +1,10 @@
+Release 0.4.1.9
+---------------
+Fixed bug #11 - https://github.com/Trinity-11/FoenixIDE/issues/11.
+Added the ability to add Watches from the CPU Window - it's much easier is less error prone.
+Added a button to the Watch List to Go to the Memory Page in the Memory Window.
+Added the ability to Save and Load watches, instead of forcing users to save a project file.
+
 Release 0.4.1.8
 ---------------
 Added the Memory Watch window.

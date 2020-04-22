@@ -320,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="UI\Images\memory-btn.png" />
     <None Include="UI\Images\delete-btn.png" />
     <None Include="Resources\foenix-96x96.png" />
     <None Include="Resources\DeleteButton.png" />

@@ -69,5 +69,15 @@ namespace FoenixIDE.Simulator.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap memory_btn {
+            get {
+                object obj = ResourceManager.GetObject("memory-btn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

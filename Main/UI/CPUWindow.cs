@@ -22,7 +22,7 @@ namespace FoenixIDE.UI
 
         public static CPUWindow Instance = null;
         private FoenixSystem kernel = null;
-
+        private int[] ActiveLine = {0, 0, 0};  // PC, startofline, width - the point of this is to underline the ADDRESS name
         
 
         const int ROW_HEIGHT = 13;
@@ -54,9 +54,9 @@ namespace FoenixIDE.UI
             DebugPanel.Refresh();
         }
 
-        public void UpdateQueue()
+        private void UpdateQueue()
         {
-            if (kernel.lstFile.Lines.Count > 0)
+            if (kernel.lstFile != null && kernel.lstFile.Lines.Count > 0)
             {
                 codeList = new List<DebugLine>(kernel.lstFile.Lines.Count);
                 foreach (DebugLine line in kernel.lstFile.Lines.Values)
@@ -175,14 +175,18 @@ namespace FoenixIDE.UI
                                         {
                                             e.Graphics.FillRectangle(Brushes.Red, LABEL_WIDTH + 3, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
-                                        e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, Brushes.Black, 102, painted * ROW_HEIGHT);
-                                        
+                                        e.Graphics.DrawString(q0.ToString(), HeaderTextbox.Font, Brushes.Black, LABEL_WIDTH + 2, painted * ROW_HEIGHT);
+                                        if (q0.PC == ActiveLine[0])
+                                        {
+                                            e.Graphics.DrawLine(Pens.Black, LABEL_WIDTH + ActiveLine[1], (painted + 1) * ROW_HEIGHT, LABEL_WIDTH + ActiveLine[1] + ActiveLine[2], (painted + 1) * ROW_HEIGHT);
+                                        }
                                         painted++;
                                     }
                                 }
                                 offsetPrinted = true;
                             }
-                            e.Graphics.FillRectangle(line.PC == IRQPC ? Brushes.Orange : Brushes.LightBlue, LABEL_WIDTH + 1, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
+                            e.Graphics.FillRectangle(line.PC == IRQPC ? Brushes.Orange : Brushes.LightBlue, LABEL_WIDTH + 1, painted * ROW_HEIGHT, DebugPanel.Width, ROW_HEIGHT);
+
                         }
                         if (painted > 27)
                         {
@@ -210,8 +214,11 @@ namespace FoenixIDE.UI
                             {
                                 e.Graphics.FillRectangle(Brushes.Red, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
-                            
                             e.Graphics.DrawString(line.ToString(), HeaderTextbox.Font, Brushes.Black, 102, painted * ROW_HEIGHT);
+                            if (line.PC == ActiveLine[0])
+                            {
+                                e.Graphics.DrawLine(Pens.Black, LABEL_WIDTH + ActiveLine[1], (painted + 1) * ROW_HEIGHT, LABEL_WIDTH + ActiveLine[1] + ActiveLine[2], (painted + 1) * ROW_HEIGHT);
+                            }
                             painted++;
                         }
                     }
@@ -232,6 +239,8 @@ namespace FoenixIDE.UI
                 if (e.X > 2 && e.X < 2 + LABEL_WIDTH)
                 {
                     int top = e.Y / ROW_HEIGHT * ROW_HEIGHT;
+                    ActiveLine[0] = 0;
+                    DebugPanel.Cursor = Cursors.Default;
                     if ( (e.Y / ROW_HEIGHT != position.Y / ROW_HEIGHT || position.Y == -1) && e.Y / ROW_HEIGHT < 28 )
                     {
                         position.X = e.X;
@@ -272,6 +281,24 @@ namespace FoenixIDE.UI
                     InspectOverlayButton.Visible = false;
                     StepOverOverlayButton.Visible = false;
                     LabelOverlayButton.Visible = false;
+                    ActiveLine[0] = 0;
+                    int row = e.Y / ROW_HEIGHT;
+                    if (codeList != null && codeList.Count > TopLineIndex + row)
+                    {
+                        DebugLine line = codeList[TopLineIndex + row];
+                        // try to highlight the word we are over 
+                        if (line.HasAddress())
+                        {
+                            ActiveLine[0] = line.PC;
+                            ActiveLine[1] = 174;
+                            ActiveLine[2] = line.GetAddressName().Length * 7;
+                            DebugPanel.Cursor = Cursors.Hand;
+                        }
+                    }
+                    if (ActiveLine[0] == 0)
+                    {
+                        DebugPanel.Cursor = Cursors.Default;
+                    }
                 }
                 DebugPanel.Refresh();
             }
@@ -442,7 +469,7 @@ namespace FoenixIDE.UI
                 return;
             }
             DebugLine line = GetExecutionInstruction(pc);
-            if (line.StepOver)
+            if (line != null && line.StepOver)
             {
                 // Set a breakpoint to the next address
                 int nextAddress = pc + line.commandLength;
@@ -614,8 +641,16 @@ namespace FoenixIDE.UI
 
         private DebugLine GetExecutionInstruction(int PC)
         {
-            kernel.lstFile.Lines.TryGetValue(PC, out DebugLine dl);
-            return dl;
+            if (kernel.lstFile != null)
+            {
+                kernel.lstFile.Lines.TryGetValue(PC, out DebugLine dl);
+                return dl;
+            }
+            else
+            {
+                return null;
+            }
+
         }
         private void GenerateNextInstruction(int pc)
         {
@@ -804,6 +839,25 @@ namespace FoenixIDE.UI
         private void WatchButton_Click(object sender, EventArgs e)
         {
             MainWindow.Instance.WatchListToolStripMenuItem_Click(sender, e);
+        }
+
+        private void DebugPanel_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (ActiveLine[0] != 0)
+            {
+                DebugLine line = kernel.lstFile.Lines[ActiveLine[0]];
+                if (line != null)
+                {
+                    string name = line.GetAddressName();
+                    int address = line.GetAddress();
+                    WatchedMemory mem = new WatchedMemory(name, address, 0, 0);
+                    if (kernel.WatchList.ContainsKey(address))
+                    {
+                        kernel.WatchList.Remove(address);
+                    }
+                    kernel.WatchList.Add(address, mem);
+                }
+            }
         }
     }
 }
