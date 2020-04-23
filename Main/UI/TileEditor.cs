@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -64,7 +65,7 @@ namespace FoenixIDE.Simulator.UI
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
             int[] graphicsLUT = Display.Gpu.LoadLUT(memory.VICKY);
-            int lut = Int32.Parse(LUTDomain.Text);
+            int lut = Int32.Parse(LUTText.Text);
             for (int y = 0; y < 256; y++)
             {
                 for (int x = 0; x < 256; x++)
@@ -139,7 +140,7 @@ namespace FoenixIDE.Simulator.UI
             int ControlReg = memory.ReadByte(addrOffset);
             LayersetAddress = memory.ReadLong(addrOffset + 1);
             int LUT = (ControlReg >> 1) & 3;
-            LUTDomain.Text = LUT.ToString();
+            LUTText.Text = LUT.ToString();
 
             TilesetAddressText.Text = (LayersetAddress + 0xB0_0000).ToString("X6");
 
@@ -168,7 +169,7 @@ namespace FoenixIDE.Simulator.UI
         {
             int addrOffset = 0xAF_0100 + layer * 8;
             byte ControlReg = memory.ReadByte(addrOffset);
-            ControlReg ^= 1;
+            ControlReg = (byte)((ControlReg & 0xF0) + (LayerEnabledCheckbox.Checked ? 1 : 0));
             memory.WriteByte(addrOffset, ControlReg);
         }
 
@@ -178,7 +179,7 @@ namespace FoenixIDE.Simulator.UI
             {
                 int addrOffset = 0xAF_0100 + layer * 8;
                 byte ControlReg = memory.ReadByte(addrOffset);
-                byte lut = Convert.ToByte(LUTDomain.Text);
+                byte lut = Convert.ToByte(LUTText.Text);
                 ControlReg = (byte)(ControlReg | (lut << 1));
                 memory.WriteByte(addrOffset, ControlReg);
             }
@@ -207,7 +208,7 @@ namespace FoenixIDE.Simulator.UI
         {
             try
             {
-                int strideValue = Convert.ToInt16(TilesetAddressText.Text, 16);
+                int strideValue = Convert.ToInt16(StrideXText.Text, 16);
                 if (strideValue >= 0)
                 {
                     int addrOffset = 0xAF_0100 + layer * 8;
@@ -224,7 +225,7 @@ namespace FoenixIDE.Simulator.UI
         {
             try
             {
-                int strideValue = Convert.ToInt16(TilesetAddressText.Text, 16);
+                int strideValue = Convert.ToInt16(StrideYText.Text, 16);
                 if (strideValue >= 0)
                 {
                     int addrOffset = 0xAF_0100 + layer * 8;
@@ -242,6 +243,59 @@ namespace FoenixIDE.Simulator.UI
             if (e.KeyCode == Keys.Escape)
             {
                 this.Close();
+            }
+        }
+
+        private void LUTText_TextChanged(object sender, EventArgs e)
+        {
+            int addrOffset = 0xAF_0100 + layer * 8;
+            byte ControlReg = memory.ReadByte(addrOffset);
+            byte lut = 0;
+            try
+            {
+                lut = Convert.ToByte(LUTText.Text);
+                if (lut > 3)
+                {
+                    lut = 0;
+                    LUTText.Text = "0";
+                }
+            } 
+            catch
+            {
+                LUTText.Text = "0";
+            }
+            ControlReg = (byte)((ControlReg & 0xF1) | (lut << 1));
+            memory.WriteByte(addrOffset, ControlReg);
+            TilesetViewer.Refresh();
+        }
+
+        private void ClearTilesetButton_Click(object sender, EventArgs e)
+        {
+            int tilemapAddress = 0xAF5000 + 0x800 * layer;
+            for (int i = 0; i < 0x800; i++)
+            {
+                memory.VICKY.WriteByte(tilemapAddress + i - memory.VICKY.StartAddress, 0);
+            }
+        }
+
+        private void SaveTilesetButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveDialog = new SaveFileDialog()
+            {
+                Title = "Save Tileset File",
+                CheckPathExists = true,
+                Filter = "Tileset|*.data"
+            };
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                FileStream dataFile = File.Create(saveDialog.FileName, 0x800, FileOptions.SequentialScan);
+                int tilemapAddress = 0xAF5000 + 0x800 * layer;
+                for (int i = 0; i < 0x800; i++)
+                {
+                    byte value = memory.VICKY.ReadByte(tilemapAddress + i - memory.VICKY.StartAddress);
+                    dataFile.WriteByte(value);
+                }
+                dataFile.Close();
             }
         }
     }

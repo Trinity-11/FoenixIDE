@@ -44,11 +44,13 @@
             this.TilesetViewer = new System.Windows.Forms.PictureBox();
             this.TileSelectedLabel = new System.Windows.Forms.Label();
             this.LUTLabel = new System.Windows.Forms.Label();
-            this.LUTDomain = new System.Windows.Forms.DomainUpDown();
             this.XLabel = new System.Windows.Forms.Label();
             this.YLabel = new System.Windows.Forms.Label();
             this.StrideXText = new System.Windows.Forms.TextBox();
             this.StrideYText = new System.Windows.Forms.TextBox();
+            this.LUTText = new System.Windows.Forms.TextBox();
+            this.ClearTilesetButton = new System.Windows.Forms.Button();
+            this.SaveTilesetButton = new System.Windows.Forms.Button();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TilesetViewer)).BeginInit();
             this.SuspendLayout();
@@ -142,7 +144,7 @@
             this.TilesetAddressText.MaxLength = 6;
             this.TilesetAddressText.Name = "TilesetAddressText";
             this.TilesetAddressText.Size = new System.Drawing.Size(100, 20);
-            this.TilesetAddressText.TabIndex = 3;
+            this.TilesetAddressText.TabIndex = 4;
             this.TilesetAddressText.TextChanged += new System.EventHandler(this.TilesetAddressText_TextChanged);
             // 
             // TilesetViewer
@@ -178,22 +180,6 @@
             this.LUTLabel.TabIndex = 6;
             this.LUTLabel.Text = "LUT:";
             // 
-            // LUTDomain
-            // 
-            this.LUTDomain.Items.Add("0");
-            this.LUTDomain.Items.Add("1");
-            this.LUTDomain.Items.Add("2");
-            this.LUTDomain.Items.Add("3");
-            this.LUTDomain.Location = new System.Drawing.Point(154, 29);
-            this.LUTDomain.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.LUTDomain.Name = "LUTDomain";
-            this.LUTDomain.Size = new System.Drawing.Size(28, 20);
-            this.LUTDomain.TabIndex = 7;
-            this.LUTDomain.Text = "0";
-            this.LUTDomain.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.LUTDomain.Wrap = true;
-            this.LUTDomain.SelectedItemChanged += new System.EventHandler(this.LUTDomain_SelectedItemChanged);
-            // 
             // XLabel
             // 
             this.XLabel.AutoSize = true;
@@ -220,7 +206,7 @@
             this.StrideXText.MaxLength = 4;
             this.StrideXText.Name = "StrideXText";
             this.StrideXText.Size = new System.Drawing.Size(38, 20);
-            this.StrideXText.TabIndex = 10;
+            this.StrideXText.TabIndex = 3;
             this.StrideXText.Text = "0";
             this.StrideXText.TextChanged += new System.EventHandler(this.StrideXText_TextChanged);
             // 
@@ -230,20 +216,53 @@
             this.StrideYText.MaxLength = 4;
             this.StrideYText.Name = "StrideYText";
             this.StrideYText.Size = new System.Drawing.Size(38, 20);
-            this.StrideYText.TabIndex = 11;
+            this.StrideYText.TabIndex = 5;
             this.StrideYText.Text = "0";
             this.StrideYText.TextChanged += new System.EventHandler(this.StrideYText_TextChanged);
+            // 
+            // LUTText
+            // 
+            this.LUTText.Location = new System.Drawing.Point(161, 29);
+            this.LUTText.MaxLength = 1;
+            this.LUTText.Name = "LUTText";
+            this.LUTText.Size = new System.Drawing.Size(21, 20);
+            this.LUTText.TabIndex = 2;
+            this.LUTText.Text = "0";
+            this.LUTText.WordWrap = false;
+            this.LUTText.TextChanged += new System.EventHandler(this.LUTText_TextChanged);
+            // 
+            // ClearTilesetButton
+            // 
+            this.ClearTilesetButton.Location = new System.Drawing.Point(123, 351);
+            this.ClearTilesetButton.Name = "ClearTilesetButton";
+            this.ClearTilesetButton.Size = new System.Drawing.Size(86, 23);
+            this.ClearTilesetButton.TabIndex = 10;
+            this.ClearTilesetButton.Text = "Clear Tileset";
+            this.ClearTilesetButton.UseVisualStyleBackColor = true;
+            this.ClearTilesetButton.Click += new System.EventHandler(this.ClearTilesetButton_Click);
+            // 
+            // SaveTilesetButton
+            // 
+            this.SaveTilesetButton.Location = new System.Drawing.Point(213, 351);
+            this.SaveTilesetButton.Name = "SaveTilesetButton";
+            this.SaveTilesetButton.Size = new System.Drawing.Size(86, 23);
+            this.SaveTilesetButton.TabIndex = 11;
+            this.SaveTilesetButton.Text = "Save Tileset";
+            this.SaveTilesetButton.UseVisualStyleBackColor = true;
+            this.SaveTilesetButton.Click += new System.EventHandler(this.SaveTilesetButton_Click);
             // 
             // TileEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(328, 375);
+            this.Controls.Add(this.SaveTilesetButton);
+            this.Controls.Add(this.ClearTilesetButton);
+            this.Controls.Add(this.LUTText);
             this.Controls.Add(this.StrideYText);
             this.Controls.Add(this.StrideXText);
             this.Controls.Add(this.YLabel);
             this.Controls.Add(this.XLabel);
-            this.Controls.Add(this.LUTDomain);
             this.Controls.Add(this.LUTLabel);
             this.Controls.Add(this.TileSelectedLabel);
             this.Controls.Add(this.TilesetViewer);
@@ -278,12 +297,14 @@
         private System.Windows.Forms.TextBox TilesetAddressText;
         private System.Windows.Forms.Label TileSelectedLabel;
         private System.Windows.Forms.Label LUTLabel;
-        private System.Windows.Forms.DomainUpDown LUTDomain;
         private System.Windows.Forms.Label XLabel;
         private System.Windows.Forms.Label YLabel;
         private System.Windows.Forms.TextBox StrideXText;
         private System.Windows.Forms.TextBox StrideYText;
         private System.Windows.Forms.PictureBox TilesetViewer;
         private System.Windows.Forms.Button Layer0Button;
+        private System.Windows.Forms.TextBox LUTText;
+        private System.Windows.Forms.Button ClearTilesetButton;
+        private System.Windows.Forms.Button SaveTilesetButton;
     }
 }

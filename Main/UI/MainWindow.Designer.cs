@@ -46,6 +46,8 @@ namespace FoenixIDE.UI
             this.openHexFileWoZeroingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFNXMLFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,8 +73,6 @@ namespace FoenixIDE.UI
             this.panel4 = new System.Windows.Forms.Panel();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.gpu = new FoenixIDE.Display.Gpu();
-            this.saveWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -238,6 +238,20 @@ namespace FoenixIDE.UI
             this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.saveProjectToolStripMenuItem.Text = "&Save Project...";
             this.saveProjectToolStripMenuItem.Click += new System.EventHandler(this.SaveProjectToolStripMenuItem_Click);
+            // 
+            // saveWatchListToolStripMenuItem
+            // 
+            this.saveWatchListToolStripMenuItem.Name = "saveWatchListToolStripMenuItem";
+            this.saveWatchListToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.saveWatchListToolStripMenuItem.Text = "Save Watch List...";
+            this.saveWatchListToolStripMenuItem.Click += new System.EventHandler(this.saveWatchListToolStripMenuItem_Click);
+            // 
+            // loadWatchListToolStripMenuItem
+            // 
+            this.loadWatchListToolStripMenuItem.Name = "loadWatchListToolStripMenuItem";
+            this.loadWatchListToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.loadWatchListToolStripMenuItem.Text = "Load Watch List...";
+            this.loadWatchListToolStripMenuItem.Click += new System.EventHandler(this.loadWatchListToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
@@ -443,24 +457,10 @@ namespace FoenixIDE.UI
             this.gpu.TabIndex = 0;
             this.gpu.TabStop = false;
             this.gpu.TileEditorMode = false;
-            this.gpu.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseClick);
+            this.gpu.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gpu_MouseDown);
             this.gpu.MouseEnter += new System.EventHandler(this.Gpu_MouseEnter);
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
-            // 
-            // saveWatchListToolStripMenuItem
-            // 
-            this.saveWatchListToolStripMenuItem.Name = "saveWatchListToolStripMenuItem";
-            this.saveWatchListToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.saveWatchListToolStripMenuItem.Text = "Save Watch List...";
-            this.saveWatchListToolStripMenuItem.Click += new System.EventHandler(this.saveWatchListToolStripMenuItem_Click);
-            // 
-            // loadWatchListToolStripMenuItem
-            // 
-            this.loadWatchListToolStripMenuItem.Name = "loadWatchListToolStripMenuItem";
-            this.loadWatchListToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.loadWatchListToolStripMenuItem.Text = "Load Watch List...";
-            this.loadWatchListToolStripMenuItem.Click += new System.EventHandler(this.loadWatchListToolStripMenuItem_Click);
             // 
             // MainWindow
             // 

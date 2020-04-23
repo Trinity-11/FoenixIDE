@@ -188,8 +188,8 @@ namespace FoenixIDE.Simulator.FileFormat
             if (watchList != null)
             {
                 // Write watch list
-                xmlWriter.WriteRaw(tabs.Substring(0, 1));
                 xmlWriter.WriteStartElement("watches");
+                xmlWriter.WriteRaw("\r");
 
                 foreach (KeyValuePair<int, WatchedMemory> nvp in watchList)
                 {

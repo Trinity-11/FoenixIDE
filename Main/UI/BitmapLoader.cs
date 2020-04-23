@@ -176,8 +176,11 @@ namespace FoenixIDE.UI
                     pointerAddress = 0XAF_0101 + offsetTL; // 3 bytes
                     strideXAddress = 0xAF_0104 + offsetTL; // 2 bytes
                     strideYAddress = 0xAF_0106 + offsetTL; // 2 bytes
-                    strideX = bitmap.Width;
-                    strideY = bitmap.Height;
+                    if (bitmap != null)
+                    {
+                        strideX = bitmap.Width;
+                        strideY = bitmap.Height;
+                    }
                     break;
                 default: // sprites 0..31
                     int offsetSP = ((BitmapTypesCombo.SelectedIndex - 5) * 8);
@@ -185,8 +188,11 @@ namespace FoenixIDE.UI
                     pointerAddress = 0XAF_0201; // 3 bytes
                     strideXAddress = 0xAF_0204; // 2 bytes --> X Position
                     strideYAddress = 0xAF_0206; // 2 bytes --> Y Position
-                    strideX = bitmap.Width;
-                    strideY = bitmap.Height;
+                    if (bitmap != null)
+                    {
+                        strideX = bitmap.Width;
+                        strideY = bitmap.Height;
+                    }
                     break;
             }
         }

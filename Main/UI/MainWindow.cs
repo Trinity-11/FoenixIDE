@@ -624,6 +624,10 @@ namespace FoenixIDE.UI
                 if ((e.X / ratioW > 32 && e.X / ratioW < 608) && (e.Y / ratioH > 32 && e.Y / ratioH < 448))
                 {
                     this.Cursor = Cursors.Hand;
+                    if (e.Button == MouseButtons.Left)
+                    {
+                        TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
+                    }
                 }
                 else
                 {
@@ -658,7 +662,7 @@ namespace FoenixIDE.UI
             this.Cursor = Cursors.Default;
         }
 
-        private void Gpu_MouseClick(object sender, MouseEventArgs e)
+        private void gpu_MouseDown(object sender, MouseEventArgs e)
         {
             if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
             {

@@ -1,3 +1,7 @@
+Release 0.4.1.10
+----------------
+Fixed a few issues with the Tile Editor - now you can add tiles by dragging the mouse (instead of clicking).
+
 Release 0.4.1.9
 ---------------
 Fixed bug #11 - https://github.com/Trinity-11/FoenixIDE/issues/11.
