@@ -231,24 +231,26 @@ namespace FoenixIDE.Display
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
             // Bitmap Mode
-            if ((MCRegister & 0x8) == 0x8)
+            if ((MCRegister & 0x4) == 0x4)
             {
-                DrawBitmap(ref bitmapData, displayBorder);
-            }
-            
-            for (int layer = 4; layer > 0; --layer)
-            {
-                if ((MCRegister & 0x10) == 0x10)
+                if ((MCRegister & 0x8) == 0x8)
                 {
-                    DrawTiles(ref bitmapData, layer - 1, displayBorder);
+                    DrawBitmap(ref bitmapData, displayBorder);
                 }
-                if ((MCRegister & 0x20) == 0x20)
-                {
-                    DrawSprites(ref bitmapData, layer - 1, displayBorder);
-                }
-            }
 
-            if ((MCRegister & 0x1) == 0x1)
+                for (int layer = 4; layer > 0; --layer)
+                {
+                    if ((MCRegister & 0x10) == 0x10)
+                    {
+                        DrawTiles(ref bitmapData, layer - 1, displayBorder);
+                    }
+                    if ((MCRegister & 0x20) == 0x20)
+                    {
+                        DrawSprites(ref bitmapData, layer - 1, displayBorder);
+                    }
+                }
+            }
+            if ((MCRegister & 7) == 0x1 || (MCRegister & 7) == 3 || (MCRegister & 7) == 7)
             {
                 if (top == 0)
                 {
