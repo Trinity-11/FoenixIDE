@@ -938,7 +938,8 @@ namespace FoenixIDE.Processor
             int sourceBank = (signature << 8) & 0xff0000;
             int destBank = (signature << 16) & 0xff0000;
 
-            
+            cpu.DataBank.Value = signature & 0xFF;
+
             int bytesToMove = cpu.A.Value + 1;
 
             // For MVN, X and Y are incremented
@@ -987,7 +988,7 @@ namespace FoenixIDE.Processor
         }
         private int HexVal(int bcd)
         {
-            return bcd / 10 * 16 + bcd % 10;
+            return bcd / 1000 * 256 * 16 + (bcd % 1000) / 100 * 256 + ((bcd % 1000) % 100)/ 10 * 16 + ((bcd % 1000) % 100) % 10;
         }
         public void ExecuteSTZ(byte instruction, AddressModes addressMode, int signature)
         {

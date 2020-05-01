@@ -1,3 +1,9 @@
+Release 0.4.1.12
+----------------
+After running MVN or MVP, set the databank to the destination bank.
+Calling SOF at the end of the Graphics Paint function.  This appears to make things smoother.
+Some minor optimization for text drawing.
+
 Release 0.4.1.11
 ----------------
 Fixed MCR bug: the graphics mode overrides the text mode.  Text is only drawn when MCR & 7 == 1, 3 or 7.
