@@ -1,3 +1,8 @@
+Release 0.4.1.13
+----------------
+Fixed the tile editor issue: it required the bitmap bit set in MCR.
+Fixed BCD addition for 16 bit integers.
+
 Release 0.4.1.12
 ----------------
 After running MVN or MVP, set the databank to the destination bank.

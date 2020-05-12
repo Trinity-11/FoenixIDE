@@ -108,9 +108,11 @@ namespace FoenixIDE.Display
         void Gpu_Paint(object sender, PaintEventArgs e)
         {
             paintCycle++;
-            // Read the Master Control Register
-            byte MCRegister = VICKY.ReadByte(0); // Reading address $AF:0000
-
+            if (DesignMode)
+            {
+                e.Graphics.DrawString("Design Mode", this.Font, TextBrush, 0, 0);
+                return;
+            }
             if (VICKY == null)
             {
                 e.Graphics.DrawString("IO Memory Not Initialized", this.Font, TextBrush, 0, 0);
@@ -121,11 +123,13 @@ namespace FoenixIDE.Display
                 e.Graphics.DrawString("VRAM Not Initialized", this.Font, TextBrush, 0, 0);
                 return;
             }
-            if (RAM == null || DesignMode)
+            if (RAM == null)
             {
                 e.Graphics.DrawString("RAM Not Initialized", this.Font, TextBrush, 0, 0);
                 return;
             }
+            // Read the Master Control Register
+            byte MCRegister = VICKY.ReadByte(0); // Reading address $AF:0000
             int top = 0; // top gets modified if error messages are displayed
             Graphics g = Graphics.FromImage(frameBuffer);
             
@@ -226,7 +230,7 @@ namespace FoenixIDE.Display
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
             // Bitmap Mode
-            if ((MCRegister & 0x4) == 0x4)
+            if ((MCRegister & 0x4) == 0x4 || tileEditorMode)
             {
                 if ((MCRegister & 0x8) == 0x8)
                 {
@@ -519,7 +523,7 @@ namespace FoenixIDE.Display
             bool striding = (reg & 0x80) == 0x80;
 
             int tilesetAddress = VICKY.ReadLong(addrTileset + 1 - MemoryMap.VICKY_BASE_ADDR);
-            int strideX = ((reg & 0x80) == 0 ) ? VICKY.ReadWord(addrTileset + 4 - MemoryMap.VICKY_BASE_ADDR) : 256;
+            int strideX = striding ? 256 : VICKY.ReadWord(addrTileset + 4 - MemoryMap.VICKY_BASE_ADDR);
             int strideY = VICKY.ReadWord(addrTileset + 6 - MemoryMap.VICKY_BASE_ADDR);
 
             // Now read the tilemap
@@ -544,10 +548,11 @@ namespace FoenixIDE.Display
                     // Tiles are 16 x 16
                     for (int line = 0; line < 16; line++)
                     {
+                        int offset = tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + line * strideX;
                         for (int col = 0; col < 16; col++)
                         {
                             // Lookup the pixel in the tileset
-                            pixelIndex = VRAM.ReadByte(tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + col + line * strideX);
+                            pixelIndex = VRAM.ReadByte(offset + col );
                             if (pixelIndex != 0)
                             {
                                 value = (int)graphicsLUT[lutIndex * 256 + pixelIndex];

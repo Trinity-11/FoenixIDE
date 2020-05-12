@@ -983,12 +983,13 @@ namespace FoenixIDE.Processor
             }
             else
             {
-                return (((value & 0xF000) >> 12) * 1000) + (((value & 0xF00) >> 8 ) * 100) + (((value & 0xF0) >> 4 ) * 10 )  + ( value & 0xF );
+                int val = (((value & 0xF000) >> 12) * 1000) + (((value & 0xF00) >> 8 ) * 100) + (((value & 0xF0) >> 4 ) * 10 )  + ( value & 0xF );
+                return val;
             }
         }
         private int HexVal(int bcd)
         {
-            return bcd / 1000 * 256 * 16 + (bcd % 1000) / 100 * 256 + ((bcd % 1000) % 100)/ 10 * 16 + ((bcd % 1000) % 100) % 10;
+            return bcd / 10000 * 256*256 + (bcd % 10000) / 1000 * 256 * 16 + ((bcd % 10000) % 1000) / 100 * 256 + (((bcd % 10000) % 1000) % 100)/ 10 * 16 + (((bcd % 10000) % 1000) % 100) % 10;
         }
         public void ExecuteSTZ(byte instruction, AddressModes addressMode, int signature)
         {
@@ -1017,8 +1018,6 @@ namespace FoenixIDE.Processor
         public void ExecuteLDA(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
-            if (addressMode == AddressModes.AbsoluteIndexedWithX && (val & 0xff) == 0)
-                global::System.Diagnostics.Debug.WriteLine("LDA break " + instruction + "," + signature);
             cpu.A.Value = val;
             cpu.Flags.SetNZ(cpu.A);
         }
