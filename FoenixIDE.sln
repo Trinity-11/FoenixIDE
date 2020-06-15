@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDE", "Main\FoenixIDE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDETester", "FoenixIDETester\FoenixIDETester.csproj", "{8A424125-D4DB-4EC4-A207-AC0A66F6424B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vgm-reader", "vgm-reader\vgm-reader.csproj", "{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,10 @@ Global
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

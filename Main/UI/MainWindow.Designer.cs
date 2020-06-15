@@ -88,10 +88,10 @@ namespace FoenixIDE.UI
             this.cpsPerf,
             this.fpsPerf,
             this.SDCardPath});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 582);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 543);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.ShowItemToolTips = true;
-            this.statusStrip1.Size = new System.Drawing.Size(686, 28);
+            this.statusStrip1.Size = new System.Drawing.Size(670, 28);
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -175,7 +175,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(277, 23);
+            this.SDCardPath.Size = new System.Drawing.Size(230, 23);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -193,7 +193,7 @@ namespace FoenixIDE.UI
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(686, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(670, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -410,27 +410,27 @@ namespace FoenixIDE.UI
             this.panel1.Location = new System.Drawing.Point(0, 40);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(16, 542);
+            this.panel1.Size = new System.Drawing.Size(16, 503);
             this.panel1.TabIndex = 3;
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.LightBlue;
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(670, 40);
+            this.panel2.Location = new System.Drawing.Point(654, 40);
             this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(16, 542);
+            this.panel2.Size = new System.Drawing.Size(16, 503);
             this.panel2.TabIndex = 4;
             // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.LightBlue;
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(16, 566);
+            this.panel3.Location = new System.Drawing.Point(16, 527);
             this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(654, 16);
+            this.panel3.Size = new System.Drawing.Size(638, 16);
             this.panel3.TabIndex = 5;
             // 
             // panel4
@@ -440,7 +440,7 @@ namespace FoenixIDE.UI
             this.panel4.Location = new System.Drawing.Point(0, 24);
             this.panel4.Margin = new System.Windows.Forms.Padding(4);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(686, 16);
+            this.panel4.Size = new System.Drawing.Size(670, 16);
             this.panel4.TabIndex = 6;
             // 
             // gpu
@@ -453,7 +453,7 @@ namespace FoenixIDE.UI
             this.gpu.Margin = new System.Windows.Forms.Padding(4);
             this.gpu.MinimumSize = new System.Drawing.Size(640, 480);
             this.gpu.Name = "gpu";
-            this.gpu.Size = new System.Drawing.Size(654, 526);
+            this.gpu.Size = new System.Drawing.Size(640, 487);
             this.gpu.TabIndex = 0;
             this.gpu.TabStop = false;
             this.gpu.TileEditorMode = false;
@@ -467,7 +467,7 @@ namespace FoenixIDE.UI
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(686, 610);
+            this.ClientSize = new System.Drawing.Size(670, 571);
             this.Controls.Add(this.gpu);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);

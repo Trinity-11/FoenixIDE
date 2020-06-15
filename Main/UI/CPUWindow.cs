@@ -123,7 +123,7 @@ namespace FoenixIDE.UI
             bool paint = false;
             int currentPC = kernel.CPU.PC;
             //if ((kernel.CPU.DebugPause))
-            if (true && codeList != null)
+            if (kernel.CPU.DebugPause && codeList != null)
             {
                 int queueLength = codeList.Count;
                 int painted = 0;

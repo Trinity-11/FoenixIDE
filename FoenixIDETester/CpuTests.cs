@@ -128,6 +128,7 @@ namespace FoenixIDETester
             Assert.AreEqual(0, mgr.RAM.ReadByte(z_C));
         }
 
+        // CLC
         // XCE
         // LDA #$234
         // TCS
@@ -140,6 +141,7 @@ namespace FoenixIDETester
         [TestMethod]
         public void RunStackIndirectWithIndex()
         {
+            ClearCarry();
             mgr.RAM.WriteByte(cpu.PC, OpcodeList.XCE_Implied);
             cpu.ExecuteNext();
             Assert.IsFalse(cpu.Flags.Emulation);

@@ -11,10 +11,26 @@ namespace FoenixIDE.MemoryLocations
         #region Vicky Memory Map
 
         public const int VICKY_BASE_ADDR = 0xAF_0000;
-        public const int VKY_TXT_CURSOR_CHAR_REG = 0xAF_0012;
-        public const int VKY_TXT_CURSOR_CTRL_REG = 0xAF_0010;
+        public const int BORDER_CTRL_REG = 0xAF_0004; // border is enabled if bit 0 is 1.
 
-        
+        public const int BORDER_X_SIZE = 0xAF_0008; // X-  Values: 0 - 32 (Default: 32)
+        public const int BORDER_Y_SIZE = 0xAF_0009; // Y- Values 0 -32 (Default: 32)
+
+
+        public const int BACKGROUND_COLOR_B = 0xAF_000D; // When in Graphic Mode, if a pixel is "0" then the Background pixel is chosen
+        public const int BACKGROUND_COLOR_G = 0xAF_000E;
+        public const int BACKGROUND_COLOR_R = 0xAF_000F;
+
+        public const int VKY_TXT_CURSOR_CTRL_REG = 0xAF_0010;
+        public const int VKY_TXT_CURSOR_CHAR_REG = 0xAF_0012;
+
+        // Line Interrupt Registers
+        public const int VKY_LINE_IRQ_CTRL_REG = 0xAF001B; // [0] - Enable Line 0, [1] -Enable Line 1
+        public const int VKY_LINE0_CMP_VALUE_LO = 0xAF001C; // Write Only[7:0]
+        public const int VKY_LINE0_CMP_VALUE_HI = 0xAF001D; // Write Only[3:0]
+        public const int VKY_LINE1_CMP_VALUE_LO = 0xAF001E; // Write Only[7:0]
+        public const int VKY_LINE1_CMP_VALUE_HI = 0xAF001F; // Write Only[3:0]
+
         public const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0100;
         public const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0140;
         public const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;

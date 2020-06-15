@@ -124,6 +124,7 @@ namespace FoenixIDE.UI
             ShowDebugWindow();
             ShowMemoryWindow();
             gpu.StartOfFrame += SOF;
+            gpu.StartOfLine += SOL;
             performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
             joystickWindow.beatrix = kernel.MemMgr.BEATRIX;
 
@@ -165,6 +166,7 @@ namespace FoenixIDE.UI
         private void LoadHexFile(string Filename, bool ResetMemory)
         {
             debugWindow.Pause();
+            kernel.SetVersion(version);
             if (kernel.ResetCPU(ResetMemory, Filename))
             {
                 if (kernel.lstFile != null)
@@ -282,12 +284,27 @@ namespace FoenixIDE.UI
 
         public void SOF()
         {
+            // Check if the interrupt is enabled
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
             if (!kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
             {
                 // Set the SOF Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 IRQ0 |= (byte)Register0.FNX0_INT00_SOF;
+                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                kernel.CPU.Pins.IRQ = true;
+            }
+        }
+
+        public void SOL()
+        {
+            // Check if the interrupt is enabled
+            byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
+            {
+                // Set the SOL Interrupt
+                byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= (byte)Register0.FNX0_INT01_SOL;
                 kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
                 kernel.CPU.Pins.IRQ = true;
             }
@@ -348,6 +365,7 @@ namespace FoenixIDE.UI
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             gpu.StartOfFrame = null;
+            gpu.StartOfLine = null;
             if (debugWindow != null)
             {
                 debugWindow.Close();
@@ -461,6 +479,7 @@ namespace FoenixIDE.UI
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             gpu.StartOfFrame = null;
+            gpu.StartOfLine = null;
             ModeText.Text = "Shutting down CPU thread";
             if (kernel.CPU != null)
             {
@@ -731,13 +750,16 @@ namespace FoenixIDE.UI
             {
                 toolStripRevision.Text = "Rev C";
             }
+            // force repaint
+            statusStrip1.Invalidate();
         }
         private void ToolStripRevision_Click(object sender, EventArgs e)
         {
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
-            } else
+            }
+            else
             {
                 version = BoardVersion.RevB;
             }

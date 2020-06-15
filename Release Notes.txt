@@ -1,3 +1,7 @@
+Release 0.4.2.0
+---------------
+Added SOL support.
+
 Release 0.4.1.13
 ----------------
 Fixed the tile editor issue: it required the bitmap bit set in MCR.
