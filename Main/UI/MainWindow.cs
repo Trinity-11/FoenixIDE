@@ -46,6 +46,7 @@ namespace FoenixIDE.UI
         private bool autoRun = false;
         private BoardVersion version = BoardVersion.RevC;
         public static MainWindow Instance = null;
+        private delegate void WriteCPSFPSFunction(string CPS, string FPS);
 
         public MainWindow(string[] programArgs)
         {
@@ -125,7 +126,8 @@ namespace FoenixIDE.UI
             ShowMemoryWindow();
             gpu.StartOfFrame += SOF;
             gpu.StartOfLine += SOL;
-            performanceTimer.Tick += new System.EventHandler(PerformanceTimer_Tick);
+            gpu.GpuUpdated += Gpu_Update_Cps_Fps;
+
             joystickWindow.beatrix = kernel.MemMgr.BEATRIX;
 
             if (disabledIRQs)
@@ -282,11 +284,16 @@ namespace FoenixIDE.UI
             loader.ShowDialog(this);
         }
 
+        DateTime pSof;
         public void SOF()
         {
             // Check if the interrupt is enabled
+            DateTime currentDT = DateTime.Now;
+            TimeSpan ts = currentDT - pSof;
+            //System.Console.WriteLine(ts.TotalMilliseconds);
+            pSof = currentDT;
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (!kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
+            if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
             {
                 // Set the SOF Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
@@ -300,7 +307,7 @@ namespace FoenixIDE.UI
         {
             // Check if the interrupt is enabled
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (!kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
+            if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
             {
                 // Set the SOL Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
@@ -314,7 +321,7 @@ namespace FoenixIDE.UI
         {
             // Check if the Keyboard interrupt is allowed
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
-            if ((~mask & (byte)Register1.FNX1_INT07_SDCARD) == (byte)Register1.FNX1_INT07_SDCARD)
+            if (!kernel.CPU.DebugPause && (~mask & (byte)Register1.FNX1_INT07_SDCARD) == (byte)Register1.FNX1_INT07_SDCARD)
             {
                 // Set the SD Card Interrupt
                 byte IRQ1 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
@@ -333,7 +340,7 @@ namespace FoenixIDE.UI
             {
                 e.Handled = true;
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                if (kernel.MemMgr != null)
+                if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
                     kernel.MemMgr.KEYBOARD.WriteKey(kernel, scanCode);
                 }
@@ -351,7 +358,7 @@ namespace FoenixIDE.UI
             {
                 scanCode += 0x80;
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                if (kernel.MemMgr != null)
+                if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
                     kernel.MemMgr.KEYBOARD.WriteKey(kernel, scanCode);
                 }
@@ -377,10 +384,23 @@ namespace FoenixIDE.UI
             this.Close();
         }
 
+        private void Write_CPS_FPS_Safe(string CPS, string FPS)
+        {
+            if (statusStrip1.InvokeRequired)
+            {
+                var d = new WriteCPSFPSFunction(Write_CPS_FPS_Safe);
+                statusStrip1.Invoke(d, new object[] { CPS, FPS});
+            }
+            else
+            {
+                cpsPerf.Text = CPS;
+                fpsPerf.Text = FPS;
+            }
+        }
         int previousCounter = 0;
         int previousFrame = 0;
         DateTime previousTime = DateTime.Now;
-        private void PerformanceTimer_Tick(object sender, EventArgs e)
+        private void Gpu_Update_Cps_Fps()
         {
             if (kernel != null  && kernel.CPU != null)
             {
@@ -398,8 +418,7 @@ namespace FoenixIDE.UI
                     previousCounter = currentCounter;
                     previousTime = currentTime;
                     previousFrame = currentFrame;
-                    cpsPerf.Text = "CPS: " + cps.ToString("N0");
-                    fpsPerf.Text = "FPS: " + fps.ToString("N0");
+                    Write_CPS_FPS_Safe("CPS: " + cps.ToString("N0"), "FPS: " + fps.ToString("N0"));
                 }
                 // write the time to memory - values are BCD
                 kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Second));

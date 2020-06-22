@@ -815,6 +815,11 @@ namespace FoenixIDE.UI
                 return true;
             }
 
+            if ((reg0 & 2) == 2 && SOLCheckbox.Checked)
+            {
+                return true;
+            }
+
             // Read Interrupt Register 1
             byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
             if ((reg1 & 0x80 ) == 0x80 && SDCardCheckBox.Checked)
@@ -822,12 +827,14 @@ namespace FoenixIDE.UI
                 return true;
             }
 
-            //Read Interrupt Register 2
-            byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
             if ((reg1 & 1) == 1 && KeyboardCheckBox.Checked)
             {
                 return true;
             }
+            //Read Interrupt Register 2
+            byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
+            //Read Interrupt Register 3
+            byte reg3 = kernel.MemMgr.INTERRUPT.ReadByte(3);
             return false;
         }
 

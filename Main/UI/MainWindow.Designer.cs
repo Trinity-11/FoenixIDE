@@ -66,7 +66,6 @@ namespace FoenixIDE.UI
             this.DebugMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.performanceTimer = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -175,7 +174,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(230, 23);
+            this.SDCardPath.Size = new System.Drawing.Size(261, 23);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -398,11 +397,6 @@ namespace FoenixIDE.UI
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
-            // performanceTimer
-            // 
-            this.performanceTimer.Enabled = true;
-            this.performanceTimer.Interval = 1000;
-            // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.LightBlue;
@@ -446,6 +440,8 @@ namespace FoenixIDE.UI
             // gpu
             // 
             this.gpu.BackColor = System.Drawing.Color.Blue;
+            this.gpu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.gpu.CausesValidation = false;
             this.gpu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gpu.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gpu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
@@ -513,7 +509,6 @@ namespace FoenixIDE.UI
         private global::System.Windows.Forms.ToolStripMenuItem cPUToolStripMenuItem;
         private global::System.Windows.Forms.ToolStripMenuItem memoryToolStripMenuItem;
         private global::System.Windows.Forms.ToolStripStatusLabel cpsPerf;
-        private global::System.Windows.Forms.Timer performanceTimer;
         private global::System.Windows.Forms.Panel panel1;
         private global::System.Windows.Forms.Panel panel2;
         private global::System.Windows.Forms.Panel panel3;

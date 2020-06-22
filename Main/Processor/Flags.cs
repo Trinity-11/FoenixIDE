@@ -149,32 +149,22 @@ namespace FoenixIDE.Processor
             Zero = X.Value == 0;
         }
 
-        public void SetN(Register Reg)
-        {
-            if (Reg.Width == 2)
-                Negative = ((int)Reg.Value & 0x8000) == 0x8000;
-            else
-                Negative = (Reg.Value & 0x80) == 0x80;
-        }
-
-        public void SetN(int Value, int Width)
-        {
-            if (Width == 1 && (Value & 0x80) != 0)
-                Negative = true;
-            else if (Width == 2 && (Value & 0x8000) != 0)
-                Negative = true;
-        }
-
-        public void SetNZ(Register Reg)
+        public void SetNZ_Dep(Register Reg)
         {
             Zero = Reg.Value == 0;
-            SetN(Reg);
+            if (Reg.Width == 2)
+                Negative = ((int)Reg.Value & 0x8000) != 0;
+            else
+                Negative = (Reg.Value & 0x80) != 0;
         }
 
         public void SetNZ(int Value, int Width)
         {
             Zero = (Width == 1 ? Value & 0xFF : Value & 0xFFFF) == 0;
-            SetN(Value, Width);
+            if (Width == 1 && (Value & 0x80) != 0)
+                Negative = true;
+            else if (Width == 2 && (Value & 0x8000) != 0)
+                Negative = true;
         }
 
         public override void Reset()

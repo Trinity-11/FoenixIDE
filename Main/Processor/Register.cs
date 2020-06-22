@@ -32,14 +32,12 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (byteLength == 1)
-                    return (int)(this._value & 0xff);
-                return this._value;
+                return byteLength == 1 ? (int)(this._value & 0xff) : this._value;
             }
 
             set
             {
-                if (Width == 1)
+                if (byteLength == 1)
                 {
                     if (DiscardUpper)
                         this._value = (int)(value & 0xff);
@@ -51,6 +49,15 @@ namespace FoenixIDE.Processor
             }
         }
 
+        public void Dec()
+        {
+            _value -= 1;
+        }
+
+        public void Inc()
+        {
+            _value += 1;
+        }
         public virtual int Low
         {
             get { return (int)(this._value & 0xff); }
@@ -100,9 +107,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (Width == 1)
-                    return 0xff;
-                return 0xffff;
+                return byteLength == 1 ? 0xff : 0xffff;
             }
         }
 
@@ -110,9 +115,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (Width == 1)
-                    return -128;
-                return -32768;
+                return byteLength == 1 ? -128 : -32768;
             }
         }
 
@@ -120,9 +123,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                if (Width == 1)
-                    return 127;
-                return 32767;
+                return byteLength == 1 ? 127 : 32767;
             }
         }
 
@@ -138,7 +139,7 @@ namespace FoenixIDE.Processor
 
         public override string ToString()
         {
-            switch (Width)
+            switch (byteLength)
             {
                 case 2:
                     return "$" + Value.ToString("X4");

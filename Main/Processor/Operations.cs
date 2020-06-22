@@ -59,13 +59,13 @@ namespace FoenixIDE.Processor
                 val = val & 0xff;
 
             cpu.A.Value = cpu.A.Value | val;
-            cpu.Flags.SetNZ(cpu.A);
+            cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
         public void OpLoad(Register Dest, int value)
         {
             Dest.Value = value;
-            cpu.Flags.SetNZ(Dest);
+            cpu.Flags.SetNZ(Dest.Value, Dest.Width);
         }
 
         /// <summary>
@@ -320,7 +320,7 @@ namespace FoenixIDE.Processor
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
             cpu.A.Value = cpu.A.Value | val;
-            cpu.Flags.SetNZ(cpu.A);
+            cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
         /// <summary>
@@ -443,35 +443,35 @@ namespace FoenixIDE.Processor
                     break;
                 case OpcodeList.PLA_StackImplied:
                     cpu.PullInto(cpu.A);
-                    cpu.Flags.SetNZ(cpu.A);
+                    cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
                     break;
                 case OpcodeList.PHX_StackImplied:
                     cpu.Push(cpu.X);
                     break;
                 case OpcodeList.PLX_StackImplied:
                     cpu.PullInto(cpu.X);
-                    cpu.Flags.SetNZ(cpu.X);
+                    cpu.Flags.SetNZ(cpu.X.Value, cpu.X.Width);
                     break;
                 case OpcodeList.PHY_StackImplied:
                     cpu.Push(cpu.Y);
                     break;
                 case OpcodeList.PLY_StackImplied:
                     cpu.PullInto(cpu.Y);
-                    cpu.Flags.SetNZ(cpu.Y);
+                    cpu.Flags.SetNZ(cpu.Y.Value, cpu.Y.Width);
                     break;
                 case OpcodeList.PHB_StackImplied:
                     cpu.Push(cpu.DataBank);
                     break;
                 case OpcodeList.PLB_StackImplied:
                     cpu.PullInto(cpu.DataBank);
-                    cpu.Flags.SetNZ(cpu.DataBank);
+                    cpu.Flags.SetNZ(cpu.DataBank.Value, cpu.DataBank.Width);
                     break;
                 case OpcodeList.PHD_StackImplied:
                     cpu.Push(cpu.DirectPage);
                     break;
                 case OpcodeList.PLD_StackImplied:
                     cpu.PullInto(cpu.DirectPage);
-                    cpu.Flags.SetNZ(cpu.DirectPage);
+                    cpu.Flags.SetNZ(cpu.DirectPage.Value, cpu.DirectPage.Width);
                     break;
                 case OpcodeList.PHK_StackImplied:
                     cpu.Push(cpu.PC >> 16, 1);
@@ -600,8 +600,9 @@ namespace FoenixIDE.Processor
             switch (instruction)
             {
                 case OpcodeList.DEC_Accumulator:
-                    cpu.A.Value -= 1;
-                    cpu.Flags.SetNZ(cpu.A);
+                    cpu.A.Dec();
+                    //cpu.A.Value -= 1;
+                    cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
                     break;
                 case OpcodeList.DEC_DirectPage:
                 case OpcodeList.DEC_Absolute:
@@ -622,8 +623,9 @@ namespace FoenixIDE.Processor
                     break;
 
                 case OpcodeList.INC_Accumulator:
-                    cpu.A.Value += 1;
-                    cpu.Flags.SetNZ(cpu.A);
+                    //cpu.A.Value += 1;
+                    cpu.A.Inc();
+                    cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
                     break;
                 case OpcodeList.INC_DirectPage:
                 case OpcodeList.INC_Absolute:
@@ -645,20 +647,24 @@ namespace FoenixIDE.Processor
                     break;
 
                 case OpcodeList.DEX_Implied:
-                    cpu.X.Value -= 1;
-                    cpu.Flags.SetNZ(cpu.X);
+                    //cpu.X.Value -= 1;
+                    cpu.X.Dec();
+                    cpu.Flags.SetNZ(cpu.X.Value, cpu.X.Width);
                     break;
                 case OpcodeList.INX_Implied:
-                    cpu.X.Value += 1;
-                    cpu.Flags.SetNZ(cpu.X);
+                    //cpu.X.Value += 1;
+                    cpu.X.Inc();
+                    cpu.Flags.SetNZ(cpu.X.Value, cpu.X.Width);
                     break;
                 case OpcodeList.DEY_Implied:
-                    cpu.Y.Value -= 1;
-                    cpu.Flags.SetNZ(cpu.Y);
+                    //cpu.Y.Value -= 1;
+                    cpu.Y.Dec();
+                    cpu.Flags.SetNZ(cpu.Y.Value, cpu.Y.Width);
                     break;
                 case OpcodeList.INY_Implied:
-                    cpu.Y.Value += 1;
-                    cpu.Flags.SetNZ(cpu.Y);
+                    //cpu.Y.Value += 1;
+                    cpu.Y.Inc();
+                    cpu.Flags.SetNZ(cpu.Y.Value, cpu.Y.Width);
                     break;
                 default:
                     break;
@@ -865,7 +871,7 @@ namespace FoenixIDE.Processor
         {
             int data = GetValue(addressMode, signature, cpu.A.Width);
             cpu.A.Value = cpu.A.Value & data;
-            cpu.Flags.SetNZ(cpu.A);
+            cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
         public void ExecuteBIT(byte instruction, AddressModes addressMode, int signature)
@@ -888,7 +894,7 @@ namespace FoenixIDE.Processor
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
             cpu.A.Value = cpu.A.Value ^ val;
-            cpu.Flags.SetNZ(cpu.A);
+            cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
         public void ExecuteMisc(byte instruction, AddressModes addressMode, int signature)
@@ -1019,21 +1025,21 @@ namespace FoenixIDE.Processor
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
             cpu.A.Value = val;
-            cpu.Flags.SetNZ(cpu.A);
+            cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
         public void ExecuteLDX(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.X.Width);
             cpu.X.Value = val;
-            cpu.Flags.SetNZ(cpu.X);
+            cpu.Flags.SetNZ(cpu.X.Value, cpu.X.Width);
         }
 
         public void ExecuteLDY(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.Y.Width);
             cpu.Y.Value = val;
-            cpu.Flags.SetNZ(cpu.Y);
+            cpu.Flags.SetNZ(cpu.Y.Value, cpu.Y.Width);
         }
 
         public void ExecuteCPX(byte instruction, AddressModes addressMode, int signature)
