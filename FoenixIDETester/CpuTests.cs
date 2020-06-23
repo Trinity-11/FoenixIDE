@@ -130,6 +130,7 @@ namespace FoenixIDETester
 
         // CLC
         // XCE
+        // REP #$30
         // LDA #$234
         // TCS
         // LDA #$123
@@ -146,6 +147,12 @@ namespace FoenixIDETester
             cpu.ExecuteNext();
             Assert.IsFalse(cpu.Flags.Emulation);
             Assert.IsTrue(cpu.Flags.Carry);
+
+            // REP #$30
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.REP_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x30);
+            cpu.ExecuteNext();
+            
             Assert.AreEqual(2, cpu.A.Width);
             Assert.AreEqual(2, cpu.X.Width);
 

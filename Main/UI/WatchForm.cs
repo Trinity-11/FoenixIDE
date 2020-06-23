@@ -15,7 +15,6 @@ namespace FoenixIDE.UI
     public partial class WatchForm : Form
     {
         private FoenixSystem kernel_ref;
-        private Image DeleteImage;
         public static WatchForm Instance;
 
         public WatchForm()
