@@ -125,7 +125,7 @@ namespace FoenixIDE.Display
         /// <param name="e"></param>
         Bitmap frameBuffer = new Bitmap(640, 480, PixelFormat.Format32bppArgb);
         private volatile bool drawing = false;
-        void Gpu_Paint(object sender, PaintEventArgs e)
+        unsafe void Gpu_Paint(object sender, PaintEventArgs e)
         {
             paintCycle++;
             if (DesignMode)
@@ -192,7 +192,7 @@ namespace FoenixIDE.Display
             e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
             e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
             e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None; //HighSpeed;
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 
             // Determine if we display a border
             byte border_register = VICKY.ReadByte(MemoryMap.BORDER_CTRL_REG - MemoryMap.VICKY_BASE_ADDR);
@@ -203,6 +203,7 @@ namespace FoenixIDE.Display
 
             Rectangle rect = new Rectangle(0, 0, 640, 480);
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            int* bitmapPointer = (int*)bitmapData.Scan0.ToPointer();
 
             // Load the SOL register - a lines
             byte SOLRegister = VICKY.ReadByte(MemoryMap.VKY_LINE_IRQ_CTRL_REG - MemoryMap.VICKY_BASE_ADDR);
@@ -243,13 +244,14 @@ namespace FoenixIDE.Display
                 {
                     borderColor = Color.LightGray.ToArgb();
                 }
-                int offset = line * 640;
-                IntPtr bitmapPointer = bitmapData.Scan0;
+                //int offset = line * 640;
+                int* ptr = bitmapPointer + line * 640;
                 if (line < borderYSize || line > 480 - borderYSize)
                 {
                     for (int x = 0; x < 640; x++)
                     {
-                        System.Runtime.InteropServices.Marshal.WriteInt32(bitmapPointer, (offset + x) * 4, borderColor);
+                        //System.Runtime.InteropServices.Marshal.WriteInt32(bitmapPointer, (offset + x) * 4, borderColor);
+                        ptr[x] = borderColor;
                     }
                 }
                 else
@@ -273,7 +275,8 @@ namespace FoenixIDE.Display
                     for (int x = 0; x < 640; x++)
                     {
                         int resetValue = x < borderXSize || x > 640 - borderXSize ? borderColor : backgroundColor;
-                        System.Runtime.InteropServices.Marshal.WriteInt32(bitmapPointer, (offset + x) * 4, resetValue);
+                        //System.Runtime.InteropServices.Marshal.WriteInt32(bitmapPointer, (offset + x) * 4, resetValue);
+                        ptr[x] = resetValue;
                     }
 
                     // Bitmap Mode
@@ -281,7 +284,6 @@ namespace FoenixIDE.Display
                     {
                         if ((MCRegister & 0x8) == 0x8)
                         {
-                            // DrawBitmap(ref bitmapData, ref graphicsLUT, ref gammaCorrection, displayBorder, backgroundColor, borderXSize, borderYSize, line);
                             DrawBitmap(bitmapPointer, gammaCorrection, displayBorder, backgroundColor, borderXSize, borderYSize, line);
                         }
 
@@ -289,12 +291,10 @@ namespace FoenixIDE.Display
                         {
                             if ((MCRegister & 0x10) == 0x10)
                             {
-                                //DrawTiles(ref bitmapData, ref graphicsLUT, ref gammaCorrection, layer - 1, displayBorder, borderXSize, borderYSize, line);
                                 DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, layer - 1, displayBorder, borderXSize, borderYSize, line);
                             }
                             if ((MCRegister & 0x20) == 0x20)
                             {
-                                //DrawSprites(ref bitmapData, ref graphicsLUT, ref gammaCorrection, layer - 1, displayBorder, borderXSize, borderYSize, line);
                                 DrawSprites(bitmapPointer, gammaCorrection, layer - 1, displayBorder, borderXSize, borderYSize, line);
                             }
                         }
@@ -303,14 +303,12 @@ namespace FoenixIDE.Display
                     {
                         if (top == 0)
                         {
-                            //DrawBitmapText(ref bitmapData, ref gammaCorrection, borderXSize, borderYSize, line);
                             DrawBitmapText(bitmapPointer, gammaCorrection, ColumnsVisible, LinesVisible, borderXSize, borderYSize, line);
                         }
                     }
                 }
                 if (!TileEditorMode)
                 {
-                    //DrawMouse(ref bitmapData, ref graphicsLUT, ref gammaCorrection, line);
                     DrawMouse(bitmapPointer, gammaCorrection, line);
                 }
                 
@@ -344,7 +342,7 @@ namespace FoenixIDE.Display
                 byte green = VKY.ReadByte(lutAddress++);
                 byte red = VKY.ReadByte(lutAddress++);
                 lutAddress++; // skip the alpha channel
-                result[c] = (0xFF << 24) + (red << 16) + (green << 8) + blue;
+                result[c] = (int)(0xFF000000 + (red << 16) + (green << 8) + blue);
             }
             return result;
         }
@@ -352,14 +350,15 @@ namespace FoenixIDE.Display
         // We only cache items that are requested, instead of precomputing all 1024 colors.
         private int getLUTValue(byte lutIndex, byte color)
         {
-            if (lutCache[lutIndex * 256 + color] == 0)
+            int offset = lutIndex * 256 + color;
+            if (lutCache[offset] == 0)
             {
-                lutCache[lutIndex * 256 + color] = (int)(0xFF000000 + VICKY.ReadLong(MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + (lutIndex * 256 + color) * 4));
+                lutCache[offset] = (int)(0xFF000000 + VICKY.ReadLong(MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + offset * 4));
             }
-            return lutCache[lutIndex * 256 + color];
+            return lutCache[offset];
         }
 
-        private void DrawBitmapText(IntPtr p, bool gammaCorrection, byte TextColumns, byte TextRows, int colOffset, int rowOffset, int line)
+        private unsafe void DrawBitmapText(int* p, bool gammaCorrection, byte TextColumns, byte TextRows, int colOffset, int rowOffset, int line)
         {
             bool overlayBitSet = (VICKY.ReadByte(0) & 0x02) == 0x02;
 
@@ -384,11 +383,11 @@ namespace FoenixIDE.Display
 
             // Each character is defined by 8 bytes
             int fontLine = (line - rowOffset) % charHeight;
-
+            int* ptr = p + line * 640 + colOffset;
             for (int col = 0; col < TextColumns; col++)
             {
-                int x = col * charWidth + colOffset;
-                if (x > 639 - colOffset)
+                int x = col * charWidth;
+                if (x + colOffset > 639 - colOffset)
                 {
                     continue;
                 }
@@ -430,91 +429,30 @@ namespace FoenixIDE.Display
                 int bgValue = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
 
                 byte value = VICKY.ReadByte(fontBaseAddress + character * 8 + fontLine);
-                int offset = (x + line * 640) * 4;
-                // TODO: this is pretty bad - rewrite it
+                //int offset = (x + line * 640) * 4;
+
+                // For each bit in the font, set the foreground color - if the bit is 0 and overlay is set, skip it (keep the background)
                 for (int b = 0x80; b >0; b = b >> 1)
                 {
                     if ((value & b) != 0)
                     {
-                        System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
+                        //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
+                        ptr[0] = fgValue;
                     }
                     else if (!overlayBitSet)
                     {
-                        System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
+                        //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
+                        ptr[0] = bgValue;
                     }
-                    offset += 4;
+                    ptr++;
+                    //offset += 4;
                 }
-                //if ((value & 0x80) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
-                //}
-                //if ((value & 0x40) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 4, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 4, bgValue);
-                //}
-                //if ((value & 0x20) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 8, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 8, bgValue);
-                //}
-                //if ((value & 0x10) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 12, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 12, bgValue);
-                //}
-
-                //// Low nibble
-                //if ((value & 0x8) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 16, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 16, bgValue);
-                //}
-                //if ((value & 0x4) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 20, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 20, bgValue);
-                //}
-                //if ((value & 0x2) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 24, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 24, bgValue);
-                //}
-                //if ((value & 0x1) != 0)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 28, fgValue);
-                //}
-                //else if (!overlayBitSet)
-                //{
-                //    System.Runtime.InteropServices.Marshal.WriteInt32(p, offset + 28, bgValue);
-                //}
             }
         }
 
-        private void DrawBitmap(IntPtr p, bool gammaCorrection, bool bkgrnd, int bgndColor, int borderXSize, int borderYSize, int line)
+        private unsafe void DrawBitmap(int* p, bool gammaCorrection, bool bkgrnd, int bgndColor, int borderXSize, int borderYSize, int line)
         {
+            
             // Bitmap Controller is located at $AF:0140
             byte reg = VICKY.ReadByte(MemoryMap.BITMAP_CONTROL_REGISTER_ADDR - MemoryMap.VICKY_BASE_ADDR);
             if ((reg & 0x01) == 00)
@@ -531,29 +469,24 @@ namespace FoenixIDE.Display
             byte pixVal = 0;
             int offsetAddress = bitmapAddress + line * 640;
             int pixelOffset = line * width;
+            int* ptr = p + pixelOffset;
             for (int col = borderXSize; col < (width - borderXSize); col++)
             {
                 pixVal = VRAM.ReadByte(offsetAddress + col);
-                if (pixVal == 0)
-                {
-                    colorVal = bgndColor;
-                }
-                else
-                {
-                    colorVal = getLUTValue(lutIndex, pixVal); // graphicsLUT[lutIndex * 256 + value];
-                }
+                colorVal = pixVal == 0 ? bgndColor : getLUTValue(lutIndex, pixVal);
                 if (gammaCorrection)
                 {
                     colorVal = (int)((VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + (colorVal & 0x00FF0000) >> 0x10) << 0x10) +
-                                  (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x100 + ((colorVal & 0x0000FF00) >> 0x08)) << 0x08) +
-                                  (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x200 + (colorVal & 0x000000FF))) + 0xFF000000);
+                                    (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x100 + ((colorVal & 0x0000FF00) >> 0x08)) << 0x08) +
+                                    (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x200 + (colorVal & 0x000000FF))) + 0xFF000000);
                 }
 
-                System.Runtime.InteropServices.Marshal.WriteInt32(p, (pixelOffset + col) * 4, colorVal);
+                //System.Runtime.InteropServices.Marshal.WriteInt32(p, (pixelOffset + col) * 4, colorVal);
+                ptr[col] = colorVal;
             }
         }
 
-        private void DrawTiles(IntPtr p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line)
+        private unsafe void DrawTiles(int* p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line)
         {
             // There are four possible tilesets to choose from
             int addrTileset = MemoryMap.TILE_CONTROL_REGISTER_ADDR + layer * 8 - MemoryMap.VICKY_BASE_ADDR;
@@ -592,6 +525,7 @@ namespace FoenixIDE.Display
 
                 int offsetAddress = tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + tline * strideX;
                 int pixelOffset = tline * 640 + tileCol * 16 + tileRow * 16 * 640;
+                int* ptr = p + pixelOffset;
                 for (int col = 0; col < 16; col++)
                 {
                     // Lookup the pixel in the tileset - if the value is 0, then it's transparent
@@ -606,14 +540,15 @@ namespace FoenixIDE.Display
                                             (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x100 + ((value & 0x0000FF00) >> 0x08)) << 0x08) +
                                             (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x200 + (value & 0x000000FF))) + 0xFF000000);
                         }
-                                
-                        System.Runtime.InteropServices.Marshal.WriteInt32(p, (pixelOffset + col) * 4, value);
+
+                        //System.Runtime.InteropServices.Marshal.WriteInt32(p, (pixelOffset + col) * 4, value);
+                        ptr[col] = value;
                     }
                 }
             }
         }
 
-        private void DrawSprites(IntPtr p, bool gammaCorrection, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line)
+        private unsafe void DrawSprites(int* p, bool gammaCorrection, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line)
         {
             // There are 32 possible sprites to choose from.
             for (int s = 0; s < 32; s++)
@@ -666,7 +601,7 @@ namespace FoenixIDE.Display
                     // Sprites are 32 x 32
                     int sline = line - posY;
                     int lineOffset = line * 640;
-                        
+                    int* ptr = p + lineOffset;
                     for (int col = xOffset; col < xOffset + spriteWidth; col++)
                     {
                         // Lookup the pixel in the tileset - if the value is 0, it's transparent
@@ -681,16 +616,17 @@ namespace FoenixIDE.Display
                                                 (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x200 + (value & 0x000000FF))) + 0xFF000000);
                             }
 
-                            System.Runtime.InteropServices.Marshal.WriteInt32(p, (lineOffset + (col-xOffset + posX)) * 4, value);
+                            //System.Runtime.InteropServices.Marshal.WriteInt32(p, (lineOffset + (col-xOffset + posX)) * 4, value);
+                            ptr[col - xOffset + posX] = value;
                         }
                     }
                 }
             }
         }
 
-        private void DrawMouse(IntPtr p, bool gammaCorrection, int line)
+        private unsafe void DrawMouse(int* p, bool gammaCorrection, int line)
         {
-            int X = VICKY.ReadWord(0x702);
+            int PosX = VICKY.ReadWord(0x702);
             int PosY = VICKY.ReadWord(0x704);
 
             byte mouseReg = VICKY.ReadByte(0x700);
@@ -704,9 +640,10 @@ namespace FoenixIDE.Display
                     pointerAddress += 0x100;
                 }
                 // Mouse pointer is a 16x16 icon
-                int colsToDraw = X < 640 - 16 ? 16 : 640 - X;
+                int colsToDraw = PosX < 640 - 16 ? 16 : 640 - PosX;
 
                 int mline = line - PosY;
+                int* ptr = p + line * 640;
                 for (int col = 0; col < colsToDraw; col++)
                 {
                     // Values are 0: transparent, 1:black, 255: white (gray scales)
@@ -722,7 +659,8 @@ namespace FoenixIDE.Display
                             pixelIndexR = VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x200 + pixelIndexR); //gammaCorrection[0x200 + pixelIndexR];
                         }
                         int value = (int)((pixelIndexB << 16) + (pixelIndexG << 8) + pixelIndexR + 0xFF000000);
-                        System.Runtime.InteropServices.Marshal.WriteInt32(p, ((mline + PosY) * 640 + col + X) * 4, value);
+                        //System.Runtime.InteropServices.Marshal.WriteInt32(p, (line * 640 + col + X) * 4, value);
+                        ptr[col + PosX] = value;
                     }
                 }
             }
