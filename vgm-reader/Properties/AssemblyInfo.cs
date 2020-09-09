@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("C256 FoenixIDE")]
-[assembly: AssemblyDescription("An integrated development environment for the C256 Foenix 8-bit computer")]
+[assembly: AssemblyTitle("vgm-ay-3-8910-converter")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("C256 Foenix")]
-[assembly: AssemblyProduct("FoenixIDE")]
-[assembly: AssemblyCopyright("Copyright ©  2018, 2020")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("vgm-ay-3-8910-converter")]
+[assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ebc67780-0386-4b97-a8dc-82ed73cbf0a0")]
+[assembly: Guid("b605cd44-57a1-4ea7-80a9-d65cd6c1c302")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.5.0.0")]
-[assembly: AssemblyFileVersion("0.5.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

@@ -31,12 +31,23 @@ namespace FoenixIDE.MemoryLocations
         public const int VKY_LINE1_CMP_VALUE_LO = 0xAF001E; // Write Only[7:0]
         public const int VKY_LINE1_CMP_VALUE_HI = 0xAF001F; // Write Only[3:0]
 
-        public const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0100;
-        public const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0140;
-        public const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0200;
+        public const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0100; // 2 layers - 8 bytes
+        public const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0200; // 12 bytes for each tile layer
+        public const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0C00; // 8 bytes for each sprite
 
         public const int VDMA_START = 0xAF_0400;
         public const int VDMA_SIZE = 0x100;
+
+        public const int MOUSE_PTR_GRAP0 = 0xAF_0500; // image for pointer 0
+        public const int MOUSE_PTR_GRAP1 = 0xAF_0600; // image for pointer 1
+
+        public const int MOUSE_PTR_REG = 0xAF_0700;
+
+        public const int C256F_MODEL_MAJOR =    0xAF_070B;
+        public const int C256F_MODEL_MINOR =    0xAF_070C ;
+        public const int FPGA_DOR =             0xAF_070D ;
+        public const int FPGA_MOR =             0xAF_070E ;
+        public const int FPGA_YOR =             0xAF_070F ;
 
         public const int RTC_SEC = 0xAF_0800; // Seconds Register
         public const int RTC_SEC_ALARM = 0xAF_0801; // Seconds Alarm Register
@@ -75,8 +86,10 @@ namespace FoenixIDE.MemoryLocations
         public const int FG_CHAR_LUT_PTR = 0xAF_1F40; // 15 color lookup table
         public const int BG_CHAR_LUT_PTR = 0xAF_1F80; // 15 color lookup table
 
-        public const int GRP_LUT_BASE_ADDR = 0xAF_2000;
-        public const int GAMMA_BASE_ADDR = 0xAF_4000;
+        public const int GRP_LUT_BASE_ADDR = 0xAF_2000;  // room for 8 LUTs at 1024 bytes each (256 * 4 bytes per colour)
+        public const int GAMMA_BASE_ADDR = 0xAF_4000;    // each 256 byte for B, G, R
+
+        public const int TILESET_BASE_ADDR = 0xAF_0280; // 8 tileset addresses, 4 bytes - 3 bytes address of tileset, 1 byte configuration
 
         public const int FONT0_MEMORY_BANK_START = 0xAF_8000;
         public const int FONT1_MEMORY_BANK_START = 0xAF_8800;

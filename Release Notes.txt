@@ -1,3 +1,7 @@
+Release 0.5.0.0
+---------------
+First implementation of Vicky II.
+
 Release 0.4.2.0
 ---------------
 Added SOL support.

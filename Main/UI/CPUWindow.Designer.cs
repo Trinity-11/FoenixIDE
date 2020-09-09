@@ -639,12 +639,11 @@
             this.Controls.Add(this.lastLine);
             this.Controls.Add(this.stackText);
             this.DoubleBuffered = true;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(1280, 0);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(774, 556);
+            this.MaximumSize = new System.Drawing.Size(1024, 556);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(774, 556);
             this.Name = "CPUWindow";
