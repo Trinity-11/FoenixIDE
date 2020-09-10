@@ -576,7 +576,7 @@ namespace FoenixIDE.Display
 
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4);
             int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6);
-            int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 ) + colOffset * 2 + lineOffset * tilemapWidth * 2; // use WindowX and WindowY to computer offset
+            int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 ); // use WindowX and WindowY to computer offset
             
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
             bool dirUp = (tilemapWindowX & 0x4000) != 0;
@@ -590,26 +590,25 @@ namespace FoenixIDE.Display
             int tileRow = line / 16;
 
             // Use width to determine how many tiles we can display
-            for (int tileCol = colOffset; tileCol < (width/16 - colOffset); tileCol++)
+            for (int tileCol = colOffset; tileCol < (width/ TILE_SIZE - colOffset); tileCol++)
             {
-                if (tileCol * 16 < borderXSize || (tileCol + 1) * 16 > (width - borderXSize)) continue;
-                byte tile = VRAM.ReadByte(tilemapAddress + tileCol * 2); // each tile is 16 bytes 
+                if (tileCol * TILE_SIZE < borderXSize || (tileCol + 1) * TILE_SIZE > (width - borderXSize)) continue;
+                byte tile = VRAM.ReadByte(tilemapAddress + (tileCol + 1) * 2 + tileRow * tilemapWidth * 2); // each tile is 16 bytes 
                 byte tilesetReg = VRAM.ReadByte(tilemapAddress + tileCol * 2 + 1);
                 byte tileset = (byte)(tilesetReg & 7);
                 byte tileLUT = (byte)((tilesetReg & 0x38) >> 3);
-                byte tileAttributes = VRAM.ReadByte(tilemapAddress + tileCol * 2 + 1);
+
                 byte pixelIndex = 0;
                 int value = 0;
 
                 int tilesetPointer = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + tileset * 4);
                 byte tilesetConfig = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + tileset * 4 + 3);
-                int strideX = (tilesetConfig & 4) != 0 ? 256 : 1;
-                int tilesetAddress = tilesetPointer + tileRow * 64;
+                int strideX = (tilesetConfig & 8) != 0 ? 256 : 1;
 
                 // Tiles are 16 x 16
                 int tline = line % 16;
 
-                int offsetAddress = tilesetAddress + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + tline * strideX;
+                int offsetAddress = tilesetPointer + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + tline * strideX;
                 int pixelOffset = tline * 640 + tileCol * 16 + tileRow * 16 * width;
                 int* ptr = p + pixelOffset;
                 for (int col = 0; col < 16; col++)
@@ -637,7 +636,7 @@ namespace FoenixIDE.Display
         private unsafe void DrawSprites(int* p, bool gammaCorrection, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line)
         {
             // There are 32 possible sprites to choose from.
-            for (int s = 0; s < 32; s++)
+            for (int s = 0; s < 64; s++)
             {
                 int addrSprite = MemoryMap.SPRITE_CONTROL_REGISTER_ADDR + s * 8 - MemoryMap.VICKY_BASE_ADDR;
                 int reg = VICKY.ReadByte(addrSprite);
@@ -647,7 +646,7 @@ namespace FoenixIDE.Display
                 if ((reg & 1) == 1 && layer == spriteLayer && (line >= posY && line < posY + 32))
                 {
                     // TODO Fix this when Vicky II fixes the LUT issue
-                    byte lutIndex = (byte)(((reg & 14) >> 1) + 1);  // 8 possible LUTs  -- sprite LUT is off by 1
+                    byte lutIndex = (byte)(((reg & 14) >> 1));  // 8 possible LUTs 
                     bool striding = (reg & 0x80) == 0x80;
 
                     int spriteAddress = VICKY.ReadLong(addrSprite + 1);

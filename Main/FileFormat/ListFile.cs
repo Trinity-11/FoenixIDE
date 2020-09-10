@@ -38,6 +38,11 @@ namespace FoenixIDE.Simulator.FileFormat
                         if (tokens.Length > 2)
                         {
                             pc = Convert.ToInt32(tokens[0].Replace(".",""), 16);
+                            if (CommandOffset > 1 && tokens[1] != "")
+                            {
+                                pc = Convert.ToInt32(tokens[1], 16);
+                            }
+
 
                             // check if a match already exists
                             DbgLines.TryGetValue(pc, out DebugLine match);

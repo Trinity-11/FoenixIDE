@@ -72,6 +72,7 @@ namespace FoenixIDE
             gpu.RAM = MemMgr.RAM;
             gpu.VICKY = MemMgr.VICKY;
             MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
+            MemMgr.VDMA.setSystemRam(MemMgr.RAM);
 
             // Load the kernel.hex if present
             ResetCPU(true, DefaultKernel);

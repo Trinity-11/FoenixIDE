@@ -643,7 +643,7 @@ namespace FoenixIDE.UI
         {
             if (kernel.lstFile != null)
             {
-                kernel.lstFile.Lines.TryGetValue(PC, out DebugLine dl);
+                DebugLine dl = codeList.Find(x => x.PC == PC);
                 return dl;
             }
             else
