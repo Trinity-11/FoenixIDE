@@ -32,45 +32,69 @@ namespace FoenixIDE.Simulator.Devices
             data[Address] = Value;
             // The only address that matters is the register
             // If the Enable and Transfer bits are set then do the transfer
-            if (Address == 0 && (Value & 0x81) == 0x81)
+            if ((Address == 0 || Address == 0x20) && (Value & 0x81) == 0x81)
             {
                 MemoryLocations.MemoryRAM srcMemory = null;
                 MemoryLocations.MemoryRAM destMemory = null;
                 int srcAddr = 0;
                 int destAddr = 0;
+                bool isSystemSource = (Value & 0x10) != 0;
+                bool isSystemDest = (Value & 0x20) != 0;
+                bool isFillTransfer = (Value & 4) != 0;
+                bool isSrcTransfer2D = false;
+                bool isDestTransfer2D = false;
+
+                // Setup variables
+                int sizeSrcX = isSystemSource ? ReadWord(0x28) : ReadWord(8); // Max 65535
+                int sizeSrcY = isSystemSource ? ReadWord(0x2A) : ReadWord(0xA); // Max 65535
+                int sizeDestX = isSystemDest ? ReadWord(0x28) : ReadWord(8); // Max 65535
+                int sizeDestY = isSystemDest ? ReadWord(0x2A) : ReadWord(0xA); // Max 65535
+                int srcStride = (isSystemSource ? ReadWord(0x2C) : ReadWord(0xC)) & 0xFFFE; // must be an event number
+                int destStride = (isSystemDest ? ReadWord(0x2E) : ReadWord(0xE)) & 0xFFFE; // must be an even number
+                // if stride is zero, read data linearly
+                srcStride = srcStride == 0 ? sizeSrcX : srcStride;
+                // if stride is zero, write data linearly
+                destStride = destStride == 0 ? sizeSrcX : destStride;
+
+
                 // Check if the source is system or video
-                if ((Value & 0x10) != 0)
+                if (isSystemSource)
                 {
                     srcMemory = System;
                     srcAddr = ReadLong(0x22); // Address $AF:0422
+                    isSrcTransfer2D = (ReadByte(0x20) & 2) != 0;
                 }
                 else
                 {
                     srcMemory = Video;
                     srcAddr = ReadLong(2); // Address $AF:0402
+                    isSrcTransfer2D = (ReadByte(0) & 2) != 0;
                 }
-                if ((Value & 0x20) != 0)
+                if (isSystemDest)
                 {
                     destMemory = System;
                     destAddr = ReadLong(0x25); // Address $AF:0425
+                    isDestTransfer2D = (ReadByte(0x20) & 2) != 0;
                 }
                 else
                 {
                     destMemory = Video;
                     destAddr = ReadLong(5); // Address $af:0405
+                    isDestTransfer2D = (ReadByte(0) & 2) != 0;
                 }
 
-                if ((Value & 4) == 4)
+                // Check for fill transfer
+                if (isFillTransfer)
                 {
                     // we're copying the same byte in all destination addresses
                     byte transferByte = ReadByte(1); // Address $AF:0401
 
-                    if ((Value & 2) == 0)
+                    // Linear or 2D
+                    if (!isDestTransfer2D) 
                     {
-                        int size1DTransfer = ReadLong(8); // Address $AF:0408 - maximum 4MB
+                        int size1DTransfer = isSystemDest ? ReadLong(0x28) : ReadLong(8); // Address $AF:0408 - maximum 4MB
                         if (Video != null)
                         {
-
                             for (int i = 0; i < size1DTransfer; i++)
                             {
                                 destMemory.WriteByte(destAddr + i, transferByte);
@@ -79,53 +103,60 @@ namespace FoenixIDE.Simulator.Devices
                     }
                     else
                     {
-                        int sizeX = ReadWord(8); // Max 65535
-                        int sizeY = ReadWord(0xA); // Max 65535
-                        int destStride = ReadWord(0xE) & 0xFFFE; // must be an even number
-                        if (destMemory != null)
+                        for (int y = 0; y < sizeDestY; y++)
                         {
-                            for (int y = 0; y < sizeY; y++)
+                            for (int x = 0; x < sizeDestX; x++)
                             {
-                                for (int x = 0; x < sizeX; x++)
-                                {
-                                    destMemory.WriteByte(destAddr + x + y * destStride, transferByte);
-                                }
+                                int srcPos = x + y * srcStride;
+                                int destY = srcPos / sizeDestX;
+                                int destX = srcPos % sizeDestX;
+                                destMemory.WriteByte(destAddr + x + y * destStride, transferByte);
                             }
                         }
                     }
                 }
                 else
                 {
-                    // Transfer data from memory to VRAM
-                    if ((Value & 2) == 0)
+                    // Load source data in buffer
+                    byte[] buffer;
+                    if (!isSrcTransfer2D)
                     {
-                        int size1DTransfer = ReadLong(8); // Address $AF:0408 - maximum 4MB
-                        byte[] buffer = new byte[size1DTransfer];
-                        if (srcMemory != null)
+                        int size1DTransfer = isSystemSource ? ReadLong(0x28) : ReadLong(0x8); // Address $AF:0408 - maximum 4MB
+                        buffer = new byte[size1DTransfer];
+                        srcMemory.CopyIntoBuffer(srcAddr, buffer, 0, size1DTransfer);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeSrcX * sizeSrcY];
+                        int ptr = 0;
+                        for (int y = 0; y < sizeSrcY; y++)
                         {
-                            srcMemory.CopyIntoBuffer(srcAddr, buffer, 0, size1DTransfer);
+                            for (int x = 0; x < sizeSrcX; x++)
+                            {
+                                byte data = srcMemory.ReadByte(srcAddr + x + y * srcStride);
+                                buffer[ptr++] = data;
+                            }
                         }
+                    }
+                    
+                    // Transfer data from memory to VRAM
+                    if (!isDestTransfer2D)
+                    {
                         if (destMemory != null)
                         {
-                            destMemory.CopyBuffer(buffer, 0, destAddr, size1DTransfer);
+                            destMemory.CopyBuffer(buffer, 0, destAddr, buffer.Length);
                         }
 
                     }
                     else
                     {
-                        int sizeX = ReadWord(8); // Max 65535
-                        int sizeY = ReadWord(0xA); // Max 65535
-                        int srcStride = ReadWord(0xC) & 0xFFFE; // must be an event number
-                        int destStride = ReadWord(0xE) & 0xFFFE; // must be an even number
-                        if (srcMemory != null && destMemory != null)
+                        int ptr = 0;
+                        for (int y = 0; y < sizeDestY; y++)
                         {
-                            for (int y = 0; y < sizeY; y++)
+                            for (int x = 0; x < sizeDestX; x++)
                             {
-                                for (int x = 0; x < sizeX; x++)
-                                {
-                                    byte data = srcMemory.ReadByte(x + y * (srcStride == 0 ? sizeX : srcStride));
-                                    destMemory.WriteByte(destAddr + x + y * (destStride == 0 ? sizeX : destStride), data);
-                                }
+                                byte data = buffer[ptr++];
+                                destMemory.WriteByte(destAddr + x + y * destStride, data);
                             }
                         }
                     }

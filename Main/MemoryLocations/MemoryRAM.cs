@@ -83,8 +83,8 @@ namespace FoenixIDE.MemoryLocations
         /// <returns></returns>
         internal int ReadLong(int Address)
         {
-            return ReadByte(Address) + (ReadByte(Address + 1) << 8) + (ReadByte(Address + 2) << 16);
-            //return (int)BitConverter.ToInt32(data, Address) & 0xFF_FFFF;
+            //return ReadByte(Address) + (ReadByte(Address + 1) << 8) + (ReadByte(Address + 2) << 16);
+            return (int)BitConverter.ToInt32(data, Address) & 0xFF_FFFF;
         }
 
         internal void Load(byte[] SourceData, int SrcStart, int DestStart, int copyLength)

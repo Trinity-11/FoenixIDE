@@ -560,7 +560,7 @@ namespace FoenixIDE.Display
 
         private unsafe void DrawTiles(int* p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line, int width, int height)
         {
-            // There are four possible tilesets to choose from
+            // There are four possible tilemaps to choose from
             int addrTileCtrlReg = MemoryMap.TILE_CONTROL_REGISTER_ADDR + layer * 12 - MemoryMap.VICKY_BASE_ADDR;
             int reg = VICKY.ReadByte(addrTileCtrlReg);
             // if the set is not enabled, we're done.
@@ -569,66 +569,61 @@ namespace FoenixIDE.Display
                 return;
             }
 
-            byte lutIndex = (byte)((reg >> 1) & 7);  // 8 possible LUTs
-
-            int colOffset = borderXSize / TILE_SIZE;
-            int lineOffset = borderYSize / TILE_SIZE;
-
-            int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4);
-            int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6);
-            int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 ); // use WindowX and WindowY to computer offset
+            int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
+            int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
+            int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 );
             
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
             bool dirUp = (tilemapWindowX & 0x4000) != 0;
             byte scrollX = (byte)(tilemapWindowX & 0x3C00 >> 10);
-            tilemapWindowX &= 0x300;
+            tilemapWindowX &= 0x3FF;
             int tilemapWindowY = VICKY.ReadWord(addrTileCtrlReg + 10);
             bool dirRight = (tilemapWindowY & 0x4000) != 0;
             byte scrollY = (byte)(tilemapWindowY & 0x3C00 >> 10);
-            tilemapWindowY &= 0x300;
+            tilemapWindowY &= 0x3FF;
 
-            int tileRow = line / 16;
+            int tileRow = ( line + tilemapWindowY ) / TILE_SIZE;
 
-            // Use width to determine how many tiles we can display
-            for (int tileCol = colOffset; tileCol < (width/ TILE_SIZE - colOffset); tileCol++)
+            // we always read tiles 0 to width/TILE_SIZE + 1 - this is to ensure we can display partial tiles, with X,Y offsets
+            byte[] tiles = new byte[(width / TILE_SIZE + 1 )* 2];
+            VRAM.CopyIntoBuffer(tilemapAddress + (3 + tilemapWindowX / TILE_SIZE) * 2 + (tileRow + 2) * tilemapWidth * 2, tiles, 0, tiles.Length);
+
+            // cache of tilesetPointers
+            int[] tilesetPointers = new int[8];
+            byte[] tilesetConfigs = new byte[8];
+            for (int i=0;i<8;i++)
             {
-                if (tileCol * TILE_SIZE < borderXSize || (tileCol + 1) * TILE_SIZE > (width - borderXSize)) continue;
-                byte tile = VRAM.ReadByte(tilemapAddress + (tileCol + 1) * 2 + tileRow * tilemapWidth * 2); // each tile is 16 bytes 
-                byte tilesetReg = VRAM.ReadByte(tilemapAddress + tileCol * 2 + 1);
+                tilesetPointers[i] = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4);
+                tilesetConfigs[i] = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4 + 3);
+            }
+
+            int* ptr = p + line * width;
+            // Ensure that only one line gets drawn, this avoid incorrect wrapping
+            for (int x = borderXSize; x < width - borderXSize; x ++)
+            {
+                int tileIndex = (x + (tilemapWindowX % TILE_SIZE)) / TILE_SIZE * 2;
+                byte tile = tiles[tileIndex];
+                byte tilesetReg = tiles[tileIndex + 1];
                 byte tileset = (byte)(tilesetReg & 7);
                 byte tileLUT = (byte)((tilesetReg & 0x38) >> 3);
 
-                byte pixelIndex = 0;
-                int value = 0;
-
-                int tilesetPointer = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + tileset * 4);
-                byte tilesetConfig = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + tileset * 4 + 3);
+                // tileset
+                int tilesetPointer = tilesetPointers[tileset];
+                byte tilesetConfig = tilesetConfigs[tileset];
                 int strideX = (tilesetConfig & 8) != 0 ? 256 : 1;
 
-                // Tiles are 16 x 16
-                int tline = line % 16;
-
-                int offsetAddress = tilesetPointer + ((tile / 16) * 256 * 16 + (tile % 16) * 16) + tline * strideX;
-                int pixelOffset = tline * 640 + tileCol * 16 + tileRow * 16 * width;
-                int* ptr = p + pixelOffset;
-                for (int col = 0; col < 16; col++)
+                int tilesetOffsetAddress = ((tile / TILE_SIZE ) * strideX * TILE_SIZE + (tile % TILE_SIZE) * TILE_SIZE) + ((line + tilemapWindowY) % TILE_SIZE) * strideX + (x + tilemapWindowX) % TILE_SIZE;
+                byte pixelIndex = VRAM.ReadByte(tilesetPointer + tilesetOffsetAddress );
+                if (pixelIndex > 0)
                 {
-                    // Lookup the pixel in the tileset - if the value is 0, then it's transparent
-                    pixelIndex = VRAM.ReadByte(offsetAddress + col );
-                    if (pixelIndex != 0)
+                    int value = getLUTValue(tileLUT, pixelIndex);
+                    if (gammaCorrection)
                     {
-                        //value = (int)graphicsLUT[lutIndex * 256 + pixelIndex];
-                        value = getLUTValue(lutIndex, pixelIndex);
-                        if (gammaCorrection)
-                        {
-                            value = (int)((VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + (value & 0x00FF0000) >> 0x10) << 0x10) +
-                                            (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x100 + ((value & 0x0000FF00) >> 0x08)) << 0x08) +
-                                            (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x200 + (value & 0x000000FF))) + 0xFF000000);
-                        }
-
-                        //System.Runtime.InteropServices.Marshal.WriteInt32(p, (pixelOffset + col) * 4, value);
-                        ptr[col] = value;
+                        value = (int)((VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + (value & 0x00FF0000) >> 0x10) << 0x10) +
+                                      (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x100 + ((value & 0x0000FF00) >> 0x08)) << 0x08) +
+                                      (VICKY.ReadByte(MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + 0x200 + (value & 0x000000FF))) + 0xFF000000);
                     }
+                    ptr[x] = value;
                 }
             }
         }
@@ -636,13 +631,13 @@ namespace FoenixIDE.Display
         private unsafe void DrawSprites(int* p, bool gammaCorrection, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line)
         {
             // There are 32 possible sprites to choose from.
-            for (int s = 0; s < 64; s++)
+            for (int s = 63; s > -1; s--)
             {
                 int addrSprite = MemoryMap.SPRITE_CONTROL_REGISTER_ADDR + s * 8 - MemoryMap.VICKY_BASE_ADDR;
                 int reg = VICKY.ReadByte(addrSprite);
                 // if the set is not enabled, we're done.
                 int spriteLayer = (reg & 0x70) >> 4;
-                int posY = VICKY.ReadWord(addrSprite + 6);
+                int posY = VICKY.ReadWord(addrSprite + 6) - 32;
                 if ((reg & 1) == 1 && layer == spriteLayer && (line >= posY && line < posY + 32))
                 {
                     // TODO Fix this when Vicky II fixes the LUT issue
@@ -650,7 +645,7 @@ namespace FoenixIDE.Display
                     bool striding = (reg & 0x80) == 0x80;
 
                     int spriteAddress = VICKY.ReadLong(addrSprite + 1);
-                    int posX = VICKY.ReadWord(addrSprite + 4);
+                    int posX = VICKY.ReadWord(addrSprite + 4) - 32;
 
 
                     if (posX >= (640 - borderXSize) || posY >= (480 - borderYSize) || posX < 0 || posY < 0)
