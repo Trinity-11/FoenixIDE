@@ -19,8 +19,9 @@ namespace FoenixIDE.UI
         public int StartAddress = 0;
         public int EndAddress = 0xFF;
         const int PageSize = 0xFF;
-        public delegate void GammaButtonClicked(bool gamma);
-        public GammaButtonClicked SetGamma;
+        public delegate void ButtonClicked(bool value);
+        public ButtonClicked SetGamma;
+        public ButtonClicked SetHiRes;
 
         public MemoryWindow()
         {
@@ -34,6 +35,8 @@ namespace FoenixIDE.UI
             MemoryWindowTooltips.SetToolTip(PreviousButton, "Previous Page");
 
             // MCR Tooltips
+            MemoryWindowTooltips.SetToolTip(MCRBit9Button, "Double Pixels");
+            MemoryWindowTooltips.SetToolTip(MCRBit8Button, "High-Res");
             MemoryWindowTooltips.SetToolTip(MCRBit7Button, "Disable Video");
             MemoryWindowTooltips.SetToolTip(MCRBit6Button, "Enable Gamma");
             MemoryWindowTooltips.SetToolTip(MCRBit5Button, "Enable Sprites");
@@ -52,6 +55,8 @@ namespace FoenixIDE.UI
             MCRBit5Button.Tag = 0;
             MCRBit6Button.Tag = 0;
             MCRBit7Button.Tag = 0;
+            MCRBit8Button.Tag = 0;
+            MCRBit9Button.Tag = 0;
 
             // Set the Address to Bank $00
             if (Memory is MemoryRAM)
@@ -280,6 +285,11 @@ namespace FoenixIDE.UI
             value |= ((int)MCRBit6Button.Tag) << 6;
             value |= ((int)MCRBit7Button.Tag) << 7;
             Memory.WriteByte(0xAF_0000, (byte)value);
+
+            value = ((int)MCRBit8Button.Tag);
+            value |= ((int)MCRBit9Button.Tag) << 1;
+            Memory.WriteByte(0xAF_0001, (byte)value);
+
             if (StartAddressText.Text.StartsWith("AF", false, null))
             {
                 RefreshMemoryView();
@@ -287,6 +297,10 @@ namespace FoenixIDE.UI
             if (btn == MCRBit6Button)
             {
                 SetGamma?.Invoke((int)MCRBit6Button.Tag == 1);
+            }
+            if (btn == MCRBit8Button)
+            {
+                SetHiRes?.Invoke((int)MCRBit8Button.Tag == 1);
             }
         }
 
@@ -301,6 +315,11 @@ namespace FoenixIDE.UI
             SetMCRButton(MCRBit2Button, (value & 0x04) == 0x04);
             SetMCRButton(MCRBit1Button, (value & 0x02) == 0x02);
             SetMCRButton(MCRBit0Button, (value & 0x01) == 0x01);
+
+            // High-res and double-pixels
+            value = Memory.ReadByte(0xAF_0001);
+            SetMCRButton(MCRBit8Button, (value & 0x01) == 0x01);
+            SetMCRButton(MCRBit9Button, (value & 0x02) == 0x02);
         }
 
         private void SetMCRButton(Button btn, bool value)

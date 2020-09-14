@@ -221,6 +221,7 @@ namespace FoenixIDE.UI
             }
             memoryWindow.UpdateMCRButtons();
             memoryWindow.SetGamma += UpdateGamma;
+            memoryWindow.SetHiRes += UpdateHiRes;
         }
 
         public void SerialTransmitByte(byte Value)
@@ -655,11 +656,12 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseMove(object sender, MouseEventArgs e)
         {
-            double ratioW = gpu.Width / 640d;
-            double ratioH = gpu.Height / 480d;
+            Point size = gpu.GetScreenSize();
+            double ratioW = gpu.Width / (double)size.X;
+            double ratioH = gpu.Height / (double)size.Y;
             if (gpu.TileEditorMode)
             {
-                if ((e.X / ratioW > 32 && e.X / ratioW < 608) && (e.Y / ratioH > 32 && e.Y / ratioH < 448))
+                if ((e.X / ratioW > 32 && e.X / ratioW < size.X -32) && (e.Y / ratioH > 32 && e.Y / ratioH < size.Y -32))
                 {
                     this.Cursor = Cursors.Hand;
                     if (e.Button == MouseButtons.Left)
@@ -704,8 +706,9 @@ namespace FoenixIDE.UI
         {
             if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
             {
-                double ratioW = gpu.Width / 640d;
-                double ratioH = gpu.Height / 480d;
+                Point size = gpu.GetScreenSize();
+                double ratioW = gpu.Width / size.X;
+                double ratioH = gpu.Height / size.Y;
                 TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
             }
         }
@@ -867,7 +870,7 @@ namespace FoenixIDE.UI
 
                 // switch 5 - high-res mode
                 byte hiRes = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR + 1);
-                if (switches[5])
+                if (switches[4])
                 {
                     hiRes |= 1;
                 }
@@ -894,6 +897,12 @@ namespace FoenixIDE.UI
         public void UpdateGamma(bool gamma)
         {
             switches[6] = gamma;
+            dipSwitch.Invalidate();
+        }
+
+        public void UpdateHiRes(bool hires)
+        {
+            switches[4] = hires;
             dipSwitch.Invalidate();
         }
 

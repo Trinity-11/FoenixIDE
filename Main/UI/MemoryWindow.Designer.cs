@@ -42,6 +42,8 @@
             this.UpdateDisplayTimer = new System.Windows.Forms.Timer(this.components);
             this.MemoryWindowTooltips = new System.Windows.Forms.ToolTip(this.components);
             this.FooterPanel = new System.Windows.Forms.Panel();
+            this.MCRBit8Button = new System.Windows.Forms.Button();
+            this.MCRBit9Button = new System.Windows.Forms.Button();
             this.MCRBit0Button = new System.Windows.Forms.Button();
             this.MCRBit1Button = new System.Windows.Forms.Button();
             this.MCRBit2Button = new System.Windows.Forms.Button();
@@ -199,6 +201,8 @@
             // 
             this.FooterPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.FooterPanel.Controls.Add(this.MCRBit8Button);
+            this.FooterPanel.Controls.Add(this.MCRBit9Button);
             this.FooterPanel.Controls.Add(this.MCRBit0Button);
             this.FooterPanel.Controls.Add(this.MCRBit1Button);
             this.FooterPanel.Controls.Add(this.MCRBit2Button);
@@ -211,17 +215,44 @@
             this.FooterPanel.Location = new System.Drawing.Point(0, 310);
             this.FooterPanel.Margin = new System.Windows.Forms.Padding(2);
             this.FooterPanel.Name = "FooterPanel";
-            this.FooterPanel.Size = new System.Drawing.Size(386, 30);
+            this.FooterPanel.Size = new System.Drawing.Size(408, 30);
             this.FooterPanel.TabIndex = 1;
+            // 
+            // MCRBit8Button
+            // 
+            this.MCRBit8Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit8Button.Location = new System.Drawing.Point(162, 2);
+            this.MCRBit8Button.Margin = new System.Windows.Forms.Padding(0);
+            this.MCRBit8Button.Name = "MCRBit8Button";
+            this.MCRBit8Button.Size = new System.Drawing.Size(26, 26);
+            this.MCRBit8Button.TabIndex = 2;
+            this.MCRBit8Button.Tag = "0";
+            this.MCRBit8Button.Text = "H";
+            this.MCRBit8Button.UseVisualStyleBackColor = true;
+            this.MCRBit8Button.Click += new System.EventHandler(this.MCRBitButton_Click);
+            // 
+            // MCRBit9Button
+            // 
+            this.MCRBit9Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.MCRBit9Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit9Button.Location = new System.Drawing.Point(137, 2);
+            this.MCRBit9Button.Margin = new System.Windows.Forms.Padding(0);
+            this.MCRBit9Button.Name = "MCRBit9Button";
+            this.MCRBit9Button.Size = new System.Drawing.Size(26, 26);
+            this.MCRBit9Button.TabIndex = 1;
+            this.MCRBit9Button.Tag = "0";
+            this.MCRBit9Button.Text = "DP";
+            this.MCRBit9Button.UseVisualStyleBackColor = true;
+            this.MCRBit9Button.Click += new System.EventHandler(this.MCRBitButton_Click);
             // 
             // MCRBit0Button
             // 
-            this.MCRBit0Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit0Button.Location = new System.Drawing.Point(339, 2);
+            this.MCRBit0Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit0Button.Location = new System.Drawing.Point(379, 2);
             this.MCRBit0Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit0Button.Name = "MCRBit0Button";
             this.MCRBit0Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit0Button.TabIndex = 8;
+            this.MCRBit0Button.TabIndex = 10;
             this.MCRBit0Button.Tag = "0";
             this.MCRBit0Button.Text = "Tx";
             this.MCRBit0Button.UseVisualStyleBackColor = true;
@@ -229,12 +260,12 @@
             // 
             // MCRBit1Button
             // 
-            this.MCRBit1Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit1Button.Location = new System.Drawing.Point(312, 2);
+            this.MCRBit1Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit1Button.Location = new System.Drawing.Point(354, 2);
             this.MCRBit1Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit1Button.Name = "MCRBit1Button";
             this.MCRBit1Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit1Button.TabIndex = 7;
+            this.MCRBit1Button.TabIndex = 9;
             this.MCRBit1Button.Tag = "0";
             this.MCRBit1Button.Text = "Ov";
             this.MCRBit1Button.UseVisualStyleBackColor = true;
@@ -242,12 +273,12 @@
             // 
             // MCRBit2Button
             // 
-            this.MCRBit2Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit2Button.Location = new System.Drawing.Point(285, 2);
+            this.MCRBit2Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit2Button.Location = new System.Drawing.Point(329, 2);
             this.MCRBit2Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit2Button.Name = "MCRBit2Button";
             this.MCRBit2Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit2Button.TabIndex = 6;
+            this.MCRBit2Button.TabIndex = 8;
             this.MCRBit2Button.Tag = "0";
             this.MCRBit2Button.Text = "G";
             this.MCRBit2Button.UseVisualStyleBackColor = true;
@@ -255,12 +286,12 @@
             // 
             // MCRBit3Button
             // 
-            this.MCRBit3Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit3Button.Location = new System.Drawing.Point(258, 2);
+            this.MCRBit3Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit3Button.Location = new System.Drawing.Point(304, 2);
             this.MCRBit3Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit3Button.Name = "MCRBit3Button";
             this.MCRBit3Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit3Button.TabIndex = 5;
+            this.MCRBit3Button.TabIndex = 7;
             this.MCRBit3Button.Tag = "0";
             this.MCRBit3Button.Text = "B";
             this.MCRBit3Button.UseVisualStyleBackColor = true;
@@ -268,12 +299,12 @@
             // 
             // MCRBit4Button
             // 
-            this.MCRBit4Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit4Button.Location = new System.Drawing.Point(226, 2);
+            this.MCRBit4Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit4Button.Location = new System.Drawing.Point(271, 2);
             this.MCRBit4Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit4Button.Name = "MCRBit4Button";
             this.MCRBit4Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit4Button.TabIndex = 4;
+            this.MCRBit4Button.TabIndex = 6;
             this.MCRBit4Button.Tag = "0";
             this.MCRBit4Button.Text = "Ti";
             this.MCRBit4Button.UseVisualStyleBackColor = true;
@@ -281,12 +312,12 @@
             // 
             // MCRBit5Button
             // 
-            this.MCRBit5Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit5Button.Location = new System.Drawing.Point(199, 2);
+            this.MCRBit5Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit5Button.Location = new System.Drawing.Point(246, 2);
             this.MCRBit5Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit5Button.Name = "MCRBit5Button";
             this.MCRBit5Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit5Button.TabIndex = 3;
+            this.MCRBit5Button.TabIndex = 5;
             this.MCRBit5Button.Tag = "0";
             this.MCRBit5Button.Text = "S";
             this.MCRBit5Button.UseVisualStyleBackColor = true;
@@ -294,12 +325,12 @@
             // 
             // MCRBit6Button
             // 
-            this.MCRBit6Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit6Button.Location = new System.Drawing.Point(172, 2);
+            this.MCRBit6Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit6Button.Location = new System.Drawing.Point(221, 2);
             this.MCRBit6Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit6Button.Name = "MCRBit6Button";
             this.MCRBit6Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit6Button.TabIndex = 2;
+            this.MCRBit6Button.TabIndex = 4;
             this.MCRBit6Button.Tag = "0";
             this.MCRBit6Button.Text = "Ga";
             this.MCRBit6Button.UseVisualStyleBackColor = true;
@@ -308,12 +339,12 @@
             // MCRBit7Button
             // 
             this.MCRBit7Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.MCRBit7Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MCRBit7Button.Location = new System.Drawing.Point(145, 2);
+            this.MCRBit7Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MCRBit7Button.Location = new System.Drawing.Point(196, 2);
             this.MCRBit7Button.Margin = new System.Windows.Forms.Padding(0);
             this.MCRBit7Button.Name = "MCRBit7Button";
             this.MCRBit7Button.Size = new System.Drawing.Size(26, 26);
-            this.MCRBit7Button.TabIndex = 1;
+            this.MCRBit7Button.TabIndex = 3;
             this.MCRBit7Button.Tag = "0";
             this.MCRBit7Button.Text = "D";
             this.MCRBit7Button.UseVisualStyleBackColor = true;
@@ -323,12 +354,13 @@
             // 
             this.MasterControlLabel.AutoSize = true;
             this.MasterControlLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MasterControlLabel.Location = new System.Drawing.Point(9, 9);
-            this.MasterControlLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.MasterControlLabel.Location = new System.Drawing.Point(4, 8);
+            this.MasterControlLabel.Margin = new System.Windows.Forms.Padding(0);
             this.MasterControlLabel.Name = "MasterControlLabel";
             this.MasterControlLabel.Size = new System.Drawing.Size(131, 15);
             this.MasterControlLabel.TabIndex = 0;
             this.MasterControlLabel.Text = "Master Control Reg";
+            this.MasterControlLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // HighlightPanel
             // 
@@ -353,7 +385,7 @@
             this.PositionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.PositionLabel.AutoSize = true;
-            this.PositionLabel.Location = new System.Drawing.Point(411, 320);
+            this.PositionLabel.Location = new System.Drawing.Point(412, 318);
             this.PositionLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.PositionLabel.Name = "PositionLabel";
             this.PositionLabel.Size = new System.Drawing.Size(73, 13);
@@ -421,5 +453,7 @@
         private System.Windows.Forms.Label PositionLabel;
         private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.SaveFileDialog SaveDialog;
+        private System.Windows.Forms.Button MCRBit8Button;
+        private System.Windows.Forms.Button MCRBit9Button;
     }
 }
