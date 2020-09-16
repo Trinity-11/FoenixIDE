@@ -307,8 +307,16 @@ namespace FoenixIDE.UI
         public void UpdateMCRButtons()
         {
             byte value = Memory.ReadByte(0xAF_0000);
+            // Determine if Gamma was changed, if so, toggle the dip switch
+            int oldGamma = (int)MCRBit6Button.Tag;
+            int newGamma = (value & 0x40) != 0 ? 1 : 0;
+
             SetMCRButton(MCRBit7Button, (value & 0x80) == 0x80);
-            SetMCRButton(MCRBit6Button, (value & 0x40) == 0x40);
+            SetMCRButton(MCRBit6Button, newGamma != 0);
+            if (oldGamma != newGamma)
+            {
+                SetGamma?.Invoke(newGamma != 0);
+            }
             SetMCRButton(MCRBit5Button, (value & 0x20) == 0x20);
             SetMCRButton(MCRBit4Button, (value & 0x10) == 0x10);
             SetMCRButton(MCRBit3Button, (value & 0x08) == 0x08);
@@ -318,8 +326,16 @@ namespace FoenixIDE.UI
 
             // High-res and double-pixels
             value = Memory.ReadByte(0xAF_0001);
-            SetMCRButton(MCRBit8Button, (value & 0x01) == 0x01);
-            SetMCRButton(MCRBit9Button, (value & 0x02) == 0x02);
+            // Determine if the Hi-Res was changed, if so toggle the dip switch
+            int oldHires = (int)MCRBit8Button.Tag;
+            int newHires = (value & 0x01) != 0 ? 1 : 0;
+            SetMCRButton(MCRBit8Button, (newHires) != 0);
+            if (oldHires != newHires)
+            {
+                SetHiRes?.Invoke(newHires != 0);
+            }
+            SetMCRButton(MCRBit9Button, (value & 0x02) != 0);
+            
         }
 
         private void SetMCRButton(Button btn, bool value)

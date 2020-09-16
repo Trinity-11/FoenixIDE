@@ -179,6 +179,7 @@ namespace FoenixIDE.Display
 
             int resX = 640;
             int resY = 480;
+            bool isPixelDoubled = false;
             switch (MCRHigh)
             {
                 case 1:
@@ -188,10 +189,12 @@ namespace FoenixIDE.Display
                 case 2:
                     resX = 320;
                     resY = 240;
+                    isPixelDoubled = true;
                     break;
                 case 3:
                     resX = 400;
                     resY = 300;
+                    isPixelDoubled = true;
                     break;
             }
 
@@ -243,10 +246,15 @@ namespace FoenixIDE.Display
 
             // Determine if we display a border
             byte border_register = VICKY.ReadByte(MemoryMap.BORDER_CTRL_REG - MemoryMap.VICKY_BASE_ADDR);
-            bool displayBorder = (border_register & 1) == 1;
+            bool displayBorder = (border_register & 1) != 0;
 
             int borderXSize = VICKY.ReadByte(MemoryMap.BORDER_X_SIZE - MemoryMap.VICKY_BASE_ADDR);
             int borderYSize = VICKY.ReadByte(MemoryMap.BORDER_Y_SIZE - MemoryMap.VICKY_BASE_ADDR);
+            if (isPixelDoubled)
+            {
+                borderXSize >>= 1; // divide by 2
+                borderYSize >>= 1; // divide by 2
+            }
 
             Rectangle rect = new Rectangle(0, 0, resX, resY);
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
@@ -318,7 +326,7 @@ namespace FoenixIDE.Display
 
                     for (int x = 0; x < resX; x++)
                     {
-                        int resetValue = x < borderXSize || x > 640 - borderXSize ? borderColor : backgroundColor;
+                        int resetValue = x < borderXSize || x > resX - borderXSize ? borderColor : backgroundColor;
                         //System.Runtime.InteropServices.Marshal.WriteInt32(bitmapPointer, (offset + x) * 4, resetValue);
                         ptr[x] = resetValue;
                     }
