@@ -20,25 +20,13 @@ namespace FoenixIDE.Simulator.UI
 
         private void BrowseFileButton_Click(object sender, EventArgs e)
         {
-            if (Iso_selection.Checked)
+            if (SDCardFolderText.Text.Length == 0)
             {
-                if (FileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    SDCardFolderText.Text = FileDialog.FileName;
-                    SDCardEnabled.Checked = true;
-                }
+                FolderDialog.SelectedPath = Application.StartupPath;
             }
-            else
-            {
-                if (SDCardFolderText.Text.Length == 0)
-                {
-                    FolderDialog.SelectedPath = Application.StartupPath;
-                }
-                if (FolderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    SDCardFolderText.Text = FolderDialog.SelectedPath;
-                    SDCardEnabled.Checked = true;
-                }
+            if (FolderDialog.ShowDialog() == DialogResult.OK) {
+                SDCardFolderText.Text = FolderDialog.SelectedPath;
+                SDCardEnabled.Checked = true;
             }
         }
 
@@ -90,14 +78,6 @@ namespace FoenixIDE.Simulator.UI
             }
         }
 
-        public bool GetISOMode()
-        {
-            return Iso_selection.Checked ? true : false;
-        }
 
-        private void Iso_selection_CheckedChanged(object sender, EventArgs e)
-        {
-            TypeLabel.Text = Iso_selection.Checked ? "Image:" : "Folder:";
-        }
     }
 }

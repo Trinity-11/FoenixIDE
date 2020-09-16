@@ -32,14 +32,13 @@
             this.SDCardFolderText = new System.Windows.Forms.TextBox();
             this.FolderSelectButton = new System.Windows.Forms.Button();
             this.SDCardEnabled = new System.Windows.Forms.CheckBox();
-            this.TypeLabel = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.ButtonClose = new System.Windows.Forms.Button();
             this.FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.CapacityCombo = new System.Windows.Forms.ComboBox();
             this.Iso_selection = new System.Windows.Forms.CheckBox();
-            this.FileDialog = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // SDCardFolderText
@@ -74,14 +73,14 @@
             this.SDCardEnabled.UseVisualStyleBackColor = true;
             this.SDCardEnabled.CheckedChanged += new System.EventHandler(this.SDCardEnabled_CheckedChanged);
             // 
-            // TypeLabel
+            // label1
             // 
-            this.TypeLabel.AutoSize = true;
-            this.TypeLabel.Location = new System.Drawing.Point(12, 47);
-            this.TypeLabel.Name = "TypeLabel";
-            this.TypeLabel.Size = new System.Drawing.Size(39, 13);
-            this.TypeLabel.TabIndex = 7;
-            this.TypeLabel.Text = "Folder:";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 47);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(39, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Folder:";
             // 
             // ButtonClose
             // 
@@ -130,19 +129,16 @@
             // Iso_selection
             // 
             this.Iso_selection.AutoSize = true;
-            this.Iso_selection.Location = new System.Drawing.Point(142, 12);
+            this.Iso_selection.Checked = false;
+            this.Iso_selection.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.Iso_selection.Location = new System.Drawing.Point(376, 22);
             this.Iso_selection.Margin = new System.Windows.Forms.Padding(6);
             this.Iso_selection.Name = "Iso_selection";
-            this.Iso_selection.Size = new System.Drawing.Size(110, 17);
+            this.Iso_selection.Size = new System.Drawing.Size(193, 29);
             this.Iso_selection.TabIndex = 13;
-            this.Iso_selection.Text = "Enable ISO Mode";
+            this.Iso_selection.Text = "Enable ISO mode";
             this.Iso_selection.UseVisualStyleBackColor = true;
             this.Iso_selection.CheckedChanged += new System.EventHandler(this.Iso_selection_CheckedChanged);
-            // 
-            // FileDialog
-            // 
-            this.FileDialog.Filter = "ISO Files|*.iso|Image Files|*.img";
-            this.FileDialog.Title = "Select an Image or ISO File";
             // 
             // SDCardWindow
             // 
@@ -150,12 +146,11 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonClose;
             this.ClientSize = new System.Drawing.Size(425, 129);
-            this.Controls.Add(this.Iso_selection);
             this.Controls.Add(this.CapacityCombo);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.ButtonClose);
-            this.Controls.Add(this.TypeLabel);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.SDCardEnabled);
             this.Controls.Add(this.SDCardFolderText);
             this.Controls.Add(this.FolderSelectButton);
@@ -173,13 +168,12 @@
         private System.Windows.Forms.TextBox SDCardFolderText;
         private System.Windows.Forms.Button FolderSelectButton;
         private System.Windows.Forms.CheckBox SDCardEnabled;
-        private System.Windows.Forms.Label TypeLabel;
+        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button ButtonClose;
         private System.Windows.Forms.FolderBrowserDialog FolderDialog;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox CapacityCombo;
         private System.Windows.Forms.CheckBox Iso_selection;
-        private System.Windows.Forms.OpenFileDialog FileDialog;
     }
 }

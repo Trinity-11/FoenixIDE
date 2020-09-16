@@ -742,7 +742,6 @@ namespace FoenixIDE.UI
         {
             string path = sdCardWindow.GetPath();
             int capacity = sdCardWindow.GetCapacity();
-            bool ISOMode = sdCardWindow.GetISOMode();
             kernel.MemMgr.SDCARD.SetSDCardPath(path);
             byte sdCardStat = 0;
             if (path == null || path.Length == 0)
@@ -752,16 +751,7 @@ namespace FoenixIDE.UI
             }
             else
             {
-                if (ISOMode == false)
-                {
                 SDCardPath.Text = "SDC: " + path;
-                    kernel.MemMgr.SDCARD.SetISOMode(false);
-                }
-                else
-                {
-                    SDCardPath.Text = "SDC: " + path + "/SD.img";
-                    kernel.MemMgr.SDCARD.SetISOMode(true);
-                }
                 sdCardStat = 1;
                 kernel.MemMgr.SDCARD.isPresent = true;
                 kernel.MemMgr.SDCARD.SetCapacity(capacity);
