@@ -23,6 +23,10 @@ namespace FoenixIDE.Simulator.Devices
     }
     public class GabeSDController : SDCardDevice
     {
+        enum FSType
+        {
+            FAT12, FAT16, FAT32
+        };
         private byte[] mbr = new byte[512];
         private byte[] boot_sector = new byte[512];
         private byte[] fat = new byte[512];
@@ -30,7 +34,7 @@ namespace FoenixIDE.Simulator.Devices
         private byte[] root = new byte[32 * 512]; // root dir is always 32 sectors, except FAT32, which omits it.
         private int blockPtr = 0;
         private int waitCounter = 4;
-        private const int BOOT_SECTOR_ADDR = 0x29 * 512;
+        private int BOOT_SECTOR_ADDR = 0x29 * 512;
         private int FAT_OFFSET_START = -1; // must be calcuated based on capacity
         private int ROOT_OFFSET_START = -1; // must be calculated based on capacity
         private int DATA_OFFSET_START = -1; // must be calculated based on capacity
@@ -41,7 +45,9 @@ namespace FoenixIDE.Simulator.Devices
         byte sectors_per_cluster = 1;
         private Dictionary<int, FileEntry> FAT = new Dictionary<int, FileEntry>();
         private string spaces = "\0\0\0\0\0\0\0\0";
-        private bool fat12 = false;
+        private FSType fsType = FSType.FAT12;
+        private bool mbrPresent = false;
+        
 
         private GabeCtrlCommand currentCommand = GabeCtrlCommand.DIRECT;
 
@@ -85,81 +91,92 @@ namespace FoenixIDE.Simulator.Devices
                     break;
                 case MemoryMap.GABE_SDC_TRANS_CONTROL_REG - MemoryMap.GABE_SDC_CTRL_START:
                     data[5] = 0;
-                    switch (currentCommand)
+                    if (isPresent)
                     {
-                        case  GabeCtrlCommand.INIT:
-                            waitCounter = 4;
-                            blockPtr = 0;
-                            break;
-                        case GabeCtrlCommand.READ_BLK:
-                            waitCounter = 10; // the read operation will be a little longer
-                            // determine which block to read
-                            blockPtr = 0;
-                            block = null;
-                            int address = ReadWord(7) + ( ReadWord(9) << 16 ) ;
-                            if (GetISOMode() == true)
-                            {
-                                block = GetData_ISO(address / 512);
-                            }
-                            else
-                            {
-	                            if (address == 0)
-	                            {
-	                                block = mbr;
-	                                
-	                            }
-	                            else if (address == BOOT_SECTOR_ADDR)
-	                            {
-	                                block = boot_sector;
-	                            }
-	                            else if (address >= FAT_OFFSET_START && address <= FAT_OFFSET_START + FAT_SIZE -1)
-	                            {
-	                                // read the fat table
-	                                blockPtr = 0;
-	                                int fatPage = (address - FAT_OFFSET_START) / 512;
-	                                BuildFatPage(fatPage);
-	                                block = fat;
-	                            }
-	                            else if (address >= ROOT_OFFSET_START && address <= ROOT_OFFSET_START + ROOT_SIZE -1)
-	                            {
-	                                // read the root table
-	                                block = root;
-	                                blockPtr = address - ROOT_OFFSET_START;
-	                            }
-	                            else if (address >= DATA_OFFSET_START && address <= DATA_OFFSET_START + DATA_SIZE -1)
-	                            {
-	                                // read the data
-	                                int dataPage = (address - DATA_OFFSET_START) / 512;
-	                                block = GetData(dataPage);
-	                                blockPtr = 0;
-	                            }
-							}
-                            if (block != null)
-                            {
-                                // tell the reader that we've got 512 bytes
-                                data[0x12] = 2;
-                                data[0x13] = 0;
-                                // clear the error status
-                                data[5] = 0;
-                            }
-                            else
-                            {
-                                // the controller returns an error
-                                data[5] = 1;
-                            }
-                            break;
-                        case GabeCtrlCommand.WRITE_BLK:
-                            waitCounter = 10; // the write operation will be a little longer
-                            // determine which block to write
-                            blockPtr = 0;
-                            
-                            int address_WR = ReadWord(7) + (ReadWord(9) << 16);
-                            if (GetISOMode() == true)
-                            {
-                                SetData_ISO(address_WR / 512, block); // write the 512 Byte buffer
+                        switch (currentCommand)
+                        {
+                            case GabeCtrlCommand.INIT:
+                                waitCounter = 4;
+                                blockPtr = 0;
+                                break;
+                            case GabeCtrlCommand.READ_BLK:
+                                waitCounter = 10; // the read operation will be a little longer
+                                                  // determine which block to read
+                                blockPtr = 0;
                                 block = null;
-                            }
-                            break;
+                                int address = ReadWord(7) + (ReadWord(9) << 16);
+                                if (GetISOMode())
+                                {
+                                    // In the case of address 0, we need to create a "fake" MBR.
+                                    if (address == 0)
+                                    {
+                                        block = mbr;
+                                    }
+                                    else
+                                    {
+                                        block = GetData_ISO((address - (mbrPresent ? 0 : BOOT_SECTOR_ADDR)) / 512);
+                                    }
+                                }
+                                else
+                                {
+                                    if (address == 0)
+                                    {
+                                        block = mbr;
+
+                                    }
+                                    else if (address == BOOT_SECTOR_ADDR)
+                                    {
+                                        block = boot_sector;
+                                    }
+                                    else if (address >= FAT_OFFSET_START && address <= FAT_OFFSET_START + FAT_SIZE - 1)
+                                    {
+                                        // read the fat table
+                                        blockPtr = 0;
+                                        int fatPage = (address - FAT_OFFSET_START) / 512;
+                                        BuildFatPage(fatPage);
+                                        block = fat;
+                                    }
+                                    else if (address >= ROOT_OFFSET_START && address <= ROOT_OFFSET_START + ROOT_SIZE - 1)
+                                    {
+                                        // read the root table
+                                        block = root;
+                                        blockPtr = address - ROOT_OFFSET_START;
+                                    }
+                                    else if (address >= DATA_OFFSET_START && address <= DATA_OFFSET_START + DATA_SIZE - 1)
+                                    {
+                                        // read the data
+                                        int dataPage = (address - DATA_OFFSET_START) / 512;
+                                        block = GetData(dataPage);
+                                        blockPtr = 0;
+                                    }
+                                }
+                                if (block != null)
+                                {
+                                    // tell the reader that we've got 512 bytes
+                                    data[0x12] = 2;
+                                    data[0x13] = 0;
+                                    // clear the error status
+                                    data[5] = 0;
+                                }
+                                else
+                                {
+                                    // the controller returns an error
+                                    data[5] = 1;
+                                }
+                                break;
+                            case GabeCtrlCommand.WRITE_BLK:
+                                waitCounter = 10; // the write operation will be a little longer
+                                                  // determine which block to write
+                                blockPtr = 0;
+
+                                int address_WR = ReadWord(7) + (ReadWord(9) << 16);
+                                if (GetISOMode())
+                                {
+                                    SetData_ISO((address_WR - BOOT_SECTOR_ADDR) / 512, block); // write the 512 Byte buffer
+                                    block = new byte[512];
+                                }
+                                break;
+                        }
                     }
                     break;
                 case MemoryMap.GABE_SDC_RX_FIFO_CTRL_REG - MemoryMap.GABE_SDC_CTRL_START:
@@ -181,6 +198,11 @@ namespace FoenixIDE.Simulator.Devices
                     }
                     break;
                 case MemoryMap.GABE_SDC_TX_FIFO_DATA_REG - MemoryMap.GABE_SDC_CTRL_START:
+                    data[5] = 0;
+                    if (blockPtr > 511)
+                    {
+                        blockPtr = 0;
+                    }
                     block[blockPtr++] = Value;
                     break;
             }
@@ -191,7 +213,10 @@ namespace FoenixIDE.Simulator.Devices
             // set default boot_sector values for the capacity
             // calculate the offsets for the root_dir and data_area
             base.SetCapacity(value);
-            ResetMbrBootSector();
+            if (!GetISOMode())
+            {
+                ResetMbrBootSector();
+            }
         }
 
         public override void SetISOMode(bool value)
@@ -203,111 +228,205 @@ namespace FoenixIDE.Simulator.Devices
 
         public void ResetMbrBootSector()
         {
-            if (GetISOMode() == false)
+            if (isPresent)
             {
-	            // Zero the master boot record
-	            Array.Clear(mbr, 0, mbr.Length);
-	            // Zero the boot sector
-	            Array.Clear(boot_sector, 0, boot_sector.Length);
-	            sectors_per_cluster = 1;
-	            fat12 = false;
-	            byte reserved_sectors = 2;
-	            int small_sectors = 0;
-	            int large_sectors = 0;
-	            byte sectors_per_fat = 0;
-	            switch (GetCapacity())
-	            {
-	                case 8:
-	                    sectors_per_cluster = 4;
-	                    fat12 = true;
-	                    small_sectors = 0x3397;
-	                    sectors_per_fat = 0xA;
-	                    
-	                    break;
-	                case 16:
-	                    sectors_per_cluster = 8;
-	                    small_sectors = 0x3397;
-	                    fat12 = true;
-	                    sectors_per_fat = 0xA;
-	                    break;
-	                case 32:
-	                    sectors_per_cluster = 1;
-	                    small_sectors = 0xF460;
-	                    sectors_per_fat = 0xF3;
-	                    break;
-	                case 64:
-	                    sectors_per_cluster = 2;
-	                    large_sectors = 0x1DBD9;
-	                    sectors_per_fat = 0xED;
-	                    break;
-	                case 2048:
-	                    sectors_per_cluster = 64;
-	                    large_sectors = 0x3C9307;
-	                    sectors_per_fat = 0xF3;
-	                    break;
-	            }
-	            logicalSectorSize = sectors_per_cluster * 512; // this is used to calculate clusters off of filesizes
-	            if (isPresent)
-	            {
-	                // Assign default values to the MBR
-	                mbr[0x1FE] = 0x55;
-	                mbr[0x1FF] = 0xAA;
-	                waitCounter = 4;
-	                // write parition table, with boot sector offset $29
-	                byte[] partition = new byte[16]
-	                {
-	                0x80, 0x01, 0x0a, 0x00, 0x0e, 0x01, 0x20, 0xce,
-	                0x29, 0x00, 0x00, 0x00, 0x97, 0x33, 0x00, 0x00
-	                };
-	                Array.Copy(partition, 0, mbr, 446, 16);
-	
-	                // Assign default values to the boot sector
-	                boot_sector[0] = 0xEB;
-	                boot_sector[1] = 0x3C;
-	                boot_sector[2] = 0x90;
-	                Array.Copy(Encoding.ASCII.GetBytes("MSDOS5.0"), 0, boot_sector, 3, 8);
-	                boot_sector[0xC] = 0x2; // 512 bytes per sector
-	                boot_sector[0xD] = sectors_per_cluster; // must be a factor of 2 
-	                boot_sector[0xE] = reserved_sectors;
-	                boot_sector[0x10] = 0x2; // Number of FATs
-	                boot_sector[0x12] = 0x2; // 512 Root Entries
-	                boot_sector[0x13] = (byte)(small_sectors & 0xFF);
-	                boot_sector[0x14] = (byte)((small_sectors & 0xFF00) >> 8);
-	                boot_sector[0x15] = 0xF8; // media type
-	                boot_sector[0x16] = sectors_per_fat;
-	                boot_sector[0x1C] = 0x29; // hidden sectors
-	                boot_sector[0x20] = (byte)(large_sectors & 0xFF);
-	                boot_sector[0x21] = (byte)((large_sectors & 0xFF00) >> 8);
-	                boot_sector[0x22] = (byte)((large_sectors & 0xFF_0000) >> 16);
-	                boot_sector[0x23] = (byte)((large_sectors & 0xFF00_0000) >> 24);
-	
-	                // volume label
-	                Array.Copy(Encoding.ASCII.GetBytes("NO NAME    "), 0, boot_sector, 0x2B, 11);
-	                // system id
-	                if (fat12)
-	                {
-	                    Array.Copy(Encoding.ASCII.GetBytes("FAT12   "), 0, boot_sector, 0x36, 8);
-	                }
-	                else
-	                {
-	                    Array.Copy(Encoding.ASCII.GetBytes("FAT16   "), 0, boot_sector, 0x36, 8);
-	                }
-	                // marker
-	                boot_sector[0x1FE] = 0x55;
-	                boot_sector[0x1FF] = 0xAA;
-	                // FAT offset
-	                FAT_OFFSET_START = BOOT_SECTOR_ADDR + reserved_sectors * 512;
-	                FAT_SIZE = 2 * sectors_per_fat * 512;
-	                // ROOT offset
-	                ROOT_OFFSET_START = FAT_OFFSET_START + FAT_SIZE;
-	                ROOT_SIZE = 0x20 * 512;
-	                PrepareRootArea();
-	
-	                // DATA offset
-	                DATA_OFFSET_START = ROOT_OFFSET_START + 0x20 * 512; // the root area is always 32 sectors
-	                DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;
-	                
-				}
+                mbrPresent = false;
+                BOOT_SECTOR_ADDR = 0x29 * 512;
+                if (GetISOMode())
+                {
+                    // Read the first sector, if it starts with $eb, then it's a Boot Sector, otherwise it's a partition table (MBR)
+                    byte[] firstSector = GetData_ISO(0);
+                    if (firstSector[0] != 0xeb && firstSector[0x1FE] == 0x55 && firstSector[0x1FF] == 0xAA && (firstSector[0x1BE] & 0x80) != 0 )
+                    {
+                        mbrPresent = true;
+                        mbr = firstSector;
+                        switch (firstSector[0x1C2])
+                        {
+                            case 1:
+                                fsType = FSType.FAT12;
+                                break;
+                            case 4:
+                                fsType = FSType.FAT16; // FAT16 with less than 65536 sectors (32MB)
+                                break;
+                            case 0xc:
+                                fsType = FSType.FAT32;
+                                break;
+                            case 0xE:
+                                fsType = FSType.FAT16; // FAT16B with LBA
+                                break;
+                            case 0x16:
+                                fsType = FSType.FAT16; //hidden FAT16B
+                                break;
+                        }
+                        BOOT_SECTOR_ADDR = (firstSector[0x1C6] + (firstSector[0x1C7] << 8) + (firstSector[0x1C8] << 16) + (firstSector[0x1C9] << 24)) * 512;
+                    }
+                    else
+                    {
+                        sectors_per_cluster = firstSector[0xD];
+                        int reserved_sectors = firstSector[0xE] + (firstSector[0xF] << 8);
+                        int numberOfFATs = firstSector[0x10]; // should be 2
+                        int maxNumberOfRootEntries = firstSector[0x11] + (firstSector[0x12] << 8);
+                        byte sectors_per_fat = firstSector[0x16];
+                        int small_sectors = firstSector[0x13] + (firstSector[0x14] << 8);
+                        int large_sectors = firstSector[0x20] + (firstSector[0x21] << 8) + (firstSector[0x22] << 16) + (firstSector[0x23] << 24);
+
+                        // FAT offset
+                        FAT_OFFSET_START = BOOT_SECTOR_ADDR + reserved_sectors * 512;
+                        FAT_SIZE = 2 * sectors_per_fat * 512;
+
+                        // ROOT offset
+                        ROOT_OFFSET_START = FAT_OFFSET_START + FAT_SIZE;
+                        ROOT_SIZE = 0x20 * 512;
+
+                        // DATA offset
+                        DATA_OFFSET_START = ROOT_OFFSET_START + 0x20 * 512; // the root area is always 32 sectors
+                        DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;
+                        if (firstSector[0x36]=='F' && firstSector[0x37] == 'A' && firstSector[0x38] == 'T' && firstSector[0x39] == '1')
+                        {
+                            if (firstSector[0x3A] == '2')
+                            {
+                                fsType = FSType.FAT12;
+                            }
+                            else if (firstSector[0x3A] == '6')
+                            {
+                                fsType = FSType.FAT16;
+                            }
+                        }
+                        else if (firstSector[0x52] == 'F' && firstSector[0x53] == 'A' && firstSector[0x54] == 'T' && firstSector[0x55] == '3' && firstSector[0x56] == '2')
+                        {
+                            fsType = FSType.FAT32;
+                        }
+                    }
+                }
+
+                // Prepare a fake MBR with a very plain partition record
+                if (!mbrPresent)
+                {
+                    // Zero the master boot record
+                    Array.Clear(mbr, 0, mbr.Length);
+
+                    // Assign default values to the MBR
+                    mbr[0x1FE] = 0x55;
+                    mbr[0x1FF] = 0xAA;
+                    waitCounter = 4;
+
+                    byte fs = 0xC; //default to FAT32
+                    switch (fsType)
+                    {
+                        case FSType.FAT12:
+                            fs = 1;
+                            break;
+                        case FSType.FAT16:
+                            fs = 4;
+                            break;
+                    }
+                    // write parition table, with boot sector offset $29
+                    byte[] partition = new byte[16]
+                    {
+                        0x80, 0x01, 0x0a, 0x00, fs, 0x01, 0x20, 0xce,
+                        0x29, 0x00, 0x00, 0x00, 0x97, 0x33, 0x00, 0x00
+                    };
+                    Array.Copy(partition, 0, mbr, 446, 16);
+
+                    // If the ISO file didn't have an MBR, ensure that we set the partiton type correctly
+                    if (GetISOMode())
+                    {
+
+                    }
+                }
+                if (!GetISOMode())
+                {
+                    // Zero the boot sector
+                    Array.Clear(boot_sector, 0, boot_sector.Length);
+                    sectors_per_cluster = 1;
+                    fsType = FSType.FAT16;
+                    byte reserved_sectors = 2;
+                    int small_sectors = 0;
+                    int large_sectors = 0;
+                    byte sectors_per_fat = 0;
+                    switch (GetCapacity())
+                    {
+                        case 8:
+                            sectors_per_cluster = 4;
+                            fsType = FSType.FAT12;
+                            small_sectors = 0x3397;
+                            sectors_per_fat = 0xA;
+                            break;
+                        case 16:
+                            sectors_per_cluster = 8;
+                            small_sectors = 0x3397;
+                            fsType = FSType.FAT12;
+                            sectors_per_fat = 0xA;
+                            break;
+                        case 32:
+                            sectors_per_cluster = 1;
+                            small_sectors = 0xF460;
+                            sectors_per_fat = 0xF3;
+                            break;
+                        case 64:
+                            sectors_per_cluster = 2;
+                            large_sectors = 0x1DBD9;
+                            sectors_per_fat = 0xED;
+                            break;
+                        case 2048:
+                            sectors_per_cluster = 64;
+                            large_sectors = 0x3C9307;
+                            sectors_per_fat = 0xF3;
+                            break;
+                    }
+                    logicalSectorSize = sectors_per_cluster * 512; // this is used to calculate clusters off of filesizes
+
+                    // Assign default values to the boot sector
+                    boot_sector[0] = 0xEB;
+                    boot_sector[1] = 0x3C;
+                    boot_sector[2] = 0x90;
+                    Array.Copy(Encoding.ASCII.GetBytes("MSDOS5.0"), 0, boot_sector, 3, 8);
+                    boot_sector[0xC] = 0x2; // 512 bytes per sector
+                    boot_sector[0xD] = sectors_per_cluster; // must be a factor of 2 
+                    boot_sector[0xE] = reserved_sectors;
+                    boot_sector[0x10] = 0x2; // Number of FATs
+                    boot_sector[0x12] = 0x2; // 512 Root Entries
+                    boot_sector[0x13] = (byte)(small_sectors & 0xFF);
+                    boot_sector[0x14] = (byte)((small_sectors & 0xFF00) >> 8);
+                    boot_sector[0x15] = 0xF8; // media type
+                    boot_sector[0x16] = sectors_per_fat;
+                    boot_sector[0x1C] = 0x29; // hidden sectors
+                    boot_sector[0x20] = (byte)(large_sectors & 0xFF);
+                    boot_sector[0x21] = (byte)((large_sectors & 0xFF00) >> 8);
+                    boot_sector[0x22] = (byte)((large_sectors & 0xFF_0000) >> 16);
+                    boot_sector[0x23] = (byte)((large_sectors & 0xFF00_0000) >> 24);
+
+                    // volume label
+                    Array.Copy(Encoding.ASCII.GetBytes("NO NAME    "), 0, boot_sector, 0x2B, 11);
+                    // system id
+                    switch (fsType)
+                    {
+                        case FSType.FAT12:
+                            Array.Copy(Encoding.ASCII.GetBytes("FAT12   "), 0, boot_sector, 0x36, 8);
+                            break;
+                        case FSType.FAT16:
+                            Array.Copy(Encoding.ASCII.GetBytes("FAT16   "), 0, boot_sector, 0x36, 8);
+                            break;
+                        case FSType.FAT32:
+                            Array.Copy(Encoding.ASCII.GetBytes("FAT32   "), 0, boot_sector, 0x36, 8);
+                            break;
+                    }
+
+                    // marker
+                    boot_sector[0x1FE] = 0x55;
+                    boot_sector[0x1FF] = 0xAA;
+                    // FAT offset
+                    FAT_OFFSET_START = BOOT_SECTOR_ADDR + reserved_sectors * 512;
+                    FAT_SIZE = 2 * sectors_per_fat * 512;
+                    // ROOT offset
+                    ROOT_OFFSET_START = FAT_OFFSET_START + FAT_SIZE;
+                    ROOT_SIZE = 0x20 * 512;
+                    PrepareRootArea();
+
+                    // DATA offset
+                    DATA_OFFSET_START = ROOT_OFFSET_START + 0x20 * 512; // the root area is always 32 sectors
+                    DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;
+                }
             }
         }
 
@@ -411,7 +530,7 @@ namespace FoenixIDE.Simulator.Devices
             // Determine how many entries are in FAT sector
             int fatCount = 512 / 2; // 256
             int byteOffset = 0;
-            if (fat12)
+            if (fsType == FSType.FAT12)
             {
                 fatCount = 513 / 3 * 2; //341
                 if (page % 3 != 0)
@@ -422,7 +541,7 @@ namespace FoenixIDE.Simulator.Devices
 
             if (page == 0)
             {
-                if (fat12)
+                if (fsType == FSType.FAT12)
                 {
                     fat[0] = 0xF8;
                     fat[1] = 0xFF;
@@ -457,7 +576,7 @@ namespace FoenixIDE.Simulator.Devices
                         startOffset = page * fatCount - key + byteOffset;
                         pageOffset = 0;
                     }
-                    if (fat12)
+                    if (fsType == FSType.FAT12)
                     {
                         
                         // even numbers start at the boundary - odd numbers are at half byte
@@ -577,7 +696,7 @@ namespace FoenixIDE.Simulator.Devices
             {
                 byte[] buffer = new byte[512];
                 string path = GetSDCardPath();
-                FileStream stream = new FileStream(path + "\\SD.img", FileMode.Open, FileAccess.Read);
+                FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
                 try
                 {
                     stream.Seek((page) * 512, SeekOrigin.Begin);
@@ -604,7 +723,7 @@ namespace FoenixIDE.Simulator.Devices
             if ((page >= 0) && (page < 512 * 4096)) // test if we are with in 256MB
             {
                 string path = GetSDCardPath();
-                FileStream stream = new FileStream(path + "\\SD.img", FileMode.Open, FileAccess.Write);
+                FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Write);
                 try
                 {
                     stream.Seek((page) * 512, SeekOrigin.Begin);

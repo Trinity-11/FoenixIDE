@@ -98,6 +98,15 @@ namespace FoenixIDE.Simulator.UI
         private void Iso_selection_CheckedChanged(object sender, EventArgs e)
         {
             TypeLabel.Text = Iso_selection.Checked ? "Image:" : "Folder:";
+            if (Iso_selection.Checked)
+            {
+                CapacityCombo.SelectedIndex = -1;
+                CapacityCombo.Enabled = false;
+            }
+            else
+            {
+                CapacityCombo.Enabled = true;
+            }
         }
     }
 }

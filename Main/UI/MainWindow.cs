@@ -752,18 +752,11 @@ namespace FoenixIDE.UI
             }
             else
             {
-                if (ISOMode == false)
-                {
                 SDCardPath.Text = "SDC: " + path;
-                    kernel.MemMgr.SDCARD.SetISOMode(false);
-                }
-                else
-                {
-                    SDCardPath.Text = "SDC: " + path + "/SD.img";
-                    kernel.MemMgr.SDCARD.SetISOMode(true);
-                }
-                sdCardStat = 1;
                 kernel.MemMgr.SDCARD.isPresent = true;
+                kernel.MemMgr.SDCARD.SetISOMode(ISOMode);
+                sdCardStat = 1;
+               
                 kernel.MemMgr.SDCARD.SetCapacity(capacity);
             }
             if (typeof(CH376SRegister) == kernel.MemMgr.SDCARD.GetType())
@@ -785,6 +778,7 @@ namespace FoenixIDE.UI
             // force repaint
             statusStrip1.Invalidate();
         }
+
         private void ToolStripRevision_Click(object sender, EventArgs e)
         {
             if (version == BoardVersion.RevB)
