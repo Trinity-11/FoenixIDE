@@ -7,11 +7,13 @@ namespace FoenixIDE.Simulator.FileFormat
     public class HexFile
     {
 
-        static public String Load(MemoryRAM ram, string Filename, int gabeAddressBank)
+        static public String Load(MemoryRAM ram, string Filename, int gabeAddressBank, out int startAddress, out int length)
         {
             int bank = 0;
             int address = 0;
             String processedFileName = Filename;
+            startAddress = -1;
+            length = -1;
 
             if (!System.IO.File.Exists(Filename))
             {
@@ -49,6 +51,11 @@ namespace FoenixIDE.Simulator.FileFormat
                         // data row. The next n bytes are data to be loaded into memory
                         case "00":
                             address = GetByte(offset, 0, 2);
+                            if (startAddress == -1)
+                            {
+                                startAddress = bank + address;
+                            }
+
                             for (int i = 0; i < data.Length; i += 2)
                             {
                                 int b = GetByte(data, i, 1);
@@ -64,6 +71,7 @@ namespace FoenixIDE.Simulator.FileFormat
 
                         // end of file - just ignore
                         case "01":
+                            length = bank + address - startAddress;
                             break;
 
                         case "02":

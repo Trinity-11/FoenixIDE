@@ -141,7 +141,7 @@ namespace FoenixIDE
                 {
                     this.ResetMemory();
                 }
-                LoadedKernel = HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress);
+                LoadedKernel = HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _);
                 if (LoadedKernel != null)
                 {
                     if (ResetMemory)

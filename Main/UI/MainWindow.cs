@@ -516,14 +516,14 @@ namespace FoenixIDE.UI
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
-                Filter = "Hex Filed|*.hex",
+                Filter = "Hex Files|*.hex",
+                Title = "Select a Hex File",
                 CheckFileExists = true
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 LoadHexFile(dialog.FileName, sender.Equals(menuOpenHexFile));
             }
-            
         }
 
         /*
@@ -940,6 +940,74 @@ namespace FoenixIDE.UI
                 if (info.Extension.ToUpper().Equals(".HEX"))
                 {
                     LoadHexFile(obj[0], false);
+                }
+            }
+        }
+
+        // Convert a Hex file to PGX
+        // Header is PGX,1,4 byte jump address
+        private void ConvertHexToPGXToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Hex Files|*.hex",
+                Title = "Select a Hex File",
+                CheckFileExists = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                MemoryRAM temporaryRAM = new MemoryRAM(0, 4 * 1024 * 1024);
+                HexFile.Load(temporaryRAM, dialog.FileName, 0, out int DataStartAddress, out int DataLength);
+                // write the file
+                string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
+                
+                byte[] buffer = new byte[DataLength];
+                temporaryRAM.CopyIntoBuffer(DataStartAddress, buffer, 0, DataLength);
+                using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
+                {
+                    // 8 byte header
+                    writer.Write((byte)'P');
+                    writer.Write((byte)'G');
+                    writer.Write((byte)'X');
+                    writer.Write((byte)1);
+                    writer.Write(DataStartAddress);
+                    writer.Write(buffer);
+                }
+            }
+        }
+
+        private void ConvertBinToPGXToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Bin Files|*.bin",
+                Title = "Select a Bin File",
+                CheckFileExists = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                // Ask the user what address to write in the header
+                string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the PGX Start Address (Hexadecimal)", "PGX Start Address", "0");
+                if (!StrAddress.Equals("0"))
+                {
+                    byte[] buffer = File.ReadAllBytes(dialog.FileName);
+                    // write the file
+                    int DataStartAddress = Convert.ToInt32(StrAddress, 16);
+                    string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
+                    using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
+                    {
+                        // 8 byte header
+                        writer.Write((byte)'P');
+                        writer.Write((byte)'G');
+                        writer.Write((byte)'X');
+                        writer.Write((byte)1);
+                        writer.Write(DataStartAddress);
+                        writer.Write(buffer);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

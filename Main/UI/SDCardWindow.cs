@@ -82,7 +82,7 @@ namespace FoenixIDE.Simulator.UI
 
         private void SDCardEnabled_CheckedChanged(object sender, EventArgs e)
         {
-            CapacityCombo.Enabled = SDCardEnabled.Checked;
+            CapacityCombo.Enabled = Iso_selection.Checked ? false : SDCardEnabled.Checked;
             if (!SDCardEnabled.Checked)
             {
                 SDCardFolderText.Text = "";
@@ -105,8 +105,10 @@ namespace FoenixIDE.Simulator.UI
             }
             else
             {
+                CapacityCombo.SelectedIndex = 3;
                 CapacityCombo.Enabled = true;
             }
+            SDCardFolderText.Text = "";
         }
     }
 }
