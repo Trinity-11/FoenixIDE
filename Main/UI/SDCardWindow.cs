@@ -46,6 +46,7 @@ namespace FoenixIDE.Simulator.UI
         {
             Close();
         }
+
         // Virtual SD Card Path
         public void SetPath(string path)
         {
@@ -80,6 +81,34 @@ namespace FoenixIDE.Simulator.UI
             return Convert.ToInt32(CapacityCombo.SelectedItem);
         }
 
+        // Virtual SD Card Cluster Size
+        public void SetClusterSize(int value)
+        {
+            int index = ClusterCombo.Items.IndexOf(value);
+            if (index != -1)
+            {
+                ClusterCombo.SelectedIndex = index;
+            }
+        }
+        public int GetClusterSize()
+        {
+            return Convert.ToInt32(ClusterCombo.SelectedItem);
+        }
+
+        // Virtual SD Card Filesystem Type
+        public void SetFSType(string fsname)
+        {
+            int index = FSTypeCombo.Items.IndexOf(fsname);
+            if (index != -1)
+            {
+                FSTypeCombo.SelectedIndex = index;
+            }
+        }
+        public string GetFSType()
+        {
+            return (string)FSTypeCombo.SelectedItem;
+        }
+
         private void SDCardEnabled_CheckedChanged(object sender, EventArgs e)
         {
             CapacityCombo.Enabled = Iso_selection.Checked ? false : SDCardEnabled.Checked;
@@ -102,13 +131,64 @@ namespace FoenixIDE.Simulator.UI
             {
                 CapacityCombo.SelectedIndex = -1;
                 CapacityCombo.Enabled = false;
+                ClusterCombo.SelectedIndex = -1;
+                ClusterCombo.Enabled = false;
+                FSTypeCombo.SelectedIndex = -1;
+                FSTypeCombo.Enabled = false;
             }
             else
             {
-                CapacityCombo.SelectedIndex = 3;
+                CapacityCombo.SelectedIndex = 3; // 64 MB
                 CapacityCombo.Enabled = true;
+                ClusterCombo.SelectedIndex = 1; // 1024
+                ClusterCombo.Enabled = true;
+                FSTypeCombo.SelectedIndex = 1; // FAT16
+                FSTypeCombo.Enabled = true;
             }
             SDCardFolderText.Text = "";
+        }
+
+        private void CapacityCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (CapacityCombo.SelectedIndex)
+            {
+                case 0: // 8MB
+                    ClusterCombo.SelectedIndex = 3; // 4096
+                    FSTypeCombo.SelectedIndex = 0; // FAT12
+                    break;
+                case 1: // 16 MB
+                    ClusterCombo.SelectedIndex = 4; // 8192
+                    FSTypeCombo.SelectedIndex = 0; // FAT12
+                    break;
+                case 2: // 32 MB
+                    ClusterCombo.SelectedIndex = 1; // 1024
+                    FSTypeCombo.SelectedIndex = 1; // FAT16
+                    break;
+                case 3: // 64 MB
+                    ClusterCombo.SelectedIndex = 2; // 2048
+                    FSTypeCombo.SelectedIndex = 1; // FAT16
+                    break;
+                case 4: // 128 MB
+                    ClusterCombo.SelectedIndex = 3; // 4096
+                    FSTypeCombo.SelectedIndex = 1; // FAT16
+                    break;
+                case 5: // 256 MB
+                    ClusterCombo.SelectedIndex = 0; // 512
+                    FSTypeCombo.SelectedIndex = 2; // FAT32
+                    break;
+                case 6: // 512 MB
+                    ClusterCombo.SelectedIndex = 1; // 1024
+                    FSTypeCombo.SelectedIndex = 2; // FAT32
+                    break;
+                case 7: // 1024 MB
+                    ClusterCombo.SelectedIndex = 2; // 2048
+                    FSTypeCombo.SelectedIndex = 2; // FAT32
+                    break;
+                case 8: // 2048 MB
+                    ClusterCombo.SelectedIndex = 3; // 4096
+                    FSTypeCombo.SelectedIndex = 2; // FAT32
+                    break;
+            }
         }
     }
 }

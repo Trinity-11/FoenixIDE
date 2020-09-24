@@ -36,6 +36,7 @@ namespace FoenixIDE.UI
         {
             InitializeComponent();
             Instance = this;
+            DisableIRQs(true);
         }
 
         public void SetKernel(FoenixSystem kernel)

@@ -23,10 +23,6 @@ namespace FoenixIDE.Simulator.Devices
     }
     public class GabeSDController : SDCardDevice
     {
-        enum FSType
-        {
-            FAT12, FAT16, FAT32
-        };
         private byte[] mbr = new byte[512];
         private byte[] boot_sector = new byte[512];
         private byte[] fat = new byte[512];
@@ -39,13 +35,12 @@ namespace FoenixIDE.Simulator.Devices
         private int ROOT_OFFSET_START = -1; // must be calculated based on capacity
         private int DATA_OFFSET_START = -1; // must be calculated based on capacity
         private int FAT_SIZE = 0;
-        private int ROOT_SIZE = 0;
+        private int ROOT_SIZE = 0x20 * 512;
         private int DATA_SIZE = 0;
         private int logicalSectorSize = 512;
         byte sectors_per_cluster = 1;
         private Dictionary<int, FileEntry> FAT = new Dictionary<int, FileEntry>();
-        private string spaces = "\0\0\0\0\0\0\0\0";
-        private FSType fsType = FSType.FAT12;
+        private string spaces = "        ";
         private bool mbrPresent = false;
         
 
@@ -146,6 +141,10 @@ namespace FoenixIDE.Simulator.Devices
                                     {
                                         // read the data
                                         int dataPage = (address - DATA_OFFSET_START) / 512;
+                                        if (GetFSType() == FSType.FAT32)
+                                        {
+                                            dataPage += ROOT_SIZE / 512;
+                                        }
                                         block = GetData(dataPage);
                                         blockPtr = 0;
                                     }
@@ -208,25 +207,7 @@ namespace FoenixIDE.Simulator.Devices
             }
         }
 
-        public override void SetCapacity(int value)
-        {
-            // set default boot_sector values for the capacity
-            // calculate the offsets for the root_dir and data_area
-            base.SetCapacity(value);
-            if (!GetISOMode())
-            {
-                ResetMbrBootSector();
-            }
-        }
-
-        public override void SetISOMode(bool value)
-        {
-            // set the SDcard module to use an iso file instead of a folder content
-            base.SetISOMode(value);
-            ResetMbrBootSector();
-        }
-
-        public void ResetMbrBootSector()
+        public override void ResetMbrBootSector()
         {
             if (isPresent)
             {
@@ -243,19 +224,19 @@ namespace FoenixIDE.Simulator.Devices
                         switch (firstSector[0x1C2])
                         {
                             case 1:
-                                fsType = FSType.FAT12;
+                                SetFSType(FSType.FAT12);
                                 break;
                             case 4:
-                                fsType = FSType.FAT16; // FAT16 with less than 65536 sectors (32MB)
+                                SetFSType(FSType.FAT16); // FAT16 with less than 65536 sectors (32MB)
                                 break;
                             case 0xc:
-                                fsType = FSType.FAT32;
+                                SetFSType(FSType.FAT32);
                                 break;
                             case 0xE:
-                                fsType = FSType.FAT16; // FAT16B with LBA
+                                SetFSType(FSType.FAT16); // FAT16B with LBA
                                 break;
                             case 0x16:
-                                fsType = FSType.FAT16; //hidden FAT16B
+                                SetFSType(FSType.FAT16); //hidden FAT16B
                                 break;
                         }
                         BOOT_SECTOR_ADDR = (firstSector[0x1C6] + (firstSector[0x1C7] << 8) + (firstSector[0x1C8] << 16) + (firstSector[0x1C9] << 24)) * 512;
@@ -285,16 +266,16 @@ namespace FoenixIDE.Simulator.Devices
                         {
                             if (firstSector[0x3A] == '2')
                             {
-                                fsType = FSType.FAT12;
+                                SetFSType(FSType.FAT12);
                             }
                             else if (firstSector[0x3A] == '6')
                             {
-                                fsType = FSType.FAT16;
+                                SetFSType(FSType.FAT16);
                             }
                         }
                         else if (firstSector[0x52] == 'F' && firstSector[0x53] == 'A' && firstSector[0x54] == 'T' && firstSector[0x55] == '3' && firstSector[0x56] == '2')
                         {
-                            fsType = FSType.FAT32;
+                            SetFSType(FSType.FAT32);
                         }
                     }
                 }
@@ -311,7 +292,7 @@ namespace FoenixIDE.Simulator.Devices
                     waitCounter = 4;
 
                     byte fs = 0xC; //default to FAT32
-                    switch (fsType)
+                    switch (GetFSType())
                     {
                         case FSType.FAT12:
                             fs = 1;
@@ -338,41 +319,62 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // Zero the boot sector
                     Array.Clear(boot_sector, 0, boot_sector.Length);
-                    sectors_per_cluster = 1;
-                    fsType = FSType.FAT16;
+                    sectors_per_cluster = (byte)(GetClusterSize() / 512);
                     byte reserved_sectors = 2;
+                    byte root_sectors = 32;
+                    // we're reserving 32 sectors for FAT32 as well, to simplify the implementation.  This limits how big the directory is to 512 entries
+                    int capacity = GetCapacity() * 1024 * 1024 - (1+1+ reserved_sectors) * 512 - BOOT_SECTOR_ADDR - root_sectors * 512;  // remove the reserved and offset spaces, boot sector, mbr and root area
+                    int sector_count = 2 + BOOT_SECTOR_ADDR / 512 + reserved_sectors + 32;
+
+                    int req_cluster = capacity / GetClusterSize();
+                    // The FAT must have enough entries to access each cluster
+                    int sectors_per_fat = 0;
+                    switch (GetFSType())
+                    {
+                        case FSType.FAT12:
+                            if (req_cluster > 4084)
+                            {
+                                req_cluster = 4084;
+                            }
+                            sectors_per_fat = req_cluster * 3 / 1024;
+                            break;
+                        case FSType.FAT16:
+                            if (req_cluster > 65524)
+                            {
+                                req_cluster = 65524;
+                            }
+                            sectors_per_fat = req_cluster / 256;
+                            break;
+                        case FSType.FAT32:
+                            // FAT32 can address all cluster sizes within 2GB
+                            sectors_per_fat = req_cluster / 128;
+                            break;
+                    }
+                    
+                    sector_count += sectors_per_fat * 2;
+
+                    switch (GetFSType())
+                    {
+                        case FSType.FAT12:
+                            sector_count += sectors_per_fat * 1024 / 3 * GetClusterSize() / 512;
+                            break;
+                        case FSType.FAT16:
+                            sector_count += sectors_per_fat * 256 * GetClusterSize() / 512;
+                            break;
+                        case FSType.FAT32:
+                            sector_count += sectors_per_fat * 128 * GetClusterSize() / 512;
+                            break;
+                    }
+                    // Assign sector count
                     int small_sectors = 0;
                     int large_sectors = 0;
-                    byte sectors_per_fat = 0;
-                    switch (GetCapacity())
+                    if (sector_count > 0xFFFF)
                     {
-                        case 8:
-                            sectors_per_cluster = 4;
-                            fsType = FSType.FAT12;
-                            small_sectors = 0x3397;
-                            sectors_per_fat = 0xA;
-                            break;
-                        case 16:
-                            sectors_per_cluster = 8;
-                            small_sectors = 0x3397;
-                            fsType = FSType.FAT12;
-                            sectors_per_fat = 0xA;
-                            break;
-                        case 32:
-                            sectors_per_cluster = 1;
-                            small_sectors = 0xF460;
-                            sectors_per_fat = 0xF3;
-                            break;
-                        case 64:
-                            sectors_per_cluster = 2;
-                            large_sectors = 0x1DBD9;
-                            sectors_per_fat = 0xED;
-                            break;
-                        case 2048:
-                            sectors_per_cluster = 64;
-                            large_sectors = 0x3C9307;
-                            sectors_per_fat = 0xF3;
-                            break;
+                        large_sectors = sector_count;
+                    }
+                    else
+                    {
+                        small_sectors = sector_count;
                     }
                     logicalSectorSize = sectors_per_cluster * 512; // this is used to calculate clusters off of filesizes
 
@@ -384,12 +386,24 @@ namespace FoenixIDE.Simulator.Devices
                     boot_sector[0xC] = 0x2; // 512 bytes per sector
                     boot_sector[0xD] = sectors_per_cluster; // must be a factor of 2 
                     boot_sector[0xE] = reserved_sectors;
+                    boot_sector[0xF] = 0;
                     boot_sector[0x10] = 0x2; // Number of FATs
                     boot_sector[0x12] = 0x2; // 512 Root Entries
                     boot_sector[0x13] = (byte)(small_sectors & 0xFF);
                     boot_sector[0x14] = (byte)((small_sectors & 0xFF00) >> 8);
                     boot_sector[0x15] = 0xF8; // media type
-                    boot_sector[0x16] = sectors_per_fat;
+                    if (GetFSType() != FSType.FAT32)
+                    {
+                        boot_sector[0x16] = (byte)(sectors_per_fat & 0xFF);
+                        boot_sector[0x17] = (byte)((sectors_per_fat & 0xFF00) >> 8);
+                    }
+                    else
+                    {
+                        boot_sector[0x24] = (byte)(sectors_per_fat & 0xFF);
+                        boot_sector[0x25] = (byte)((sectors_per_fat & 0xFF00) >> 8);
+                        boot_sector[0x26] = (byte)((sectors_per_fat & 0xFF0000) >> 16);
+                        boot_sector[0x27] = (byte)((sectors_per_fat & 0xFF000000) >> 24);
+                    }
                     boot_sector[0x1C] = 0x29; // hidden sectors
                     boot_sector[0x20] = (byte)(large_sectors & 0xFF);
                     boot_sector[0x21] = (byte)((large_sectors & 0xFF00) >> 8);
@@ -399,7 +413,7 @@ namespace FoenixIDE.Simulator.Devices
                     // volume label
                     Array.Copy(Encoding.ASCII.GetBytes("NO NAME    "), 0, boot_sector, 0x2B, 11);
                     // system id
-                    switch (fsType)
+                    switch (GetFSType())
                     {
                         case FSType.FAT12:
                             Array.Copy(Encoding.ASCII.GetBytes("FAT12   "), 0, boot_sector, 0x36, 8);
@@ -408,7 +422,7 @@ namespace FoenixIDE.Simulator.Devices
                             Array.Copy(Encoding.ASCII.GetBytes("FAT16   "), 0, boot_sector, 0x36, 8);
                             break;
                         case FSType.FAT32:
-                            Array.Copy(Encoding.ASCII.GetBytes("FAT32   "), 0, boot_sector, 0x36, 8);
+                            Array.Copy(Encoding.ASCII.GetBytes("FAT32   "), 0, boot_sector, 0x52, 8);
                             break;
                     }
 
@@ -418,14 +432,22 @@ namespace FoenixIDE.Simulator.Devices
                     // FAT offset
                     FAT_OFFSET_START = BOOT_SECTOR_ADDR + reserved_sectors * 512;
                     FAT_SIZE = 2 * sectors_per_fat * 512;
-                    // ROOT offset
+
+                    // ROOT offset - For FAT32 as well
                     ROOT_OFFSET_START = FAT_OFFSET_START + FAT_SIZE;
-                    ROOT_SIZE = 0x20 * 512;
+                    if (GetFSType() == FSType.FAT32)
+                    {
+                        // The cluster to the root area
+                        boot_sector[0x2C] = 2;
+                        boot_sector[0x2D] = 0;
+                        boot_sector[0x2E] = 0;
+                        boot_sector[0x2F] = 0;
+                    }
                     PrepareRootArea();
 
                     // DATA offset
-                    DATA_OFFSET_START = ROOT_OFFSET_START + 0x20 * 512; // the root area is always 32 sectors
-                    DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;
+                    DATA_OFFSET_START = ROOT_OFFSET_START + ROOT_SIZE; // the root area is always 32 sectors
+                    DATA_SIZE = small_sectors != 0 ? small_sectors * 512 : large_sectors * 512;                    
                 }
             }
         }
@@ -457,11 +479,15 @@ namespace FoenixIDE.Simulator.Devices
 
             int pointer = 32;
             int currentCluster = 4;
+            if (GetFSType() == FSType.FAT32)
+            {
+                currentCluster = 2 + 32 * 512 / GetClusterSize();
+            }
             
             foreach (string dir in dirs)
             {
                 FileInfo info = new FileInfo(dir);
-                string dirname = info.Name.ToUpper();
+                string dirname = info.Name.Replace(" ", "").ToUpper();
                 if (dirname.Length < 8)
                 {
                     dirname += spaces.Substring(0, 8 - dirname.Length);
@@ -478,7 +504,7 @@ namespace FoenixIDE.Simulator.Devices
                 int size = (int)info.Length;
                 int clusters = size / logicalSectorSize;
                 string extension = info.Extension.ToUpper().Substring(1);
-                string filename = info.Name.ToUpper();
+                string filename = info.Name.Replace(" ", "").ToUpper();
                 int dot = filename.IndexOf(".");
                 if (dot > -1)
                 {
@@ -514,6 +540,11 @@ namespace FoenixIDE.Simulator.Devices
                 // cluster number
                 root[pointer + 0x1a] = (byte)(currentCluster & 0xFF);
                 root[pointer + 0x1b] = (byte)((currentCluster & 0xFF00) >> 8);
+                if (GetFSType() == FSType.FAT32)
+                {
+                    root[pointer + 0x14] = (byte)((currentCluster & 0xFF0000) >> 16);
+                    root[pointer + 0x15] = (byte)((currentCluster & 0xFF000000) >> 24);
+                }
                 // file size
                 root[pointer + 0x1c] = (byte)(size & 0xFF);
                 root[pointer + 0x1d] = (byte)((size & 0xFF00) >> 8);
@@ -527,39 +558,76 @@ namespace FoenixIDE.Simulator.Devices
         private void BuildFatPage(int page)
         {
             Array.Clear(fat, 0, 512);
-            // Determine how many entries are in FAT sector
-            int fatCount = 512 / 2; // 256
+            // The most likely used FS is FAT32
+            int fatCount = 0;
             int byteOffset = 0;
-            if (fsType == FSType.FAT12)
+            switch (GetFSType())
             {
-                fatCount = 513 / 3 * 2; //341
-                if (page % 3 != 0)
-                {
-                    byteOffset = (page % 3) - 3;
-                }
-            }
+                case FSType.FAT12: 
+                    fatCount = 513 / 3 * 2; //341
+                    if (page % 3 != 0)
+                    {
+                        byteOffset = (page % 3) - 3;
+                    }
+                    break;
 
+                case FSType.FAT16:
+                    fatCount = 512 / 2; //256
+                    byteOffset = 0;
+                    break;
+                case FSType.FAT32:
+                    fatCount = 512 / 4; // 128
+                    byteOffset = 0;
+                    break;
+            }
+            
             if (page == 0)
             {
-                if (fsType == FSType.FAT12)
+                switch (GetFSType())
                 {
-                    fat[0] = 0xF8;
-                    fat[1] = 0xFF;
-                    fat[2] = 0xFF;
-                    fat[3] = 0xFF;
-                    fat[4] = 0xFF;
-                    fat[5] = 0xFF;
-                }
-                else
-                {
-                    fat[0] = 0xF8;
-                    fat[1] = 0xFF;
-                    fat[2] = 0xFF;
-                    fat[3] = 0xFF;
-                    fat[4] = 0xFF;
-                    fat[5] = 0xFF;
-                    fat[6] = 0xFF;
-                    fat[7] = 0xFF;
+                    case FSType.FAT12:
+                        fat[0] = 0xF8;
+                        fat[1] = 0xFF;
+                        fat[2] = 0xFF;
+                        fat[3] = 0xFF;
+                        fat[4] = 0xFF;
+                        fat[5] = 0xFF;
+                        break;
+                    case FSType.FAT16:
+                        fat[0] = 0xF0;
+                        fat[1] = 0xFF;
+                        fat[2] = 0xFF;
+                        fat[3] = 0xFF;
+                        fat[4] = 0xFF;
+                        fat[5] = 0xFF;
+                        fat[6] = 0xFF;
+                        fat[7] = 0xFF;
+                        break;
+                    case FSType.FAT32:
+                        fat[0] = 0xF0;
+                        fat[1] = 0xFF;
+                        fat[2] = 0xFF;
+                        fat[3] = 0xF0;
+                        fat[4] = 0xFF;
+                        fat[5] = 0xFF;
+                        fat[6] = 0xFF;
+                        fat[7] = 0x0F;
+
+                        // Generate the Root area FAT
+                        int currentCluster = 3;
+                        for (int i =0; i < 32 * 512/ GetClusterSize() - 1; i++)
+                        {
+                            fat[8 + i * 4] = (byte)(currentCluster++ & 0xFF);
+                            fat[8 + i * 4 + 1] = 0;
+                            fat[8 + i * 4 + 2] = 0;
+                            fat[8 + i * 4 + 3] = 0;
+
+                        }
+                        fat[8 + 31 * 4] = 0xFF;
+                        fat[8 + 31 * 4 + 1] = 0xFF;
+                        fat[8 + 31 * 4 + 2] = 0xFF;
+                        fat[8 + 31 * 4 + 3] = 0x0F;
+                        break;
                 }
             }
             // scan the FAT entries
@@ -576,76 +644,98 @@ namespace FoenixIDE.Simulator.Devices
                         startOffset = page * fatCount - key + byteOffset;
                         pageOffset = 0;
                     }
-                    if (fsType == FSType.FAT12)
+                    switch (GetFSType())
                     {
-                        
-                        // even numbers start at the boundary - odd numbers are at half byte
-                        for (int i = startOffset; i < entry.clusters; i++)
-                        {
-                            int position = (pageOffset + i - startOffset) >> 1;
-                            if ((pageOffset - startOffset + i) % 2 == 0)
+                        case FSType.FAT12:
+
+                            // even numbers start at the boundary - odd numbers are at half byte
+                            for (int i = startOffset; i < entry.clusters; i++)
                             {
-                                if (position * 3 + byteOffset >= 0 && position * 3 + byteOffset < 512)
+                                int position = (pageOffset + i - startOffset) >> 1;
+                                if ((pageOffset - startOffset + i) % 2 == 0)
                                 {
-                                    fat[position * 3 + byteOffset] = (byte)((key + i + 1) & 0xFF);
+                                    if (position * 3 + byteOffset >= 0 && position * 3 + byteOffset < 512)
+                                    {
+                                        fat[position * 3 + byteOffset] = (byte)((key + i + 1) & 0xFF);
+                                    }
+                                    if ((position * 3) + 1 + byteOffset >= 0 && (position * 3) + 1 + byteOffset < 512)
+                                    {
+                                        fat[(position * 3) + 1 + byteOffset] = (byte)(((key + i + 1) & 0xF00) >> 8);
+                                    }
                                 }
-                                if ((position * 3) + 1 + byteOffset >= 0 && (position * 3) + 1 + byteOffset < 512)
+                                else
                                 {
-                                    fat[(position * 3) + 1 + byteOffset] = (byte)(((key + i + 1) & 0xF00) >> 8);
+                                    if ((position * 3) + 1 + byteOffset >= 0)
+                                    {
+                                        int existingNibble = fat[position * 3 + 1 + byteOffset];
+                                        fat[position * 3 + 1 + byteOffset] = (byte)((((key + i + 1) & 0xF) << 4) + existingNibble);
+                                    }
+                                    if (position * 3 + 2 + byteOffset >= 0 && position * 3 + 2 < 512)
+                                    {
+                                        fat[position * 3 + 2 + byteOffset] = (byte)(((key + i + 1) & 0xFF0) >> 4);
+                                    }
+                                }
+
+                                if ((pageOffset + i - startOffset + 1) > fatCount)
+                                {
+                                    return;
                                 }
                             }
-                            else
+                            // write the end cluster
+                            if (pageOffset + entry.clusters - startOffset < fatCount)
                             {
-                                if ((position * 3) + 1 + byteOffset >= 0)
+                                int position = (pageOffset + entry.clusters - startOffset) >> 1;
+                                if ((pageOffset + entry.clusters - startOffset) % 2 == 0)
+                                {
+                                    fat[position * 3 + byteOffset] = 0xFF;
+                                    fat[(position * 3) + 1 + byteOffset] = 0xF;
+                                }
+                                else
                                 {
                                     int existingNibble = fat[position * 3 + 1 + byteOffset];
-                                    fat[position * 3 + 1 + byteOffset] = (byte)((((key + i + 1) & 0xF) << 4) + existingNibble);
+                                    fat[position * 3 + 1 + byteOffset] = (byte)(0xF0 + existingNibble);
+                                    fat[position * 3 + 2 + byteOffset] = 0xFF;
                                 }
-                                if (position * 3 + 2 + byteOffset >= 0 && position * 3 + 2 < 512)
+                            }
+                            break;
+                        case FSType.FAT16:
+                            for (int i = startOffset; i < entry.clusters; i++)
+                            {
+                                fat[(pageOffset + i - startOffset) * 2] = (byte)((key + i + 1) & 0xFF);
+                                fat[(pageOffset + i - startOffset) * 2 + 1] = (byte)(((key + i + 1) & 0xFF00) >> 8);
+                                if ((pageOffset + i - startOffset + 1) >= fatCount)
                                 {
-                                    fat[position * 3 + 2 + byteOffset] = (byte)(((key + i + 1) & 0xFF0) >> 4);
+                                    return;
                                 }
                             }
-                            
-                            if ((pageOffset + i - startOffset + 1) > fatCount)
+                            // write the end cluster
+                            if (pageOffset + entry.clusters - startOffset < fatCount)
                             {
-                                return;
+                                fat[(pageOffset + entry.clusters - startOffset) * 2] = 0xFF;
+                                fat[(pageOffset + entry.clusters - startOffset) * 2 + 1] = 0xFF;
                             }
-                        }
-                        // write the end cluster
-                        if (pageOffset + entry.clusters - startOffset < fatCount)
-                        {
-                            int position = (pageOffset + entry.clusters - startOffset) >> 1;
-                            if ((pageOffset + entry.clusters - startOffset) % 2 == 0)
+                            break;
+                        case FSType.FAT32:
+                            for (int i = startOffset; i < entry.clusters; i++)
                             {
-                                fat[position * 3 + byteOffset] = 0xFF;
-                                fat[(position * 3) + 1 + byteOffset] = 0xF;
+                                fat[(pageOffset + i - startOffset) * 4] = (byte)((key + i + 1) & 0xFF);
+                                fat[(pageOffset + i - startOffset) * 4 + 1] = (byte)(((key + i + 1) & 0xFF00) >> 8);
+                                fat[(pageOffset + i - startOffset) * 4 + 2] = (byte)(((key + i + 1) & 0xFF0000) >> 16);
+                                fat[(pageOffset + i - startOffset) * 4 + 3] = (byte)(((key + i + 1) & 0xFF000000) >> 24);
+                                if ((pageOffset + i - startOffset + 1) >= fatCount)
+                                {
+                                    return;
+                                }
                             }
-                            else
+                            // write the end cluster
+                            if (pageOffset + entry.clusters - startOffset < fatCount)
                             {
-                                int existingNibble = fat[position * 3 + 1 + byteOffset];
-                                fat[position * 3 + 1 + byteOffset] = (byte)(0xF0 + existingNibble);
-                                fat[position * 3 + 2 + byteOffset] = 0xFF;
+                                fat[(pageOffset + entry.clusters - startOffset) * 4] = 0xFF;
+                                fat[(pageOffset + entry.clusters - startOffset) * 4 + 1] = 0xFF;
+                                fat[(pageOffset + entry.clusters - startOffset) * 4 + 2] = 0xFF;
+                                fat[(pageOffset + entry.clusters - startOffset) * 4 + 3] = 0xF;
                             }
-                        }
-                    }
-                    else
-                    {
-                        for (int i = startOffset; i < entry.clusters; i ++)
-                        {
-                            fat[(pageOffset + i - startOffset) * 2] = (byte)((key + i + 1) & 0xFF);
-                            fat[(pageOffset + i - startOffset) * 2 + 1] = (byte)(((key + i + 1) & 0xFF00) >> 8);
-                            if ((pageOffset + i - startOffset + 1) >= fatCount)
-                            {
-                                return;
-                            }
-                        }
-                        // write the end cluster
-                        if (pageOffset + entry.clusters - startOffset < fatCount)
-                        {
-                            fat[(pageOffset + entry.clusters - startOffset) * 2] = 0xFF;
-                            fat[(pageOffset + entry.clusters - startOffset) * 2 + 1] = 0xFF;
-                        }
+                            break;
                     }
                 }
             }
@@ -660,13 +750,14 @@ namespace FoenixIDE.Simulator.Devices
             foreach (int key in FAT.Keys)
             {
                 FileEntry entry = FAT[key];
-                if (page >= ( key - 2 ) * sectors_per_cluster && page < (key - 2 + entry.clusters) * sectors_per_cluster)
+                int firstSector = (key - 2) * sectors_per_cluster;
+                if (page >= firstSector && page < (key - 2 + entry.clusters) * sectors_per_cluster)
                 {
                     byte[] buffer = new byte[512];
                     FileStream stream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
                     try
                     {
-                        stream.Seek((page - (key -2 ) * sectors_per_cluster) * 512, SeekOrigin.Begin);
+                        stream.Seek((page - firstSector) * 512, SeekOrigin.Begin);
                         stream.Read(buffer, 0, 512);
                         return buffer;
                     }

@@ -35,7 +35,11 @@ namespace FoenixIDE.Simulator.Devices
         {
         }
 
-       
+
+        public override void ResetMbrBootSector()
+        {
+            // Do nothing
+        }
 
         public override byte ReadByte(int Address)
         {

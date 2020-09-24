@@ -40,6 +40,10 @@
             this.CapacityCombo = new System.Windows.Forms.ComboBox();
             this.Iso_selection = new System.Windows.Forms.CheckBox();
             this.FileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ClusterCombo = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.FSTypeCombo = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SDCardFolderText
@@ -121,11 +125,15 @@
             "16",
             "32",
             "64",
-            "256"});
+            "256",
+            "512",
+            "1024",
+            "2048"});
             this.CapacityCombo.Location = new System.Drawing.Point(68, 67);
             this.CapacityCombo.Name = "CapacityCombo";
             this.CapacityCombo.Size = new System.Drawing.Size(56, 21);
             this.CapacityCombo.TabIndex = 12;
+            this.CapacityCombo.SelectedIndexChanged += new System.EventHandler(this.CapacityCombo_SelectedIndexChanged);
             // 
             // Iso_selection
             // 
@@ -144,12 +152,62 @@
             this.FileDialog.Filter = "ISO Files|*.iso|Image Files|*.img";
             this.FileDialog.Title = "Select an Image or ISO File";
             // 
+            // ClusterCombo
+            // 
+            this.ClusterCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ClusterCombo.FormattingEnabled = true;
+            this.ClusterCombo.Items.AddRange(new object[] {
+            "512",
+            "1024",
+            "2048",
+            "4096",
+            "8192"});
+            this.ClusterCombo.Location = new System.Drawing.Point(219, 68);
+            this.ClusterCombo.Name = "ClusterCombo";
+            this.ClusterCombo.Size = new System.Drawing.Size(56, 21);
+            this.ClusterCombo.TabIndex = 15;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(173, 70);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(42, 13);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "Cluster:";
+            // 
+            // FSTypeCombo
+            // 
+            this.FSTypeCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.FSTypeCombo.FormattingEnabled = true;
+            this.FSTypeCombo.Items.AddRange(new object[] {
+            "FAT12",
+            "FAT16",
+            "FAT32"});
+            this.FSTypeCombo.Location = new System.Drawing.Point(354, 67);
+            this.FSTypeCombo.Name = "FSTypeCombo";
+            this.FSTypeCombo.Size = new System.Drawing.Size(56, 21);
+            this.FSTypeCombo.TabIndex = 17;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(314, 70);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(34, 13);
+            this.label4.TabIndex = 16;
+            this.label4.Text = "Type:";
+            // 
             // SDCardWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonClose;
             this.ClientSize = new System.Drawing.Size(425, 129);
+            this.Controls.Add(this.FSTypeCombo);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.ClusterCombo);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.Iso_selection);
             this.Controls.Add(this.CapacityCombo);
             this.Controls.Add(this.label3);
@@ -181,5 +239,9 @@
         private System.Windows.Forms.ComboBox CapacityCombo;
         private System.Windows.Forms.CheckBox Iso_selection;
         private System.Windows.Forms.OpenFileDialog FileDialog;
+        private System.Windows.Forms.ComboBox ClusterCombo;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox FSTypeCombo;
+        private System.Windows.Forms.Label label4;
     }
 }

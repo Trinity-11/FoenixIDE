@@ -3,12 +3,19 @@ using FoenixIDE.Simulator.Devices.SDCard;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class SDCardDevice : MemoryRAM
+    public enum FSType
+    {
+        FAT12, FAT16, FAT32
+    };
+
+    public abstract class SDCardDevice : MemoryRAM
     {
         public bool isPresent = false;
         private string SDCardPath = "";
         private bool ISOMode = false;
         private int capacity = 8; // Capacity in MB
+        private int clusterSize = 4096;
+        private FSType fsType = FSType.FAT12;
         protected string sdCurrentPath = "";
         public delegate void SDCardInterruptEvent(CH376SInterrupt irq);
         public SDCardInterruptEvent sdCardIRQMethod;
@@ -17,6 +24,7 @@ namespace FoenixIDE.Simulator.Devices
         {
         }
 
+        // Path
         public string GetSDCardPath()
         {
             return SDCardPath;
@@ -25,6 +33,8 @@ namespace FoenixIDE.Simulator.Devices
         {
             SDCardPath = path;
         }
+
+        // Capacity
         public int GetCapacity()
         {
             return capacity;
@@ -33,6 +43,8 @@ namespace FoenixIDE.Simulator.Devices
         {
             capacity = value;
         }
+
+        // ISO mode
         public bool GetISOMode()
         {
             return ISOMode;
@@ -41,5 +53,28 @@ namespace FoenixIDE.Simulator.Devices
         {
             ISOMode = mode;
         }
+
+        // Cluster Size
+        public void SetClusterSize(int value)
+        {
+            clusterSize = value;
+        }
+        public int GetClusterSize()
+        {
+            return clusterSize;
+        }
+
+        // Filesystem Type
+        public void SetFSType(FSType value)
+        {
+            fsType = value;
+
+        }
+        public FSType GetFSType()
+        {
+            return fsType;
+        }
+
+        public abstract void ResetMbrBootSector();
     }
 }

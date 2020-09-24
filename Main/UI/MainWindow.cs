@@ -733,6 +733,8 @@ namespace FoenixIDE.UI
             {
                 sdCardWindow.SetPath(kernel.MemMgr.SDCARD.GetSDCardPath());
                 sdCardWindow.SetCapacity(kernel.MemMgr.SDCARD.GetCapacity());
+                sdCardWindow.SetClusterSize(kernel.MemMgr.SDCARD.GetClusterSize());
+                sdCardWindow.SetFSType(kernel.MemMgr.SDCARD.GetFSType().ToString());
                 sdCardWindow.ShowDialog(this);
                 ResetSDCard();
             }
@@ -742,7 +744,10 @@ namespace FoenixIDE.UI
         {
             string path = sdCardWindow.GetPath();
             int capacity = sdCardWindow.GetCapacity();
+            int clusterSize = sdCardWindow.GetClusterSize();
+            string fsType = sdCardWindow.GetFSType();
             bool ISOMode = sdCardWindow.GetISOMode();
+
             kernel.MemMgr.SDCARD.SetSDCardPath(path);
             byte sdCardStat = 0;
             if (path == null || path.Length == 0)
@@ -758,6 +763,21 @@ namespace FoenixIDE.UI
                 sdCardStat = 1;
                
                 kernel.MemMgr.SDCARD.SetCapacity(capacity);
+                kernel.MemMgr.SDCARD.SetClusterSize(clusterSize);
+                
+                if ("FAT12".Equals(fsType))
+                {
+                    kernel.MemMgr.SDCARD.SetFSType(FSType.FAT12);
+                }
+                else if ("FAT16".Equals(fsType))
+                {
+                    kernel.MemMgr.SDCARD.SetFSType(FSType.FAT16);
+                }
+                else if ("FAT32".Equals(fsType))
+                {
+                    kernel.MemMgr.SDCARD.SetFSType(FSType.FAT32);
+                }
+                kernel.MemMgr.SDCARD.ResetMbrBootSector();
             }
             if (typeof(CH376SRegister) == kernel.MemMgr.SDCARD.GetType())
             {
