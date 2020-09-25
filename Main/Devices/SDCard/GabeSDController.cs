@@ -26,7 +26,7 @@ namespace FoenixIDE.Simulator.Devices
         private byte[] mbr = new byte[512];
         private byte[] boot_sector = new byte[512];
         private byte[] fat = new byte[512];
-        private byte[] block;
+        private byte[] readBlock, writeBlock = new byte[512];
         private byte[] root = new byte[32 * 512]; // root dir is always 32 sectors, except FAT32, which omits it.
         private int blockPtr = 0;
         private int waitCounter = 4;
@@ -43,6 +43,9 @@ namespace FoenixIDE.Simulator.Devices
         private string spaces = "        ";
         private bool mbrPresent = false;
         
+        int writeStartCluster = 0; // this is used when writing to file, to determine the cluster number
+        FileEntry voidEntry = null; // this is a "newfile" entry that gets used when creating a new file.
+
 
         private GabeCtrlCommand currentCommand = GabeCtrlCommand.DIRECT;
 
@@ -63,7 +66,7 @@ namespace FoenixIDE.Simulator.Devices
                     // return 
                     return isPresent ? data[5] : (byte)1;
                 case MemoryMap.GABE_SDC_RX_FIFO_DATA_REG - MemoryMap.GABE_SDC_CTRL_START:
-                    return isPresent ? (block != null ? block[blockPtr++] : (byte)0xEF) : (byte)0;
+                    return isPresent ? (readBlock != null ? readBlock[blockPtr++] : (byte)0xEF) : (byte)0;
             }
             return data[Address];
         }
@@ -98,58 +101,58 @@ namespace FoenixIDE.Simulator.Devices
                                 waitCounter = 10; // the read operation will be a little longer
                                                   // determine which block to read
                                 blockPtr = 0;
-                                block = null;
-                                int address = ReadWord(7) + (ReadWord(9) << 16);
+                                readBlock = null;
+                                int readAddress = ReadWord(7) + (ReadWord(9) << 16);
                                 if (GetISOMode())
                                 {
-                                    // In the case of address 0, we need to create a "fake" MBR.
-                                    if (address == 0)
+                                    // In the case of address 0, return the MBR.
+                                    if (readAddress == 0)
                                     {
-                                        block = mbr;
+                                        readBlock = mbr;
                                     }
                                     else
                                     {
-                                        block = GetData_ISO((address - (mbrPresent ? 0 : BOOT_SECTOR_ADDR)) / 512);
+                                        readBlock = GetData_ISO((readAddress - (mbrPresent ? 0 : BOOT_SECTOR_ADDR)) / 512);
                                     }
                                 }
                                 else
                                 {
-                                    if (address == 0)
+                                    if (readAddress == 0)
                                     {
-                                        block = mbr;
+                                        readBlock = mbr;
 
                                     }
-                                    else if (address == BOOT_SECTOR_ADDR)
+                                    else if (readAddress == BOOT_SECTOR_ADDR)
                                     {
-                                        block = boot_sector;
+                                        readBlock = boot_sector;
                                     }
-                                    else if (address >= FAT_OFFSET_START && address <= FAT_OFFSET_START + FAT_SIZE - 1)
+                                    else if (readAddress >= FAT_OFFSET_START && readAddress <= FAT_OFFSET_START + FAT_SIZE - 1)
                                     {
                                         // read the fat table
                                         blockPtr = 0;
-                                        int fatPage = (address - FAT_OFFSET_START) / 512;
+                                        int fatPage = (readAddress - FAT_OFFSET_START) / 512;
                                         BuildFatPage(fatPage);
-                                        block = fat;
+                                        readBlock = fat;
                                     }
-                                    else if (address >= ROOT_OFFSET_START && address <= ROOT_OFFSET_START + ROOT_SIZE - 1)
+                                    else if (readAddress >= ROOT_OFFSET_START && readAddress <= ROOT_OFFSET_START + ROOT_SIZE - 1)
                                     {
                                         // read the root table
-                                        block = root;
-                                        blockPtr = address - ROOT_OFFSET_START;
+                                        readBlock = root;
+                                        blockPtr = readAddress - ROOT_OFFSET_START;
                                     }
-                                    else if (address >= DATA_OFFSET_START && address <= DATA_OFFSET_START + DATA_SIZE - 1)
+                                    else if (readAddress >= DATA_OFFSET_START && readAddress <= DATA_OFFSET_START + DATA_SIZE - 1)
                                     {
                                         // read the data
-                                        int dataPage = (address - DATA_OFFSET_START) / 512;
+                                        int dataPage = (readAddress - DATA_OFFSET_START) / 512;
                                         if (GetFSType() == FSType.FAT32)
                                         {
                                             dataPage += ROOT_SIZE / 512;
                                         }
-                                        block = GetData(dataPage);
+                                        readBlock = GetData(dataPage);
                                         blockPtr = 0;
                                     }
                                 }
-                                if (block != null)
+                                if (readBlock != null)
                                 {
                                     // tell the reader that we've got 512 bytes
                                     data[0x12] = 2;
@@ -168,12 +171,57 @@ namespace FoenixIDE.Simulator.Devices
                                                   // determine which block to write
                                 blockPtr = 0;
 
-                                int address_WR = ReadWord(7) + (ReadWord(9) << 16);
+                                int writeAddress = ReadWord(7) + (ReadWord(9) << 16);
                                 if (GetISOMode())
                                 {
-                                    SetData_ISO((address_WR - BOOT_SECTOR_ADDR) / 512, block); // write the 512 Byte buffer
-                                    block = new byte[512];
+                                    SetData_ISO((writeAddress - BOOT_SECTOR_ADDR) / 512, readBlock); // write the 512 Byte buffer
                                 }
+                                else
+                                {
+                                    if (writeAddress == 0)
+                                    {
+                                        Console.WriteLine("Gabe is trying to write to MBR!");
+
+                                    }
+                                    else if (writeAddress == BOOT_SECTOR_ADDR)
+                                    {
+                                        Console.WriteLine("Gabe is trying to write to Boot Sector!");
+                                    }
+                                    else if (writeAddress >= FAT_OFFSET_START && writeAddress <= FAT_OFFSET_START + FAT_SIZE - 1)
+                                    {
+                                        Console.WriteLine("Gabe is trying to write to FAT Area!");
+                                        
+                                        // read the fat table
+                                        blockPtr = 0;
+                                        int fatPage = (writeAddress - FAT_OFFSET_START) / 512;
+                                        // Compare the last FAT with the writeBlock - based on how many clusters are created, we can determine the filesize
+                                        PrepareEmptyFileEntry(fatPage);
+                                        writeBlock = new byte[512];
+                                    }
+                                    else if (writeAddress >= ROOT_OFFSET_START && writeAddress <= ROOT_OFFSET_START + ROOT_SIZE - 1)
+                                    {
+                                        Console.WriteLine("Gabe is trying to write to Root Area!");
+                                        blockPtr = writeAddress - ROOT_OFFSET_START;
+                                        UpdateRootEntries();
+                                        firstPtr = -1;
+                                        lastPtr = -1;
+                                    }
+                                    else if (writeAddress >= DATA_OFFSET_START && writeAddress <= DATA_OFFSET_START + DATA_SIZE - 1)
+                                    {
+                                        Console.WriteLine("Gabe is trying to write to Data Area!");
+
+                                        // read the data
+                                        int dataPage = (writeAddress - DATA_OFFSET_START) / 512;
+                                        if (GetFSType() == FSType.FAT32)
+                                        {
+                                            dataPage += ROOT_SIZE / 512;
+                                        }
+                                        SetData(dataPage, writeBlock);
+                                        blockPtr = 0;
+                                    }
+                                }
+                                // reset the write block
+                                writeBlock = new byte[512];
                                 break;
                         }
                     }
@@ -191,7 +239,7 @@ namespace FoenixIDE.Simulator.Devices
                     if (Value == 1)
                     {
                         blockPtr = 0;
-                        block = new byte[512];
+                        writeBlock = new byte[512];
                         data[0x12] = 0;
                         data[0x13] = 0;
                     }
@@ -202,7 +250,7 @@ namespace FoenixIDE.Simulator.Devices
                     {
                         blockPtr = 0;
                     }
-                    block[blockPtr++] = Value;
+                    writeBlock[blockPtr++] = Value;
                     break;
             }
         }
@@ -554,7 +602,78 @@ namespace FoenixIDE.Simulator.Devices
                 pointer += 32;
             }
         }
-        
+
+
+        // We're writing to the Root entries, so this means:
+        // - A new file was created,
+        // - A file was deleted
+        // - A file was moved
+        private void UpdateRootEntries()
+        {
+            // Detect what changed - each entry is 32 bytes
+            for (int i = 0; i < 512; i = i + 0x20)
+            {
+                byte byte0 = writeBlock[i];
+                byte attrs = writeBlock[i + 0xB];
+                if (attrs != 8)
+                {
+                    // Get the cluster
+                    int key = writeBlock[i + 0x1a] + (writeBlock[i + 0x1b] << 8);
+                    if (GetFSType() == FSType.FAT32)
+                    {
+                        key += (writeBlock[i + 0x14] << 16) + (writeBlock[i + 0x15] << 24);
+                    }
+                    int size = writeBlock[i + 0x1c] + (writeBlock[i + 0x1d] << 8) + (writeBlock[i + 0x1e] << 16) + (writeBlock[i + 0x1f] << 24);
+                    if (FAT.ContainsKey(key))
+                    {
+                        FileEntry entry = FAT[key];
+                        // check if the file has been deleted
+                        if (byte0 == 0xE5 && entry != null)
+                        {
+                            File.Delete(entry.fqpn);
+                            FAT.Remove(key);
+                            continue;
+                        }
+                        string name = System.Text.Encoding.UTF8.GetString(writeBlock, i, 8);
+                        string ext = System.Text.Encoding.UTF8.GetString(writeBlock, i + 8, 3);
+                        if (byte0 != 0xE5 && entry == voidEntry)
+                        {
+                            entry.size = size;
+                            FileInfo info = new FileInfo(entry.fqpn);
+                            string newFileName = info.DirectoryName + "\\" + name.Trim() + "." + ext.Trim();
+                            FileStream readStream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
+                            FileStream writeStream = new FileStream(newFileName, FileMode.CreateNew);
+                            try
+                            {
+                                byte[] buffer = new byte[512];
+                                for (int cluster = 0; cluster < entry.clusters; cluster++)
+                                {
+                                    readStream.Read(buffer, cluster * 512, 512);
+                                    writeStream.Write(buffer, cluster * 512, (cluster == entry.clusters - 1) ? size % 512 : 512);
+                                }
+                                entry.fqpn = newFileName;
+                                entry.shortname = name; 
+                            }
+                            catch (Exception e)
+                            {
+                                // controller error
+                                data[5] = 1;
+                                System.Console.WriteLine(e.ToString());
+                            }
+                            finally
+                            {
+                                writeStream.Close();
+                                readStream.Close();
+                            }
+                            File.Delete(info.FullName);
+                        }
+
+                    }
+                }
+            }
+            Array.Copy(writeBlock, 0, root, blockPtr, 512);
+        }
+
         private void BuildFatPage(int page)
         {
             Array.Clear(fat, 0, 512);
@@ -754,9 +873,10 @@ namespace FoenixIDE.Simulator.Devices
                 if (page >= firstSector && page < (key - 2 + entry.clusters) * sectors_per_cluster)
                 {
                     byte[] buffer = new byte[512];
-                    FileStream stream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
+                    FileStream stream = null;
                     try
                     {
+                        stream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
                         stream.Seek((page - firstSector) * 512, SeekOrigin.Begin);
                         stream.Read(buffer, 0, 512);
                         return buffer;
@@ -770,13 +890,112 @@ namespace FoenixIDE.Simulator.Devices
                     }
                     finally
                     {
-                        stream.Close();
+                        if (stream != null)
+                        {
+                            stream.Close();
+                        }
                     }
                 }
             }
             return null;
         }
 
+        private void SetData(int page, byte[] buffer)
+        {
+            FileStream stream = new FileStream(voidEntry.fqpn, FileMode.Open, FileAccess.Write);
+            try
+            {
+                stream.Seek((page + 2 - writeStartCluster) * 512, SeekOrigin.Begin);
+                stream.Write(buffer, 0, 512);
+            }
+            catch (Exception e)
+            {
+                // controller error
+                data[5] = 1;
+                System.Console.WriteLine(e.ToString());
+            }
+            finally
+            {
+                stream.Close();
+            }
+        }
+
+        int firstPtr = -1, lastPtr = -1;
+        int clusterCount = 0;
+        private void PrepareEmptyFileEntry(int page)
+        {
+            int ffCntr = 0;
+            for (int i = 0; i < 512; i++)
+            {
+                if (firstPtr == -1)
+                {
+                    if (fat[i] != writeBlock[i])
+                    {
+                        firstPtr = i;
+                        if (writeBlock[i] == 0xFF)
+                        {
+                            ffCntr++;
+                        }
+                    }
+                }
+                else
+                {
+                    if (i % 4 != 3 && writeBlock[i] == 0xff)
+                    {
+                        ffCntr++;
+                    }
+                    if (ffCntr == 3 && i %4 ==3 && writeBlock[i] == 0x0f)
+                    {
+                        lastPtr = i;
+                        break;
+                    }
+                }
+            }
+            // Determine how many clusters have been added.
+            if (firstPtr != -1 && lastPtr != -1)
+            {
+                clusterCount = (lastPtr - firstPtr + 1) / 4;
+                // Create a new file entry
+                CreateEmptyFile(clusterCount * 512, page);
+            }
+            else if (firstPtr != -1 )
+            {
+                clusterCount = (512 - firstPtr) / 4;
+            }
+            else if (lastPtr != -1)
+            {
+                clusterCount += lastPtr / 4;
+                // Create a new file entry
+                CreateEmptyFile(clusterCount * 512, page);
+            }
+        }
+
+        private void CreateEmptyFile(int size, int page)
+        {
+            string path = GetSDCardPath();
+            string randomFileName = Guid.NewGuid().ToString();
+            string filename = path + "\\" + randomFileName + ".new";
+            using (var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                fs.SetLength(size);
+            }
+            voidEntry = new FileEntry();
+            voidEntry.fqpn = filename;
+            voidEntry.clusters = clusterCount;
+            
+
+            // calculate the first cluster offset
+            switch (GetFSType())
+            {
+                case FSType.FAT16:
+                    writeStartCluster = firstPtr / 2 - page * 256;
+                    break;
+                case FSType.FAT32:
+                    writeStartCluster = firstPtr / 4 + page * 128;
+                    break;
+            }
+            FAT.Add(writeStartCluster, voidEntry);
+        }
         /*
          * Return a sector of data from files.
          * by block of 512 Byte
@@ -790,7 +1009,7 @@ namespace FoenixIDE.Simulator.Devices
                 FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
                 try
                 {
-                    stream.Seek((page) * 512, SeekOrigin.Begin);
+                    stream.Seek(page * 512, SeekOrigin.Begin);
                     stream.Read(buffer, 0, 512);
                     return buffer;
                 }
@@ -817,7 +1036,7 @@ namespace FoenixIDE.Simulator.Devices
                 FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Write);
                 try
                 {
-                    stream.Seek((page) * 512, SeekOrigin.Begin);
+                    stream.Seek(page * 512, SeekOrigin.Begin);
                     stream.Write(buffer, 0, 512);
                     return;
                 }
