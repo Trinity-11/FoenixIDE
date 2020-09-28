@@ -574,6 +574,10 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     filename += spaces.Substring(0, 8 - filename.Length);
                 }
+                if (extension.Length < 3)
+                {
+                    extension += spaces.Substring(0, 3 - extension.Length);
+                }
                 FileEntry entry = new FileEntry()
                 {
                     fqpn = file,
@@ -870,7 +874,7 @@ namespace FoenixIDE.Simulator.Devices
             {
                 FileEntry entry = FAT[key];
                 int firstSector = (key - 2) * sectors_per_cluster;
-                if (page >= firstSector && page < (key - 2 + entry.clusters) * sectors_per_cluster)
+                if (page >= firstSector && page <= (key - 2 + entry.clusters) * sectors_per_cluster)
                 {
                     byte[] buffer = new byte[512];
                     FileStream stream = null;

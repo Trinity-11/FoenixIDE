@@ -771,45 +771,74 @@ namespace FoenixIDE.Processor
 
         public void ExecuteTransfer(byte instruction, AddressModes addressMode, int signature)
         {
+            int transWidth = 0;
             switch (instruction)
             {
+                // C - D - always 16-bit (except in emulation mode)
                 case OpcodeList.TCD_Implied:
                     cpu.DirectPage.Value = cpu.A.Value16;
+                    cpu.Flags.SetNZ(cpu.DirectPage.Value, 2);
                     break;
                 case OpcodeList.TDC_Implied:
                     cpu.A.Value16 = cpu.DirectPage.Value;
+                    cpu.Flags.SetNZ(cpu.A.Value16, 2);
                     break;
                 case OpcodeList.TCS_Implied:
                     cpu.Stack.Value = cpu.A.Value16;
                     cpu.Stack.TopOfStack = cpu.A.Value16;
+                    cpu.Flags.SetNZ(cpu.Stack.Value, 2);
                     break;
                 case OpcodeList.TSC_Implied:
                     cpu.A.Value16 = cpu.Stack.Value;
+                    cpu.Flags.SetNZ(cpu.A.Value16, 2);
+                    break;
+
+                // A - X
+                case OpcodeList.TXA_Implied:
+                    transWidth = cpu.A.Width;
+                    cpu.A.Value = transWidth == 1? cpu.X.Value & 0xFF : cpu.X.Value;
+                    cpu.Flags.SetNZ(cpu.A.Value, transWidth);
                     break;
                 case OpcodeList.TAX_Implied:
-                    cpu.X.Value = cpu.A.Value16;
+                    transWidth = cpu.X.Width;
+                    cpu.X.Value = transWidth == 1 ? cpu.A.Value16 & 0xFF : cpu.A.Value16;
+                    cpu.Flags.SetNZ(cpu.X.Value, transWidth);
+                    break;
+                // A - Y
+                case OpcodeList.TYA_Implied:
+                    transWidth = cpu.A.Width;
+                    cpu.A.Value = transWidth == 1 ? cpu.Y.Value & 0xFF : cpu.Y.Value;
+                    cpu.Flags.SetNZ(cpu.A.Value, transWidth);
                     break;
                 case OpcodeList.TAY_Implied:
-                    cpu.Y.Value = cpu.A.Value16;
+                    transWidth = cpu.Y.Width;
+                    cpu.Y.Value = transWidth == 1 ? cpu.A.Value16 & 0xFF : cpu.A.Value16;
+                    cpu.Flags.SetNZ(cpu.Y.Value, transWidth);
                     break;
+
+                // S - X
                 case OpcodeList.TSX_Implied:
-                    cpu.X.Value = cpu.Stack.Value;
-                    break;
-                case OpcodeList.TXA_Implied:
-                    cpu.A.Value = cpu.X.Value;
+                    transWidth = cpu.X.Width;
+                    cpu.X.Value = transWidth == 1 ? cpu.Stack.Value & 0xFF : cpu.Stack.Value;
+                    cpu.Flags.SetNZ(cpu.X.Value, transWidth);
                     break;
                 case OpcodeList.TXS_Implied:
                     cpu.Stack.Value = cpu.X.Value;
                     cpu.Stack.TopOfStack = cpu.X.Value;
+                    cpu.Flags.SetNZ(cpu.Stack.Value, 2);
                     break;
+
+                // X - Y
                 case OpcodeList.TXY_Implied:
-                    cpu.Y.Value = cpu.X.Value;
+                    transWidth = cpu.Y.Width;
+                    cpu.Y.Value = transWidth == 1 ? cpu.X.Value & 0xFF : cpu.X.Value;
+                    cpu.Flags.SetNZ(cpu.Y.Value, transWidth);
                     break;
-                case OpcodeList.TYA_Implied:
-                    cpu.A.Value = cpu.Y.Value;
-                    break;
+                
                 case OpcodeList.TYX_Implied:
-                    cpu.X.Value = cpu.Y.Value;
+                    transWidth = cpu.X.Width;
+                    cpu.X.Value = transWidth == 1 ? cpu.Y.Value & 0xFF : cpu.Y.Value;
+                    cpu.Flags.SetNZ(cpu.X.Value, transWidth);
                     break;
                 default:
                     throw new NotImplementedException("ExecuteTransfer() opcode not implemented: " + instruction.ToString("X2"));
@@ -878,16 +907,20 @@ namespace FoenixIDE.Processor
         {
             int data = GetValue(addressMode, signature, cpu.A.Width);
             int result = cpu.A.Value & data;
+            cpu.Flags.SetZ(result);
             if (addressMode != AddressModes.Immediate)
             {
-                cpu.Flags.SetNZ(result, cpu.A.Width);
                 if (cpu.A.Width == 2)
-                    cpu.Flags.oVerflow = (result & 0x4000) == 0x4000;
+                {
+                    cpu.Flags.oVerflow = (data & 0x4000) != 0;
+                    cpu.Flags.Negative = (data & 0x8000) != 0;
+                }
                 else
-                    cpu.Flags.oVerflow = (result & 0x400) == 0x40;
+                {
+                    cpu.Flags.oVerflow = (data & 0x40) != 0;
+                    cpu.Flags.Negative = (data & 0x80) != 0;
+                }
             }
-            else
-                cpu.Flags.SetZ(result);
         }
 
         public void ExecuteEOR(byte instruction, AddressModes addressMode, int signature)
@@ -914,7 +947,7 @@ namespace FoenixIDE.Processor
                 case OpcodeList.XBA_Implied: // transfer B into A
                     cpu.A.Swap();
                     cpu.Flags.Zero = (cpu.A.Low == 0);
-                    cpu.Flags.Negative = ((cpu.A.Low & 0x80) == 0x80);
+                    cpu.Flags.Negative = (cpu.A.Low & 0x80) != 0;
                     break;
                 default:
                     throw new NotImplementedException("ExecuteMisc() opcode not implemented: " + instruction.ToString("X2"));

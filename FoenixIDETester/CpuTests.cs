@@ -20,7 +20,7 @@ namespace FoenixIDETester
         {
             mgr = new MemoryManager
             {
-                RAM = new MemoryRAM(0, 3 * 0x1_0000),  // Only setup 3K of RAM - this should be tons to test our CPU
+                RAM = new MemoryRAM(0, 3 * 0x20_0000),
                 CODEC = new CodecRAM(1025,1),
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4)
             };
@@ -365,5 +365,52 @@ namespace FoenixIDETester
             Assert.AreEqual(0xEE55, cpu.Y.Value);
         }
 
+        /*
+         * http://www.6502.org/tutorials/65c816opcodes.html#6.1.2.2
+         * LDA #$43
+         * DBR $12
+         * address $12ABCD = $9C
+         * After BIT $ABCD, N=1 V=0, Z=1
+         */
+        [TestMethod]
+        public void TestBit()
+        {
+            cpu.A.Value = 0x43;
+            
+            cpu.SetEmulationMode();
+            cpu.DataBank.Value = 0x12;
+            // set the value in memory
+            mgr.RAM.WriteByte(0x12_ABCD, 0x9C);
+
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.BIT_Absolute);
+            mgr.RAM.WriteWord(cpu.PC + 1, 0xABCD);
+
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Negative);
+            Assert.IsTrue(cpu.Flags.Zero);
+            Assert.IsFalse(cpu.Flags.oVerflow);
+        }
+
+        /*
+         * http://www.6502.org/tutorials/65c816opcodes.html#6.10.1
+         *
+         * Accumulator $1234
+         * X is $ABCD
+         * in emulation
+         * After TXA, A contains $12CD
+         * N=1, Z=0
+         */ 
+        [TestMethod]
+        public void TestTransfer()
+        {
+            cpu.Flags.accumulatorShort = true;
+            cpu.A.Value = 0x1234;
+            cpu.X.Value = 0xABCD;
+
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.TXA_Implied);
+            cpu.ExecuteNext();
+            Assert.IsTrue(cpu.Flags.Negative);
+            Assert.IsFalse(cpu.Flags.Zero);
+        }
     }
 }
