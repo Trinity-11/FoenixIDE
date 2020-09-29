@@ -4,7 +4,7 @@ Development and Debugging Suite for the C256 Foenix Family of Computers.
 This project is derived from the Nu64 emulator built by Tom Wilson.  Nu64 is owned by Tom Wilson. 
 FoenixIDE is owned by the C256 team, led by Stefany Allaire.
 
-This is a virtual WDC 65816 powered computer. It is intended to be used as a software devlopment tool and learning platform for assembly language and BASIC programming. The software will be relesed with an open soruce license and may be used for whatever purpose you want, including personal projects, education, and commercial use. 
+This is a virtual WDC 65816 powered computer. It is intended to be used as a software development tool and learning platform for assembly language and BASIC programming. The software will be relesed with an open soruce license and may be used for whatever purpose you want, including personal projects, education, and commercial use. 
 
 The C256 is loosely based around the concept of the world's most popular computer, the Commodore 64. When you turn on the system, you see a BASIC screen, with the READY prompt. You can type in BASIC commands, enter programs, or load programs from disk, tape or cartridge. 
 
