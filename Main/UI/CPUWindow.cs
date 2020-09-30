@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Processor;
+using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using Microsoft.VisualBasic;
 
@@ -811,24 +812,26 @@ namespace FoenixIDE.UI
         {
             // Read Interrupt Register 0
             byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
-            if ((reg0 & 1) == 1 && SOFCheckbox.Checked)
+            if ((reg0 & (byte)Register0.FNX0_INT00_SOF) != 0 && SOFCheckbox.Checked)
             {
                 return true;
             }
-
-            if ((reg0 & 2) == 2 && SOLCheckbox.Checked)
+            if ((reg0 & (byte)Register0.FNX0_INT01_SOL) != 0 && SOLCheckbox.Checked)
+            {
+                return true;
+            }
+            if ((reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0 && MouseCheckbox.Checked)
             {
                 return true;
             }
 
             // Read Interrupt Register 1
             byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
-            if ((reg1 & 0x80 ) == 0x80 && SDCardCheckBox.Checked)
+            if ((reg1 & (byte)Register1.FNX1_INT07_SDCARD ) != 0 && SDCardCheckBox.Checked)
             {
                 return true;
             }
-
-            if ((reg1 & 1) == 1 && KeyboardCheckBox.Checked)
+            if ((reg1 & (byte)Register1.FNX1_INT00_KBD) != 0 && KeyboardCheckBox.Checked)
             {
                 return true;
             }
