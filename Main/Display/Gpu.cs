@@ -248,8 +248,8 @@ namespace FoenixIDE.Display
             byte border_register = VICKY.ReadByte(MemoryMap.BORDER_CTRL_REG - MemoryMap.VICKY_BASE_ADDR);
             bool displayBorder = (border_register & 1) != 0;
 
-            int borderXSize = VICKY.ReadByte(MemoryMap.BORDER_X_SIZE - MemoryMap.VICKY_BASE_ADDR);
-            int borderYSize = VICKY.ReadByte(MemoryMap.BORDER_Y_SIZE - MemoryMap.VICKY_BASE_ADDR);
+            int borderXSize = displayBorder ? VICKY.ReadByte(MemoryMap.BORDER_X_SIZE - MemoryMap.VICKY_BASE_ADDR) : 0;
+            int borderYSize = displayBorder ? VICKY.ReadByte(MemoryMap.BORDER_Y_SIZE - MemoryMap.VICKY_BASE_ADDR) : 0;
             if (isPixelDoubled)
             {
                 borderXSize >>= 1; // divide by 2
@@ -673,7 +673,7 @@ namespace FoenixIDE.Display
             int tilemapItemCount = width / TILE_SIZE + 1;
             byte[] tiles = new byte[tilemapItemCount * 2];
             int[] tilesetOffsets = new int[tilemapItemCount];
-            VRAM.CopyIntoBuffer(tilemapAddress + (3 + tilemapWindowX / TILE_SIZE) * 2 + (tileRow + 2) * tilemapWidth * 2, tiles, 0, tilemapItemCount * 2);
+            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / TILE_SIZE) * 2 + (tileRow + 0) * tilemapWidth * 2, tiles, 0, tilemapItemCount * 2);
 
             // cache of tilesetPointers
             int[] tilesetPointers = new int[8];
