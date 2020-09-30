@@ -8,8 +8,18 @@ namespace FoenixIDE.Simulator.Devices
 {
     public class KeyboardRegister: MemoryLocations.MemoryRAM
     {
+        private bool mouseDevice = false;
+        private byte ps2PacketCntr = 0;
+        private byte[] ps2packet = new byte[3];
+        private FoenixSystem kernel;
+
         public KeyboardRegister(int StartAddress, int Length) : base(StartAddress, Length)
         {
+        }
+
+        public void SetKernel(FoenixSystem kernel)
+        {
+            this.kernel = kernel;
         }
 
         // This is used to simulate the Keyboard Register
@@ -75,11 +85,25 @@ namespace FoenixIDE.Simulator.Devices
             // Whenever the buffer is read, set the buffer to empty.
             if (Address == 0)
             {
-                data[4] = 0;
+                if (!mouseDevice)
+                {
+                    data[4] = 0;
+                }
+                else if (ps2PacketCntr != 0)
+                {
+                    // send the next byte in the packet
+                    data[4] = ps2packet[ps2PacketCntr++];
+                    if (ps2PacketCntr == 3)
+                    {
+                        ps2PacketCntr = 0;
+                    }
+                    // raise interrupt
+                    TriggerMouseInterrupt();
+                }
             }
             return base.ReadByte(Address);
         }
-        public void WriteKey(FoenixSystem kernel, ScanCode key)
+        public void WriteKey(ScanCode key)
         {
             // Check if the Keyboard interrupt is allowed
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
@@ -93,6 +117,27 @@ namespace FoenixIDE.Simulator.Devices
                 kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
                 kernel.CPU.Pins.IRQ = true;
             }
+        }
+
+        
+        public void MousePackets(byte buttons, byte X, byte Y)
+        {
+            mouseDevice = true;
+            data[0] = buttons;
+            ps2packet[0] = buttons;
+            ps2packet[1] = X;
+            ps2packet[2] = Y;
+            ps2PacketCntr = 1;
+
+            TriggerMouseInterrupt();
+        }
+        private void TriggerMouseInterrupt()
+        {
+            // Set the Mouse Interrupt
+            byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+            IRQ0 |= (byte)Register0.FNX0_INT07_MOUSE;
+            kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+            kernel.CPU.Pins.IRQ = true;
         }
     }
 }

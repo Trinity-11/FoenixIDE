@@ -70,7 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Basic\Joystick.cs" />
     <Compile Include="Basic\ScanCodes.cs" />
     <Compile Include="Devices\BoardVersion.cs" />
     <Compile Include="Devices\GabeRAM.cs" />
@@ -294,6 +293,7 @@
     <EmbeddedResource Include="UI\WatchForm.resx">
       <DependentUpon>WatchForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

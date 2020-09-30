@@ -320,7 +320,7 @@ namespace FoenixIDE.UI
 
         public void SDCardInterrupt(CH376SInterrupt irq)
         {
-            // Check if the Keyboard interrupt is allowed
+            // Check if the SD Card interrupt is allowed
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
             if (!kernel.CPU.DebugPause && (~mask & (byte)Register1.FNX1_INT07_SDCARD) == (byte)Register1.FNX1_INT07_SDCARD)
             {
@@ -343,7 +343,7 @@ namespace FoenixIDE.UI
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
                 if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
-                    kernel.MemMgr.KEYBOARD.WriteKey(kernel, scanCode);
+                    kernel.MemMgr.KEYBOARD.WriteKey(scanCode);
                 }
             }
             else
@@ -361,7 +361,7 @@ namespace FoenixIDE.UI
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
                 if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
-                    kernel.MemMgr.KEYBOARD.WriteKey(kernel, scanCode);
+                    kernel.MemMgr.KEYBOARD.WriteKey(scanCode);
                 }
             }
             else
@@ -676,20 +676,61 @@ namespace FoenixIDE.UI
             }
             else if (kernel.MemMgr != null)
             {
-                // Read the mouse pointer register
-                byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0x700);
-                if ((mouseReg & 1) == 1)
-                {
-                    int X = (int)(e.X / ratioW);
-                    int Y = (int)(e.Y / ratioH);
-                    kernel.MemMgr.VICKY.WriteWord(0x702, X);
-                    kernel.MemMgr.VICKY.WriteWord(0x704, Y);
-                    
-                }
-                else
-                {
-                    this.Cursor = Cursors.Default;
-                }
+                GenerateMouseInterrupt(e);
+            }
+        }
+
+        private void gpu_MouseDown(object sender, MouseEventArgs e)
+        {
+            Point size = gpu.GetScreenSize();
+            double ratioW = gpu.Width / size.X;
+            double ratioH = gpu.Height / size.Y;
+            if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
+            {
+
+                TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
+            }
+            else
+            {
+                GenerateMouseInterrupt(e);
+            }
+        }
+
+
+        private void gpu_MouseUp(object sender, MouseEventArgs e)
+        {
+            GenerateMouseInterrupt(e);
+        }
+
+        private void GenerateMouseInterrupt(MouseEventArgs e)
+        {
+            Point size = gpu.GetScreenSize();
+            double ratioW = gpu.Width / (double)size.X;
+            double ratioH = gpu.Height / (double)size.Y;
+            int X = (int)(e.X / ratioW);
+            int Y = (int)(e.Y / ratioH);
+            bool middle = e.Button == MouseButtons.Middle;
+            bool left = e.Button == MouseButtons.Left;
+            bool right = e.Button == MouseButtons.Right;
+
+            // Read the mouse pointer register
+            byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0x700);
+            if ((mouseReg & 1) == 1)
+            {
+                kernel.MemMgr.VICKY.WriteWord(0x702, X);
+                kernel.MemMgr.VICKY.WriteWord(0x704, Y);
+            }
+            else
+            {
+                this.Cursor = Cursors.Default;
+            }
+            
+            // Generate three interrupts - to emulate how the PS/2 controller works
+            byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            // The PS/2 packet is byte0, xm, ym
+            if ((~mask & (byte)Register0.FNX0_INT07_MOUSE) == (byte)Register0.FNX0_INT07_MOUSE)
+            {
+                kernel.MemMgr.KEYBOARD.MousePackets((byte)(8+(middle?4:0)+ (right?2:0) + (left?1:0)) , (byte)(X & 0xFF), (byte)(Y & 0xFF));
             }
         }
 
@@ -702,16 +743,7 @@ namespace FoenixIDE.UI
             this.Cursor = Cursors.Default;
         }
 
-        private void gpu_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
-            {
-                Point size = gpu.GetScreenSize();
-                double ratioW = gpu.Width / size.X;
-                double ratioH = gpu.Height / size.Y;
-                TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
-            }
-        }
+        
 
 
         private void Gpu_MouseEnter(object sender, EventArgs e)

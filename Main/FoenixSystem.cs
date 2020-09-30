@@ -64,6 +64,7 @@ namespace FoenixIDE
                 VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE)
             };
             MemMgr.CODEC = codec;
+            MemMgr.KEYBOARD.SetKernel(this);
 
             // Assign memory variables used by other processes
             CPU = new CPU(MemMgr);
