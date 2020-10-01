@@ -265,10 +265,6 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void NewTileLoaded(int layer)
-        {
-            tileEditor?.SelectLayer(layer);
-        }
         /*
          * Loading image into memory requires the user to specify what kind of image (tile, bitmap, sprite).
          * What address location in video RAM.
@@ -281,7 +277,6 @@ namespace FoenixIDE.UI
                 Memory = kernel.CPU.Memory,
                 ResChecker = ResChecker
             };
-            loader.OnTileLoaded += NewTileLoaded;
             loader.ShowDialog(this);
         }
 
@@ -713,17 +708,8 @@ namespace FoenixIDE.UI
             bool left = e.Button == MouseButtons.Left;
             bool right = e.Button == MouseButtons.Right;
 
-            // Read the mouse pointer register
-            byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0x700);
-            if ((mouseReg & 1) == 1)
-            {
-                kernel.MemMgr.VICKY.WriteWord(0x702, X);
-                kernel.MemMgr.VICKY.WriteWord(0x704, Y);
-            }
-            else
-            {
-                this.Cursor = Cursors.Default;
-            }
+            kernel.MemMgr.VICKY.WriteWord(0x702, X);
+            kernel.MemMgr.VICKY.WriteWord(0x704, Y);
             
             // Generate three interrupts - to emulate how the PS/2 controller works
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
@@ -736,7 +722,7 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseLeave(object sender, EventArgs e)
         {
-            if (gpu.MousePointerMode || gpu.TileEditorMode)
+            if (gpu.IsMousePointerVisible() || gpu.TileEditorMode)
             {
                 Cursor.Show();
             }
@@ -748,7 +734,7 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseEnter(object sender, EventArgs e)
         {
-            if (gpu.MousePointerMode && !gpu.TileEditorMode)
+            if (gpu.IsMousePointerVisible() && !gpu.TileEditorMode)
             {
                 Cursor.Hide();
             }

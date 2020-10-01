@@ -36,13 +36,9 @@
             this.LoadAddressLabel = new System.Windows.Forms.Label();
             this.LoadAddressTextBox = new System.Windows.Forms.TextBox();
             this.DollarSignLabel = new System.Windows.Forms.Label();
-            this.BitmapSizeLabel = new System.Windows.Forms.Label();
-            this.BitmapSizeValueLabel = new System.Windows.Forms.Label();
             this.StoreButton = new System.Windows.Forms.Button();
             this.TypeLabel = new System.Windows.Forms.Label();
-            this.BitmapTypesCombo = new System.Windows.Forms.ComboBox();
-            this.PixelDepthLabel = new System.Windows.Forms.Label();
-            this.PixelDepthValueLabel = new System.Windows.Forms.Label();
+            this.FileTypesCombo = new System.Windows.Forms.ComboBox();
             this.LabelLUT = new System.Windows.Forms.Label();
             this.LUTCombo = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
@@ -75,9 +71,9 @@
             this.FileSizeLabel.Location = new System.Drawing.Point(11, 37);
             this.FileSizeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeLabel.Name = "FileSizeLabel";
-            this.FileSizeLabel.Size = new System.Drawing.Size(73, 13);
+            this.FileSizeLabel.Size = new System.Drawing.Size(59, 13);
             this.FileSizeLabel.TabIndex = 4;
-            this.FileSizeLabel.Text = "Image Size:";
+            this.FileSizeLabel.Text = "File Size:";
             // 
             // FileSizeResultLabel
             // 
@@ -93,7 +89,7 @@
             // 
             this.LoadAddressLabel.AutoSize = true;
             this.LoadAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LoadAddressLabel.Location = new System.Drawing.Point(12, 57);
+            this.LoadAddressLabel.Location = new System.Drawing.Point(259, 38);
             this.LoadAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.LoadAddressLabel.Name = "LoadAddressLabel";
             this.LoadAddressLabel.Size = new System.Drawing.Size(88, 13);
@@ -102,50 +98,28 @@
             // 
             // LoadAddressTextBox
             // 
-            this.LoadAddressTextBox.Location = new System.Drawing.Point(142, 53);
+            this.LoadAddressTextBox.Location = new System.Drawing.Point(389, 34);
             this.LoadAddressTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.LoadAddressTextBox.Name = "LoadAddressTextBox";
             this.LoadAddressTextBox.Size = new System.Drawing.Size(71, 20);
             this.LoadAddressTextBox.TabIndex = 8;
             this.LoadAddressTextBox.Text = "B0:0000";
-            this.LoadAddressTextBox.TextChanged += new System.EventHandler(this.LoadAddressTextBox_TextChanged);
             // 
             // DollarSignLabel
             // 
             this.DollarSignLabel.AutoSize = true;
-            this.DollarSignLabel.Location = new System.Drawing.Point(130, 54);
+            this.DollarSignLabel.Location = new System.Drawing.Point(377, 35);
             this.DollarSignLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DollarSignLabel.Name = "DollarSignLabel";
             this.DollarSignLabel.Size = new System.Drawing.Size(13, 13);
             this.DollarSignLabel.TabIndex = 9;
             this.DollarSignLabel.Text = "$";
             // 
-            // BitmapSizeLabel
-            // 
-            this.BitmapSizeLabel.AutoSize = true;
-            this.BitmapSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BitmapSizeLabel.Location = new System.Drawing.Point(230, 37);
-            this.BitmapSizeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.BitmapSizeLabel.Name = "BitmapSizeLabel";
-            this.BitmapSizeLabel.Size = new System.Drawing.Size(77, 13);
-            this.BitmapSizeLabel.TabIndex = 10;
-            this.BitmapSizeLabel.Text = "Bitmap Size:";
-            // 
-            // BitmapSizeValueLabel
-            // 
-            this.BitmapSizeValueLabel.AutoSize = true;
-            this.BitmapSizeValueLabel.Location = new System.Drawing.Point(306, 37);
-            this.BitmapSizeValueLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.BitmapSizeValueLabel.Name = "BitmapSizeValueLabel";
-            this.BitmapSizeValueLabel.Size = new System.Drawing.Size(30, 13);
-            this.BitmapSizeValueLabel.TabIndex = 11;
-            this.BitmapSizeValueLabel.Text = "0 x 0";
-            // 
             // StoreButton
             // 
             this.StoreButton.Enabled = false;
             this.StoreButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StoreButton.Location = new System.Drawing.Point(13, 110);
+            this.StoreButton.Location = new System.Drawing.Point(189, 110);
             this.StoreButton.Margin = new System.Windows.Forms.Padding(2);
             this.StoreButton.Name = "StoreButton";
             this.StoreButton.Size = new System.Drawing.Size(112, 24);
@@ -158,50 +132,29 @@
             // 
             this.TypeLabel.AutoSize = true;
             this.TypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TypeLabel.Location = new System.Drawing.Point(12, 78);
+            this.TypeLabel.Location = new System.Drawing.Point(15, 70);
             this.TypeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.TypeLabel.Name = "TypeLabel";
             this.TypeLabel.Size = new System.Drawing.Size(39, 13);
             this.TypeLabel.TabIndex = 12;
             this.TypeLabel.Text = "Type:";
             // 
-            // BitmapTypesCombo
+            // FileTypesCombo
             // 
-            this.BitmapTypesCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.BitmapTypesCombo.FormattingEnabled = true;
-            this.BitmapTypesCombo.Location = new System.Drawing.Point(134, 78);
-            this.BitmapTypesCombo.Margin = new System.Windows.Forms.Padding(2);
-            this.BitmapTypesCombo.Name = "BitmapTypesCombo";
-            this.BitmapTypesCombo.Size = new System.Drawing.Size(144, 21);
-            this.BitmapTypesCombo.TabIndex = 13;
-            this.BitmapTypesCombo.SelectedIndexChanged += new System.EventHandler(this.BitmapTypesCombo_SelectedIndexChanged);
-            // 
-            // PixelDepthLabel
-            // 
-            this.PixelDepthLabel.AutoSize = true;
-            this.PixelDepthLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PixelDepthLabel.Location = new System.Drawing.Point(357, 37);
-            this.PixelDepthLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.PixelDepthLabel.Name = "PixelDepthLabel";
-            this.PixelDepthLabel.Size = new System.Drawing.Size(76, 13);
-            this.PixelDepthLabel.TabIndex = 14;
-            this.PixelDepthLabel.Text = "Pixel Depth:";
-            // 
-            // PixelDepthValueLabel
-            // 
-            this.PixelDepthValueLabel.AutoSize = true;
-            this.PixelDepthValueLabel.Location = new System.Drawing.Point(430, 37);
-            this.PixelDepthValueLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.PixelDepthValueLabel.Name = "PixelDepthValueLabel";
-            this.PixelDepthValueLabel.Size = new System.Drawing.Size(13, 13);
-            this.PixelDepthValueLabel.TabIndex = 15;
-            this.PixelDepthValueLabel.Text = "0";
+            this.FileTypesCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.FileTypesCombo.FormattingEnabled = true;
+            this.FileTypesCombo.Location = new System.Drawing.Point(137, 67);
+            this.FileTypesCombo.Margin = new System.Windows.Forms.Padding(2);
+            this.FileTypesCombo.Name = "FileTypesCombo";
+            this.FileTypesCombo.Size = new System.Drawing.Size(144, 21);
+            this.FileTypesCombo.TabIndex = 13;
+            this.FileTypesCombo.SelectedIndexChanged += new System.EventHandler(this.FileTypesCombo_SelectedIndexChanged);
             // 
             // LabelLUT
             // 
             this.LabelLUT.AutoSize = true;
             this.LabelLUT.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelLUT.Location = new System.Drawing.Point(306, 78);
+            this.LabelLUT.Location = new System.Drawing.Point(309, 70);
             this.LabelLUT.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.LabelLUT.Name = "LabelLUT";
             this.LabelLUT.Size = new System.Drawing.Size(35, 13);
@@ -212,7 +165,7 @@
             // 
             this.LUTCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.LUTCombo.FormattingEnabled = true;
-            this.LUTCombo.Location = new System.Drawing.Point(342, 78);
+            this.LUTCombo.Location = new System.Drawing.Point(348, 67);
             this.LUTCombo.Margin = new System.Windows.Forms.Padding(2);
             this.LUTCombo.Name = "LUTCombo";
             this.LUTCombo.Size = new System.Drawing.Size(117, 21);
@@ -225,12 +178,8 @@
             this.ClientSize = new System.Drawing.Size(476, 145);
             this.Controls.Add(this.LUTCombo);
             this.Controls.Add(this.LabelLUT);
-            this.Controls.Add(this.PixelDepthValueLabel);
-            this.Controls.Add(this.PixelDepthLabel);
-            this.Controls.Add(this.BitmapTypesCombo);
+            this.Controls.Add(this.FileTypesCombo);
             this.Controls.Add(this.TypeLabel);
-            this.Controls.Add(this.BitmapSizeValueLabel);
-            this.Controls.Add(this.BitmapSizeLabel);
             this.Controls.Add(this.LoadAddressTextBox);
             this.Controls.Add(this.StoreButton);
             this.Controls.Add(this.LoadAddressLabel);
@@ -261,13 +210,9 @@
         private System.Windows.Forms.Label LoadAddressLabel;
         private System.Windows.Forms.TextBox LoadAddressTextBox;
         private System.Windows.Forms.Label DollarSignLabel;
-        private System.Windows.Forms.Label BitmapSizeLabel;
-        private System.Windows.Forms.Label BitmapSizeValueLabel;
         private System.Windows.Forms.Button StoreButton;
         private System.Windows.Forms.Label TypeLabel;
-        private System.Windows.Forms.ComboBox BitmapTypesCombo;
-        private System.Windows.Forms.Label PixelDepthLabel;
-        private System.Windows.Forms.Label PixelDepthValueLabel;
+        private System.Windows.Forms.ComboBox FileTypesCombo;
         private System.Windows.Forms.Label LabelLUT;
         private System.Windows.Forms.ComboBox LUTCombo;
     }

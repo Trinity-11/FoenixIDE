@@ -14,6 +14,7 @@ namespace FoenixIDE.Simulator.FileFormat
             public int Length = 0;
             public string Name;
             public string SourceFile;
+            public int FileType = 0; // 0 = Raw, 1-5 = tilemap, 6-13 = tileset, 14-77 = sprite
         }
 
         List<Resource> resources = new List<Resource>();

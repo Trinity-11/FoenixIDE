@@ -31,7 +31,7 @@ namespace FoenixIDE.Display
         public MemoryRAM VICKY = null;
         public int paintCycle = 0;
         private bool tileEditorMode = false;
-        public bool MousePointerMode = false;
+
         public delegate void StartOfFramEvent();
         public StartOfFramEvent StartOfFrame;
         public delegate void StartOfLineEvent();
@@ -250,13 +250,15 @@ namespace FoenixIDE.Display
 
             int borderXSize = displayBorder ? VICKY.ReadByte(MemoryMap.BORDER_X_SIZE - MemoryMap.VICKY_BASE_ADDR) : 0;
             int borderYSize = displayBorder ? VICKY.ReadByte(MemoryMap.BORDER_Y_SIZE - MemoryMap.VICKY_BASE_ADDR) : 0;
-            if (isPixelDoubled)
-            {
-                borderXSize >>= 1; // divide by 2
-                borderYSize >>= 1; // divide by 2
-            }
+            //this may get corrected in Vicky in the near future.
+            // if (isPixelDoubled)
+            //{
+            //    borderXSize >>= 1; // divide by 2
+            //    borderYSize >>= 1; // divide by 2
+            //}
 
-            Rectangle rect = new Rectangle(0, 0, resX, resY);
+            //Rectangle rect = new Rectangle(0, 0, resX, resY);
+            Rectangle rect = new Rectangle(0, 0, resX-1, resY-1);
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             int* bitmapPointer = (int*)bitmapData.Scan0.ToPointer();
 
@@ -298,7 +300,7 @@ namespace FoenixIDE.Display
                 }
                 //int offset = line * 640;
                 int* ptr = bitmapPointer + line * STRIDE;
-                if (line < borderYSize || line > resY - borderYSize)
+                if (line < borderYSize || line >= resY - borderYSize)
                 {
                     for (int x = 0; x < resX; x++)
                     {
@@ -326,7 +328,7 @@ namespace FoenixIDE.Display
 
                     for (int x = 0; x < resX; x++)
                     {
-                        int resetValue = x < borderXSize || x > resX - borderXSize ? borderColor : backgroundColor;
+                        int resetValue = x < borderXSize || x >= resX - borderXSize ? borderColor : backgroundColor;
                         //System.Runtime.InteropServices.Marshal.WriteInt32(bitmapPointer, (offset + x) * 4, resetValue);
                         ptr[x] = resetValue;
                     }
@@ -419,6 +421,7 @@ namespace FoenixIDE.Display
             }
             frameBuffer.UnlockBits(bitmapData);
             e.Graphics.DrawImage(frameBuffer, ClientRectangle, rect, GraphicsUnit.Pixel);
+            //e.Graphics.DrawImageUnscaled(frameBuffer, rect);  // Use this to debug
             drawing = false;
         }
 
@@ -833,6 +836,13 @@ namespace FoenixIDE.Display
                 }
                 
             }
+        }
+
+        public bool IsMousePointerVisible()
+        {
+            // Read the mouse pointer register
+            byte mouseReg = VICKY.ReadByte(0x700);
+            return (mouseReg & 1) != 0;
         }
 
         /// <summary>
