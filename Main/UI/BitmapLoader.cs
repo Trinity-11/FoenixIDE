@@ -44,13 +44,14 @@ namespace FoenixIDE.UI
             {
                 FileTypesCombo.Items.Add("Sprite " + i);
             }
-            FileTypesCombo.SelectedItem = 0;
+            FileTypesCombo.SelectedItem = 0; // Raw
 
             for (int i = 0; i < 4; i++)
             {
                 LUTCombo.Items.Add("LUT " + i);
             }
             LUTCombo.SelectedIndex = 0;
+            LUTCombo.Enabled = false;
         }
 
         private void FileTypesCombo_SelectedIndexChanged(object sender, EventArgs e)

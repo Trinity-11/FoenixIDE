@@ -232,6 +232,7 @@
             this.SaveTilesetButton.TabIndex = 25;
             this.SaveTilesetButton.Text = "Save Tileset";
             this.SaveTilesetButton.UseVisualStyleBackColor = true;
+            this.SaveTilesetButton.Click += new System.EventHandler(this.SaveTilemapButton_Click);
             // 
             // ClearTilemapButton
             // 
@@ -241,6 +242,7 @@
             this.ClearTilemapButton.TabIndex = 24;
             this.ClearTilemapButton.Text = "Clear Tileset";
             this.ClearTilemapButton.UseVisualStyleBackColor = true;
+            this.ClearTilemapButton.Click += new System.EventHandler(this.ClearTilemapButton_Click);
             // 
             // Height
             // 

@@ -678,8 +678,8 @@ namespace FoenixIDE.UI
         private void gpu_MouseDown(object sender, MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
-            double ratioW = gpu.Width / size.X;
-            double ratioH = gpu.Height / size.Y;
+            double ratioW = gpu.Width / (double)size.X;
+            double ratioH = gpu.Height / (double)size.Y;
             if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
             {
 

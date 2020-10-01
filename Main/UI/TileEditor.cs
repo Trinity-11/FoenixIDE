@@ -22,7 +22,6 @@ namespace FoenixIDE.Simulator.UI
         private int selectedTilemap = 0;
 
         private MemoryManager memory;
-        int LayersetAddress = 0;
 
         private Pen whitePen = new Pen(Color.White);
         private Pen yellowPen = new Pen(Color.Yellow);
@@ -37,6 +36,7 @@ namespace FoenixIDE.Simulator.UI
         private void TileEditor_Load(object sender, EventArgs e)
         {
             Tilemap0Button_Click(Tilemap0Button, null);
+            TilesetList.SelectedIndex = 0;
         }
 
         /**
@@ -67,11 +67,12 @@ namespace FoenixIDE.Simulator.UI
             int stride = bitmapData.Stride;
             int[] graphicsLUT = Display.Gpu.LoadLUT(memory.VICKY);
             int lut = LutList.SelectedIndex;
+            int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) - 0xB0_0000;
             for (int y = 0; y < 256; y++)
             {
                 for (int x = 0; x < 256; x++)
                 {
-                    byte pixel = memory.VIDEO.ReadByte(LayersetAddress + y * 256 + x);
+                    byte pixel = memory.VIDEO.ReadByte(tilesetAddress + y * 256 + x);
                     if (pixel != 0)
                     {
                         int color = graphicsLUT[lut * 256 + pixel];
@@ -121,8 +122,8 @@ namespace FoenixIDE.Simulator.UI
             int ControlReg = memory.ReadByte(addrOffset);
             TilemapEnabledCheckbox.Checked = (ControlReg & 1) != 0;
             // address in memory
-            LayersetAddress = memory.ReadLong(addrOffset + 1);
-            TilemapAddress.Text = (LayersetAddress + 0xB0_0000).ToString("X6");
+            int tilemapAddr = memory.ReadLong(addrOffset + 1);
+            TilemapAddress.Text = (tilemapAddr + 0xB0_0000).ToString("X6");
 
             int width = memory.ReadWord(addrOffset + 4);
             int height = memory.ReadWord(addrOffset + 6);
@@ -142,7 +143,7 @@ namespace FoenixIDE.Simulator.UI
         {
 
             int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
-            int offset = tile.Y * Convert.ToInt32(Width.Text) + tile.X;                
+            int offset = (tile.Y * Convert.ToInt32(Width.Text) + tile.X + 1) * 2;
             if (selectedX != -1 && selectedY != -1)
             {
                 byte value = (byte)(selectedY * 16 + selectedX);
@@ -213,7 +214,10 @@ namespace FoenixIDE.Simulator.UI
             int tilesetBaseAddr = MemoryLocations.MemoryMap.TILESET_BASE_ADDR + TilesetList.SelectedIndex * 4;
             int newAddress = Convert.ToInt32(TilesetAddress.Text.Replace(":", ""), 16);
             int offsetAddress = newAddress - 0xB0_0000;
-            memory.WriteLong(tilesetBaseAddr, offsetAddress);
+            if (offsetAddress > -1)
+            {
+                memory.WriteLong(tilesetBaseAddr, offsetAddress);
+            }
         }
 
         private void TilemapAddress_TextChanged(object sender, EventArgs e)
@@ -221,7 +225,10 @@ namespace FoenixIDE.Simulator.UI
             int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
             int newAddress = Convert.ToInt32(TilemapAddress.Text.Replace(":", ""), 16);
             int offsetAddress = newAddress - 0xB0_0000;
-            memory.WriteLong(tilemapBaseAddr + 1, offsetAddress);
+            if (offsetAddress > -1)
+            {
+                memory.WriteLong(tilemapBaseAddr + 1, offsetAddress);
+            }
         }
 
         private void Width_TextChanged(object sender, EventArgs e)
@@ -262,7 +269,7 @@ namespace FoenixIDE.Simulator.UI
         {
             int tilesetBaseAddr = MemoryLocations.MemoryMap.TILESET_BASE_ADDR + TilesetList.SelectedIndex * 4;
             int tilesetAddr = memory.ReadLong(tilesetBaseAddr);
-            TilesetAddress.Text = tilesetAddr.ToString("X6");
+            TilesetAddress.Text = (tilesetAddr + 0xB0_0000).ToString("X6");
             int cfgReg = memory.ReadByte(tilesetBaseAddr + 3);
             Stride256Checkbox.Checked = (cfgReg & 8) != 0;
             LutList.SelectedIndex = cfgReg & 7;
