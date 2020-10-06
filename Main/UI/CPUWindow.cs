@@ -854,7 +854,7 @@ namespace FoenixIDE.UI
 
         private void DebugPanel_MouseClick(object sender, MouseEventArgs e)
         {
-            if (ActiveLine[0] != 0)
+            if (ActiveLine[0] != 0 && kernel.lstFile.Lines.ContainsKey(ActiveLine[0]))
             {
                 DebugLine line = kernel.lstFile.Lines[ActiveLine[0]];
                 if (line != null)

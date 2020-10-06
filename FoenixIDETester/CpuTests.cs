@@ -21,7 +21,7 @@ namespace FoenixIDETester
             mgr = new MemoryManager
             {
                 RAM = new MemoryRAM(0, 3 * 0x20_0000),
-                CODEC = new CodecRAM(1025,1),
+                CODEC = new CodecRAM(1025, 1),
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4)
             };
             cpu = new CPU(mgr);
@@ -53,7 +53,9 @@ namespace FoenixIDETester
         // LDA #$99
         // CLC
         // ADC #$78
-        // -- overflow and carry are set
+        // -- overflow and carry are set.
+        // Unsigned: $99 + $78 = $11  ==> carry set
+        // Signed: -$67 + $78 = $11 ==> overflow false
         [TestMethod]
         public void LoadCheckCarrySetForOverflowAbsolute()
         {
@@ -63,13 +65,14 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC + 1, 0x78);
             cpu.ExecuteNext();
             Assert.AreEqual(0x11, cpu.A.Value);
-            Assert.IsTrue(cpu.Flags.oVerflow);
-            Assert.IsTrue(cpu.Flags.Carry);
+            Assert.IsFalse(cpu.Flags.oVerflow, "Overflow should be false");
+            Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
         }
         // LDA #$99
         // CLC
         // ADC $56
-        // 
+        // Unsigned: $99 + $78 = $11 => carry set
+        // Signed: -$67 + $78 = $11 ==> overflow false
         [TestMethod]
         public void LoadCheckCarrySetForOverflowDirectPage()
         {
@@ -81,8 +84,8 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC + 1, 0x56);
             cpu.ExecuteNext();
             Assert.AreEqual(0x11, cpu.A.Value);
-            Assert.IsTrue(cpu.Flags.oVerflow);
-            Assert.IsTrue(cpu.Flags.Carry);
+            Assert.IsFalse(cpu.Flags.oVerflow, "Overflow should be false");
+            Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
         }
 
         /*
@@ -112,7 +115,7 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate); // LDA Immediate
             mgr.RAM.WriteByte(cpu.PC + 1, 255); // #255
             cpu.ExecuteNext();
-            
+
             // adc z_B
             mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_DirectPage);
             mgr.RAM.WriteByte(cpu.PC + 1, z_B);
@@ -152,7 +155,7 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC, OpcodeList.REP_Immediate);
             mgr.RAM.WriteByte(cpu.PC + 1, 0x30);
             cpu.ExecuteNext();
-            
+
             Assert.AreEqual(2, cpu.A.Width);
             Assert.AreEqual(2, cpu.X.Width);
 
@@ -260,7 +263,7 @@ namespace FoenixIDETester
             mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
             mgr.RAM.WriteByte(cpu.PC + 1, 0x39);
             cpu.ExecuteNext();
-            Assert.AreEqual(0xE9 - 0x39, cpu.A.Value);
+            Assert.AreEqual(0xB0, cpu.A.Value);
             Assert.IsTrue(cpu.Flags.Carry);
 
             mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
@@ -376,7 +379,7 @@ namespace FoenixIDETester
         public void TestBit()
         {
             cpu.A.Value = 0x43;
-            
+
             cpu.SetEmulationMode();
             cpu.DataBank.Value = 0x12;
             // set the value in memory
@@ -399,7 +402,7 @@ namespace FoenixIDETester
          * in emulation
          * After TXA, A contains $12CD
          * N=1, Z=0
-         */ 
+         */
         [TestMethod]
         public void TestTransfer()
         {
@@ -411,6 +414,201 @@ namespace FoenixIDETester
             cpu.ExecuteNext();
             Assert.IsTrue(cpu.Flags.Negative);
             Assert.IsFalse(cpu.Flags.Zero);
+        }
+
+        /**
+         *   Taken from http://www.6502.org/tutorials/vflag.html
+        #1   CLC; 1 + 1 = 2, returns C = 0, V = 0
+             LDA #$01
+             ADC #$01
+        */
+        [TestMethod]
+        public void TestOverflowADC1()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CLC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 1);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 1);
+            cpu.ExecuteNext();
+            Assert.AreEqual(2, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry);
+            Assert.IsFalse(cpu.Flags.oVerflow);
+        }
+        /**
+         *   Taken from http://www.6502.org/tutorials/vflag.html
+         #2   CLC; 1 + -1 = 0, returns C = 1, V = 0
+              LDA #$01
+              ADC #$FF
+        */
+        [TestMethod]
+        public void TestOverflowADC2()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CLC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 1);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0xFF);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
+            Assert.IsFalse(cpu.Flags.oVerflow, "Overflow should be false");
+        }
+        /**
+         *   Taken from http://www.6502.org/tutorials/vflag.html
+         #3   CLC; 127 + 1 = 128, returns C = 0, V = 1
+              LDA #$7F
+              ADC #$01
+           */
+        [TestMethod]
+        public void TestOverflowADC3()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CLC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x7F);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x80, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry, "Carry should be false");
+            Assert.IsTrue(cpu.Flags.oVerflow, "Overflow should be true");
+        }
+
+        /**
+         *   Taken from http://www.6502.org/tutorials/vflag.html
+         #4   CLC; -128 + -1 = -129, returns C = 1, V = 1
+              LDA #$80
+              ADC #$FF
+        */
+        [TestMethod]
+        public void TestOverflowADC4()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CLC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x80);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0xFF);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x7F, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
+            Assert.IsTrue(cpu.Flags.oVerflow, "Overflow should be true");
+        }
+
+        /**
+         *   Taken from http://www.6502.org/tutorials/vflag.html
+         #5   SEC      ; 0 - 1 = -1, returns V = 0
+              LDA #$00
+              SBC #$01
+        */
+        [TestMethod]
+        public void TestOverflowSBC5()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x0);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0xFF, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry, "Carry should be false");
+            Assert.IsFalse(cpu.Flags.oVerflow, "Overflow should be false");
+        }
+
+        /**
+         *   Taken from http://www.6502.org/tutorials/vflag.html
+         #6   SEC      ; -128 - 1 = -129, returns V = 1
+              LDA #$80
+              SBC #$01
+
+                */
+        [TestMethod]
+        public void TestOverflowSBC6()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x80);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x7F, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
+            Assert.IsTrue(cpu.Flags.oVerflow, "Overflow should be true");
+        }
+
+        /**
+         * Taken from http://www.6502.org/tutorials/vflag.html
+         #7  SEC      ; 127 - -1 = 128, returns V = 1
+             LDA #$7F
+             SBC #$FF
+        */
+        [TestMethod]
+        public void TestOverflowSBC7()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x7F);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0xFF);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x80, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry, "Carry should be false");
+            Assert.IsTrue(cpu.Flags.oVerflow, "Overflow should be true");
+        }
+        /**
+         *  Taken from http://www.6502.org/tutorials/vflag.html
+         #8   SEC      ; Note: SEC, not CLC
+              LDA #$3F ; 63 + 64 + 1 = 128, returns V = 1
+              ADC #$40
+        */
+        [TestMethod]
+        public void TestOverflowADC8()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x3F);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.ADC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x40);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x80, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry, "Carry should be false");
+            Assert.IsTrue(cpu.Flags.oVerflow, "Overflow should be true");
+        }
+        /**
+         * Taken from http://www.6502.org/tutorials/vflag.html
+         #9   CLC      ; Note: CLC, not SEC
+              LDA #$C0 ; -64 - 64 - 1 = -129, returns V = 1
+              SBC #$40
+        */
+        [TestMethod]
+        public void TestOverflowSBC9()
+        {
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.CLC_Implied);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0xC0);
+            cpu.ExecuteNext();
+            mgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            mgr.RAM.WriteByte(cpu.PC + 1, 0x40);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x7F, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
+            Assert.IsTrue(cpu.Flags.oVerflow, "Overflow should be true");
         }
     }
 }

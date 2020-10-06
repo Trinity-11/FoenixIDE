@@ -1001,17 +1001,41 @@ namespace FoenixIDE.Processor
         public void ExecuteADC(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
-
+            int nv = 0;
             if (cpu.Flags.Decimal)
-                val = HexVal(BCDVal(val) + BCDVal(cpu.A.Value) + cpu.Flags.CarryBit);
+                nv = HexVal(BCDVal(val) + BCDVal(cpu.A.Value) + cpu.Flags.CarryBit);
             else
-                val = val + cpu.A.Value + cpu.Flags.CarryBit;
+                nv = val + cpu.A.Value + cpu.Flags.CarryBit;
+            
+            cpu.Flags.Carry = (nv < 0 || nv > cpu.A.MaxUnsigned);
+            // We need to detect a wraparound - when the sign changes but there is no overflow
+            cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & (val ^ nv) & 0x80) != 0;
+            cpu.Flags.SetNZ(nv, cpu.A.Width);
 
-            cpu.Flags.Carry = (val < 0 || val > cpu.A.MaxUnsigned);
-            cpu.Flags.oVerflow = (val < cpu.A.MinSigned || val > cpu.A.MaxSigned);
-            cpu.Flags.SetNZ(val, cpu.A.Width);
+            cpu.A.Value = nv;
+        }
 
-            cpu.A.Value = val;
+        /// <summary>
+        /// Subtract value from accumulator. Carry acts as a "borrow". When Carry is 0,
+        /// subtract one more from Accumulator. Carry will be 0 if result < 0 and 1 if result >= 0.
+        /// </summary>
+        /// <param name="instruction"></param>
+        /// <param name="addressMode"></param>
+        /// <param name="signature"></param>
+        public void ExecuteSBC(byte instruction, AddressModes addressMode, int signature)
+        {
+            int val = GetValue(addressMode, signature, cpu.A.Width);
+            int nv = 0;
+            if (cpu.Flags.Decimal)
+                nv = HexVal(BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+            else
+                nv = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;
+
+            cpu.Flags.Carry = (nv >= 0 && nv <= cpu.A.MaxUnsigned);
+            cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((256 - val) ^ nv) & 0x80) != 0;            
+            cpu.Flags.SetNZ(nv, cpu.A.Width);
+
+            cpu.A.Value = nv;
         }
 
         private int BCDVal(int value)
@@ -1098,29 +1122,6 @@ namespace FoenixIDE.Processor
             cpu.Flags.Zero = subResult == 0;
             cpu.Flags.Carry = Reg.Value >= val;
             cpu.Flags.Negative = Reg.Width == 1 ? (subResult & 0x80) == 0x80 : (subResult & 0x8000) == 0x8000;
-        }
-
-        /// <summary>
-        /// Subtract value from accumulator. Carry acts as a "borrow". When Carry is 0,
-        /// subtract one more from Accumulator. Carry will be 0 if result < 0 and 1 if result >= 0.
-        /// </summary>
-        /// <param name="instruction"></param>
-        /// <param name="addressMode"></param>
-        /// <param name="signature"></param>
-        public void ExecuteSBC(byte instruction, AddressModes addressMode, int signature)
-        {
-            int val = GetValue(addressMode, signature, cpu.A.Width);
-
-            if (cpu.Flags.Decimal)
-                val = HexVal(BCDVal(cpu.A.Value) - BCDVal(val+1) + cpu.Flags.CarryBit);
-            else
-                val = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;
-
-            cpu.Flags.Carry = (val >= 0 && val <= cpu.A.MaxUnsigned);
-            cpu.Flags.oVerflow = (val < cpu.A.MinSigned || val > cpu.A.MaxSigned);
-            cpu.Flags.SetNZ(val, cpu.A.Width);
-
-            cpu.A.Value = val;
         }
 
         public void ExecuteWAI(byte Instruction, AddressModes AddressMode, int Signature)
