@@ -9,6 +9,8 @@ namespace FoenixIDE.MemoryLocations
     public static partial class MemoryMap
     {
         #region Beatrix Memory Map
+        public const int FLOAT_START = 0xAF_E200;
+        public const int FLOAT_END = 0xAF_E20F;
 
         public const int OPL2_S_BASE = 0xAF_E700;   // Start of OPL2 Stereo range
 

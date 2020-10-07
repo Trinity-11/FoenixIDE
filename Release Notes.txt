@@ -1,3 +1,52 @@
+Release 0.5.3.2
+---------------
+Added the floating point (FP) processor.
+Fixed the bug with TXS setting NZ flags.
+
+Release 0.5.3.1
+---------------
+Fixed problem with overflow flag.  This fixed the issue found in the SimplePrintf program.
+
+Release 0.5.3.0
+---------------
+Fixed the tile editor to work with Vicky II.
+
+Release 0.5.2.4
+---------------
+The border was getting displayed even when the register was set to 0.
+Tiles were off by several lines and offset to the right.
+
+Release 0.5.2.3
+---------------
+The checkbox to break on Mouse Interrupts was not handled.
+Added mouse interrupts.
+Update README.md typo.
+
+Release 0.5.2.2 
+---------------
+Fixed issues with BIT and transfers (TXA, TAX, TYA, TAY, etc) not setting the N and Z flags correctly.
+Added writing to files, in FAT32 only so far.
+
+Release 0.5.2.0 
+---------------
+Added SD Card support for FAT32.
+
+Release 0.5.1.0 
+---------------
+Added tools to convert "bin" and "hex" files to PGX.
+
+Release 0.5.0.2
+---------------
+Finally merged drone84's ISO changes.
+Added ISO MBR and filesystem type detection.
+If an MBR is not present in the ISO is no present, one is created, to match the filesystem type.
+Verified that BASIC is able to load and save from/to FAT32 with 512 byte clusters.
+
+Release 0.5.0.1
+---------------
+Added pixel doubling and high-resolution mode.
+Added Master Control Registry button to the Memory Window.
+
 Release 0.5.0.0
 ---------------
 First implementation of Vicky II.

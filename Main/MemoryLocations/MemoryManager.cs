@@ -25,7 +25,8 @@ namespace FoenixIDE.MemoryLocations
         public MemoryRAM VIDEO = null;
         public MemoryRAM VICKY = null;
         public MemoryRAM BEATRIX = null;
-        public MathCoproRegisters MATH = null;
+        public MathCoproRegister MATH = null;
+        public MathFloatRegister FLOAT = null;
         public CodecRAM CODEC = null;
         public KeyboardRegister KEYBOARD = null;
         public SDCardDevice SDCARD = null;
@@ -133,6 +134,12 @@ namespace FoenixIDE.MemoryLocations
             {
                 Device = SDCARD;
                 DeviceAddress = Address - SDCARD.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.FLOAT_START && Address <= MemoryMap.FLOAT_END)
+            {
+                Device = FLOAT;
+                DeviceAddress = Address - FLOAT.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.VDMA_START && Address < MemoryMap.VDMA_START + MemoryMap.VDMA_SIZE)

@@ -825,7 +825,6 @@ namespace FoenixIDE.Processor
                 case OpcodeList.TXS_Implied:
                     cpu.Stack.Value = cpu.X.Value;
                     cpu.Stack.TopOfStack = cpu.X.Value;
-                    cpu.Flags.SetNZ(cpu.Stack.Value, 2);
                     break;
 
                 // X - Y

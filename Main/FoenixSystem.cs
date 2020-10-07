@@ -53,13 +53,14 @@ namespace FoenixIDE
                 BEATRIX = new GabeRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE),   // 4K 
 
                 // Special devices
-                MATH = new MathCoproRegisters(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
+                MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
                 KEYBOARD = new KeyboardRegister(MemoryMap.KBD_DATA_BUF, 5),
                 SDCARD = sdcard,
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
                 UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
                 UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),
                 OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
+                FLOAT = new MathFloatRegister(MemoryMap.FLOAT_START, MemoryMap.FLOAT_END - MemoryMap.FLOAT_START + 1),
                 MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2),
                 VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE)
             };

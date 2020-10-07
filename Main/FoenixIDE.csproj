@@ -76,6 +76,7 @@
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
+    <Compile Include="Devices\MathFloatRegister.cs" />
     <Compile Include="Devices\SDCard\GabeSDController.cs" />
     <Compile Include="Devices\VDMA.cs" />
     <Compile Include="Devices\MPU401.cs" />
@@ -92,7 +93,7 @@
     <Compile Include="FileFormat\ListFile.cs" />
     <Compile Include="FileFormat\WatchedMemory.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
-    <Compile Include="Devices\MathCoproRegisters.cs" />
+    <Compile Include="Devices\MathCoproRegister.cs" />
     <Compile Include="Devices\SDCard\SDCardDevice.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Beatrix.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />
