@@ -867,6 +867,7 @@ namespace FoenixIDE.UI
                         kernel.WatchList.Remove(address);
                     }
                     kernel.WatchList.Add(address, mem);
+                    MainWindow.Instance.WatchListToolStripMenuItem_Click(sender, e);
                 }
             }
         }

@@ -34,29 +34,40 @@ namespace FoenixIDE.UI
             {
                 FileTypesCombo.Items.Add("Tilemap " + i);
             }
-
             for (int i = 0; i < 8; i++)
             {
                 FileTypesCombo.Items.Add("Tileset " + i);
             }
-
             for (int i = 0; i < 64; i++)
             {
                 FileTypesCombo.Items.Add("Sprite " + i);
             }
             FileTypesCombo.SelectedItem = 0; // Raw
+            for (int i = 0; i < 4; i++)
+            {
+                FileTypesCombo.Items.Add("LUT " + i);
+            }
 
             for (int i = 0; i < 4; i++)
             {
                 LUTCombo.Items.Add("LUT " + i);
             }
+            FileTypesCombo.SelectedIndex = 0;
             LUTCombo.SelectedIndex = 0;
             LUTCombo.Enabled = false;
         }
 
         private void FileTypesCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LUTCombo.Enabled = FileTypesCombo.SelectedIndex != 0;
+            bool LUTSelected = FileTypesCombo.SelectedItem.ToString().StartsWith("LUT");
+            LUTCombo.Enabled = FileTypesCombo.SelectedIndex != 0 && !LUTSelected;
+            LoadAddressTextBox.Enabled = !LUTSelected;
+            if (FileTypesCombo.SelectedItem.ToString().StartsWith("LUT"))
+            {
+                int lut = Convert.ToInt32(FileTypesCombo.SelectedItem.ToString().Substring(4));
+                LoadAddressTextBox.Enabled = false;
+                LoadAddressTextBox.Text = (MemoryLocations.MemoryMap.GRP_LUT_BASE_ADDR + lut * 1024).ToString("X6");
+            }
         }
 
         private String FormatAddress(int address)
@@ -116,7 +127,7 @@ namespace FoenixIDE.UI
                 int offsetAddress = destAddress - 0xB0_0000;
                 Memory.WriteByte(baseAddress + 1, (byte)(offsetAddress & 0xFF));
                 Memory.WriteByte(baseAddress + 2, (byte)((offsetAddress & 0xFF00) >> 8));
-                Memory.WriteByte(baseAddress + 3, (byte)((offsetAddress & 0xFF00) >> 16));
+                Memory.WriteByte(baseAddress + 3, (byte)((offsetAddress & 0xFF_0000) >> 16));
                 // TODO: Need to write the size of the tilemap
             }
             else if (FileTypesCombo.SelectedIndex < 13)
@@ -130,7 +141,7 @@ namespace FoenixIDE.UI
                 int offsetAddress = destAddress - 0xB0_0000;
                 Memory.WriteByte(baseAddress, (byte)(offsetAddress & 0xFF));
                 Memory.WriteByte(baseAddress + 1, (byte)((offsetAddress & 0xFF00) >> 8));
-                Memory.WriteByte(baseAddress + 2, (byte)((offsetAddress & 0xFF00) >> 16));
+                Memory.WriteByte(baseAddress + 2, (byte)((offsetAddress & 0xFF_0000) >> 16));
                 Memory.WriteByte(baseAddress + 3, lutValue);  // TODO: Add the stride 256 bit 3.
 
             }
@@ -148,7 +159,7 @@ namespace FoenixIDE.UI
                 int offsetAddress = destAddress - 0xB0_0000;
                 Memory.WriteByte(baseAddress + 1, (byte)(offsetAddress & 0xFF));
                 Memory.WriteByte(baseAddress + 2, (byte)((offsetAddress & 0xFF00) >> 8));
-                Memory.WriteByte(baseAddress + 3, (byte)((offsetAddress & 0xFF00) >> 16));
+                Memory.WriteByte(baseAddress + 3, (byte)((offsetAddress & 0xFF_0000) >> 16));
                 // TODO: set the position of the sprite
             }
             

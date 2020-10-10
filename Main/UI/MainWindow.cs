@@ -682,7 +682,6 @@ namespace FoenixIDE.UI
             double ratioH = gpu.Height / (double)size.Y;
             if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
             {
-
                 TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
             }
             else

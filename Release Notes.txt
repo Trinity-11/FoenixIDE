@@ -1,3 +1,9 @@
+Release 0.5.3.3
+---------------
+Fixed several issues with the tile editor.
+Added a few more addresses to the Memory Addresses dropdown list.
+In the Memory Window, when the user types an address, try to match it to an item in the dropdown list.
+
 Release 0.5.3.2
 ---------------
 Added the floating point (FP) processor.

@@ -146,8 +146,11 @@ namespace FoenixIDE.Simulator.UI
             int offset = (tile.Y * Convert.ToInt32(Width.Text) + tile.X + 1) * 2;
             if (selectedX != -1 && selectedY != -1)
             {
+                // Write the tile value
                 byte value = (byte)(selectedY * 16 + selectedX);
                 memory.WriteByte(tilemapAddress + offset, value);
+                // Write the tileset and LUT - this way we can mix tiles from multiple tilesets in a single map
+                memory.WriteByte(tilemapAddress + offset + 1, (byte)((LutList.SelectedIndex << 3) + TilesetList.SelectedIndex));
             }
         }
 
@@ -204,7 +207,7 @@ namespace FoenixIDE.Simulator.UI
         private void LutList_SelectedIndexChanged(object sender, EventArgs e)
         {
             int tilesetBaseAddr = MemoryLocations.MemoryMap.TILESET_BASE_ADDR + TilesetList.SelectedIndex * 4;
-            byte ConfigRegister = (byte)(Stride256Checkbox.Checked? 8:0 + LutList.SelectedIndex);
+            byte ConfigRegister = (byte)((Stride256Checkbox.Checked? 8:0) + LutList.SelectedIndex);
             memory.WriteByte(tilesetBaseAddr + 3, ConfigRegister);
             TilesetViewer.Refresh();
         }
@@ -234,29 +237,41 @@ namespace FoenixIDE.Simulator.UI
         private void Width_TextChanged(object sender, EventArgs e)
         {
             int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            int newValue = Convert.ToInt32(Width.Text) & 0x3FF;
-            memory.WriteWord(tilemapBaseAddr + 4, newValue);
+            if (Width.Text.Length > 0)
+            {
+                int newValue = Convert.ToInt32(Width.Text) & 0x3FF;
+                memory.WriteWord(tilemapBaseAddr + 4, newValue);
+            }
         }
 
         private void Height_TextChanged(object sender, EventArgs e)
         {
             int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            int newValue = Convert.ToInt32(Height.Text) & 0x3FF;
-            memory.WriteWord(tilemapBaseAddr + 6, newValue);
+            if (Height.Text.Length > 0)
+            {
+                int newValue = Convert.ToInt32(Height.Text) & 0x3FF;
+                memory.WriteWord(tilemapBaseAddr + 6, newValue);
+            }
         }
 
         private void WindowX_TextChanged(object sender, EventArgs e)
         {
             int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            int newValue = Convert.ToInt32(WindowX.Text) & 0x3FF;
-            memory.WriteWord(tilemapBaseAddr + 8, newValue);
+            if (WindowX.Text.Length > 0)
+            {
+                int newValue = Convert.ToInt32(WindowX.Text) & 0x3FF;
+                memory.WriteWord(tilemapBaseAddr + 8, newValue);
+            }
         }
 
         private void WindowY_TextChanged(object sender, EventArgs e)
         {
             int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            int newValue = Convert.ToInt32(WindowY.Text) & 0x3FF;
-            memory.WriteWord(tilemapBaseAddr + 10, newValue);
+            if (WindowY.Text.Length > 0)
+            {
+                int newValue = Convert.ToInt32(WindowY.Text) & 0x3FF;
+                memory.WriteWord(tilemapBaseAddr + 10, newValue);
+            }
         }
 
         private void TilemapEnabledCheckbox_CheckedChanged(object sender, EventArgs e)

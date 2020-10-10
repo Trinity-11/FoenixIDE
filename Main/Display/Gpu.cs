@@ -337,7 +337,7 @@ namespace FoenixIDE.Display
                     if ((MCRegister & 0x4) == 0x4 || tileEditorMode)
                     {
                         // Reset LUT Cache
-                        lutCache = new int[256 * 4]; // 4 LUTs
+                        lutCache = new int[256 * 8]; // 8 LUTs
                         // Layer 12 - sprite layer 6
                         if ((MCRegister & 0x20) != 0)
                         {

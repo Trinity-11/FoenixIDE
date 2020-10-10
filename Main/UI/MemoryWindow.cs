@@ -162,6 +162,7 @@ namespace FoenixIDE.UI
             {
                 int requestedAddress = Convert.ToInt32(this.StartAddressText.Text, 16) & 0xFFFF00;
                 GotoAddress(requestedAddress);
+                FindMatchedDropDownEntry(requestedAddress);
             }
             catch (global::System.FormatException ex)
             {
@@ -203,6 +204,36 @@ namespace FoenixIDE.UI
             }
         }
 
+        private void FindMatchedDropDownEntry(int address)
+        { // find the address in the dropdown list
+            int dropdownAddress = 0;
+            bool matched = false;
+            foreach (string item in AddressCombo.Items)
+            {
+                dropdownAddress = 0;
+                if (item.StartsWith("Bank"))
+                {
+                    int start = item.IndexOf('$');
+                    dropdownAddress = Convert.ToInt32(item.Substring(start + 1, 2) + "0000", 16);
+                }
+                else if (item.StartsWith("Address"))
+                {
+                    int start = item.IndexOf('$');
+                    dropdownAddress = Convert.ToInt32(item.Replace(":", "").Substring(start + 1, 6), 16);
+                }
+                if (dropdownAddress != 0 && dropdownAddress == address)
+                {
+                    AddressCombo.SelectedItem = item;
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched)
+            {
+                AddressCombo.SelectedItem = "Unspecified Page";
+            }
+        }
+
         private void NextButton_Click(object sender, EventArgs e)
         {
             // Move Down by one page
@@ -210,6 +241,7 @@ namespace FoenixIDE.UI
             if (desiredStart < MemoryMap.FLASH_END)
             {
                 GotoAddress(desiredStart);
+                FindMatchedDropDownEntry(desiredStart);
             }
         }
 
@@ -219,6 +251,7 @@ namespace FoenixIDE.UI
             if (desiredStart >= 0)
             {
                 GotoAddress(desiredStart);
+                FindMatchedDropDownEntry(desiredStart);
             }
         }
 
@@ -261,7 +294,7 @@ namespace FoenixIDE.UI
          * Change the Master Control Register (MCR).
          * This allows for displaying text, overlay on top of graphics.
          */
-        private void MCRBitButton_Click(object sender, EventArgs e)
+                private void MCRBitButton_Click(object sender, EventArgs e)
         {
             // toggle the button tag 0 or 1
             Button btn = ((Button)sender);
