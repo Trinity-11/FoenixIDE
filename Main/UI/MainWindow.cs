@@ -47,7 +47,6 @@ namespace FoenixIDE.UI
         private BoardVersion version = BoardVersion.RevC;
         public static MainWindow Instance = null;
         private delegate void WriteCPSFPSFunction(string CPS, string FPS);
-        private bool fullScreen = false;
 
         public MainWindow(string[] programArgs)
         {
@@ -330,68 +329,8 @@ namespace FoenixIDE.UI
                 kernel.MemMgr.SDCARD.WriteByte(0, (byte)irq);
             }
         }
-
-        private void FullScreenToggle()
-        {
-            if (this.fullScreen == false)
-            {
-                this.fullScreen = true;
-
-                this.menuStrip1.Visible = false;
-                this.statusStrip1.Visible = false;
-                this.panel1.Visible = false;
-                this.panel2.Visible = false;
-                this.panel3.Visible = false;
-                this.panel4.Visible = false;
-                this.debugWindow.Visible = false;               // not sure that is needed
-                this.memoryWindow.Visible = false;              // maybe maximizing GPU Window is enough?
-
-                this.WindowState = FormWindowState.Normal;
-                this.FormBorderStyle = FormBorderStyle.None;
-                this.WindowState = FormWindowState.Maximized;
-            }
-            else
-            {
-                this.fullScreen = false;
-
-                this.FormBorderStyle = FormBorderStyle.Sizable;
-                this.WindowState = FormWindowState.Normal;
-
-                this.menuStrip1.Visible = true;
-                this.statusStrip1.Visible = true;
-                this.panel1.Visible = true;
-                this.panel2.Visible = true;
-                this.panel3.Visible = true;
-                this.panel4.Visible = true;
-                this.debugWindow.Visible = true;
-                this.debugWindow.Show();
-                this.debugWindow.Refresh();
-                this.memoryWindow.Visible = true;
-                this.memoryWindow.Show();
-                this.memoryWindow.Refresh();
-
-                this.Focus();
-                this.Refresh();
-            }
-        }
-
         private void BasicWindow_KeyDown(object sender, KeyEventArgs e)
         {
-
-            // we take over Shift+F11 and Shift+F5
-            if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
-            {
-                switch (e.KeyCode)
-                {
-                    case Keys.F11:
-                        FullScreenToggle();
-                        break;
-                    case Keys.F5:
-                        this.debugWindow.RunButton_Click(sender, null);
-                        break;
-                }
-            }
-
             ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
             if (scanCode != ScanCode.sc_null)
             {
