@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDETester", "FoenixID
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vgm-reader", "vgm-reader\vgm-reader.csproj", "{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIDI-to-VGM-Converter", "MIDI-to-VGM-Converter\MIDI-to-VGM-Converter.csproj", "{9CA195ED-7CC8-444A-98A3-D20F6A382FBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CA195ED-7CC8-444A-98A3-D20F6A382FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CA195ED-7CC8-444A-98A3-D20F6A382FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CA195ED-7CC8-444A-98A3-D20F6A382FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CA195ED-7CC8-444A-98A3-D20F6A382FBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
