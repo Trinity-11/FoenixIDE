@@ -551,7 +551,7 @@ namespace FoenixIDE.Simulator.Devices
                 FileInfo info = new FileInfo(file);
                 int size = (int)info.Length;
                 int clusters = size / logicalSectorSize;
-                string extension = info.Extension.ToUpper().Substring(1);
+                string extension = info.Extension.Length > 0 ? info.Extension.ToUpper().Substring(1) : "";
                 string filename = info.Name.Replace(" ", "").ToUpper();
                 int dot = filename.IndexOf(".");
                 if (dot > -1)
