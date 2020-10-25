@@ -27,6 +27,8 @@ namespace vgm_reader
             YM2608_P1 = 0x57,
             YM2610_P0 = 0x58,
             YM2610_P1 = 0x59,
+            YMF262_P0 = 0x5e,
+            YMF262_P1 = 0x5f,
             WAIT_N = 0x61,
             WAIT_60th = 0x62,
             WAIT_50th = 0x63,
@@ -137,6 +139,13 @@ namespace vgm_reader
                                     val = buffer[ptr++];
                                     sb.Append("OPM[" + reg.ToString("X2") + "]:" + val.ToString("X2") + " ");
                                     break;
+                                case (byte)VGM_Commands.YMF262_P0:
+                                case (byte)VGM_Commands.YMF262_P1:
+                                    reg = buffer[ptr++];
+                                    val = buffer[ptr++];
+                                    sb.AppendFormat("OPL3[{0}.{1:X2}]:{2:X2} ", command & 1, reg, val);
+                                    break;
+
                             }
                             break;
                         case 6:

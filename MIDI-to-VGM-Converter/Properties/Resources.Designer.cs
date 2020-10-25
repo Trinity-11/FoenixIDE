@@ -61,6 +61,26 @@ namespace MIDI_to_VGM_Converter.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] GENMIDI {
+            get {
+                object obj = ResourceManager.GetObject("GENMIDI", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] GENMIDI___Vanilla {
+            get {
+                object obj = ResourceManager.GetObject("GENMIDI___Vanilla", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon icon {
