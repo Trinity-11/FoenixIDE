@@ -9,6 +9,7 @@ namespace FoenixIDE.Simulator.Devices
     public enum BoardVersion
     {
         RevB,
-        RevC
+        RevC,
+        RevU
     }
 }

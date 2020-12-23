@@ -43,79 +43,48 @@ namespace FoenixIDE.UI
         private String defaultKernel = @"roms\kernel.hex";
         private int jumpStartAddress;
         private bool disabledIRQs = false;
-        private bool autoRun = false;
+        private bool autoRun = true;
         private BoardVersion version = BoardVersion.RevC;
         public static MainWindow Instance = null;
         private delegate void WriteCPSFPSFunction(string CPS, string FPS);
         private bool fullScreen = false;
 
-        public MainWindow(string[] programArgs)
+        public MainWindow(Dictionary<string, string> context)
         {
-            if (programArgs.Length >0)
+            if (context != null)
             {
-                DecodeProgramArguments(programArgs);
-            }
-            InitializeComponent();
-            Instance = this;
-        }
-
-        private void DecodeProgramArguments(string[] args)
-        {
-            for (int i = 0; i < args.Length; i++)
-            {
-                switch(args[i].Trim())
+                if (context.ContainsKey("jumpStartAddress"))
                 {
-                    // the hex file to load is specified
-                    case "-h":
-                    case "--hex":
-                        // a kernel file must be specified
-                        if (args[i+1].Trim().StartsWith("-") || !args[i + 1].Trim().EndsWith("hex"))
-                        {
-                            throw new Exception("You must specify a hex file.");
-                        }
-                        defaultKernel = args[i+1];
-                        i++; // skip the next argument
-                        break;
-                    case "-j":
-                    case "--jump":
-                        // An address must be specified
-                        int value = Convert.ToInt32(args[i+1].Replace("$:", ""), 16);
-                        if (value != 0)
-                        {
-                            jumpStartAddress = value;
-                            i++; // skip the next argument
-                        } else
-                        {
-                            throw new Exception("Invalid address specified: " + args[i + 1]);
-                        }
-                        break;
-                    // Autorun - a value is not expected for this one
-                    case "-r":
-                    case "--run":
-                        autoRun = true;
-                        break;
-                    // Disable IRQs - a value is not expected for this one
-                    case "-i":
-                    case "--irq":
-                        disabledIRQs = true;
-                        break;
-                    // Board Version B or C
-                    case "-b":
-                    case "--board":
-                        string verArg = args[i + 1];
-                        switch (verArg.ToLower())
-                        {
-                            case "b":
-                                version = BoardVersion.RevB;
-                                break;
-                            case "c":
-                                version = BoardVersion.RevC;
-                                break;
-                        }
-                        break;
-                    default:
-                        throw new Exception("Unknown switch used:" + args[i].Trim());
+                    jumpStartAddress = int.Parse(context["jumpStartAddress"]);
                 }
+                if (context.ContainsKey("defaultKernel"))
+                {
+                    defaultKernel = context["defaultKernel"];
+                }
+                if (context.ContainsKey("autoRun"))
+                {
+                    autoRun = "true".Equals(context["autoRun"]);
+                }
+                if (context.ContainsKey("disabledIRQs"))
+                {
+                    disabledIRQs = "true".Equals(context["disabledIRQs"]);
+                }
+                if (context.ContainsKey("version"))
+                {
+                    if (context["version"] == "RevB")
+                    {
+                        version = BoardVersion.RevB;
+                    }
+                    else if (context["version"] == "RevU")
+                    {
+                        version = BoardVersion.RevU;
+                    }
+                }
+            }
+            if (context == null || "true".Equals(context["Continue"]))
+            {
+                InitializeComponent();
+                Instance = this;
             }
         }
 
@@ -134,11 +103,6 @@ namespace FoenixIDE.UI
             if (disabledIRQs)
             {
                 debugWindow.DisableIRQs(true);
-            }
-
-            if (autoRun)
-            {   
-                debugWindow.RunButton_Click(null, null);
             }
 
             this.Top = 0;
@@ -164,6 +128,11 @@ namespace FoenixIDE.UI
             DisplayBoardVersion();
             EnableMenuItems();
             ResetSDCard();
+
+            if (autoRun)
+            {
+                debugWindow.RunButton_Click(null, null);
+            }
         }
 
         private void LoadHexFile(string Filename, bool ResetMemory)
