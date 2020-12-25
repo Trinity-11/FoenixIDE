@@ -33,8 +33,10 @@ namespace FoenixIDE
 
         private static Dictionary<String,String> DecodeProgramArguments(string[] args)
         {
-            Dictionary<string, string> context = new Dictionary<string, string>();
-            context.Add("Continue", "true");
+            Dictionary<string, string> context = new Dictionary<string, string>
+            {
+                { "Continue", "true" }
+            };
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i].Trim())

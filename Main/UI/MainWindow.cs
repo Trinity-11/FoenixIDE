@@ -14,6 +14,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Timers;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
+using System.Net;
 
 namespace FoenixIDE.UI
 {
@@ -596,7 +600,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void saveWatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveWatchListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Pick the file to create
             SaveFileDialog dialog = new SaveFileDialog
@@ -613,7 +617,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void loadWatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LoadWatchListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -631,7 +635,7 @@ namespace FoenixIDE.UI
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutFrom about = new AboutFrom();
+            AboutForm about = new AboutForm();
             about.ShowDialog();
         }
 
@@ -705,7 +709,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void gpu_MouseDown(object sender, MouseEventArgs e)
+        private void Gpu_MouseDown(object sender, MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
             double ratioW = gpu.Width / (double)size.X;
@@ -721,7 +725,7 @@ namespace FoenixIDE.UI
         }
 
 
-        private void gpu_MouseUp(object sender, MouseEventArgs e)
+        private void Gpu_MouseUp(object sender, MouseEventArgs e)
         {
             GenerateMouseInterrupt(e);
         }
@@ -1077,6 +1081,77 @@ namespace FoenixIDE.UI
                     MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private int VersionValue(string value)
+        {
+            string[] parts = value.Split('.');
+            int intValue = 0;
+            foreach (string part in parts)
+            {
+                try
+                {
+                    int partialValue = int.Parse(part);
+                    intValue += partialValue * 100;
+                }
+                finally
+                {
+
+                }
+            }
+            return intValue;
+        }
+
+        /**
+         * Call the GitHub REST API with / repos / Trinity-11 / FoenixIDE / releases.
+         * From the returned JSON, check which one is the latest and if it matches ours.
+         * 
+         */
+        private void CheckForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string URL = "https://api.github.com/repos/Trinity-11/FoenixIDE/releases";
+            HttpClient client = new HttpClient();
+
+            String version = AboutForm.AppVersion();
+            int appVersion = VersionValue(version);
+
+            // Add an Accept header for JSON format
+            client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            client.DefaultRequestHeaders.Add("user-agent", "Foenix IDE");
+            bool done = false;
+
+            // List data response.
+            HttpResponseMessage response = client.GetAsync(URL).Result;  // Blocking call! Program will wait here until a response is received or a timeout occurs.
+            if (response.IsSuccessStatusCode)
+            {
+                // Parse the response body.
+                string value = response.Content.ReadAsStringAsync().Result;
+                MatchCollection matches = Regex.Matches(value, "\"tag_name\":\"(.*?)\"");
+                foreach (Match match in matches)
+                {
+                    string fullRelease = match.Groups[1].Value;
+                    string release = fullRelease.Replace("release-", "");
+                    int releaseVersion = VersionValue(release);
+                    if (releaseVersion > appVersion)
+                    {
+                        MessageBox.Show(string.Format("A new version is available.\nThe latest release is {0}, you are running version {1}.", release, version), "Version Check");
+                        done = true;
+                        break;
+                    }
+                }                
+            }
+            else
+            {
+                Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+            }
+
+            if (!done)
+            {
+                MessageBox.Show("You are running the latest version of the Foenix IDE.", "Version Check");
+            }
+
+            // Dispose once all HttpClient calls are complete. This is not necessary if the containing object will be disposed of; for example in this case the HttpClient instance will be disposed automatically when the application terminates so the following call is superfluous.
+            client.Dispose();
         }
     }
 }

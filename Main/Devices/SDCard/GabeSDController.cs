@@ -983,10 +983,12 @@ namespace FoenixIDE.Simulator.Devices
             {
                 fs.SetLength(size);
             }
-            voidEntry = new FileEntry();
-            voidEntry.fqpn = filename;
-            voidEntry.clusters = clusterCount;
-            
+            voidEntry = new FileEntry
+            {
+                fqpn = filename,
+                clusters = clusterCount
+            };
+
 
             // calculate the first cluster offset
             switch (GetFSType())
