@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.54.1900 listing file
 ; 64tass --m65816 -D TARGET=1 --long-address --flat -b -o kernel.bin --list kernel.lst --labels=kernel.lbl src\kernel.asm
-; Sat Oct 17 20:31:34 2020
+; Wed Sep 30 14:48:19 2020
 
 ;Offset	;PC	;Hex		;Monitor	;Source
 
@@ -443,8 +443,8 @@
 =$40						FNX0_INT06_FDC        = $40  ;Floppy Disk Controller
 =$80						FNX0_INT07_MOUSE      = $80  ; Mouse Interrupt (INT12 in SuperIO IOspace)
 =$01						FNX1_INT00_KBD        = $01  ;Keyboard Interrupt
-=$02						FNX1_INT01_COL0       = $02  ;VICKY_II (INT2) Sprite Collision
-=$04						FNX1_INT02_COL1       = $04  ;VICKY_II (INT3) Bitmap Collision
+=$02						FNX1_INT01_SC0        = $02  ;VICKY_II (INT2) Sprite 2 Sprite Collision
+=$04						FNX1_INT02_SC1        = $04  ;VICKY_II (INT3) Sprite 2 Tiles Collision
 =$08						FNX1_INT03_COM2       = $08  ;Serial Port 2
 =$10						FNX1_INT04_COM1       = $10  ;Serial Port 1
 =$20						FNX1_INT05_MPU401     = $20  ;Midi Controller Interrupt
@@ -453,8 +453,8 @@
 =$01						FNX2_INT00_OPL3       = $01  ;OPl3
 =$02						FNX2_INT01_GABE_INT0  = $02  ;GABE (INT0) - TBD
 =$04						FNX2_INT02_GABE_INT1  = $04  ;GABE (INT1) - TBD
-=$08						FNX2_INT03_VDMA       = $08  ;VICKY_II (INT4) - VDMA Interrupt
-=$10						FNX2_INT04_COL2       = $10  ;VICKY_II (INT5) Tile Collision
+=$08						FNX2_INT03_SDMA       = $08  ;VICKY_II (INT4)
+=$10						FNX2_INT04_VDMA       = $10  ;VICKY_II (INT5)
 =$20						FNX2_INT05_GABE_INT2  = $20  ;GABE (INT2) - TBD
 =$40						FNX2_INT06_EXT        = $40  ;External Expansion
 =$80						FNX2_INT07_SDCARD_INS = $80  ; SDCARD Insertion
@@ -576,7 +576,6 @@
 =$0a						BM_LUT5               = $0A ;
 =$0c						BM_LUT6               = $0C ;
 =$0e						BM_LUT7               = $0E ;
-=$40						BM_Collision_On       = $40 ;
 =$af0100					BM0_CONTROL_REG     = $AF0100
 =$af0101					BM0_START_ADDY_L    = $AF0101
 =$af0102					BM0_START_ADDY_M    = $AF0102
@@ -600,7 +599,6 @@
 ;******  Processing file: src\VKYII_CFP9553_TILEMAP_def.asm
 
 =$01						TILE_Enable             = $01
-=$40						TILE_Collision_On       = $40           ; Enable
 =$af0200					TL0_CONTROL_REG         = $AF0200       ; Bit[0] - Enable, Bit[3:1] - LUT Select,
 =$af0201					TL0_START_ADDY_L        = $AF0201       ; Not USed right now - Starting Address to where is the MAP
 =$af0202					TL0_START_ADDY_M        = $AF0202
@@ -652,7 +650,7 @@
 =$af0280					TILESET0_ADDY_L         = $AF0280   ; Pointer to Tileset 0 [21:0]
 =$af0281					TILESET0_ADDY_M         = $AF0281
 =$af0282					TILESET0_ADDY_H         = $AF0282
-=$af0283					TILESET0_ADDY_CFG       = $AF0283   ; [3] - TileStride256x256
+=$af0283					TILESET0_ADDY_CFG       = $AF0283   ; [3] - TileStride256x256 [2:0] LUT
 =$af0284					TILESET1_ADDY_L         = $AF0284
 =$af0285					TILESET1_ADDY_M         = $AF0285
 =$af0286					TILESET1_ADDY_H         = $AF0286
@@ -779,12 +777,12 @@
 =$01						SPRITE_Enable             = $01
 =$00						SPRITE_LUT0               = $00 ; This is the LUT that the Sprite will use
 =$02						SPRITE_LUT1               = $02
-=$04						SPRITE_LUT2               = $04
-=$06						SPRITE_LUT3               = $06
-=$08						SPRITE_LUT4               = $08
-=$0a						SPRITE_LUT5               = $0A
-=$0c						SPRITE_LUT6               = $0C
-=$0e						SPRITE_LUT7               = $0E
+=$04						SPRITE_LUT2               = $04 ; Only 4 LUT for Now, So this bit is not used.
+=$06						SPRITE_LUT3               = $06 ; Only 4 LUT for Now, So this bit is not used.
+=$08						SPRITE_LUT4               = $08 ; Only 4 LUT for Now, So this bit is not used.
+=$0a						SPRITE_LUT5               = $0A ; Only 4 LUT for Now, So this bit is not used.
+=$0c						SPRITE_LUT6               = $0C ; Only 4 LUT for Now, So this bit is not used.
+=$0e						SPRITE_LUT7               = $0E ; Only 4 LUT for Now, So this bit is not used.
 =$00						SPRITE_DEPTH0             = $00
 =$10						SPRITE_DEPTH1             = $10
 =$20						SPRITE_DEPTH2             = $20
@@ -792,7 +790,6 @@
 =$40						SPRITE_DEPTH4             = $40
 =$50						SPRITE_DEPTH5             = $50
 =$60						SPRITE_DEPTH6             = $60
-=$80						SPRITE_Collision_On       = $80 ; Enable the Collision Detection
 =$af0c00					SP00_CONTROL_REG        = $AF0C00
 =$af0c01					SP00_ADDY_PTR_L         = $AF0C01
 =$af0c02					SP00_ADDY_PTR_M         = $AF0C02
