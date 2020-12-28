@@ -420,6 +420,7 @@ namespace FoenixIDE.UI
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
                 registerDisplay1.updateRegisterTimer.Enabled = true;
+                DebugPanel.Refresh();
             }
             else
             {
