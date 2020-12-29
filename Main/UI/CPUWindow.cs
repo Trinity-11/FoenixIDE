@@ -513,8 +513,11 @@ namespace FoenixIDE.UI
         private void RefreshStatus()
         {
             this.Text = "Debug: " + StepCounter.ToString();
-            DebugPanel.Refresh();
-            UpdateStackDisplay();
+            if (kernel.CPU.DebugPause)
+            {
+                DebugPanel.Refresh();
+                UpdateStackDisplay();
+            }
             registerDisplay1.UpdateRegisters();
         }
 
@@ -600,7 +603,10 @@ namespace FoenixIDE.UI
                     }
                     return;
                 }
-                if (knl_breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && ((kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) || kernel.CPU.CurrentOpcode.Value == 0)))
+                if ( knl_breakpoints.ContainsKey(nextPC) || 
+                     kernel.CPU.CurrentOpcode.Value == 0 || 
+                     (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) )
+                   )
                 {
                     if (UpdateTraceTimer.Enabled || kernel.CPU.CurrentOpcode.Value == 0)
                     {
@@ -813,26 +819,26 @@ namespace FoenixIDE.UI
         {
             // Read Interrupt Register 0
             byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
-            if ((reg0 & (byte)Register0.FNX0_INT00_SOF) != 0 && SOFCheckbox.Checked)
+            if (SOFCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT00_SOF) != 0)
             {
                 return true;
             }
-            if ((reg0 & (byte)Register0.FNX0_INT01_SOL) != 0 && SOLCheckbox.Checked)
+            if (SOLCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT01_SOL) != 0)
             {
                 return true;
             }
-            if ((reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0 && MouseCheckbox.Checked)
+            if (MouseCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0)
             {
                 return true;
             }
 
             // Read Interrupt Register 1
             byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
-            if ((reg1 & (byte)Register1.FNX1_INT07_SDCARD ) != 0 && SDCardCheckBox.Checked)
+            if (SDCardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT07_SDCARD ) != 0)
             {
                 return true;
             }
-            if ((reg1 & (byte)Register1.FNX1_INT00_KBD) != 0 && KeyboardCheckBox.Checked)
+            if (KeyboardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT00_KBD) != 0)
             {
                 return true;
             }

@@ -43,7 +43,6 @@ namespace FoenixIDE.Simulator.Devices
         private string spaces = "        ";
         private bool mbrPresent = false;
         
-        int writeStartCluster = 0; // this is used when writing to file, to determine the cluster number
         FileEntry voidEntry = null; // this is a "newfile" entry that gets used when creating a new file.
 
 
@@ -174,7 +173,7 @@ namespace FoenixIDE.Simulator.Devices
                                 int writeAddress = ReadWord(7) + (ReadWord(9) << 16);
                                 if (GetISOMode())
                                 {
-                                    SetData_ISO((writeAddress - BOOT_SECTOR_ADDR) / 512, readBlock); // write the 512 Byte buffer
+                                    SetData_ISO((writeAddress - BOOT_SECTOR_ADDR) / 512, writeBlock); // write the 512 Byte buffer
                                 }
                                 else
                                 {
@@ -189,11 +188,10 @@ namespace FoenixIDE.Simulator.Devices
                                     }
                                     else if (writeAddress >= FAT_OFFSET_START && writeAddress <= FAT_OFFSET_START + FAT_SIZE - 1)
                                     {
-                                        Console.WriteLine("Gabe is trying to write to FAT Area!");
-                                        
                                         // read the fat table
                                         blockPtr = 0;
                                         int fatPage = (writeAddress - FAT_OFFSET_START) / 512;
+                                        Console.WriteLine("Gabe is trying to write to FAT Area! Page: " + fatPage);
                                         // Compare the last FAT with the writeBlock - based on how many clusters are created, we can determine the filesize
                                         PrepareEmptyFileEntry(fatPage);
                                         writeBlock = new byte[512];
@@ -208,22 +206,32 @@ namespace FoenixIDE.Simulator.Devices
                                     }
                                     else if (writeAddress >= DATA_OFFSET_START && writeAddress <= DATA_OFFSET_START + DATA_SIZE - 1)
                                     {
-                                        Console.WriteLine("Gabe is trying to write to Data Area!");
-
                                         // read the data
                                         int dataPage = (writeAddress - DATA_OFFSET_START) / 512;
                                         if (GetFSType() == FSType.FAT32)
                                         {
-                                            dataPage += ROOT_SIZE / 512;
+                                            dataPage += 2 + ROOT_SIZE / 512;
                                         }
+                                        Console.WriteLine("Gabe is trying to write to Data Area! Cluster: " + dataPage);
                                         SetData(dataPage, writeBlock);
                                         blockPtr = 0;
+                                    }
+                                    else
+                                    {
+                                        // Invalid address
+                                        Console.WriteLine("Gabe is trying to write to an invalid address:" + writeAddress);
+                                        data[5] = 1;
                                     }
                                 }
                                 // reset the write block
                                 writeBlock = new byte[512];
                                 break;
                         }
+                    }
+                    else
+                    {
+                        // set the error status
+                        data[5] = 1;
                     }
                     break;
                 case MemoryMap.GABE_SDC_RX_FIFO_CTRL_REG - MemoryMap.GABE_SDC_CTRL_START:
@@ -906,21 +914,38 @@ namespace FoenixIDE.Simulator.Devices
 
         private void SetData(int page, byte[] buffer)
         {
-            FileStream stream = new FileStream(voidEntry.fqpn, FileMode.Open, FileAccess.Write);
-            try
+            // Find the file in FAT
+            FileEntry fEntry = null;
+            int writeStartCluster = 0;
+            foreach (int key in FAT.Keys)
             {
-                stream.Seek((page + 2 - writeStartCluster) * 512, SeekOrigin.Begin);
-                stream.Write(buffer, 0, 512);
+                FileEntry entry = FAT[key];
+                if (page >= key && page <= key + entry.clusters)
+                {
+                    fEntry = entry;
+                    writeStartCluster = key;
+                    break;
+                }
             }
-            catch (Exception e)
+
+            if (fEntry != null)
             {
-                // controller error
-                data[5] = 1;
-                System.Console.WriteLine(e.ToString());
-            }
-            finally
-            {
-                stream.Close();
+                FileStream stream = new FileStream(fEntry.fqpn, FileMode.Open, FileAccess.Write);
+                try
+                {
+                    stream.Seek((page - writeStartCluster) * 512, SeekOrigin.Begin);
+                    stream.Write(buffer, 0, 512);
+                }
+                catch (Exception e)
+                {
+                    // controller error
+                    data[5] = 1;
+                    System.Console.WriteLine(e.ToString());
+                }
+                finally
+                {
+                    stream.Close();
+                }
             }
         }
 
@@ -929,29 +954,32 @@ namespace FoenixIDE.Simulator.Devices
         private void PrepareEmptyFileEntry(int page)
         {
             int ffCntr = 0;
-            for (int i = 0; i < 512; i++)
+            if (firstPtr == -1 && lastPtr == -1)
             {
-                if (firstPtr == -1)
+                for (int i = 0; i < 512; i++)
                 {
-                    if (fat[i] != writeBlock[i])
+                    if (firstPtr == -1)
                     {
-                        firstPtr = i;
-                        if (writeBlock[i] == 0xFF)
+                        if (fat[i] != writeBlock[i])
+                        {
+                            firstPtr = i;
+                            if (writeBlock[i] == 0xFF)
+                            {
+                                ffCntr++;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (i % 4 != 3 && writeBlock[i] == 0xff)
                         {
                             ffCntr++;
                         }
-                    }
-                }
-                else
-                {
-                    if (i % 4 != 3 && writeBlock[i] == 0xff)
-                    {
-                        ffCntr++;
-                    }
-                    if (ffCntr == 3 && i %4 ==3 && writeBlock[i] == 0x0f)
-                    {
-                        lastPtr = i;
-                        break;
+                        if (ffCntr == 3 && i % 4 == 3 && writeBlock[i] == 0x0f)
+                        {
+                            lastPtr = i;
+                            break;
+                        }
                     }
                 }
             }
@@ -991,6 +1019,7 @@ namespace FoenixIDE.Simulator.Devices
 
 
             // calculate the first cluster offset
+            int writeStartCluster = 0; // this is used when writing to file, to determine the cluster number
             switch (GetFSType())
             {
                 case FSType.FAT16:
