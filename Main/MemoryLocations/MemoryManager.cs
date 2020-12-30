@@ -75,16 +75,7 @@ namespace FoenixIDE.MemoryLocations
         /// <param name="DeviceAddress"></param>
         public void GetDeviceAt(int Address, out IMappable Device, out int DeviceAddress)
         {
-            //foreach (IMappable device in devices)
-            //{
-            //    if (Address >= device.StartAddress && Address < device.EndAddress)
-            //    {
-            //        Device = device;
-            //        DeviceAddress = Address - device.StartAddress;
-            //        return;
-            //    }
-            //}
-            if (Address == CODEC.StartAddress)
+            if (Address == MemoryMap.CODEC_WR_CTRL_FMX)
             {
                 Device = CODEC;
                 DeviceAddress = 0;
@@ -96,25 +87,25 @@ namespace FoenixIDE.MemoryLocations
                 DeviceAddress = Address - MATH.StartAddress;
                 return;
             }
-            if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.EndAddress)
+            if (Address >= MemoryMap.INT_PENDING_REG0 && Address <= MemoryMap.INT_PENDING_REG0 + 3)
             {
                 Device = INTERRUPT;
                 DeviceAddress = Address - INTERRUPT.StartAddress;
                 return;
             }
-            if (Address >= TIMER0.StartAddress && Address <= TIMER0.EndAddress)
+            if (Address >= MemoryMap.TIMER0_CTRL_REG && Address <= MemoryMap.TIMER0_CTRL_REG + 7)
             {
                 Device = TIMER0;
                 DeviceAddress = Address - TIMER0.StartAddress;
                 return;
             }
-            if (Address >= TIMER1.StartAddress && Address <= TIMER1.EndAddress)
+            if (Address >= MemoryMap.TIMER1_CTRL_REG && Address <= MemoryMap.TIMER1_CTRL_REG + 7)
             {
                 Device = TIMER1;
                 DeviceAddress = Address - TIMER1.StartAddress;
                 return;
             }
-            if (Address >= TIMER2.StartAddress && Address <= TIMER2.EndAddress)
+            if (Address >= MemoryMap.TIMER2_CTRL_REG && Address <= MemoryMap.TIMER2_CTRL_REG + 7)
             {
                 Device = TIMER2;
                 DeviceAddress = Address - TIMER2.StartAddress;

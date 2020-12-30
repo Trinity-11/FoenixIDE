@@ -183,7 +183,7 @@ namespace FoenixIDE.UI
             {
                 memoryWindow = new MemoryWindow
                 {
-                    Memory = kernel.CPU.Memory,
+                    Memory = kernel.CPU.MemMgr,
                     Left = debugWindow.Left,
                     Top = debugWindow.Top + debugWindow.Height
                 };
@@ -248,7 +248,7 @@ namespace FoenixIDE.UI
             BitmapLoader loader = new BitmapLoader
             {
                 StartPosition = FormStartPosition.CenterParent,
-                Memory = kernel.CPU.Memory,
+                Memory = kernel.CPU.MemMgr,
                 ResChecker = ResChecker
             };
             loader.ShowDialog(this);
@@ -499,7 +499,7 @@ namespace FoenixIDE.UI
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
-                memoryWindow.Memory = kernel.CPU.Memory;
+                memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.UpdateMCRButtons();
 
                 // Restart the CPU
@@ -519,7 +519,7 @@ namespace FoenixIDE.UI
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
-                memoryWindow.Memory = kernel.CPU.Memory;
+                memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.UpdateMCRButtons();
                 debugWindow.Refresh();
             }

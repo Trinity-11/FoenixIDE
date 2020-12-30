@@ -1,3 +1,7 @@
+Release 0.5.4.0
+---------------
+Handling Timer interrupts.  Only the CHARGE registers are used to determine the interval.  Minimum interval allowed is 1 millisecond.
+
 Release 0.5.3.3
 ---------------
 Fixed several issues with the tile editor.

@@ -540,7 +540,7 @@ namespace FoenixIDE.UI
                 while (i > 0)
                 {
                     int address = kernel.CPU.Stack.Value + i;
-                    stackText.AppendText(address.ToString("X4") + " " + kernel.CPU.Memory[address].ToString("X2") + "\r\n");
+                    stackText.AppendText(address.ToString("X4") + " " + kernel.CPU.MemMgr[address].ToString("X2") + "\r\n");
                     i--;
                 }
             }

@@ -88,6 +88,9 @@ namespace FoenixIDE
             // Write bytes $9F in the joystick registers to mean that they are not installed.
             MemMgr.WriteWord(0xAFE800, 0x9F9F);
             MemMgr.WriteWord(0xAFE802, 0x9F9F);
+            MemMgr.TIMER0.TimerInterruptDelegate += TimerEvent0;
+            MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
+            MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
         }
 
         private void CPU_SimulatorCommand(int EventID)
@@ -99,6 +102,43 @@ namespace FoenixIDE
                     break;
                 default:
                     break;
+            }
+        }
+
+        private void TimerEvent0()
+        {
+            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT02_TMR0) == (byte)Register0.FNX0_INT02_TMR0))
+            {
+                // Set the Timer0 Interrupt
+                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= (byte)Register0.FNX0_INT02_TMR0;
+                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                CPU.Pins.IRQ = true;
+            }
+        }
+        private void TimerEvent1()
+        {
+            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT03_TMR1) == (byte)Register0.FNX0_INT03_TMR1))
+            {
+                // Set the Timer1 Interrupt
+                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= (byte)Register0.FNX0_INT03_TMR1;
+                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                CPU.Pins.IRQ = true;
+            }
+        }
+        private void TimerEvent2()
+        {
+            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT04_TMR2) == (byte)Register0.FNX0_INT04_TMR2))
+            {
+                // Set the Timer2 Interrupt
+                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= (byte)Register0.FNX0_INT04_TMR2;
+                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                CPU.Pins.IRQ = true;
             }
         }
 
