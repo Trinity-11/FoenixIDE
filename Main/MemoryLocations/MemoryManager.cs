@@ -36,6 +36,9 @@ namespace FoenixIDE.MemoryLocations
         public OPL2 OPL2 = null;
         public MPU401 MPU401 = null;
         public VDMA VDMA = null;
+        public TimerRegister TIMER0 = null;
+        public TimerRegister TIMER1 = null;
+        public TimerRegister TIMER2 = null;
 
         public bool VectorPull = false;
 
@@ -93,10 +96,28 @@ namespace FoenixIDE.MemoryLocations
                 DeviceAddress = Address - MATH.StartAddress;
                 return;
             }
-            if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.StartAddress + INTERRUPT.Length - 1)
+            if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.EndAddress)
             {
                 Device = INTERRUPT;
                 DeviceAddress = Address - INTERRUPT.StartAddress;
+                return;
+            }
+            if (Address >= TIMER0.StartAddress && Address <= TIMER0.EndAddress)
+            {
+                Device = TIMER0;
+                DeviceAddress = Address - TIMER0.StartAddress;
+                return;
+            }
+            if (Address >= TIMER1.StartAddress && Address <= TIMER1.EndAddress)
+            {
+                Device = TIMER1;
+                DeviceAddress = Address - TIMER1.StartAddress;
+                return;
+            }
+            if (Address >= TIMER2.StartAddress && Address <= TIMER2.EndAddress)
+            {
+                Device = TIMER2;
+                DeviceAddress = Address - TIMER2.StartAddress;
                 return;
             }
             if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)

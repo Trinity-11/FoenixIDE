@@ -33,7 +33,7 @@ namespace FoenixIDE
             int memSize = MemoryMap.RAM_SIZE;
             CodecRAM codec = null;
             SDCardDevice sdcard = null;
-            if (boardVersion == BoardVersion.RevC)
+            if (boardVersion == BoardVersion.RevC || boardVersion == BoardVersion.RevU)
             {
                 memSize *= 2;
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_FMX, 2);  // This register is only a single byte but we allow writing a word
@@ -62,7 +62,10 @@ namespace FoenixIDE
                 OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
                 FLOAT = new MathFloatRegister(MemoryMap.FLOAT_START, MemoryMap.FLOAT_END - MemoryMap.FLOAT_START + 1),
                 MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2),
-                VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE)
+                VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE),
+                TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
+                TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
+                TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8)
             };
             MemMgr.CODEC = codec;
             MemMgr.KEYBOARD.SetKernel(this);

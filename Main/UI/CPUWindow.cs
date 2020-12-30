@@ -827,6 +827,19 @@ namespace FoenixIDE.UI
             {
                 return true;
             }
+            if (TMR0Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT02_TMR0) != 0)
+            {
+                return true;
+            }
+
+            if (TMR1Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT03_TMR1) != 0)
+            {
+                return true;
+            }
+            if (TMR2Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT04_TMR2) != 0)
+            {
+                return true;
+            }
             if (MouseCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0)
             {
                 return true;

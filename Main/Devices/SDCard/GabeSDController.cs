@@ -25,7 +25,7 @@ namespace FoenixIDE.Simulator.Devices
     {
         private byte[] mbr = new byte[512];
         private byte[] boot_sector = new byte[512];
-        private byte[] fat = new byte[512];
+        private readonly byte[] fat = new byte[512];
         private byte[] readBlock, writeBlock = new byte[512];
         private byte[] root = new byte[32 * 512]; // root dir is always 32 sectors, except FAT32, which omits it.
         private int blockPtr = 0;

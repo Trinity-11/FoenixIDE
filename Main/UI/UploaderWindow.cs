@@ -40,6 +40,9 @@ namespace FoenixIDE.UI
                 case BoardVersion.RevC:
                     RevModeLabel.Text = "Mode: RevC";
                     break;
+                case BoardVersion.RevU:
+                    RevModeLabel.Text = "Mode: RevU";
+                    break;
             }
         }
 
@@ -231,10 +234,10 @@ namespace FoenixIDE.UI
             UploadProgressBar.Value = 0;
             UploadProgressBar.Visible = true;
 
-            int BaseBankAddress = 0x18_0000;
-            if (boardVersion == BoardVersion.RevC)
+            int BaseBankAddress = 0x38_0000;
+            if (boardVersion != BoardVersion.RevB)
             {
-                BaseBankAddress = 0x38_0000;
+                BaseBankAddress = 0x18_0000;
             }
 
             if (SendFileRadio.Checked)

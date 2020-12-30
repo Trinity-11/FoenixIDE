@@ -842,9 +842,13 @@ namespace FoenixIDE.UI
             {
                 toolStripRevision.Text = "Rev B";
             }
-            else
+            else if (version == BoardVersion.RevC)
             {
                 toolStripRevision.Text = "Rev C";
+            }
+            else
+            {
+                toolStripRevision.Text = "Rev U";
             }
             // force repaint
             statusStrip1.Invalidate();
@@ -855,6 +859,10 @@ namespace FoenixIDE.UI
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
+            }
+            else if (version == BoardVersion.RevC)
+            {
+                version = BoardVersion.RevU;
             }
             else
             {
@@ -891,7 +899,7 @@ namespace FoenixIDE.UI
         {
             base.OnPaint(e);
 
-            if (version == BoardVersion.RevC)
+            if (version != BoardVersion.RevB)
             {
                 int textOffset = 24;
                 ToolStripStatusLabel label = (ToolStripStatusLabel)sender;
