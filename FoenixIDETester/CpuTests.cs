@@ -608,5 +608,51 @@ namespace FoenixIDETester
             Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
             Assert.IsTrue(cpu.Flags.oVerflow, "Overflow should be true");
         }
+
+        /**
+         * Error reported by Phil
+         * CLC
+         * XCE
+         * REP #$30
+         * 
+         * SEC
+         * LDA #$AA
+         * SBC #$78
+         * 
+         * Carry should be set
+         */
+        [TestMethod]
+        public void TestOverflowSBC10()
+        {
+            ClearCarry();
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.XCE_Implied);
+            cpu.ExecuteNext();
+            Assert.IsFalse(cpu.Flags.Emulation);
+            Assert.IsTrue(cpu.Flags.Carry);
+
+            // REP #$30
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.REP_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x30);
+            cpu.ExecuteNext();
+
+            Assert.AreEqual(2, cpu.A.Width);
+            Assert.AreEqual(2, cpu.X.Width);
+
+            // SEC
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+
+            // LDA #$AA
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteWord(cpu.PC + 1, 0xAA);
+            cpu.ExecuteNext();
+
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteWord(cpu.PC + 1, 0x78);
+            cpu.ExecuteNext();
+
+            Assert.AreEqual(0x32, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry, "Carry should be true");
+            Assert.IsFalse(cpu.Flags.oVerflow, "Overflow should be false");
+        }
     }
 }

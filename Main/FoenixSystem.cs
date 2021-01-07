@@ -16,7 +16,6 @@ namespace FoenixIDE
     {
         public MemoryManager MemMgr = null;
         public Processor.CPU CPU = null;
-        public Gpu gpu = null;
 
         public ResourceChecker Resources;
         public Processor.Breakpoints Breakpoints = new Processor.Breakpoints();
@@ -25,9 +24,8 @@ namespace FoenixIDE
         public SortedList<int, WatchedMemory> WatchList = new SortedList<int, WatchedMemory>();
         private string LoadedKernel;
 
-        public FoenixSystem(Gpu gpu, BoardVersion version, string DefaultKernel)
+        public FoenixSystem(BoardVersion version, string DefaultKernel)
         {
-            this.gpu = gpu;
             boardVersion = version;
 
             int memSize = MemoryMap.RAM_SIZE;
@@ -72,18 +70,12 @@ namespace FoenixIDE
 
             // Assign memory variables used by other processes
             CPU = new CPU(MemMgr);
-            CPU.SimulatorCommand += CPU_SimulatorCommand;
-            gpu.VRAM = MemMgr.VIDEO;
-            gpu.RAM = MemMgr.RAM;
-            gpu.VICKY = MemMgr.VICKY;
+            
             MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
             MemMgr.VDMA.setSystemRam(MemMgr.RAM);
 
             // Load the kernel.hex if present
-            ResetCPU(true, DefaultKernel);
-
-            // This fontset is loaded just in case the kernel doesn't provide one.
-            gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+            ResetCPU(DefaultKernel);
 
             // Write bytes $9F in the joystick registers to mean that they are not installed.
             MemMgr.WriteWord(0xAFE800, 0x9F9F);
@@ -91,18 +83,6 @@ namespace FoenixIDE
             MemMgr.TIMER0.TimerInterruptDelegate += TimerEvent0;
             MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
             MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
-        }
-
-        private void CPU_SimulatorCommand(int EventID)
-        {
-            switch (EventID)
-            {
-                case SimulatorCommands.RefreshDisplay:
-                    gpu.BlinkingCounter = Gpu.BLINK_RATE;
-                    break;
-                default:
-                    break;
-            }
         }
 
         private void TimerEvent0()
@@ -151,15 +131,13 @@ namespace FoenixIDE
             boardVersion = rev;
         }
         // return true if the CPU was reset and the program was loaded
-        public bool ResetCPU(bool ResetMemory, string kernelFilename)
+        public bool ResetCPU(string kernelFilename)
         {
             if (CPU != null)
             {
                 CPU.DebugPause = true;
                 //CPU.Halt();
             }
-
-            gpu.Refresh();
 
             if (kernelFilename != null)
             {
@@ -182,19 +160,15 @@ namespace FoenixIDE
             }
             else
             {
-                if (ResetMemory)
-                {
-                    this.ResetMemory();
-                }
                 LoadedKernel = HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _);
                 if (LoadedKernel != null)
                 {
-                    if (ResetMemory)
+                    if (lstFile == null)
                     {
                         lstFile = new ListFile(LoadedKernel);
                     }
                     else
-                    {
+                    { 
                         // TODO: This results in lines of code to be shown in incorrect order - Fix
                         ListFile tempList = new ListFile(LoadedKernel);
                         foreach (DebugLine line in tempList.Lines.Values)
@@ -204,14 +178,13 @@ namespace FoenixIDE
                                 lstFile.Lines.Remove(line.PC);
                             }
                             lstFile.Lines.Add(line.PC, line);
-                            for (int i=1; i < line.commandLength; i++)
+                            for (int i = 1; i < line.commandLength; i++)
                             {
-                                if (lstFile.Lines.ContainsKey(line.PC+i))
+                                if (lstFile.Lines.ContainsKey(line.PC + i))
                                 {
-                                    lstFile.Lines.Remove(line.PC+i);
+                                    lstFile.Lines.Remove(line.PC + i);
                                 }
                             }
-                            
                         }
                     }
                 }

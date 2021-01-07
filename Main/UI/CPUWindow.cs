@@ -46,6 +46,21 @@ namespace FoenixIDE.UI
             MemoryLimit = kernel.MemMgr.RAM.Length;
             registerDisplay1.CPU = kernel.CPU;
             knl_breakpoints = kernel.Breakpoints;
+            if (knl_breakpoints.Count > 0)
+            {
+                BPLabel.Text = knl_breakpoints.Count.ToString() + " BP";
+                // Update the combo
+                foreach (KeyValuePair<int, string> kvp in knl_breakpoints)
+                {
+                    BPCombo.Items.Add(kvp.Value);
+                    UpdateDebugLines(kvp.Key, true);
+                }
+            }
+            else
+            {
+                BPLabel.Text = "Breakpoint";
+            }
+
             UpdateQueue();
             int pc = kernel.CPU.PC;
             DebugLine line = GetExecutionInstruction(pc);
@@ -608,6 +623,20 @@ namespace FoenixIDE.UI
                      (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) )
                    )
                 {
+                    if (kernel.CPU.CurrentOpcode.Value == 0)
+                    {
+                        if (lastLine.InvokeRequired)
+                        {
+                            lastLine.Invoke((MethodInvoker)delegate
+                           {
+                               lastLine.Text = "BRK OpCode read";
+                           });
+                        }
+                        else
+                        {
+                            lastLine.Text = "BRK OpCode read";
+                        }
+                    }
                     if (UpdateTraceTimer.Enabled || kernel.CPU.CurrentOpcode.Value == 0)
                     {
                         UpdateTraceTimer.Enabled = false;

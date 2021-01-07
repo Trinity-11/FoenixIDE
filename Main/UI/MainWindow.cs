@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Net;
+using FoenixIDE.Display;
 
 namespace FoenixIDE.UI
 {
@@ -94,13 +95,20 @@ namespace FoenixIDE.UI
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-            kernel = new FoenixSystem(this.gpu, version, defaultKernel);
+            kernel = new FoenixSystem(version, defaultKernel);
             terminal = new SerialTerminal();
             ShowDebugWindow();
             ShowMemoryWindow();
+
+            // Now that the kernel is initialized, allocate variables to the GPU
             gpu.StartOfFrame += SOF;
             gpu.StartOfLine += SOL;
             gpu.GpuUpdated += Gpu_Update_Cps_Fps;
+            gpu.VRAM = kernel.MemMgr.VIDEO;
+            gpu.RAM = kernel.MemMgr.RAM;
+            gpu.VICKY = kernel.MemMgr.VICKY;
+            // This fontset is loaded just in case the kernel doesn't provide one.
+            gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
             joystickWindow.beatrix = kernel.MemMgr.BEATRIX;
 
@@ -139,12 +147,13 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void LoadHexFile(string Filename, bool ResetMemory)
+        private void LoadHexFile(string Filename)
         {
             debugWindow.Pause();
             kernel.SetVersion(version);
-            if (kernel.ResetCPU(ResetMemory, Filename))
+            if (kernel.ResetCPU(Filename))
             {
+                gpu.Refresh();
                 if (kernel.lstFile != null)
                 {
                     ShowDebugWindow();
@@ -312,10 +321,6 @@ namespace FoenixIDE.UI
 
                 this.menuStrip1.Visible = false;
                 this.statusStrip1.Visible = false;
-                this.panel1.Visible = false;
-                this.panel2.Visible = false;
-                this.panel3.Visible = false;
-                this.panel4.Visible = false;
                 this.debugWindow.Visible = false;               // not sure that is needed
                 this.memoryWindow.Visible = false;              // maybe maximizing GPU Window is enough?
 
@@ -332,10 +337,6 @@ namespace FoenixIDE.UI
 
                 this.menuStrip1.Visible = true;
                 this.statusStrip1.Visible = true;
-                this.panel1.Visible = true;
-                this.panel2.Visible = true;
-                this.panel3.Visible = true;
-                this.panel4.Visible = true;
                 this.debugWindow.Visible = true;
                 this.debugWindow.Show();
                 this.debugWindow.Refresh();
@@ -420,11 +421,13 @@ namespace FoenixIDE.UI
             {
                 var d = new WriteCPSFPSFunction(Write_CPS_FPS_Safe);
                 statusStrip1.Invoke(d, new object[] { CPS, FPS});
+
             }
             else
             {
                 cpsPerf.Text = CPS;
                 fpsPerf.Text = FPS;
+                statusStrip1.Update();
             }
         }
         int previousCounter = 0;
@@ -494,8 +497,9 @@ namespace FoenixIDE.UI
         {           
             previousCounter = 0;
             debugWindow.Pause();
-            if (kernel.ResetCPU(false, null))
+            if (kernel.ResetCPU(null))
             {
+                gpu.Refresh();
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
@@ -514,7 +518,7 @@ namespace FoenixIDE.UI
         {
             previousCounter = 0;
             debugWindow.Pause();
-            if (kernel.ResetCPU(false, null))
+            if (kernel.ResetCPU(null))
             {
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
@@ -551,7 +555,7 @@ namespace FoenixIDE.UI
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                LoadHexFile(dialog.FileName, sender.Equals(menuOpenHexFile));
+                LoadHexFile(dialog.FileName);
             }
         }
 
@@ -570,8 +574,10 @@ namespace FoenixIDE.UI
             {
                 // TODO - this code is so coupled - we need to set the version in the XML file too.
                 kernel.Resources = ResChecker;
-                if (kernel.ResetCPU(true, dialog.FileName))
+                if (kernel.ResetCPU(dialog.FileName))
                 {
+                    gpu.Refresh();
+                    debugWindow.Pause();
                     SetDipSwitchMemory();
                     ShowDebugWindow();
                     ShowMemoryWindow();
@@ -1018,7 +1024,7 @@ namespace FoenixIDE.UI
                 FileInfo info = new FileInfo(obj[0]);
                 if (info.Extension.ToUpper().Equals(".HEX"))
                 {
-                    LoadHexFile(obj[0], false);
+                    LoadHexFile(obj[0]);
                 }
             }
         }
@@ -1100,7 +1106,7 @@ namespace FoenixIDE.UI
                 try
                 {
                     int partialValue = int.Parse(part);
-                    intValue += partialValue * 100;
+                    intValue = (intValue + partialValue) * 100;
                 }
                 finally
                 {

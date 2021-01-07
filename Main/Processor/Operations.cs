@@ -1031,7 +1031,15 @@ namespace FoenixIDE.Processor
                 nv = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;
 
             cpu.Flags.Carry = (nv >= 0 && nv <= cpu.A.MaxUnsigned);
-            cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((256 - val) ^ nv) & 0x80) != 0;            
+            if (cpu.A.Width == 1)
+            {
+                cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((256 - val) ^ nv) & 0x80) != 0;
+            }
+            else
+            {
+                cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((65536 - val) ^ nv) & 0x8000) != 0;
+            }
+                      
             cpu.Flags.SetNZ(nv, cpu.A.Width);
 
             cpu.A.Value = nv;
