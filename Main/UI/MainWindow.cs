@@ -14,6 +14,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Timers;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
+using System.Net;
+using FoenixIDE.Display;
 
 namespace FoenixIDE.UI
 {
@@ -43,102 +48,73 @@ namespace FoenixIDE.UI
         private String defaultKernel = @"roms\kernel.hex";
         private int jumpStartAddress;
         private bool disabledIRQs = false;
-        private bool autoRun = false;
+        private bool autoRun = true;
         private BoardVersion version = BoardVersion.RevC;
         public static MainWindow Instance = null;
         private delegate void WriteCPSFPSFunction(string CPS, string FPS);
         private bool fullScreen = false;
 
-        public MainWindow(string[] programArgs)
+        public MainWindow(Dictionary<string, string> context)
         {
-            if (programArgs.Length >0)
+            if (context != null)
             {
-                DecodeProgramArguments(programArgs);
-            }
-            InitializeComponent();
-            Instance = this;
-        }
-
-        private void DecodeProgramArguments(string[] args)
-        {
-            for (int i = 0; i < args.Length; i++)
-            {
-                switch(args[i].Trim())
+                if (context.ContainsKey("jumpStartAddress"))
                 {
-                    // the hex file to load is specified
-                    case "-h":
-                    case "--hex":
-                        // a kernel file must be specified
-                        if (args[i+1].Trim().StartsWith("-") || !args[i + 1].Trim().EndsWith("hex"))
-                        {
-                            throw new Exception("You must specify a hex file.");
-                        }
-                        defaultKernel = args[i+1];
-                        i++; // skip the next argument
-                        break;
-                    case "-j":
-                    case "--jump":
-                        // An address must be specified
-                        int value = Convert.ToInt32(args[i+1].Replace("$:", ""), 16);
-                        if (value != 0)
-                        {
-                            jumpStartAddress = value;
-                            i++; // skip the next argument
-                        } else
-                        {
-                            throw new Exception("Invalid address specified: " + args[i + 1]);
-                        }
-                        break;
-                    // Autorun - a value is not expected for this one
-                    case "-r":
-                    case "--run":
-                        autoRun = true;
-                        break;
-                    // Disable IRQs - a value is not expected for this one
-                    case "-i":
-                    case "--irq":
-                        disabledIRQs = true;
-                        break;
-                    // Board Version B or C
-                    case "-b":
-                    case "--board":
-                        string verArg = args[i + 1];
-                        switch (verArg.ToLower())
-                        {
-                            case "b":
-                                version = BoardVersion.RevB;
-                                break;
-                            case "c":
-                                version = BoardVersion.RevC;
-                                break;
-                        }
-                        break;
-                    default:
-                        throw new Exception("Unknown switch used:" + args[i].Trim());
+                    jumpStartAddress = int.Parse(context["jumpStartAddress"]);
                 }
+                if (context.ContainsKey("defaultKernel"))
+                {
+                    defaultKernel = context["defaultKernel"];
+                }
+                if (context.ContainsKey("autoRun"))
+                {
+                    autoRun = "true".Equals(context["autoRun"]);
+                }
+                if (context.ContainsKey("disabledIRQs"))
+                {
+                    disabledIRQs = "true".Equals(context["disabledIRQs"]);
+                }
+                if (context.ContainsKey("version"))
+                {
+                    if (context["version"] == "RevB")
+                    {
+                        version = BoardVersion.RevB;
+                    }
+                    else if (context["version"] == "RevU")
+                    {
+                        version = BoardVersion.RevU;
+                    }
+                }
+            }
+            if (context == null || "true".Equals(context["Continue"]))
+            {
+                InitializeComponent();
+                Instance = this;
             }
         }
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
-            kernel = new FoenixSystem(this.gpu, version, defaultKernel);
+            kernel = new FoenixSystem(version, defaultKernel);
             terminal = new SerialTerminal();
             ShowDebugWindow();
             ShowMemoryWindow();
+
+            // Now that the kernel is initialized, allocate variables to the GPU
             gpu.StartOfFrame += SOF;
             gpu.StartOfLine += SOL;
             gpu.GpuUpdated += Gpu_Update_Cps_Fps;
+            gpu.VRAM = kernel.MemMgr.VIDEO;
+            gpu.RAM = kernel.MemMgr.RAM;
+            gpu.VICKY = kernel.MemMgr.VICKY;
+            // This fontset is loaded just in case the kernel doesn't provide one.
+            gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
             joystickWindow.beatrix = kernel.MemMgr.BEATRIX;
 
             if (disabledIRQs)
             {
                 debugWindow.DisableIRQs(true);
-            }
-
-            if (autoRun)
-            {   
-                debugWindow.RunButton_Click(null, null);
             }
 
             this.Top = 0;
@@ -164,14 +140,20 @@ namespace FoenixIDE.UI
             DisplayBoardVersion();
             EnableMenuItems();
             ResetSDCard();
+
+            if (autoRun)
+            {
+                debugWindow.RunButton_Click(null, null);
+            }
         }
 
-        private void LoadHexFile(string Filename, bool ResetMemory)
+        private void LoadHexFile(string Filename)
         {
             debugWindow.Pause();
             kernel.SetVersion(version);
-            if (kernel.ResetCPU(ResetMemory, Filename))
+            if (kernel.ResetCPU(Filename))
             {
+                gpu.Refresh();
                 if (kernel.lstFile != null)
                 {
                     ShowDebugWindow();
@@ -210,7 +192,7 @@ namespace FoenixIDE.UI
             {
                 memoryWindow = new MemoryWindow
                 {
-                    Memory = kernel.CPU.Memory,
+                    Memory = kernel.CPU.MemMgr,
                     Left = debugWindow.Left,
                     Top = debugWindow.Top + debugWindow.Height
                 };
@@ -275,7 +257,7 @@ namespace FoenixIDE.UI
             BitmapLoader loader = new BitmapLoader
             {
                 StartPosition = FormStartPosition.CenterParent,
-                Memory = kernel.CPU.Memory,
+                Memory = kernel.CPU.MemMgr,
                 ResChecker = ResChecker
             };
             loader.ShowDialog(this);
@@ -339,10 +321,6 @@ namespace FoenixIDE.UI
 
                 this.menuStrip1.Visible = false;
                 this.statusStrip1.Visible = false;
-                this.panel1.Visible = false;
-                this.panel2.Visible = false;
-                this.panel3.Visible = false;
-                this.panel4.Visible = false;
                 this.debugWindow.Visible = false;               // not sure that is needed
                 this.memoryWindow.Visible = false;              // maybe maximizing GPU Window is enough?
 
@@ -359,10 +337,6 @@ namespace FoenixIDE.UI
 
                 this.menuStrip1.Visible = true;
                 this.statusStrip1.Visible = true;
-                this.panel1.Visible = true;
-                this.panel2.Visible = true;
-                this.panel3.Visible = true;
-                this.panel4.Visible = true;
                 this.debugWindow.Visible = true;
                 this.debugWindow.Show();
                 this.debugWindow.Refresh();
@@ -447,11 +421,13 @@ namespace FoenixIDE.UI
             {
                 var d = new WriteCPSFPSFunction(Write_CPS_FPS_Safe);
                 statusStrip1.Invoke(d, new object[] { CPS, FPS});
+
             }
             else
             {
                 cpsPerf.Text = CPS;
                 fpsPerf.Text = FPS;
+                statusStrip1.Update();
             }
         }
         int previousCounter = 0;
@@ -521,12 +497,13 @@ namespace FoenixIDE.UI
         {           
             previousCounter = 0;
             debugWindow.Pause();
-            if (kernel.ResetCPU(false, null))
+            if (kernel.ResetCPU(null))
             {
+                gpu.Refresh();
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
-                memoryWindow.Memory = kernel.CPU.Memory;
+                memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.UpdateMCRButtons();
 
                 // Restart the CPU
@@ -541,12 +518,12 @@ namespace FoenixIDE.UI
         {
             previousCounter = 0;
             debugWindow.Pause();
-            if (kernel.ResetCPU(false, null))
+            if (kernel.ResetCPU(null))
             {
                 debugWindow.SetKernel(kernel);
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
-                memoryWindow.Memory = kernel.CPU.Memory;
+                memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.UpdateMCRButtons();
                 debugWindow.Refresh();
             }
@@ -578,7 +555,7 @@ namespace FoenixIDE.UI
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                LoadHexFile(dialog.FileName, sender.Equals(menuOpenHexFile));
+                LoadHexFile(dialog.FileName);
             }
         }
 
@@ -597,8 +574,10 @@ namespace FoenixIDE.UI
             {
                 // TODO - this code is so coupled - we need to set the version in the XML file too.
                 kernel.Resources = ResChecker;
-                if (kernel.ResetCPU(true, dialog.FileName))
+                if (kernel.ResetCPU(dialog.FileName))
                 {
+                    gpu.Refresh();
+                    debugWindow.Pause();
                     SetDipSwitchMemory();
                     ShowDebugWindow();
                     ShowMemoryWindow();
@@ -627,7 +606,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void saveWatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveWatchListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Pick the file to create
             SaveFileDialog dialog = new SaveFileDialog
@@ -644,7 +623,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void loadWatchListToolStripMenuItem_Click(object sender, EventArgs e)
+        private void LoadWatchListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -662,7 +641,7 @@ namespace FoenixIDE.UI
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutFrom about = new AboutFrom();
+            AboutForm about = new AboutForm();
             about.ShowDialog();
         }
 
@@ -736,7 +715,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void gpu_MouseDown(object sender, MouseEventArgs e)
+        private void Gpu_MouseDown(object sender, MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
             double ratioW = gpu.Width / (double)size.X;
@@ -752,7 +731,7 @@ namespace FoenixIDE.UI
         }
 
 
-        private void gpu_MouseUp(object sender, MouseEventArgs e)
+        private void Gpu_MouseUp(object sender, MouseEventArgs e)
         {
             GenerateMouseInterrupt(e);
         }
@@ -869,9 +848,13 @@ namespace FoenixIDE.UI
             {
                 toolStripRevision.Text = "Rev B";
             }
-            else
+            else if (version == BoardVersion.RevC)
             {
                 toolStripRevision.Text = "Rev C";
+            }
+            else
+            {
+                toolStripRevision.Text = "Rev U";
             }
             // force repaint
             statusStrip1.Invalidate();
@@ -882,6 +865,10 @@ namespace FoenixIDE.UI
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
+            }
+            else if (version == BoardVersion.RevC)
+            {
+                version = BoardVersion.RevU;
             }
             else
             {
@@ -918,7 +905,7 @@ namespace FoenixIDE.UI
         {
             base.OnPaint(e);
 
-            if (version == BoardVersion.RevC)
+            if (version != BoardVersion.RevB)
             {
                 int textOffset = 24;
                 ToolStripStatusLabel label = (ToolStripStatusLabel)sender;
@@ -1037,7 +1024,7 @@ namespace FoenixIDE.UI
                 FileInfo info = new FileInfo(obj[0]);
                 if (info.Extension.ToUpper().Equals(".HEX"))
                 {
-                    LoadHexFile(obj[0], false);
+                    LoadHexFile(obj[0]);
                 }
             }
         }
@@ -1108,6 +1095,77 @@ namespace FoenixIDE.UI
                     MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private int VersionValue(string value)
+        {
+            string[] parts = value.Split('.');
+            int intValue = 0;
+            foreach (string part in parts)
+            {
+                try
+                {
+                    int partialValue = int.Parse(part);
+                    intValue = (intValue + partialValue) * 100;
+                }
+                finally
+                {
+
+                }
+            }
+            return intValue;
+        }
+
+        /**
+         * Call the GitHub REST API with / repos / Trinity-11 / FoenixIDE / releases.
+         * From the returned JSON, check which one is the latest and if it matches ours.
+         * 
+         */
+        private void CheckForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string URL = "https://api.github.com/repos/Trinity-11/FoenixIDE/releases";
+            HttpClient client = new HttpClient();
+
+            String version = AboutForm.AppVersion();
+            int appVersion = VersionValue(version);
+
+            // Add an Accept header for JSON format
+            client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            client.DefaultRequestHeaders.Add("user-agent", "Foenix IDE");
+            bool done = false;
+
+            // List data response.
+            HttpResponseMessage response = client.GetAsync(URL).Result;  // Blocking call! Program will wait here until a response is received or a timeout occurs.
+            if (response.IsSuccessStatusCode)
+            {
+                // Parse the response body.
+                string value = response.Content.ReadAsStringAsync().Result;
+                MatchCollection matches = Regex.Matches(value, "\"tag_name\":\"(.*?)\"");
+                foreach (Match match in matches)
+                {
+                    string fullRelease = match.Groups[1].Value;
+                    string release = fullRelease.Replace("release-", "");
+                    int releaseVersion = VersionValue(release);
+                    if (releaseVersion > appVersion)
+                    {
+                        MessageBox.Show(string.Format("A new version is available.\nThe latest release is {0}, you are running version {1}.", release, version), "Version Check");
+                        done = true;
+                        break;
+                    }
+                }                
+            }
+            else
+            {
+                Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+            }
+
+            if (!done)
+            {
+                MessageBox.Show("You are running the latest version of the Foenix IDE.", "Version Check");
+            }
+
+            // Dispose once all HttpClient calls are complete. This is not necessary if the containing object will be disposed of; for example in this case the HttpClient instance will be disposed automatically when the application terminates so the following call is superfluous.
+            client.Dispose();
         }
     }
 }

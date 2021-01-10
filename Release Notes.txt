@@ -1,3 +1,14 @@
+Release 0.5.4.1
+---------------
+Fixed a bug in the SBC when using a 16-bit accumulator.
+Removed the "Open Hex File (w/o Zeroing)" - the option was confusing.
+Removed the silly blue border around the GPU control.
+Fixed loading of breakpoints with the Foenix XML file.
+
+Release 0.5.4.0
+---------------
+Handling Timer interrupts.  Only the CHARGE registers are used to determine the interval.  Minimum interval allowed is 1 millisecond.
+
 Release 0.5.3.3
 ---------------
 Fixed several issues with the tile editor.

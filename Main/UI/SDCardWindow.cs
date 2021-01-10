@@ -15,7 +15,9 @@ namespace FoenixIDE.Simulator.UI
         public SDCardWindow()
         {
             InitializeComponent();
-            CapacityCombo.SelectedIndex = 3;
+            CapacityCombo.SelectedIndex = 3; // 64 MB
+            ClusterCombo.SelectedIndex = 0;  // 512 bytes
+            FSTypeCombo.SelectedIndex = 2;   // FAT32
         }
 
         private void BrowseFileButton_Click(object sender, EventArgs e)
@@ -112,10 +114,14 @@ namespace FoenixIDE.Simulator.UI
         private void SDCardEnabled_CheckedChanged(object sender, EventArgs e)
         {
             CapacityCombo.Enabled = Iso_selection.Checked ? false : SDCardEnabled.Checked;
+            FSTypeCombo.Enabled = Iso_selection.Checked ? false : SDCardEnabled.Checked;
+            ClusterCombo.Enabled = Iso_selection.Checked ? false : SDCardEnabled.Checked;
             if (!SDCardEnabled.Checked)
             {
                 SDCardFolderText.Text = "";
                 CapacityCombo.SelectedIndex = 3;
+                FSTypeCombo.SelectedIndex = 2;
+                ClusterCombo.SelectedIndex = 0;
             }
         }
 
@@ -140,9 +146,9 @@ namespace FoenixIDE.Simulator.UI
             {
                 CapacityCombo.SelectedIndex = 3; // 64 MB
                 CapacityCombo.Enabled = true;
-                ClusterCombo.SelectedIndex = 1; // 1024
+                ClusterCombo.SelectedIndex = 0; // 512
                 ClusterCombo.Enabled = true;
-                FSTypeCombo.SelectedIndex = 1; // FAT16
+                FSTypeCombo.SelectedIndex = 2; // FAT32
                 FSTypeCombo.Enabled = true;
             }
             SDCardFolderText.Text = "";

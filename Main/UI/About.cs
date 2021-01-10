@@ -10,19 +10,24 @@ using System.Windows.Forms;
 
 namespace FoenixIDE.Simulator.UI
 {
-    public partial class AboutFrom : Form
+    public partial class AboutForm : Form
     {
-        public AboutFrom()
+        public AboutForm()
         {
             InitializeComponent();
         }
 
-        private void AboutFrom_Load(object sender, EventArgs e)
+        public static string AppVersion()
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            string version = fvi.FileVersion;
-            label1.Text = "Foenix IDE Version " + version;
+            return fvi.FileVersion;
+        }
+
+        private void AboutFrom_Load(object sender, EventArgs e)
+        {
+            
+            label1.Text = "Foenix IDE Version " + AppVersion();
         }
 
         private void CloseButton_Click(object sender, EventArgs e)

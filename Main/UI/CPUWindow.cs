@@ -46,6 +46,21 @@ namespace FoenixIDE.UI
             MemoryLimit = kernel.MemMgr.RAM.Length;
             registerDisplay1.CPU = kernel.CPU;
             knl_breakpoints = kernel.Breakpoints;
+            if (knl_breakpoints.Count > 0)
+            {
+                BPLabel.Text = knl_breakpoints.Count.ToString() + " BP";
+                // Update the combo
+                foreach (KeyValuePair<int, string> kvp in knl_breakpoints)
+                {
+                    BPCombo.Items.Add(kvp.Value);
+                    UpdateDebugLines(kvp.Key, true);
+                }
+            }
+            else
+            {
+                BPLabel.Text = "Breakpoint";
+            }
+
             UpdateQueue();
             int pc = kernel.CPU.PC;
             DebugLine line = GetExecutionInstruction(pc);
@@ -420,6 +435,7 @@ namespace FoenixIDE.UI
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
                 registerDisplay1.updateRegisterTimer.Enabled = true;
+                DebugPanel.Refresh();
             }
             else
             {
@@ -512,8 +528,11 @@ namespace FoenixIDE.UI
         private void RefreshStatus()
         {
             this.Text = "Debug: " + StepCounter.ToString();
-            DebugPanel.Refresh();
-            UpdateStackDisplay();
+            if (kernel.CPU.DebugPause)
+            {
+                DebugPanel.Refresh();
+                UpdateStackDisplay();
+            }
             registerDisplay1.UpdateRegisters();
         }
 
@@ -536,7 +555,7 @@ namespace FoenixIDE.UI
                 while (i > 0)
                 {
                     int address = kernel.CPU.Stack.Value + i;
-                    stackText.AppendText(address.ToString("X4") + " " + kernel.CPU.Memory[address].ToString("X2") + "\r\n");
+                    stackText.AppendText(address.ToString("X4") + " " + kernel.CPU.MemMgr[address].ToString("X2") + "\r\n");
                     i--;
                 }
             }
@@ -599,8 +618,25 @@ namespace FoenixIDE.UI
                     }
                     return;
                 }
-                if (knl_breakpoints.ContainsKey(nextPC) || (BreakOnIRQCheckBox.Checked && ((kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) || kernel.CPU.CurrentOpcode.Value == 0)))
+                if ( knl_breakpoints.ContainsKey(nextPC) || 
+                     kernel.CPU.CurrentOpcode.Value == 0 || 
+                     (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) )
+                   )
                 {
+                    if (kernel.CPU.CurrentOpcode.Value == 0)
+                    {
+                        if (lastLine.InvokeRequired)
+                        {
+                            lastLine.Invoke((MethodInvoker)delegate
+                           {
+                               lastLine.Text = "BRK OpCode read";
+                           });
+                        }
+                        else
+                        {
+                            lastLine.Text = "BRK OpCode read";
+                        }
+                    }
                     if (UpdateTraceTimer.Enabled || kernel.CPU.CurrentOpcode.Value == 0)
                     {
                         UpdateTraceTimer.Enabled = false;
@@ -812,26 +848,39 @@ namespace FoenixIDE.UI
         {
             // Read Interrupt Register 0
             byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
-            if ((reg0 & (byte)Register0.FNX0_INT00_SOF) != 0 && SOFCheckbox.Checked)
+            if (SOFCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT00_SOF) != 0)
             {
                 return true;
             }
-            if ((reg0 & (byte)Register0.FNX0_INT01_SOL) != 0 && SOLCheckbox.Checked)
+            if (SOLCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT01_SOL) != 0)
             {
                 return true;
             }
-            if ((reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0 && MouseCheckbox.Checked)
+            if (TMR0Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT02_TMR0) != 0)
+            {
+                return true;
+            }
+
+            if (TMR1Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT03_TMR1) != 0)
+            {
+                return true;
+            }
+            if (TMR2Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT04_TMR2) != 0)
+            {
+                return true;
+            }
+            if (MouseCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0)
             {
                 return true;
             }
 
             // Read Interrupt Register 1
             byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
-            if ((reg1 & (byte)Register1.FNX1_INT07_SDCARD ) != 0 && SDCardCheckBox.Checked)
+            if (SDCardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT07_SDCARD ) != 0)
             {
                 return true;
             }
-            if ((reg1 & (byte)Register1.FNX1_INT00_KBD) != 0 && KeyboardCheckBox.Checked)
+            if (KeyboardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT00_KBD) != 0)
             {
                 return true;
             }

@@ -143,7 +143,7 @@ namespace FoenixIDE.Display
 
         const int STRIDE = 800;
         Bitmap frameBuffer = new Bitmap(STRIDE, 600, PixelFormat.Format32bppArgb);
-        private volatile bool drawing = false;
+        private bool drawing = false;
 
         /// <summary>
         /// Draw the frame buffer to the screen.
@@ -158,21 +158,7 @@ namespace FoenixIDE.Display
                 e.Graphics.DrawString("Design Mode", this.Font, TextBrush, 0, 0);
                 return;
             }
-            if (VICKY == null)
-            {
-                e.Graphics.DrawString("IO Memory Not Initialized", this.Font, TextBrush, 0, 0);
-                return;
-            }
-            if (VRAM == null)
-            {
-                e.Graphics.DrawString("VRAM Not Initialized", this.Font, TextBrush, 0, 0);
-                return;
-            }
-            if (RAM == null)
-            {
-                e.Graphics.DrawString("RAM Not Initialized", this.Font, TextBrush, 0, 0);
-                return;
-            }
+
             // Read the Master Control Register
             byte MCRegister = VICKY.ReadByte(0); // Reading address $AF:0000
             byte MCRHigh = (byte)(VICKY.ReadByte(1) & 3); // Reading address $AF:0001
@@ -242,8 +228,8 @@ namespace FoenixIDE.Display
             e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
             e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
             // Bilinear interpolation has effect very similar to real HW 
-            //e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            //e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 
             // Determine if we display a border
@@ -457,7 +443,7 @@ namespace FoenixIDE.Display
         }
 
         // We only cache items that are requested, instead of precomputing all 1024 colors.
-        private int getLUTValue(byte lutIndex, byte color, bool gamma)
+        private int GetLUTValue(byte lutIndex, byte color, bool gamma)
         {
             int offset = lutIndex * 256 + color;
             int value = lutCache[offset];
@@ -484,7 +470,7 @@ namespace FoenixIDE.Display
 
         int[] FGTextLUT;
         int[] BGTextLUT;
-        private int[] getTextLUT(byte fg, byte bg, bool gamma)
+        private int[] GetTextLUT(byte fg, byte bg, bool gamma)
         {
             int[] values = new int[2];
             if (FGTextLUT[fg] == 0)
@@ -591,7 +577,7 @@ namespace FoenixIDE.Display
                 byte fgColor = (byte)((color & 0xF0) >> 4);
                 byte bgColor = (byte)(color & 0x0F);
 
-                int[] textColors = getTextLUT(fgColor, bgColor, gammaCorrection); 
+                int[] textColors = GetTextLUT(fgColor, bgColor, gammaCorrection); 
 
                 byte value = VICKY.ReadByte(fontBaseAddress + character * 8 + fontLine);
                 //int offset = (x + line * 640) * 4;
@@ -636,11 +622,14 @@ namespace FoenixIDE.Display
             int pixelOffset = line * STRIDE;
             int* ptr = p + pixelOffset;
             int col = borderXSize;
-            byte pixVal = 0;
+            //byte pixVal = 0;
+
+            byte[] pixVals = new byte[width];
+            VRAM.CopyIntoBuffer(offsetAddress, pixVals, 0, width);
             while (col < width - borderXSize)
             {
-                pixVal = VRAM.ReadByte(offsetAddress + col);
-                colorVal = pixVal == 0 ? bgndColor : getLUTValue(lutIndex, pixVal, gammaCorrection);
+                //pixVal = VRAM.ReadByte(offsetAddress + col);
+                colorVal = pixVals[col] == 0 ? bgndColor : GetLUTValue(lutIndex, pixVals[col], gammaCorrection);
                 ptr[col++] = colorVal;
             }
         }
@@ -723,7 +712,7 @@ namespace FoenixIDE.Display
                 byte pixelIndex = VRAM.ReadByte(tilesetOffsetAddress);
                 if (pixelIndex > 0)
                 {
-                    int value = getLUTValue(tileLUT, pixelIndex, gammaCorrection);
+                    int value = GetLUTValue(tileLUT, pixelIndex, gammaCorrection);
                     ptr[x] = value;
                 }
             }
@@ -789,7 +778,7 @@ namespace FoenixIDE.Display
                         pixelIndex = VRAM.ReadByte(spriteAddress + col + sline * 32);
                         if (pixelIndex != 0)
                         {
-                            value = getLUTValue(lutIndex, pixelIndex, gammaCorrection);
+                            value = GetLUTValue(lutIndex, pixelIndex, gammaCorrection);
 
                             //System.Runtime.InteropServices.Marshal.WriteInt32(p, (lineOffset + (col-xOffset + posX)) * 4, value);
                             ptr[col - xOffset + posX] = value;

@@ -44,9 +44,9 @@ namespace FoenixIDE.Simulator.Devices
 
         void MathCoproUnsignedMultiplier(int baseAddr)
         {
-            uint acc1 = (uint)((data[baseAddr + 1] << 8) + data[baseAddr]);
-            uint acc2 = (uint)((data[baseAddr + 3] << 8) + data[baseAddr + 2]);
-            uint result = acc1 * acc2;
+            ushort acc1 = (ushort)((data[baseAddr + 1] << 8) + data[baseAddr]);
+            ushort acc2 = (ushort)((data[baseAddr + 3] << 8) + data[baseAddr + 2]);
+            uint result = (uint)acc1 * acc2;
             data[baseAddr + 4] = (byte)(result & 0xFF);
             data[baseAddr + 5] = (byte)(result >> 8 & 0xFF);
             data[baseAddr + 6] = (byte)(result >> 16 & 0xFF);
@@ -55,8 +55,8 @@ namespace FoenixIDE.Simulator.Devices
 
         void MathCoproSignedMultiplier(int baseAddr)
         {
-            int acc1 = (data[baseAddr + 1] << 8) + data[baseAddr];
-            int acc2 = (data[baseAddr + 3] << 8) + data[baseAddr + 2];
+            short acc1 = (short)((data[baseAddr + 1] << 8) + data[baseAddr]);
+            short acc2 = (short)((data[baseAddr + 3] << 8) + data[baseAddr + 2]);
             int result = acc1 * acc2;
             data[baseAddr + 4] = (byte)(result & 0xFF);
             data[baseAddr + 5] = (byte)(result >> 8 & 0xFF);
@@ -66,14 +66,14 @@ namespace FoenixIDE.Simulator.Devices
 
         void MathCoproUnsignedDivider(int baseAddr)
         {
-            uint acc1 = (uint)((data[baseAddr + 1] << 8) + data[baseAddr]);
-            uint acc2 = (uint)((data[baseAddr + 3] << 8) + data[baseAddr + 2]);
+            ushort acc1 = (ushort)((data[baseAddr + 1] << 8) + data[baseAddr]);
+            ushort acc2 = (ushort)((data[baseAddr + 3] << 8) + data[baseAddr + 2]);
             uint result = 0;
             uint remainder = 0;
             if (acc1 != 0)
             {
-                result = acc2 / acc1;
-                remainder = acc2 % acc1;
+                result = (uint)acc2 / acc1;
+                remainder = (uint)acc2 % acc1;
             }
             data[baseAddr + 4] = (byte)(result & 0xFF);
             data[baseAddr + 5] = (byte)(result >> 8 & 0xFF);
@@ -83,8 +83,8 @@ namespace FoenixIDE.Simulator.Devices
 
         void MathCoproSignedDivider(int baseAddr)
         {
-            int acc1 = (data[baseAddr + 1] << 8) + data[baseAddr];
-            int acc2 = (data[baseAddr + 3] << 8) + data[baseAddr + 2];
+            short acc1 = (short)((data[baseAddr + 1] << 8) + data[baseAddr]);
+            short acc2 = (short)((data[baseAddr + 3] << 8) + data[baseAddr + 2]);
             int result = 0;
             int remainder = 0;
             if (acc1 != 0)

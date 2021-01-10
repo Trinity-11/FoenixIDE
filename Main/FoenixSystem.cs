@@ -16,7 +16,6 @@ namespace FoenixIDE
     {
         public MemoryManager MemMgr = null;
         public Processor.CPU CPU = null;
-        public Gpu gpu = null;
 
         public ResourceChecker Resources;
         public Processor.Breakpoints Breakpoints = new Processor.Breakpoints();
@@ -25,15 +24,14 @@ namespace FoenixIDE
         public SortedList<int, WatchedMemory> WatchList = new SortedList<int, WatchedMemory>();
         private string LoadedKernel;
 
-        public FoenixSystem(Gpu gpu, BoardVersion version, string DefaultKernel)
+        public FoenixSystem(BoardVersion version, string DefaultKernel)
         {
-            this.gpu = gpu;
             boardVersion = version;
 
             int memSize = MemoryMap.RAM_SIZE;
             CodecRAM codec = null;
             SDCardDevice sdcard = null;
-            if (boardVersion == BoardVersion.RevC)
+            if (boardVersion == BoardVersion.RevC || boardVersion == BoardVersion.RevU)
             {
                 memSize *= 2;
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_FMX, 2);  // This register is only a single byte but we allow writing a word
@@ -62,40 +60,65 @@ namespace FoenixIDE
                 OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
                 FLOAT = new MathFloatRegister(MemoryMap.FLOAT_START, MemoryMap.FLOAT_END - MemoryMap.FLOAT_START + 1),
                 MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2),
-                VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE)
+                VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE),
+                TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
+                TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
+                TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8)
             };
             MemMgr.CODEC = codec;
             MemMgr.KEYBOARD.SetKernel(this);
 
             // Assign memory variables used by other processes
             CPU = new CPU(MemMgr);
-            CPU.SimulatorCommand += CPU_SimulatorCommand;
-            gpu.VRAM = MemMgr.VIDEO;
-            gpu.RAM = MemMgr.RAM;
-            gpu.VICKY = MemMgr.VICKY;
+            
             MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
             MemMgr.VDMA.setSystemRam(MemMgr.RAM);
 
             // Load the kernel.hex if present
-            ResetCPU(true, DefaultKernel);
-
-            // This fontset is loaded just in case the kernel doesn't provide one.
-            gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+            ResetCPU(DefaultKernel);
 
             // Write bytes $9F in the joystick registers to mean that they are not installed.
             MemMgr.WriteWord(0xAFE800, 0x9F9F);
             MemMgr.WriteWord(0xAFE802, 0x9F9F);
+            MemMgr.TIMER0.TimerInterruptDelegate += TimerEvent0;
+            MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
+            MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
         }
 
-        private void CPU_SimulatorCommand(int EventID)
+        private void TimerEvent0()
         {
-            switch (EventID)
+            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT02_TMR0) == (byte)Register0.FNX0_INT02_TMR0))
             {
-                case SimulatorCommands.RefreshDisplay:
-                    gpu.BlinkingCounter = Gpu.BLINK_RATE;
-                    break;
-                default:
-                    break;
+                // Set the Timer0 Interrupt
+                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= (byte)Register0.FNX0_INT02_TMR0;
+                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                CPU.Pins.IRQ = true;
+            }
+        }
+        private void TimerEvent1()
+        {
+            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT03_TMR1) == (byte)Register0.FNX0_INT03_TMR1))
+            {
+                // Set the Timer1 Interrupt
+                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= (byte)Register0.FNX0_INT03_TMR1;
+                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                CPU.Pins.IRQ = true;
+            }
+        }
+        private void TimerEvent2()
+        {
+            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT04_TMR2) == (byte)Register0.FNX0_INT04_TMR2))
+            {
+                // Set the Timer2 Interrupt
+                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                IRQ0 |= (byte)Register0.FNX0_INT04_TMR2;
+                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                CPU.Pins.IRQ = true;
             }
         }
 
@@ -108,15 +131,13 @@ namespace FoenixIDE
             boardVersion = rev;
         }
         // return true if the CPU was reset and the program was loaded
-        public bool ResetCPU(bool ResetMemory, string kernelFilename)
+        public bool ResetCPU(string kernelFilename)
         {
             if (CPU != null)
             {
                 CPU.DebugPause = true;
                 //CPU.Halt();
             }
-
-            gpu.Refresh();
 
             if (kernelFilename != null)
             {
@@ -139,19 +160,15 @@ namespace FoenixIDE
             }
             else
             {
-                if (ResetMemory)
-                {
-                    this.ResetMemory();
-                }
                 LoadedKernel = HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _);
                 if (LoadedKernel != null)
                 {
-                    if (ResetMemory)
+                    if (lstFile == null)
                     {
                         lstFile = new ListFile(LoadedKernel);
                     }
                     else
-                    {
+                    { 
                         // TODO: This results in lines of code to be shown in incorrect order - Fix
                         ListFile tempList = new ListFile(LoadedKernel);
                         foreach (DebugLine line in tempList.Lines.Values)
@@ -161,14 +178,13 @@ namespace FoenixIDE
                                 lstFile.Lines.Remove(line.PC);
                             }
                             lstFile.Lines.Add(line.PC, line);
-                            for (int i=1; i < line.commandLength; i++)
+                            for (int i = 1; i < line.commandLength; i++)
                             {
-                                if (lstFile.Lines.ContainsKey(line.PC+i))
+                                if (lstFile.Lines.ContainsKey(line.PC + i))
                                 {
-                                    lstFile.Lines.Remove(line.PC+i);
+                                    lstFile.Lines.Remove(line.PC + i);
                                 }
                             }
-                            
                         }
                     }
                 }

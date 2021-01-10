@@ -40,6 +40,9 @@ namespace FoenixIDE.UI
                 case BoardVersion.RevC:
                     RevModeLabel.Text = "Mode: RevC";
                     break;
+                case BoardVersion.RevU:
+                    RevModeLabel.Text = "Mode: RevU";
+                    break;
             }
         }
 
@@ -231,10 +234,10 @@ namespace FoenixIDE.UI
             UploadProgressBar.Value = 0;
             UploadProgressBar.Visible = true;
 
-            int BaseBankAddress = 0x18_0000;
-            if (boardVersion == BoardVersion.RevC)
+            int BaseBankAddress = 0x38_0000;
+            if (boardVersion != BoardVersion.RevB)
             {
-                BaseBankAddress = 0x38_0000;
+                BaseBankAddress = 0x18_0000;
             }
 
             if (SendFileRadio.Checked)
@@ -375,7 +378,7 @@ namespace FoenixIDE.UI
                 byte[] DataBuffer = new byte[transmissionSize];  // Maximum 2 MB, example from $0 to $1F:FFFF.
                 for (int start = blockAddress; start < blockAddress + transmissionSize; start++)
                 {
-                    DataBuffer[offset++] = kernel.CPU.Memory.ReadByte(start);
+                    DataBuffer[offset++] = kernel.CPU.MemMgr.ReadByte(start);
                 }
                 SendData(DataBuffer, FnxAddressPtr, transmissionSize);
                 // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00

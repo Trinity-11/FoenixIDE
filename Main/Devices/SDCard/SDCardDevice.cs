@@ -14,8 +14,8 @@ namespace FoenixIDE.Simulator.Devices
         private string SDCardPath = "";
         private bool ISOMode = false;
         private int capacity = 8; // Capacity in MB
-        private int clusterSize = 4096;
-        private FSType fsType = FSType.FAT12;
+        private int clusterSize = 512;
+        private FSType fsType = FSType.FAT32;
         protected string sdCurrentPath = "";
         public delegate void SDCardInterruptEvent(CH376SInterrupt irq);
         public SDCardInterruptEvent sdCardIRQMethod;

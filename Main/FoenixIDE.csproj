@@ -66,6 +66,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -77,6 +78,7 @@
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
     <Compile Include="Devices\MathFloatRegister.cs" />
+    <Compile Include="Devices\TimerRegister.cs" />
     <Compile Include="Devices\SDCard\GabeSDController.cs" />
     <Compile Include="Devices\VDMA.cs" />
     <Compile Include="Devices\MPU401.cs" />

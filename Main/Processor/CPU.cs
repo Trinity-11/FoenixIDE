@@ -56,7 +56,7 @@ namespace FoenixIDE.Processor
         /// </summary>
         private DateTime checkStartTime = DateTime.Now;
 
-        public MemoryManager Memory = null;
+        public MemoryManager MemMgr = null;
         public Thread CPUThread = null;
 
         public event Operations.SimulatorCommandEvent SimulatorCommand;
@@ -91,9 +91,9 @@ namespace FoenixIDE.Processor
             }
         }
 
-        public CPU(MemoryManager newMemory)
+        public CPU(MemoryManager mm)
         {
-            Memory = newMemory;
+            MemMgr = mm;
             clockSpeed = 14000000;
             clockCyles = 0;
             Operations operations = new Operations(this);
@@ -153,7 +153,7 @@ namespace FoenixIDE.Processor
             }
 
             // TODO - if pc > RAM size, then throw an exception
-            CurrentOpcode = opcodes[Memory.RAM.ReadByte(PC)];
+            CurrentOpcode = opcodes[MemMgr.RAM.ReadByte(PC)];
             OpcodeLength = CurrentOpcode.Length;
             OpcodeCycles = 1;
             SignatureBytes = ReadSignature(OpcodeLength, PC);
@@ -182,7 +182,7 @@ namespace FoenixIDE.Processor
         public void Reset()
         {
             Pins.VectorPull = true;
-            Memory.VectorPull = true;
+            MemMgr.VectorPull = true;
 
             SetEmulationMode();
             Flags.Value = 0;
@@ -194,12 +194,12 @@ namespace FoenixIDE.Processor
             DirectPage.Value = 0;
             //ProgramBank.Value = 0;
 
-            PC = Memory.ReadWord(MemoryMap.VECTOR_ERESET);
+            PC = MemMgr.ReadWord(MemoryMap.VECTOR_ERESET);
 
             Flags.IrqDisable = true;
             Pins.IRQ = false;
             Pins.VectorPull = false;
-            Memory.VectorPull = false;
+            MemMgr.VectorPull = false;
             Waiting = false;
         }
 
@@ -237,7 +237,7 @@ namespace FoenixIDE.Processor
         /// </summary>
         public OpCode PreFetch()
         {
-            return opcodes[Memory[PC]];
+            return opcodes[MemMgr[PC]];
         }
 
         public int ReadSignature(int length, int pc)
@@ -245,11 +245,11 @@ namespace FoenixIDE.Processor
             switch (length)
             {
                 case 2:
-                    return Memory.RAM.ReadByte(pc + 1);
+                    return MemMgr.RAM.ReadByte(pc + 1);
                 case 3:
-                    return Memory.RAM.ReadWord(pc + 1);
+                    return MemMgr.RAM.ReadWord(pc + 1);
                 case 4:
-                    return Memory.RAM.ReadLong(pc + 1);
+                    return MemMgr.RAM.ReadLong(pc + 1);
             }
 
             return 0;
@@ -291,7 +291,7 @@ namespace FoenixIDE.Processor
             int addr = DirectPage.Value + baseAddress;
             if (Index != null)
                 addr += Index.Value;
-            int pointer = Memory.ReadWord(addr);
+            int pointer = MemMgr.ReadWord(addr);
             return DataBank.GetLongAddress(pointer);
         }
 
@@ -306,7 +306,7 @@ namespace FoenixIDE.Processor
             int addr = baseAddress;
             if (Index != null)
                 addr += Index.Value;
-            return DataBank.GetLongAddress(Memory.ReadWord(addr));
+            return DataBank.GetLongAddress(MemMgr.ReadWord(addr));
         }
 
         #endregion
@@ -333,7 +333,7 @@ namespace FoenixIDE.Processor
 
         public void JumpVector(int VectorAddress)
         {
-            int addr = Memory.ReadWord(VectorAddress);
+            int addr = MemMgr.ReadWord(VectorAddress);
             //ProgramBank.Value = 0;
             //PC.Value = addr;
             PC = addr;
@@ -357,7 +357,7 @@ namespace FoenixIDE.Processor
                 throw new Exception("bytes must be between 1 and 3. Got " + bytes.ToString());
 
             Stack.Value -= bytes;
-            Memory.Write(Stack.Value + 1, value, bytes);
+            MemMgr.Write(Stack.Value + 1, value, bytes);
         }
 
         public void Push(Register Reg, int Offset)
@@ -375,7 +375,7 @@ namespace FoenixIDE.Processor
             if (bytes < 1 || bytes > 3)
                 throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
 
-            int ret = Memory.Read(Stack.Value + 1, bytes);
+            int ret = MemMgr.Read(Stack.Value + 1, bytes);
             
             Stack.Value += bytes;
             return ret;
