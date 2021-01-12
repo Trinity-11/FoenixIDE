@@ -36,6 +36,7 @@ namespace FoenixIDE.UI
         private CharEditorWindow charEditor;
         public SerialTerminal terminal;
         private JoystickForm joystickWindow = new JoystickForm();
+        private GameGeneratorForm GGF = new GameGeneratorForm();
 
         // Local variables and events
         private byte previousGraphicMode;
@@ -411,6 +412,10 @@ namespace FoenixIDE.UI
             if (memoryWindow != null)
             {
                 memoryWindow.Close();
+            }
+            if (GGF != null)
+            {
+                GGF.Close();
             }
             this.Close();
         }
@@ -1166,6 +1171,18 @@ namespace FoenixIDE.UI
 
             // Dispose once all HttpClient calls are complete. This is not necessary if the containing object will be disposed of; for example in this case the HttpClient instance will be disposed automatically when the application terminates so the following call is superfluous.
             client.Dispose();
+        }
+
+        private void GameEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!GGF.Visible)
+            {
+                GGF.Show();
+            }
+            else
+            {
+                GGF.BringToFront();
+            }
         }
     }
 }

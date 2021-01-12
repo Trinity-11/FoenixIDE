@@ -126,7 +126,7 @@
             this.DBR.Register = null;
             this.DBR.Size = new System.Drawing.Size(33, 34);
             this.DBR.TabIndex = 10;
-            this.DBR.Value = "0000";
+            this.DBR.Value = "00";
             // 
             // panel5
             // 

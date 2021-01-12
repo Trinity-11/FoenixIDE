@@ -75,7 +75,7 @@ namespace FoenixIDE.Simulator.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap memory_btn {
             get {
-                object obj = ResourceManager.GetObject("memory-btn", resourceCulture);
+                object obj = ResourceManager.GetObject("memory_btn", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

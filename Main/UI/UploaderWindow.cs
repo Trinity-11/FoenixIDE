@@ -235,7 +235,7 @@ namespace FoenixIDE.UI
             UploadProgressBar.Visible = true;
 
             int BaseBankAddress = 0x38_0000;
-            if (boardVersion != BoardVersion.RevB)
+            if (boardVersion == BoardVersion.RevB)
             {
                 BaseBankAddress = 0x18_0000;
             }

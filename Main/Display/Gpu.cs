@@ -251,21 +251,32 @@ namespace FoenixIDE.Display
             int* bitmapPointer = (int*)bitmapData.Scan0.ToPointer();
 
             // Load the SOL register - a lines
-            byte SOLRegister = VICKY.ReadByte(MemoryMap.VKY_LINE_IRQ_CTRL_REG - MemoryMap.VICKY_BASE_ADDR);
-            int SOLLine0 = VICKY.ReadWord(MemoryMap.VKY_LINE0_CMP_VALUE_LO - MemoryMap.VICKY_BASE_ADDR);
-            int SOLLine1 = VICKY.ReadWord(MemoryMap.VKY_LINE1_CMP_VALUE_LO - MemoryMap.VICKY_BASE_ADDR);
+            int SOLRegAddr = MemoryMap.VKY_LINE_IRQ_CTRL_REG - MemoryMap.VICKY_BASE_ADDR;
+            int SOLLine0Addr = MemoryMap.VKY_LINE0_CMP_VALUE_LO - MemoryMap.VICKY_BASE_ADDR;
+            int SOLLine1Addr = MemoryMap.VKY_LINE1_CMP_VALUE_LO - MemoryMap.VICKY_BASE_ADDR;
+            
 
             for (int line = 0; line < resY; line++)
             {
                 // Handle SOL interrupts
-                if (((SOLRegister & 1) == 1) && line == SOLLine0)
+                byte SOLRegister = VICKY.ReadByte(SOLRegAddr);
+                if ((SOLRegister & 1) != 0)
                 {
-                    StartOfLine?.Invoke();
+                    int SOLLine0 = VICKY.ReadWord(SOLLine0Addr);
+                    if (line == SOLLine0)
+                    {
+                        StartOfLine?.Invoke();
+                    }
                 }
-                if (((SOLRegister & 2) == 2) && line == SOLLine1)
+                if ((SOLRegister & 2) != 0)
                 {
-                    StartOfLine?.Invoke();
+                    int SOLLine1 = VICKY.ReadWord(SOLLine1Addr);
+                    if (line == SOLLine1)
+                    {
+                        StartOfLine?.Invoke();
+                    }
                 }
+
 
                 bool gammaCorrection = (MCRegister & 0x40) == 0x40;
 

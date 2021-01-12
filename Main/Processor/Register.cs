@@ -239,6 +239,11 @@ namespace FoenixIDE.Processor
     /// </summary>
     public class Register8 : Register
     {
+        public Register8()
+        {
+            base.Width = 1;
+        }
+
         public override int Width
         {
             get
