@@ -150,6 +150,12 @@
     <Compile Include="UI\CharEditor\EditControl.Designer.cs">
       <DependentUpon>EditControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\GameGeneratorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\GameGeneratorForm.Designer.cs">
+      <DependentUpon>GameGeneratorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\JoystickForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -248,6 +254,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\CharEditor\EditControl.resx">
       <DependentUpon>EditControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\GameGeneratorForm.resx">
+      <DependentUpon>GameGeneratorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\JoystickForm.resx">
       <DependentUpon>JoystickForm.cs</DependentUpon>
