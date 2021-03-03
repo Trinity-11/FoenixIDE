@@ -6,12 +6,13 @@ using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace FoenixIDE.CharEditor
 {
     public partial class CharViewer : UserControl
     {
-        int CHARSET_SIZE = 4096;
+        const int CHARSET_SIZE = 2048;
         
         Brush textBrush = Brushes.LightGray;  //new SolidBrush(SystemColors.WindowText);
         Brush selectedBrush = Brushes.Gray;
@@ -50,8 +51,9 @@ namespace FoenixIDE.CharEditor
             if (!System.IO.File.Exists(Filename))
                 return new byte[CHARSET_SIZE];
 
-            byte[] data = new byte[CHARSET_SIZE];
-            data = System.IO.File.ReadAllBytes(Filename);
+            BinaryReader br = new System.IO.BinaryReader(new FileStream(Filename, FileMode.Open));
+            byte[] data = br.ReadBytes(CHARSET_SIZE);
+            
             return data;
         }
 

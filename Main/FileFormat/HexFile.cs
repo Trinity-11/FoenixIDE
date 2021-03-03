@@ -55,18 +55,21 @@ namespace FoenixIDE.Simulator.FileFormat
                             {
                                 startAddress = bank + address;
                             }
-
-                            for (int i = 0; i < data.Length; i += 2)
+                            if (bank <= ram.Length)
                             {
-                                int b = GetByte(data, i, 1);
-                                ram.WriteByte(bank + address, (byte)b);
-                                // Copy bank $38 or $18 to page 0
-                                if (bank == gabeAddressBank)
+                                for (int i = 0; i < data.Length; i += 2)
                                 {
-                                    ram.WriteByte(address, (byte)b);
+                                    int b = GetByte(data, i, 1);
+                                    ram.WriteByte(bank + address, (byte)b);
+                                    // Copy bank $38 or $18 to page 0
+                                    if (bank == gabeAddressBank)
+                                    {
+                                        ram.WriteByte(address, (byte)b);
+                                    }
+                                    address++;
                                 }
-                                address++;
                             }
+                            
                             break;
 
                         // end of file - just ignore

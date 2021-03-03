@@ -11,7 +11,7 @@ namespace FoenixIDE.Simulator.UI
 {
     public partial class JoystickForm : Form
     {
-        public MemoryRAM beatrix = null;
+        public MemoryRAM gabe = null;
         public JoystickForm()
         {
             InitializeComponent();
@@ -19,9 +19,9 @@ namespace FoenixIDE.Simulator.UI
 
         private void SendJoystickValue(int joystick, byte value)
         {
-            if (beatrix != null)
+            if (gabe != null)
             {
-                beatrix.WriteByte(MemoryLocations.MemoryMap.JOYSTICK0 - MemoryLocations.MemoryMap.BEATRIX_START + joystick, value);
+                gabe.WriteByte(MemoryLocations.MemoryMap.JOYSTICK0 - MemoryLocations.MemoryMap.GABE_START + joystick, value);
             }
         }
 

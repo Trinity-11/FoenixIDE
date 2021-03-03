@@ -10,6 +10,7 @@ using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.MemoryLocations;
 using System.Diagnostics;
 using FoenixIDE.Timers;
+using System.Threading.Tasks;
 
 namespace FoenixIDE.Display
 {
@@ -144,6 +145,7 @@ namespace FoenixIDE.Display
         const int STRIDE = 800;
         Bitmap frameBuffer = new Bitmap(STRIDE, 600, PixelFormat.Format32bppArgb);
         private bool drawing = false;
+        byte[] pixVals = null;
 
         /// <summary>
         /// Draw the frame buffer to the screen.
@@ -184,7 +186,7 @@ namespace FoenixIDE.Display
                     break;
             }
 
-
+            pixVals = new byte[resX];
             int top = 0; // top gets modified if error messages are displayed
             //Graphics g = Graphics.FromImage(frameBuffer);
             Graphics g = e.Graphics;
@@ -193,7 +195,7 @@ namespace FoenixIDE.Display
 
             if (MCRegister == 0 || (MCRegister & 0x80) == 0x80)
             {
-                e.Graphics.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
+                g.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
                 return;
             }
             else if ((MCRegister & 0x1) == 0x1)
@@ -225,12 +227,12 @@ namespace FoenixIDE.Display
                 StartOfFrame?.Invoke();
             }
 
-            e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-            e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
             // Bilinear interpolation has effect very similar to real HW 
-            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             //e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 
             // Determine if we display a border
             byte border_register = VICKY.ReadByte(MemoryMap.BORDER_CTRL_REG - MemoryMap.VICKY_BASE_ADDR);
@@ -254,7 +256,10 @@ namespace FoenixIDE.Display
             int SOLRegAddr = MemoryMap.VKY_LINE_IRQ_CTRL_REG - MemoryMap.VICKY_BASE_ADDR;
             int SOLLine0Addr = MemoryMap.VKY_LINE0_CMP_VALUE_LO - MemoryMap.VICKY_BASE_ADDR;
             int SOLLine1Addr = MemoryMap.VKY_LINE1_CMP_VALUE_LO - MemoryMap.VICKY_BASE_ADDR;
-            
+
+            // Reset LUT Cache
+            lutCache = new int[256 * 8]; // 8 LUTs
+
 
             for (int line = 0; line < resY; line++)
             {
@@ -276,7 +281,6 @@ namespace FoenixIDE.Display
                         StartOfLine?.Invoke();
                     }
                 }
-
 
                 bool gammaCorrection = (MCRegister & 0x40) == 0x40;
 
@@ -328,15 +332,13 @@ namespace FoenixIDE.Display
                     for (int x = 0; x < resX; x++)
                     {
                         int resetValue = x < borderXSize || x >= resX - borderXSize ? borderColor : backgroundColor;
-                        //System.Runtime.InteropServices.Marshal.WriteInt32(bitmapPointer, (offset + x) * 4, resetValue);
                         ptr[x] = resetValue;
                     }
 
                     // Bitmap Mode - draw the layers in revers order from back to front
                     if ((MCRegister & 0x4) == 0x4 || tileEditorMode)
                     {
-                        // Reset LUT Cache
-                        lutCache = new int[256 * 8]; // 8 LUTs
+                        
                         // Layer 12 - sprite layer 6
                         if ((MCRegister & 0x20) != 0)
                         {
@@ -419,50 +421,21 @@ namespace FoenixIDE.Display
 
             }
             frameBuffer.UnlockBits(bitmapData);
-            e.Graphics.DrawImage(frameBuffer, ClientRectangle, rect, GraphicsUnit.Pixel);
+            g.DrawImage(frameBuffer, ClientRectangle, rect, GraphicsUnit.Pixel);
             //e.Graphics.DrawImageUnscaled(frameBuffer, rect);  // Use this to debug
             drawing = false;
-        }
-
-        //public static byte[] LoadGammaCorrection_DontUse(MemoryRAM VKY)
-        //{
-        //    // Read the color lookup tables
-        //    int gammaAddress = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
-        //    // 
-        //    byte[] result = new byte[3*256];
-        //    VKY.CopyIntoBuffer(gammaAddress, result, 0, 3 * 256);
-        //    return result;
-        //}
-
-        public static int[] LoadLUT(MemoryRAM VKY)
-        {
-            // Read the color lookup tables
-            int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
-            int lookupTables = 4;
-            int[] result = new int[lookupTables * 256];
-
-
-            for (int c = 0; c < lookupTables * 256; c++)
-            {
-                byte blue = VKY.ReadByte(lutAddress++);
-                byte green = VKY.ReadByte(lutAddress++);
-                byte red = VKY.ReadByte(lutAddress++);
-                lutAddress++; // skip the alpha channel
-                result[c] = (int)(0xFF000000 + (red << 16) + (green << 8) + blue);
-            }
-            return result;
         }
 
         // We only cache items that are requested, instead of precomputing all 1024 colors.
         private int GetLUTValue(byte lutIndex, byte color, bool gamma)
         {
-            int offset = lutIndex * 256 + color;
-            int value = lutCache[offset];
+            //int offset = lutIndex * 256 + color;
+            int value = lutCache[lutIndex * 256 + color];
             
             if (value == 0)
             {
                 
-                int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + offset * 4;
+                int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + (lutIndex * 256 + color) * 4;
                 byte red = VICKY.ReadByte(lutAddress);
                 byte green = VICKY.ReadByte(lutAddress+1);
                 byte blue = VICKY.ReadByte(lutAddress+2);
@@ -474,7 +447,7 @@ namespace FoenixIDE.Display
                     red = VICKY.ReadByte(baseAddr + 0x200 + red);     // gammaCorrection[0x200 + fgValueRed];
                 }
                 value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
-                lutCache[offset] = value;
+                lutCache[lutIndex * 256 + color] = value;
             }
             return value;
         }
@@ -632,16 +605,20 @@ namespace FoenixIDE.Display
             int offsetAddress = bitmapAddress + line * width;
             int pixelOffset = line * STRIDE;
             int* ptr = p + pixelOffset;
-            int col = borderXSize;
-            //byte pixVal = 0;
-
-            byte[] pixVals = new byte[width];
+            //int col = borderXSize;
+            byte pixVal = 0;
             VRAM.CopyIntoBuffer(offsetAddress, pixVals, 0, width);
-            while (col < width - borderXSize)
+
+            //while (col < width - borderXSize)
+            for (int col = borderXSize; col < width - borderXSize; col++)
             {
-                //pixVal = VRAM.ReadByte(offsetAddress + col);
-                colorVal = pixVals[col] == 0 ? bgndColor : GetLUTValue(lutIndex, pixVals[col], gammaCorrection);
-                ptr[col++] = colorVal;
+                colorVal = bgndColor;
+                pixVal = pixVals[col];
+                if (pixVal != 0)
+                {
+                    colorVal = GetLUTValue(lutIndex, pixVal, gammaCorrection);
+                }
+                ptr[col] = colorVal;
             }
         }
 
@@ -729,17 +706,17 @@ namespace FoenixIDE.Display
             }
         }
 
-        private unsafe void DrawSprites(int* p, bool gammaCorrection, int layer, bool bkgrnd, int borderXSize, int borderYSize, int line, int width, int height)
+        private unsafe void DrawSprites(int* p, bool gammaCorrection, byte layer, bool bkgrnd, int borderXSize, int borderYSize, int line, int width, int height)
         {
             // There are 32 possible sprites to choose from.
             for (int s = 63; s > -1; s--)
             {
                 int addrSprite = MemoryMap.SPRITE_CONTROL_REGISTER_ADDR + s * 8 - MemoryMap.VICKY_BASE_ADDR;
-                int reg = VICKY.ReadByte(addrSprite);
+                byte reg = VICKY.ReadByte(addrSprite);
                 // if the set is not enabled, we're done.
-                int spriteLayer = (reg & 0x70) >> 4;
+                byte spriteLayer = (byte)((reg & 0x70) >> 4);
                 int posY = VICKY.ReadWord(addrSprite + 6) - 32;
-                if ((reg & 1) == 1 && layer == spriteLayer && (line >= posY && line < posY + 32))
+                if ((reg & 1) != 0 && layer == spriteLayer && (line >= posY && line < posY + 32))
                 {
                     // TODO Fix this when Vicky II fixes the LUT issue
                     byte lutIndex = (byte)(((reg & 14) >> 1));  // 8 possible LUTs 

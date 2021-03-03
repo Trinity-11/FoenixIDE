@@ -34,7 +34,7 @@ namespace FoenixIDE.Simulator.Devices
     {
         FNX2_INT00_OPL2R = 1,       // OPL2 Right Channel
         FNX2_INT01_OPL2L = 2,       // OPL2 Left Channel
-        FNX2_INT02_BTX_INT = 4,     // Beatrix Interrupt (TBD)
+        FNX2_INT02_BTX_INT = 4,     // GABE Interrupt (TBD)
         FNX2_INT03_SDMA = 8,        // System DMA
         FNX2_INT04_VDMA = 0x10,     // Video DMA
         FNX2_INT05_DACHP = 0x20,    // DAC Hot Plug

@@ -361,7 +361,7 @@ namespace FoenixIDE.Processor
         public void ExecuteShift(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
-            int addr = GetAddress(addressMode, signature, cpu.DataBank);
+            
             switch (instruction)
             {
                 case OpcodeList.ASL_DirectPage:
@@ -431,7 +431,10 @@ namespace FoenixIDE.Processor
             if (addressMode == AddressModes.Accumulator)
                 cpu.A.Value = val;
             else
+            {
+                int addr = GetAddress(addressMode, signature, cpu.DataBank);
                 cpu.MemMgr.Write(addr, val, cpu.A.Width);
+            }
         }
 
         public void ExecuteStack(byte instruction, AddressModes addressMode, int signature)
@@ -594,8 +597,8 @@ namespace FoenixIDE.Processor
 
         public void ExecuteINCDEC(byte instruction, AddressModes addressMode, int signature)
         {
-            int bval = GetValue(addressMode, signature, cpu.A.Width);
-            int addr = GetAddress(addressMode, signature, cpu.DataBank);
+            int bval = 0;
+            int addr = 0;
 
             switch (instruction)
             {
@@ -608,6 +611,8 @@ namespace FoenixIDE.Processor
                 case OpcodeList.DEC_Absolute:
                 case OpcodeList.DEC_DirectPageIndexedWithX:
                 case OpcodeList.DEC_AbsoluteIndexedWithX:
+                    bval = GetValue(addressMode, signature, cpu.A.Width);
+                    addr = GetAddress(addressMode, signature, cpu.DataBank);
                     bval--;
                     if (cpu.A.Width == 1)
                     {
@@ -632,6 +637,8 @@ namespace FoenixIDE.Processor
                 case OpcodeList.INC_DirectPageIndexedWithX:
                 case OpcodeList.INC_AbsoluteIndexedWithX:
                     //addr = cpu.DirectPage.GetLongAddress(addr);
+                    bval = GetValue(addressMode, signature, cpu.A.Width);
+                    addr = GetAddress(addressMode, signature, cpu.DataBank);
                     bval++;
                     if (cpu.A.Width == 1)
                     {
@@ -669,8 +676,6 @@ namespace FoenixIDE.Processor
                 default:
                     break;
             }
-
-
         }
 
         private int GetAddress(AddressModes addressMode, int SignatureBytes, RegisterBankNumber Bank)

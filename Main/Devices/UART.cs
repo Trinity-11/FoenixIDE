@@ -54,7 +54,7 @@ namespace FoenixIDE.Simulator.Devices
                     break;
                 case InterruptEnable:
                     // bit 0 - Received Data Available IRQ
-                    // bit 1 - Transmitter Holding Reigster Empty IRQ
+                    // bit 1 - Transmitter Holding Register Empty IRQ
                     // bit 2 - Received Line Status IRQ
                     // bit 3 - MODEM Status IRQ
                     // bits 4 - 7 : always 0

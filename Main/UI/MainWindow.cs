@@ -111,7 +111,7 @@ namespace FoenixIDE.UI
             // This fontset is loaded just in case the kernel doesn't provide one.
             gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
-            joystickWindow.beatrix = kernel.MemMgr.BEATRIX;
+            joystickWindow.gabe = kernel.MemMgr.GABE;
 
             if (disabledIRQs)
             {
@@ -274,11 +274,12 @@ namespace FoenixIDE.UI
             pSof = currentDT;
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
             if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
+            //if (!kernel.CPU.DebugPause && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
             {
                 // Set the SOF Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 IRQ0 |= (byte)Register0.FNX0_INT00_SOF;
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 kernel.CPU.Pins.IRQ = true;
             }
         }
@@ -287,12 +288,13 @@ namespace FoenixIDE.UI
         {
             // Check if the interrupt is enabled
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
+           // if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
+            if (!kernel.CPU.DebugPause && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
             {
                 // Set the SOL Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 IRQ0 |= (byte)Register0.FNX0_INT01_SOL;
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 kernel.CPU.Pins.IRQ = true;
             }
         }
@@ -306,7 +308,7 @@ namespace FoenixIDE.UI
                 // Set the SD Card Interrupt
                 byte IRQ1 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
                 IRQ1 |= (byte)Register1.FNX1_INT07_SDCARD;
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IRQ1);
                 kernel.CPU.Pins.IRQ = true;
 
                 // Write the interrupt result
@@ -857,9 +859,13 @@ namespace FoenixIDE.UI
             {
                 toolStripRevision.Text = "Rev C";
             }
-            else
+            else if (version == BoardVersion.RevU)
             {
                 toolStripRevision.Text = "Rev U";
+            }
+            else
+            {
+                toolStripRevision.Text = "Rev U+";
             }
             // force repaint
             statusStrip1.Invalidate();
@@ -875,6 +881,10 @@ namespace FoenixIDE.UI
             {
                 version = BoardVersion.RevU;
             }
+            else if (version == BoardVersion.RevU)
+            {
+                version = BoardVersion.RevUPlus;
+            }   
             else
             {
                 version = BoardVersion.RevB;
@@ -885,7 +895,9 @@ namespace FoenixIDE.UI
                 uploaderWindow.SetBoardVersion(version);
             }
             DisplayBoardVersion();
-            // TODO - Reset the memory and reload the program?
+            // Reset the memory, keyboard, GABE and reload the program?
+            debugWindow.Pause();
+            BasicWindow_Load(null, null);
         }
 
         private void EnableMenuItems()

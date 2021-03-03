@@ -11,6 +11,7 @@ namespace FoenixIDE.Simulator.Devices
         {
 
         }
+        // When the CPU writes to the register
         public override void WriteByte(int Address, byte Value)
         {
             // Read the current byte at the address, to detect an edge
@@ -19,12 +20,18 @@ namespace FoenixIDE.Simulator.Devices
             byte combo = (byte)(old & Value);
             if (combo > 0)
             {
-                data[Address] = (byte)(data[Address] & (byte)(~combo));
+                data[Address] = (byte)(old & (byte)(~combo));
             }
-            else
-            {
-                data[Address] = Value;
-            }
+            //else
+            //{
+            //    data[Address] = Value;
+            //}
+        }
+        // When GABE writes to the register
+        public void WriteFromGabe(int Address, byte Value)
+        {
+            
+            data[Address] = Value;
         }
     }
 }

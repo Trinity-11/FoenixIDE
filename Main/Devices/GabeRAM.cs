@@ -16,7 +16,7 @@ namespace FoenixIDE.Simulator.Devices
         }
         override public byte ReadByte(int Address)
         {
-            if (Address == (MemoryMap.GABE_RNG_SEED_LO - MemoryMap.BEATRIX_START))
+            if (Address == (MemoryMap.GABE_RNG_SEED_LO - MemoryMap.GABE_START))
             {
                 return (byte)rng.Next(255);
             }

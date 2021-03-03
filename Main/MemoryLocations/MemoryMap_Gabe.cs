@@ -8,7 +8,7 @@ namespace FoenixIDE.MemoryLocations
 {
     public static partial class MemoryMap
     {
-        #region Beatrix Memory Map
+        #region Gabe Memory Map
         public const int FLOAT_START = 0xAF_E200;
         public const int FLOAT_END = 0xAF_E20F;
 

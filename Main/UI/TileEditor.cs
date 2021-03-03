@@ -54,6 +54,25 @@ namespace FoenixIDE.Simulator.UI
             MemMgr = mm;
         }
 
+        private int[] LoadLUT(MemoryRAM VKY)
+        {
+            // Read the color lookup tables
+            int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
+            int lookupTables = 4;
+            int[] result = new int[lookupTables * 256];
+
+
+            for (int c = 0; c < lookupTables * 256; c++)
+            {
+                byte blue = VKY.ReadByte(lutAddress++);
+                byte green = VKY.ReadByte(lutAddress++);
+                byte red = VKY.ReadByte(lutAddress++);
+                lutAddress++; // skip the alpha channel
+                result[c] = (int)(0xFF000000 + (red << 16) + (green << 8) + blue);
+            }
+            return result;
+        }
+
         /**
          * Draw the tileset with clear lines separating the images 16x16.
          */
@@ -65,7 +84,7 @@ namespace FoenixIDE.Simulator.UI
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
-            int[] graphicsLUT = Display.Gpu.LoadLUT(MemMgr.VICKY);
+            int[] graphicsLUT = LoadLUT(MemMgr.VICKY);
             int lut = LutList.SelectedIndex;
             int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) - 0xB0_0000;
             for (int y = 0; y < 256; y++)

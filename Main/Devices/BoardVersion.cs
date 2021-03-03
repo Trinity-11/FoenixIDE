@@ -10,6 +10,7 @@ namespace FoenixIDE.Simulator.Devices
     {
         RevB,
         RevC,
-        RevU
+        RevU,
+        RevUPlus
     }
 }

@@ -31,28 +31,48 @@ namespace FoenixIDE
             int memSize = MemoryMap.RAM_SIZE;
             CodecRAM codec = null;
             SDCardDevice sdcard = null;
-            if (boardVersion == BoardVersion.RevC || boardVersion == BoardVersion.RevU)
+            byte SystemStat = 0; // FMX
+            int keyboardAddress = MemoryMap.KBD_DATA_BUF_FMX; // FMX
+
+            switch (boardVersion)
             {
-                memSize *= 2;
-                codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_FMX, 2);  // This register is only a single byte but we allow writing a word
-                sdcard = new GabeSDController(MemoryMap.GABE_SDC_CTRL_START, MemoryMap.GABE_SDC_CTRL_SIZE);
-            } 
-            else
+                case BoardVersion.RevB:
+                    break;
+                case BoardVersion.RevC:
+                    memSize *= 2;
+                    break;
+                case BoardVersion.RevU:
+                    SystemStat = 1;
+                    keyboardAddress = MemoryMap.KBD_DATA_BUF_U;
+                    break;
+                case BoardVersion.RevUPlus:
+                    memSize *= 2;
+                    SystemStat = 5;
+                    keyboardAddress = MemoryMap.KBD_DATA_BUF_U;
+                    break;
+            }
+            if (boardVersion == BoardVersion.RevB)
             {
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 2);  // This register is only a single byte but we allow writing a word
                 sdcard = new CH376SRegister(MemoryMap.SDCARD_DATA, MemoryMap.SDCARD_SIZE);
             }
+            else
+            {
+                codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_FMX, 2);  // This register is only a single byte but we allow writing a word
+                sdcard = new GabeSDController(MemoryMap.GABE_SDC_CTRL_START, MemoryMap.GABE_SDC_CTRL_SIZE);
+            }
+
             MemMgr = new MemoryManager
             {
-                RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),                      // RAM: 2MB Rev B, 4MB Rev C
+                RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),                        // RAM: 2MB Rev B & U, 4MB Rev C & U+
                 VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),       // 60K
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE),       // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE),       // 8MB RAM
-                BEATRIX = new GabeRAM(MemoryMap.BEATRIX_START, MemoryMap.BEATRIX_SIZE),   // 4K 
+                GABE = new GabeRAM(MemoryMap.GABE_START, MemoryMap.GABE_SIZE),   // 4K 
 
                 // Special devices
                 MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
-                KEYBOARD = new KeyboardRegister(MemoryMap.KBD_DATA_BUF, 5),
+                KEYBOARD = new KeyboardRegister(keyboardAddress, 5),
                 SDCARD = sdcard,
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
                 UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
@@ -73,6 +93,7 @@ namespace FoenixIDE
             
             MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
             MemMgr.VDMA.setSystemRam(MemMgr.RAM);
+            MemMgr.GABE.WriteByte(MemoryMap.GABE_SYS_STAT - MemoryMap.GABE_START, SystemStat);
 
             // Load the kernel.hex if present
             ResetCPU(DefaultKernel);
@@ -93,7 +114,7 @@ namespace FoenixIDE
                 // Set the Timer0 Interrupt
                 byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 IRQ0 |= (byte)Register0.FNX0_INT02_TMR0;
-                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 CPU.Pins.IRQ = true;
             }
         }
@@ -105,7 +126,7 @@ namespace FoenixIDE
                 // Set the Timer1 Interrupt
                 byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 IRQ0 |= (byte)Register0.FNX0_INT03_TMR1;
-                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 CPU.Pins.IRQ = true;
             }
         }
@@ -117,7 +138,7 @@ namespace FoenixIDE
                 // Set the Timer2 Interrupt
                 byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 IRQ0 |= (byte)Register0.FNX0_INT04_TMR2;
-                MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+                MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 CPU.Pins.IRQ = true;
             }
         }
@@ -146,7 +167,7 @@ namespace FoenixIDE
 
             // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
             int BasePageAddress = 0x18_0000;
-            if (boardVersion == BoardVersion.RevC)
+            if (boardVersion == BoardVersion.RevC || boardVersion == BoardVersion.RevUPlus)
             {
                 BasePageAddress = 0x38_0000;
             }

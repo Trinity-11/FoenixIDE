@@ -68,8 +68,10 @@ namespace FoenixIDE.MemoryLocations
 
         public const int SUPERIO_START = 0xAF_1000;
         public const int SUPERIO_END = 0xAF_13FF;
-        public const int KBD_DATA_BUF = 0xAF_1060; // Keyboard input, output buffer
-        public const int KBD_STATUS_PORT = 0xAF_1064;  // keyboard status port
+        public const int KBD_DATA_BUF_FMX = 0xAF_1060;     // FMX Keyboard input, output buffer
+        public const int KBD_STATUS_PORT_FMX = 0xAF_1064;  // FMX keyboard status port
+        public const int KBD_DATA_BUF_U = 0xAF_1803;       // U Keyboard input, output buffer
+        public const int KBD_STATUS_PORT_U = 0xAF_1807;    // U keyboard status port
 
         // FDC  - $AF:13F0
         // LPT1 - $AF:1378

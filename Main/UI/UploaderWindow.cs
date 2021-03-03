@@ -43,6 +43,9 @@ namespace FoenixIDE.UI
                 case BoardVersion.RevU:
                     RevModeLabel.Text = "Mode: RevU";
                     break;
+                case BoardVersion.RevUPlus:
+                    RevModeLabel.Text = "Mode: RevU+";
+                    break;
             }
         }
 

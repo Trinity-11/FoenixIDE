@@ -24,7 +24,7 @@ namespace FoenixIDE.MemoryLocations
         public MemoryRAM FLASH = null;
         public MemoryRAM VIDEO = null;
         public MemoryRAM VICKY = null;
-        public MemoryRAM BEATRIX = null;
+        public MemoryRAM GABE = null;
         public MathCoproRegister MATH = null;
         public MathFloatRegister FLOAT = null;
         public CodecRAM CODEC = null;
@@ -118,10 +118,10 @@ namespace FoenixIDE.MemoryLocations
                 return;
             }
             
-            if (Address >= MemoryMap.KBD_DATA_BUF && Address <= MemoryMap.KBD_STATUS_PORT)
+            if (Address >= KEYBOARD.StartAddress && Address <= KEYBOARD.EndAddress)
             {
                 Device = KEYBOARD;
-                DeviceAddress = Address - MemoryMap.KBD_DATA_BUF;
+                DeviceAddress = Address - KEYBOARD.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.UART1_REGISTERS && Address < MemoryMap.UART1_REGISTERS + 8)
@@ -172,10 +172,10 @@ namespace FoenixIDE.MemoryLocations
                 DeviceAddress = Address - OPL2.StartAddress;
                 return;
             }
-            if (Address >= MemoryMap.BEATRIX_START && Address <= MemoryMap.BEATRIX_END)
+            if (Address >= MemoryMap.GABE_START && Address <= MemoryMap.GABE_END)
             {
-                Device = BEATRIX;
-                DeviceAddress = Address - BEATRIX.StartAddress;
+                Device = GABE;
+                DeviceAddress = Address - GABE.StartAddress;
                 return;
             }
             if (Address >= MemoryMap.VIDEO_START && Address < (MemoryMap.VIDEO_START + MemoryMap.VIDEO_SIZE))

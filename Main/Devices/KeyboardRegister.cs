@@ -112,9 +112,9 @@ namespace FoenixIDE.Simulator.Devices
                 kernel.MemMgr.KEYBOARD.WriteByte(0, (byte)key);
                 kernel.MemMgr.KEYBOARD.WriteByte(4, 0);
                 // Set the Keyboard Interrupt
-                byte IRQ1 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
+                byte IRQ1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
                 IRQ1 |= (byte)Register1.FNX1_INT00_KBD;
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG1, IRQ1);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IRQ1);
                 kernel.CPU.Pins.IRQ = true;
             }
         }
@@ -136,7 +136,7 @@ namespace FoenixIDE.Simulator.Devices
             // Set the Mouse Interrupt
             byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
             IRQ0 |= (byte)Register0.FNX0_INT07_MOUSE;
-            kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.INT_PENDING_REG0, IRQ0);
+            kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
             kernel.CPU.Pins.IRQ = true;
         }
     }

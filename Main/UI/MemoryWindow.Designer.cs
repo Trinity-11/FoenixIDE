@@ -111,7 +111,7 @@
             "Address $AF:8800 (Font Memory Bank 1)",
             "Address $AF:A000 (Text Memory)",
             "Address $AF:C000 (Text Colors)",
-            "Address $AF:E000 (Beatrix)",
+            "Address $AF:E000 (Gabe)",
             "Unspecified Page"});
             this.AddressCombo.Location = new System.Drawing.Point(214, 2);
             this.AddressCombo.Margin = new System.Windows.Forms.Padding(2);
