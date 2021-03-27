@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Timer = System.Windows.Forms.Timer;
 
 namespace FoenixIDE.UI
 {
@@ -231,7 +232,7 @@ namespace FoenixIDE.UI
         {
             SendBinaryButton.Enabled = false;
             DisconnectButton.Enabled = false;
-
+            hideLabelTimer_Tick(null, null);
             int transmissionSize = GetTransmissionSize();
             UploadProgressBar.Maximum = transmissionSize;
             UploadProgressBar.Value = 0;
@@ -355,16 +356,14 @@ namespace FoenixIDE.UI
                         EraseFlash();
                         int SrcFlashAddress = Convert.ToInt32(C256DestAddress.Text.Replace(":", ""), 16);
                         ProgramFlash(SrcFlashAddress);
-
                         CountdownLabel.Visible = false;
-                        this.Update();
                     }
                     if (DebugModeCheckbox.Checked)
                     {
                         // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
                         ExitFnxDebugMode();
                     }
-                    MessageBox.Show("Transfer Done! System Reset!", "Send Binary Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    HideProgressBarAfter5Seconds("Transfer Done! System Reset!");
                 }
             }
             else if (BlockSendRadio.Checked && kernel.CPU != null)
@@ -394,7 +393,7 @@ namespace FoenixIDE.UI
                     // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
                     ExitFnxDebugMode();
                 }
-                MessageBox.Show("Transfer Done! System Reset!", "Send Binary Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                HideProgressBarAfter5Seconds("Transfer Done! System Reset!");
             }
             else
             {
@@ -415,11 +414,25 @@ namespace FoenixIDE.UI
                     tempMem.Show();
                 }
             }
-            
-            UploadProgressBar.Visible = false;
             SendBinaryButton.Enabled = true;
             DisconnectButton.Enabled = true;
         }
+
+        private void HideProgressBarAfter5Seconds(string message)
+        {
+            UploadProgressBar.Visible = false;
+            CountdownLabel.Visible = true;
+            CountdownLabel.Text = message;
+            hideLabelTimer.Enabled = true;
+        }
+
+        private void hideLabelTimer_Tick(object sender, EventArgs e)
+        {
+            hideLabelTimer.Enabled = false;
+            CountdownLabel.Visible = false;
+            CountdownLabel.Text = "";
+        }
+
 
         private byte Checksum(byte[] buffer, int length)
         {

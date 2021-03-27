@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UploaderWindow));
             this.ConnectButton = new System.Windows.Forms.Button();
             this.COMPortComboBox = new System.Windows.Forms.ComboBox();
@@ -60,6 +61,7 @@
             this.ReflashCheckbox = new System.Windows.Forms.CheckBox();
             this.CountdownLabel = new System.Windows.Forms.Label();
             this.RevModeLabel = new System.Windows.Forms.Label();
+            this.hideLabelTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // ConnectButton
@@ -421,6 +423,11 @@
             this.RevModeLabel.TabIndex = 30;
             this.RevModeLabel.Text = "Mode: RevB";
             // 
+            // hideLabelTimer
+            // 
+            this.hideLabelTimer.Interval = 5000;
+            this.hideLabelTimer.Tick += new System.EventHandler(this.hideLabelTimer_Tick);
+            // 
             // UploaderWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -508,5 +515,6 @@
         private System.Windows.Forms.CheckBox ReflashCheckbox;
         private System.Windows.Forms.Label CountdownLabel;
         private System.Windows.Forms.Label RevModeLabel;
+        private System.Windows.Forms.Timer hideLabelTimer;
     }
 }

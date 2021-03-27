@@ -19,6 +19,7 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Net;
 using FoenixIDE.Display;
+using System.Runtime.InteropServices;
 
 namespace FoenixIDE.UI
 {
@@ -85,6 +86,30 @@ namespace FoenixIDE.UI
                     {
                         version = BoardVersion.RevU;
                     }
+                    else if (context["version"] == "RevU+")
+                    {
+                        version = BoardVersion.RevUPlus;
+                    }
+                }
+            }
+            // If the user didn't specify context switches, read the ini setting
+            if (context == null)
+            {
+                autoRun = Simulator.Properties.Settings.Default.Autorun;
+                switch (Simulator.Properties.Settings.Default.BoardRevision)
+                {
+                    case "B":
+                        version = BoardVersion.RevB;
+                        break;
+                    case "C":
+                        version = BoardVersion.RevC;
+                        break;
+                    case "U":
+                        version = BoardVersion.RevU;
+                        break;
+                    case "U+":
+                        version = BoardVersion.RevUPlus;
+                        break;
                 }
             }
             if (context == null || "true".Equals(context["Continue"]))
@@ -146,6 +171,7 @@ namespace FoenixIDE.UI
             {
                 debugWindow.RunButton_Click(null, null);
             }
+            autorunEmulatorToolStripMenuItem.Checked = autoRun;
         }
 
         private void LoadHexFile(string Filename)
@@ -643,6 +669,10 @@ namespace FoenixIDE.UI
                 FoeniXmlFile xmlFile = new FoeniXmlFile(kernel, null);
                 xmlFile.ReadWatches(dialog.FileName);
                 watchWindow.SetKernel(kernel);
+                if (!watchWindow.Visible)
+                {
+                    watchWindow.Show();
+                }
             }
         }
 
@@ -851,9 +881,11 @@ namespace FoenixIDE.UI
 
         private void DisplayBoardVersion()
         {
+            string shortVersion = "C";
             if (version == BoardVersion.RevB)
             {
                 toolStripRevision.Text = "Rev B";
+                shortVersion = "B";
             }
             else if (version == BoardVersion.RevC)
             {
@@ -862,13 +894,17 @@ namespace FoenixIDE.UI
             else if (version == BoardVersion.RevU)
             {
                 toolStripRevision.Text = "Rev U";
+                shortVersion = "U";
             }
             else
             {
                 toolStripRevision.Text = "Rev U+";
+                shortVersion = "U+";
             }
             // force repaint
             statusStrip1.Invalidate();
+            Simulator.Properties.Settings.Default.BoardRevision = shortVersion;
+            Simulator.Properties.Settings.Default.Save();
         }
 
         private void ToolStripRevision_Click(object sender, EventArgs e)
@@ -1195,6 +1231,12 @@ namespace FoenixIDE.UI
             {
                 GGF.BringToFront();
             }
+        }
+
+        private void autorunEmulatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Simulator.Properties.Settings.Default.Autorun = autorunEmulatorToolStripMenuItem.Checked;
+            Simulator.Properties.Settings.Default.Save();
         }
     }
 }

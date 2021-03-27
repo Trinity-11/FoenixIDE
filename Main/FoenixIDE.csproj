@@ -335,10 +335,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="Resources\kernel_U_Plus.hex" />
     <None Include="UI\Images\memory-btn.png" />
     <None Include="UI\Images\delete-btn.png" />
     <None Include="Resources\foenix-96x96.png" />
     <None Include="Resources\DeleteButton.png" />
+    <None Include="Resources\kernel_U_Plus.lst" />
     <Content Include="Resources\PET-ASCII.png" />
   </ItemGroup>
   <ItemGroup>
