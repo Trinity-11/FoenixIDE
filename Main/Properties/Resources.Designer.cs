@@ -71,40 +71,6 @@ namespace FoenixIDE.Simulator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] kernel_U_Plus_Hex {
-            get {
-                object obj = ResourceManager.GetObject("kernel_U_Plus_Hex", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 
-        ///; 64tass Turbo Assembler Macro V1.54.1900 listing file
-        ///; 64tass --m65816 -D TARGET=1 -D TARGET_SYS=3 --long-address --flat -b -o kernel_U_Plus.bin --list kernel_U_Plus.lst --labels=kernel_U_Plus.lbl src\kernel.asm
-        ///; Fri Feb 19 14:45:31 2021
-        ///
-        ///;Offset	;PC	;Hex		;Monitor	;Source
-        ///
-        ///;******  Command line definitions
-        ///
-        ///=1						TARGET=1
-        ///=3						TARGET_SYS=3
-        ///
-        ///;******  Processing input file: src\kernel.asm
-        ///
-        ///=0						TEST_KEYBOARD = 0 ; This is to enable the ScreenOutput
-        ///=1						SYS_C256_FMX = 1          [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string kernel_U_Plus_Lst {
-            get {
-                return ResourceManager.GetString("kernel_U_Plus_Lst", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap memory_btn {

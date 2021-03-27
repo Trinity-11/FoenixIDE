@@ -121,12 +121,6 @@
   <data name="delete_btn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\UI\Images\delete-btn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="kernel_U_Plus_Hex" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\kernel_U_Plus.hex;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="kernel_U_Plus_Lst" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\kernel_U_Plus.lst;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
   <data name="memory_btn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\UI\Images\memory-btn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
