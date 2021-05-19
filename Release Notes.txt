@@ -1,3 +1,9 @@
+Release 0.5.5.0
+---------------
+Added the Asset Window and connected it to the Asset Loader (used to be bitmap loader).
+Resources are now saved with the FNXML file and reloaded.
+TileEditor saves its Tilemaps to assets now, instead of plain files.
+
 Release 0.5.4.1
 ---------------
 Fixed a bug in the SBC when using a 16-bit accumulator.

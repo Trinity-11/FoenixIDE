@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using static FoenixIDE.Simulator.FileFormat.ResourceChecker;
 
 namespace FoenixIDE.Simulator.FileFormat
 {
     class FoeniXmlFile
     {
-        private ResourceChecker Resources;
         private const int PHRASE_LENGTH = 16;
         private Processor.Breakpoints BreakPoints;
         private SortedList<int, DebugLine> codeList;
@@ -25,16 +25,15 @@ namespace FoenixIDE.Simulator.FileFormat
         public FoeniXmlFile(FoenixSystem kernel, ResourceChecker resources)
         {
             this.kernel = kernel;
-            this.Resources = resources;
             this.codeList = kernel.lstFile.Lines;
             this.BreakPoints = kernel.Breakpoints;
             watchList = kernel.WatchList;
         }
-
+        private static string tabs = "\t\t\t\t\t\t\t\t";
         public void Write(String filename, bool compact)
         {
             XmlWriter xmlWriter = XmlWriter.Create(filename);
-            string tabs = "\t\t\t\t\t\t\t\t";
+            
             xmlWriter.WriteStartDocument();
             xmlWriter.WriteRaw("\r");
             xmlWriter.WriteComment("Export of FoenixIDE for C256.  All values are in hexadecimal form");
@@ -49,7 +48,7 @@ namespace FoenixIDE.Simulator.FileFormat
             xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteStartElement("resources");
             xmlWriter.WriteRaw("\r");
-            foreach (ResourceChecker.Resource res in Resources.Items)
+            foreach (ResourceChecker.Resource res in kernel.ResCheckerRef.Items)
             {
                 xmlWriter.WriteRaw(tabs.Substring(0, 2));
                 xmlWriter.WriteStartElement("resource");
@@ -57,6 +56,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 xmlWriter.WriteAttributeString("source", res.SourceFile);
                 xmlWriter.WriteAttributeString("start-address", res.StartAddress.ToString("X6"));
                 xmlWriter.WriteAttributeString("length", res.Length.ToString("X"));
+                xmlWriter.WriteAttributeString("resource-type", res.FileType.ToString());
                 xmlWriter.WriteEndElement();  // end resource
                 xmlWriter.WriteRaw("\r");
             }
@@ -156,6 +156,7 @@ namespace FoenixIDE.Simulator.FileFormat
             }
             xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteEndElement(); // end pages
+            xmlWriter.WriteRaw("\r");
 
             xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteStartElement("vicky");
@@ -169,6 +170,28 @@ namespace FoenixIDE.Simulator.FileFormat
             }
             xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteEndElement(); // end vicky
+
+            // Video RAM for resources
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
+            xmlWriter.WriteStartElement("video");
+            xmlWriter.WriteRaw("\r");
+            foreach (ResourceChecker.Resource res in kernel.ResCheckerRef.Items)
+            {
+                // If the assets were loaded in RAM, they would have been saved already
+                if (res.StartAddress >= 0xB0_0000)
+                {
+                    for (int i = res.StartAddress; i < res.StartAddress + res.Length; i = i + 256)
+                    {
+                        if (PageChecksum(i) != 0)
+                        {
+                            WriteData(i, xmlWriter, compact);
+                        }
+                    }
+                }
+            }
+            xmlWriter.WriteRaw(tabs.Substring(0, 1));
+            xmlWriter.WriteEndElement(); // end video
+
             xmlWriter.WriteRaw("\r");
             xmlWriter.WriteEndElement(); // end project
 
@@ -232,6 +255,7 @@ namespace FoenixIDE.Simulator.FileFormat
 
         private void WriteData(int startAddress, XmlWriter writer, bool compact)
         {
+            writer.WriteRaw(tabs.Substring(0, 1));
             writer.WriteStartElement("page");
             writer.WriteAttributeString("start-address", "$" + startAddress.ToString("X6"));
             writer.WriteAttributeString("bank", "$" + startAddress.ToString("X6").Substring(0, 2));
@@ -242,6 +266,7 @@ namespace FoenixIDE.Simulator.FileFormat
             {
                 WritePhrase(startAddress + i, writer, compact);
             }
+            writer.WriteRaw(tabs.Substring(0, 1));
             writer.WriteEndElement();
             writer.WriteRaw("\r");
         }
@@ -251,6 +276,7 @@ namespace FoenixIDE.Simulator.FileFormat
         {
             if (PhraseChecksum(startAddress) == 0 && !compact || PhraseChecksum(startAddress) != 0)
             {
+                writer.WriteRaw(tabs.Substring(0, 2));
                 writer.WriteStartElement("data");
                 writer.WriteAttributeString("address", "$" + (startAddress).ToString("X6"));
                 for (int i = 0; i < PHRASE_LENGTH; i++)
@@ -291,14 +317,7 @@ namespace FoenixIDE.Simulator.FileFormat
         {
             XmlReader reader = XmlReader.Create(filename);
             Version = BoardVersion.RevB;
-            if (Resources == null)
-            {
-                Resources = new ResourceChecker();
-            }
-            else
-            {
-                Resources.Clear();
-            }
+            kernel.ResCheckerRef.Clear();
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.Element)
@@ -317,7 +336,16 @@ namespace FoenixIDE.Simulator.FileFormat
                             StartAddress = Convert.ToInt32(reader.GetAttribute("start-address"), 16),
                             Length = Convert.ToInt32(reader.GetAttribute("length"), 16)
                         };
-                        Resources.Add(res);
+                        string resType = reader.GetAttribute("resource-type");
+                        if (resType != null)
+                        {
+                            res.FileType = (ResourceType)Enum.Parse(typeof(ResourceType), resType);
+                        }
+                        else
+                        {
+                            res.FileType = ResourceType.raw;
+                        }
+                        kernel.ResCheckerRef.Add(res);
                         continue;
                     }
                     if (reader.Name.Equals("code"))

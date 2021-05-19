@@ -17,7 +17,7 @@ namespace FoenixIDE
         public MemoryManager MemMgr = null;
         public Processor.CPU CPU = null;
 
-        public ResourceChecker Resources;
+        public ResourceChecker ResCheckerRef;
         public Processor.Breakpoints Breakpoints = new Processor.Breakpoints();
         public ListFile lstFile;
         private BoardVersion boardVersion;
@@ -175,7 +175,7 @@ namespace FoenixIDE
             if (LoadedKernel.EndsWith(".fnxml", true, null))
             {
                 this.ResetMemory();
-                FoeniXmlFile fnxml = new FoeniXmlFile(this, Resources);
+                FoeniXmlFile fnxml = new FoeniXmlFile(this, ResCheckerRef);
                 fnxml.Load(LoadedKernel);
                 boardVersion = fnxml.Version;
             }

@@ -1,4 +1,5 @@
 ﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.UI;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static FoenixIDE.Simulator.FileFormat.ResourceChecker;
 
 namespace FoenixIDE.Simulator.UI
 {
@@ -22,6 +24,7 @@ namespace FoenixIDE.Simulator.UI
         private int selectedTilemap = 0;
 
         private MemoryManager MemMgr;
+        private ResourceChecker resCheckerRef;
 
         private Pen whitePen = new Pen(Color.White);
         private Pen yellowPen = new Pen(Color.Yellow);
@@ -52,6 +55,11 @@ namespace FoenixIDE.Simulator.UI
         public void SetMemory(MemoryManager mm)
         {
             MemMgr = mm;
+        }
+
+        public void SetResourceChecker(ResourceChecker rc)
+        {
+            resCheckerRef = rc;
         }
 
         private int[] LoadLUT(MemoryRAM VKY)
@@ -192,35 +200,35 @@ namespace FoenixIDE.Simulator.UI
         private void ClearTilemapButton_Click(object sender, EventArgs e)
         {
             int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
+            byte selectedTile = (byte)(selectedY * 16 + selectedX);
             int width = Convert.ToInt32(Width.Text);
             int height = Convert.ToInt32(Height.Text);
-            for (int i = 0; i < width * height * 2; i++)
+            for (int i = 0; i < width * height * 2 + 1; i = i+ 2)
             {
-                MemMgr.WriteByte(tilemapAddress + i, 0);
+                MemMgr.WriteByte(tilemapAddress + i, selectedTile);
+                MemMgr.WriteByte(tilemapAddress + i + 1, 0);
             }
         }
 
         private void SaveTilemapButton_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveDialog = new SaveFileDialog()
+            // Create a new resource
+            int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
+            int width = Convert.ToInt32(Width.Text);
+            int height = Convert.ToInt32(Height.Text);
+            Resource resource = new Resource()
             {
-                Title = "Save Tilemap File",
-                CheckPathExists = true,
-                Filter = "Tilemap|*.data"
+                Name = "Tile Editor Map",
+                Length = width * height,
+                FileType = ResourceType.tilemap,
+                StartAddress = tilemapAddress
             };
-            if (saveDialog.ShowDialog() == DialogResult.OK)
-            {
-                FileStream dataFile = File.Create(saveDialog.FileName, 0x800, FileOptions.SequentialScan);
-                int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
-                int width = Convert.ToInt32(Width.Text);
-                int height = Convert.ToInt32(Height.Text);
-                for (int i = 0; i < width * height * 2; i++)
-                {
-                    byte value = MemMgr.ReadByte(tilemapAddress + i);
-                    dataFile.WriteByte(value);
-                }
-                dataFile.Close();
-            }
+
+            // if this resource is already in the list of resource
+            Resource oldRes = resCheckerRef.Find(ResourceType.tilemap, tilemapAddress);
+            resCheckerRef.Items.Remove(oldRes);
+            resCheckerRef.Add(resource);
+            AssetWindow.Instance.UpdateAssets();
         }
 
         private void LutList_SelectedIndexChanged(object sender, EventArgs e)

@@ -31,16 +31,16 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WatchForm));
             this.WatchGrid = new System.Windows.Forms.DataGridView();
+            this.AddressName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Address = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Val8bit = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Val16bit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.WatchUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.AddButton = new System.Windows.Forms.Button();
             this.NameText = new System.Windows.Forms.TextBox();
             this.AddressText = new System.Windows.Forms.TextBox();
             this.dataGridViewImageColumn1 = new System.Windows.Forms.DataGridViewImageColumn();
             this.dataGridViewImageColumn2 = new System.Windows.Forms.DataGridViewImageColumn();
-            this.AddressName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Address = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Val8bit = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Val16bit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColMemory = new System.Windows.Forms.DataGridViewImageColumn();
             this.ColDelete = new System.Windows.Forms.DataGridViewImageColumn();
             ((System.ComponentModel.ISupportInitialize)(this.WatchGrid)).BeginInit();
@@ -76,6 +76,45 @@
             this.WatchGrid.TabIndex = 3;
             this.WatchGrid.VirtualMode = true;
             this.WatchGrid.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.WatchGrid_CellClick);
+            // 
+            // AddressName
+            // 
+            this.AddressName.FillWeight = 150F;
+            this.AddressName.HeaderText = "Name";
+            this.AddressName.MaxInputLength = 32;
+            this.AddressName.Name = "AddressName";
+            this.AddressName.ReadOnly = true;
+            this.AddressName.Width = 120;
+            // 
+            // Address
+            // 
+            this.Address.FillWeight = 80F;
+            this.Address.HeaderText = "Address";
+            this.Address.MaxInputLength = 6;
+            this.Address.Name = "Address";
+            this.Address.ReadOnly = true;
+            this.Address.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Address.Width = 80;
+            // 
+            // Val8bit
+            // 
+            this.Val8bit.FillWeight = 40F;
+            this.Val8bit.HeaderText = "8-Bits";
+            this.Val8bit.MaxInputLength = 2;
+            this.Val8bit.Name = "Val8bit";
+            this.Val8bit.ReadOnly = true;
+            this.Val8bit.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Val8bit.Width = 40;
+            // 
+            // Val16bit
+            // 
+            this.Val16bit.FillWeight = 60F;
+            this.Val16bit.HeaderText = "16-Bits";
+            this.Val16bit.MaxInputLength = 4;
+            this.Val16bit.Name = "Val16bit";
+            this.Val16bit.ReadOnly = true;
+            this.Val16bit.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Val16bit.Width = 60;
             // 
             // WatchUpdateTimer
             // 
@@ -117,6 +156,7 @@
             this.dataGridViewImageColumn1.Name = "dataGridViewImageColumn1";
             this.dataGridViewImageColumn1.ReadOnly = true;
             this.dataGridViewImageColumn1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewImageColumn1.ToolTipText = "Show in Memory Window";
             this.dataGridViewImageColumn1.Width = 24;
             // 
             // dataGridViewImageColumn2
@@ -128,46 +168,8 @@
             this.dataGridViewImageColumn2.Name = "dataGridViewImageColumn2";
             this.dataGridViewImageColumn2.ReadOnly = true;
             this.dataGridViewImageColumn2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewImageColumn2.ToolTipText = "Delete Item";
             this.dataGridViewImageColumn2.Width = 24;
-            // 
-            // AddressName
-            // 
-            this.AddressName.FillWeight = 150F;
-            this.AddressName.HeaderText = "Name";
-            this.AddressName.MaxInputLength = 32;
-            this.AddressName.Name = "AddressName";
-            this.AddressName.ReadOnly = true;
-            this.AddressName.Width = 120;
-            // 
-            // Address
-            // 
-            this.Address.FillWeight = 80F;
-            this.Address.HeaderText = "Address";
-            this.Address.MaxInputLength = 6;
-            this.Address.Name = "Address";
-            this.Address.ReadOnly = true;
-            this.Address.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Address.Width = 80;
-            // 
-            // Val8bit
-            // 
-            this.Val8bit.FillWeight = 40F;
-            this.Val8bit.HeaderText = "8-Bits";
-            this.Val8bit.MaxInputLength = 2;
-            this.Val8bit.Name = "Val8bit";
-            this.Val8bit.ReadOnly = true;
-            this.Val8bit.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Val8bit.Width = 40;
-            // 
-            // Val16bit
-            // 
-            this.Val16bit.FillWeight = 60F;
-            this.Val16bit.HeaderText = "16-Bits";
-            this.Val16bit.MaxInputLength = 4;
-            this.Val16bit.Name = "Val16bit";
-            this.Val16bit.ReadOnly = true;
-            this.Val16bit.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Val16bit.Width = 60;
             // 
             // ColMemory
             // 
@@ -207,7 +209,7 @@
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(367, 489);
             this.Name = "WatchForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Watch List";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WatchForm_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.WatchForm_KeyDown);

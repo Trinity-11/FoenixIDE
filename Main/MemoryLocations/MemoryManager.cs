@@ -289,5 +289,23 @@ namespace FoenixIDE.MemoryLocations
             if (Length >= 3)
                 device.WriteByte(deviceAddress + 2, (byte)(Value >> 16 & 0xff));
         }
+
+        public void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length)
+        {
+            GetDeviceAt(destAddress, out IMappable device, out int deviceAddress);
+            if (device != null)
+            {
+                device.CopyBuffer(src, srcAddress, deviceAddress, length);
+            }
+        }
+
+        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer)
+        {
+            GetDeviceAt(srcAddress, out IMappable device, out int deviceAddress);
+            if (device != null)
+            {
+                device.CopyIntoBuffer(deviceAddress, srcLength, buffer);
+            }
+        }
     }
 }

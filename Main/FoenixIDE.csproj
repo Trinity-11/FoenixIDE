@@ -16,6 +16,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -127,6 +128,12 @@
     <Compile Include="UI\AccumulatorControl.Designer.cs">
       <DependentUpon>AccumulatorControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\AssetWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\AssetWindow.Designer.cs">
+      <DependentUpon>AssetWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\CharEditor\CharEditorWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,11 +209,11 @@
       <DependentUpon>RegisterDisplay.cs</DependentUpon>
     </Compile>
     <Compile Include="SystemLog.cs" />
-    <Compile Include="UI\BitmapLoader.cs">
+    <Compile Include="UI\AssetLoader.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\BitmapLoader.Designer.cs">
-      <DependentUpon>BitmapLoader.cs</DependentUpon>
+    <Compile Include="UI\AssetLoader.Designer.cs">
+      <DependentUpon>AssetLoader.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\SerialTerminal.cs">
       <SubType>Form</SubType>
@@ -243,6 +250,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\AccumulatorControl.resx">
       <DependentUpon>AccumulatorControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\AssetWindow.resx">
+      <DependentUpon>AssetWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\CharEditor\CharEditorWindow.resx">
       <DependentUpon>CharEditorWindow.cs</DependentUpon>
@@ -284,8 +294,8 @@
     <EmbeddedResource Include="UI\RegisterDisplay.resx">
       <DependentUpon>RegisterDisplay.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\BitmapLoader.resx">
-      <DependentUpon>BitmapLoader.cs</DependentUpon>
+    <EmbeddedResource Include="UI\AssetLoader.resx">
+      <DependentUpon>AssetLoader.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SDCardWindow.resx">
       <DependentUpon>SDCardWindow.cs</DependentUpon>
@@ -335,6 +345,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <None Include="Resources\save_btn.bmp" />
     <None Include="Resources\kernel_U_Plus.hex" />
     <None Include="UI\Images\memory-btn.png" />
     <None Include="UI\Images\delete-btn.png" />

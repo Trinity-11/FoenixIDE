@@ -32,6 +32,7 @@ namespace FoenixIDE.UI
         public MemoryWindow memoryWindow;
         public UploaderWindow uploaderWindow;
         private WatchForm watchWindow = new WatchForm();
+        private AssetWindow assetWindow = new AssetWindow();
         private SDCardWindow sdCardWindow = new SDCardWindow();
         private TileEditor tileEditor;
         private CharEditorWindow charEditor;
@@ -42,7 +43,6 @@ namespace FoenixIDE.UI
         // Local variables and events
         private byte previousGraphicMode;
         private delegate void TileClickEvent(Point tile);
-        public delegate void TileLoadedEvent(int layer);
         private TileClickEvent TileClicked;
         private ResourceChecker ResChecker = new ResourceChecker();
         private delegate void TransmitByteFunction(byte Value);
@@ -157,11 +157,10 @@ namespace FoenixIDE.UI
             kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
             kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
             kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
-
-            int left = this.Left + (this.Width - watchWindow.Width) / 2;
-            int top = this.Top + (this.Height - watchWindow.Height) / 2;
-            watchWindow.Location = new Point(left, top);
+            kernel.ResCheckerRef = ResChecker;
+            
             watchWindow.SetKernel(kernel);
+            assetWindow.SetKernel(kernel);
 
             DisplayBoardVersion();
             EnableMenuItems();
@@ -172,6 +171,13 @@ namespace FoenixIDE.UI
                 debugWindow.RunButton_Click(null, null);
             }
             autorunEmulatorToolStripMenuItem.Checked = autoRun;
+        }
+
+        private void CenterForm(Form form)
+        {
+            int left = this.Left + (this.Width - form.Width) / 2;
+            int top = this.Top + (this.Height - form.Height) / 2;
+            form.Location = new Point(left, top);
         }
 
         private void LoadHexFile(string Filename)
@@ -267,6 +273,7 @@ namespace FoenixIDE.UI
         {
             if (!watchWindow.Visible)
             {
+                CenterForm(watchWindow);
                 watchWindow.Show();
             }
             else
@@ -279,15 +286,23 @@ namespace FoenixIDE.UI
          * Loading image into memory requires the user to specify what kind of image (tile, bitmap, sprite).
          * What address location in video RAM.
          */
-        private void LoadImageToolStripMenuItem_Click(object sender, EventArgs e)
+        public void LoadImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BitmapLoader loader = new BitmapLoader
+            AssetLoader loader = new AssetLoader
             {
                 StartPosition = FormStartPosition.CenterParent,
-                Memory = kernel.CPU.MemMgr,
+                MemMgrRef = kernel.CPU.MemMgr,
                 ResChecker = ResChecker
             };
-            loader.ShowDialog(this);
+            IWin32Window parent = this;
+            if (!(sender is ToolStripMenuItem))
+            {
+                parent = (IWin32Window)sender;
+            }
+            if (loader.ShowDialog(parent) == DialogResult.OK)
+            {
+                AssetWindow.Instance.UpdateAssets();
+            }
         }
 
         DateTime pSof;
@@ -606,7 +621,7 @@ namespace FoenixIDE.UI
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 // TODO - this code is so coupled - we need to set the version in the XML file too.
-                kernel.Resources = ResChecker;
+                kernel.ResCheckerRef = ResChecker;
                 if (kernel.ResetCPU(dialog.FileName))
                 {
                     gpu.Refresh();
@@ -615,6 +630,7 @@ namespace FoenixIDE.UI
                     ShowDebugWindow();
                     ShowMemoryWindow();
                     EnableMenuItems();
+                    assetWindow.UpdateAssets();
                 }
             }
         }
@@ -690,6 +706,7 @@ namespace FoenixIDE.UI
             kernel.MemMgr.VICKY.WriteByte(0, previousGraphicMode);
             tileEditor.Dispose();
             tileEditor = null;
+            TileClicked = null;
         }
         
         private void TileEditorToolStripMenuItem_Click(object sender, EventArgs e)
@@ -698,12 +715,14 @@ namespace FoenixIDE.UI
             {
                 tileEditor = new TileEditor();
                 tileEditor.SetMemory(kernel.MemMgr);
+                tileEditor.SetResourceChecker(kernel.ResCheckerRef);
                 gpu.TileEditorMode = true;
                 // Set Vicky into Tile mode
                 previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0);
                 kernel.MemMgr.VICKY.WriteByte(0, 0x10);
                 // Enable borders
                 kernel.MemMgr.VICKY.WriteByte(4, 1);
+                CenterForm(tileEditor);
                 tileEditor.Show();
                 tileEditor.FormClosed += new FormClosedEventHandler(EditorWindowClosed);
 
@@ -1100,7 +1119,7 @@ namespace FoenixIDE.UI
                 string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
                 
                 byte[] buffer = new byte[DataLength];
-                temporaryRAM.CopyIntoBuffer(DataStartAddress, buffer, 0, DataLength);
+                temporaryRAM.CopyIntoBuffer(DataStartAddress, DataLength, buffer);
                 using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
                 {
                     // 8 byte header
@@ -1237,6 +1256,19 @@ namespace FoenixIDE.UI
         {
             Simulator.Properties.Settings.Default.Autorun = autorunEmulatorToolStripMenuItem.Checked;
             Simulator.Properties.Settings.Default.Save();
+        }
+
+        private void assetListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!assetWindow.Visible)
+            {
+                CenterForm(assetWindow);
+                assetWindow.Show();
+            }
+            else
+            {
+                assetWindow.BringToFront();
+            }
         }
     }
 }

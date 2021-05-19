@@ -607,7 +607,7 @@ namespace FoenixIDE.Display
             int* ptr = p + pixelOffset;
             //int col = borderXSize;
             byte pixVal = 0;
-            VRAM.CopyIntoBuffer(offsetAddress, pixVals, 0, width);
+            VRAM.CopyIntoBuffer(offsetAddress, width, pixVals);
 
             //while (col < width - borderXSize)
             for (int col = borderXSize; col < width - borderXSize; col++)
@@ -617,8 +617,8 @@ namespace FoenixIDE.Display
                 if (pixVal != 0)
                 {
                     colorVal = GetLUTValue(lutIndex, pixVal, gammaCorrection);
+                    ptr[col] = colorVal;
                 }
-                ptr[col] = colorVal;
             }
         }
 
@@ -655,7 +655,7 @@ namespace FoenixIDE.Display
             int tilemapItemCount = width / TILE_SIZE + 1;
             byte[] tiles = new byte[tilemapItemCount * 2];
             int[] tilesetOffsets = new int[tilemapItemCount];
-            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / TILE_SIZE) * 2 + (tileRow + 0) * tilemapWidth * 2, tiles, 0, tilemapItemCount * 2);
+            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / TILE_SIZE) * 2 + (tileRow + 0) * tilemapWidth * 2, tilemapItemCount * 2, tiles);
 
             // cache of tilesetPointers
             int[] tilesetPointers = new int[8];

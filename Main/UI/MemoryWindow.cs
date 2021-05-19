@@ -469,13 +469,20 @@ namespace FoenixIDE.UI
                 if (HighlightPanel.Text != "")
                 {
                     // The result may be a hexadecimal value
-                    byte intResult = Convert.ToByte(HighlightPanel.Text, 16);
-                    // Check that the value was changed
-                    if (intResult != mem.Y)
+                    try
                     {
-                        Memory.WriteByte(mem.X, intResult);
-                        //HighlightPanel.Text = intResult.ToString("X2");
-                        RefreshMemoryView();
+                        byte intResult = Convert.ToByte(HighlightPanel.Text, 16);
+                        // Check that the value was changed
+                        if (intResult != mem.Y)
+                        {
+                            Memory.WriteByte(mem.X, intResult);
+                            //HighlightPanel.Text = intResult.ToString("X2");
+                            RefreshMemoryView();
+                        }
+                    }
+                    catch
+                    {
+
                     }
                 }
             }
@@ -496,7 +503,7 @@ namespace FoenixIDE.UI
                 FileStream outputFile = File.Create(SaveDialog.FileName);
                 MemoryRAM ram = (MemoryRAM)Memory;
                 byte[] buffer = new byte[ram.Length];
-                ram.CopyIntoBuffer(0, buffer, 0, ram.Length);
+                ram.CopyIntoBuffer(0, ram.Length, buffer);
                 outputFile.Write(buffer, 0, buffer.Length);
                 outputFile.Flush();
                 outputFile.Close();

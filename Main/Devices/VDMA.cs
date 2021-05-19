@@ -123,7 +123,7 @@ namespace FoenixIDE.Simulator.Devices
                     {
                         int size1DTransfer = isSystemSource ? ReadLong(0x28) : ReadLong(0x8); // Address $AF:0408 - maximum 4MB
                         buffer = new byte[size1DTransfer];
-                        srcMemory.CopyIntoBuffer(srcAddr, buffer, 0, size1DTransfer);
+                        srcMemory.CopyIntoBuffer(srcAddr, size1DTransfer, buffer);
                     }
                     else
                     {

@@ -20,5 +20,9 @@ namespace FoenixIDE.MemoryLocations
         int StartAddress { get; }
         int Length { get; }
         int EndAddress { get; }
+
+        void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length);
+        void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer);
+
     }
 }

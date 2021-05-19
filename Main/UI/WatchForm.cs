@@ -77,21 +77,24 @@ namespace FoenixIDE.UI
         private void WatchGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             // Get the address for the RowIndex
-            KeyValuePair<int, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
-            switch (e.ColumnIndex)
+            if (e.RowIndex > -1)
             {
-                // Browse this page in the Memory Window
-                case 4:
-                    MemoryWindow.Instance.GotoAddress(kvp.Key & 0xFFFF00);
-                    break;
-                // Delete the row, but copy the values into our input boxes
-                case 5:
-                    
-                    NameText.Text = kvp.Value.name;
-                    AddressText.Text = "$" + kvp.Value.address.ToString("X6");
-                    kernel_ref.WatchList.Remove(kvp.Key);
-                    WatchGrid.RowCount -= 1;
-                    break;
+                KeyValuePair<int, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
+                switch (e.ColumnIndex)
+                {
+                    // Browse this page in the Memory Window
+                    case 4:
+                        MemoryWindow.Instance.GotoAddress(kvp.Key & 0xFFFF00);
+                        break;
+                    // Delete the row, but copy the values into our input boxes
+                    case 5:
+
+                        NameText.Text = kvp.Value.name;
+                        AddressText.Text = "$" + kvp.Value.address.ToString("X6");
+                        kernel_ref.WatchList.Remove(kvp.Key);
+                        WatchGrid.RowCount -= 1;
+                        break;
+                }
             }
         }
 

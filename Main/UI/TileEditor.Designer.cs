@@ -150,7 +150,7 @@
             this.TileSelectedLabel.Location = new System.Drawing.Point(185, 170);
             this.TileSelectedLabel.Name = "TileSelectedLabel";
             this.TileSelectedLabel.Size = new System.Drawing.Size(81, 13);
-            this.TileSelectedLabel.TabIndex = 5;
+            this.TileSelectedLabel.TabIndex = 4;
             this.TileSelectedLabel.Text = "Tile Selected: $";
             // 
             // label1
@@ -159,7 +159,7 @@
             this.label1.Location = new System.Drawing.Point(1, 168);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 13);
-            this.label1.TabIndex = 12;
+            this.label1.TabIndex = 2;
             this.label1.Text = "Tileset:";
             // 
             // TilemapGroup
@@ -180,7 +180,7 @@
             this.TilemapGroup.Location = new System.Drawing.Point(5, 30);
             this.TilemapGroup.Name = "TilemapGroup";
             this.TilemapGroup.Size = new System.Drawing.Size(353, 133);
-            this.TilemapGroup.TabIndex = 17;
+            this.TilemapGroup.TabIndex = 1;
             this.TilemapGroup.TabStop = false;
             this.TilemapGroup.Text = "Tilemap Properties";
             // 
@@ -190,7 +190,7 @@
             this.WindowY.MaxLength = 4;
             this.WindowY.Name = "WindowY";
             this.WindowY.Size = new System.Drawing.Size(38, 20);
-            this.WindowY.TabIndex = 27;
+            this.WindowY.TabIndex = 10;
             this.WindowY.Text = "1023";
             this.WindowY.TextChanged += new System.EventHandler(this.WindowY_TextChanged);
             // 
@@ -200,7 +200,7 @@
             this.WindowX.MaxLength = 4;
             this.WindowX.Name = "WindowX";
             this.WindowX.Size = new System.Drawing.Size(38, 20);
-            this.WindowX.TabIndex = 26;
+            this.WindowX.TabIndex = 8;
             this.WindowX.Text = "1023";
             this.WindowX.TextChanged += new System.EventHandler(this.WindowX_TextChanged);
             // 
@@ -211,7 +211,7 @@
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(59, 13);
-            this.label2.TabIndex = 29;
+            this.label2.TabIndex = 9;
             this.label2.Text = "Window Y:";
             // 
             // label3
@@ -221,7 +221,7 @@
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(59, 13);
-            this.label3.TabIndex = 28;
+            this.label3.TabIndex = 7;
             this.label3.Text = "Window X:";
             // 
             // SaveTilesetButton
@@ -229,7 +229,7 @@
             this.SaveTilesetButton.Location = new System.Drawing.Point(199, 101);
             this.SaveTilesetButton.Name = "SaveTilesetButton";
             this.SaveTilesetButton.Size = new System.Drawing.Size(86, 23);
-            this.SaveTilesetButton.TabIndex = 25;
+            this.SaveTilesetButton.TabIndex = 12;
             this.SaveTilesetButton.Text = "Save Tileset";
             this.SaveTilesetButton.UseVisualStyleBackColor = true;
             this.SaveTilesetButton.Click += new System.EventHandler(this.SaveTilemapButton_Click);
@@ -239,7 +239,7 @@
             this.ClearTilemapButton.Location = new System.Drawing.Point(109, 101);
             this.ClearTilemapButton.Name = "ClearTilemapButton";
             this.ClearTilemapButton.Size = new System.Drawing.Size(86, 23);
-            this.ClearTilemapButton.TabIndex = 24;
+            this.ClearTilemapButton.TabIndex = 11;
             this.ClearTilemapButton.Text = "Clear Tileset";
             this.ClearTilemapButton.UseVisualStyleBackColor = true;
             this.ClearTilemapButton.Click += new System.EventHandler(this.ClearTilemapButton_Click);
@@ -250,7 +250,7 @@
             this.Height.MaxLength = 4;
             this.Height.Name = "Height";
             this.Height.Size = new System.Drawing.Size(38, 20);
-            this.Height.TabIndex = 21;
+            this.Height.TabIndex = 6;
             this.Height.Text = "1023";
             this.Height.TextChanged += new System.EventHandler(this.Height_TextChanged);
             // 
@@ -260,7 +260,7 @@
             this.Width.MaxLength = 4;
             this.Width.Name = "Width";
             this.Width.Size = new System.Drawing.Size(38, 20);
-            this.Width.TabIndex = 19;
+            this.Width.TabIndex = 4;
             this.Width.Text = "1023";
             this.Width.TextChanged += new System.EventHandler(this.Width_TextChanged);
             // 
@@ -271,7 +271,7 @@
             this.YLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.YLabel.Name = "YLabel";
             this.YLabel.Size = new System.Drawing.Size(41, 13);
-            this.YLabel.TabIndex = 23;
+            this.YLabel.TabIndex = 5;
             this.YLabel.Text = "Height:";
             // 
             // XLabel
@@ -281,7 +281,7 @@
             this.XLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.XLabel.Name = "XLabel";
             this.XLabel.Size = new System.Drawing.Size(38, 13);
-            this.XLabel.TabIndex = 22;
+            this.XLabel.TabIndex = 3;
             this.XLabel.Text = "Width:";
             // 
             // TilemapAddress
@@ -290,7 +290,7 @@
             this.TilemapAddress.MaxLength = 6;
             this.TilemapAddress.Name = "TilemapAddress";
             this.TilemapAddress.Size = new System.Drawing.Size(88, 20);
-            this.TilemapAddress.TabIndex = 20;
+            this.TilemapAddress.TabIndex = 2;
             this.TilemapAddress.TextChanged += new System.EventHandler(this.TilemapAddress_TextChanged);
             // 
             // TilesetAddressLabel
@@ -299,7 +299,7 @@
             this.TilesetAddressLabel.Location = new System.Drawing.Point(154, 20);
             this.TilesetAddressLabel.Name = "TilesetAddressLabel";
             this.TilesetAddressLabel.Size = new System.Drawing.Size(97, 13);
-            this.TilesetAddressLabel.TabIndex = 18;
+            this.TilesetAddressLabel.TabIndex = 1;
             this.TilesetAddressLabel.Text = "Tilemap Address: $";
             // 
             // TilemapEnabledCheckbox
@@ -308,7 +308,7 @@
             this.TilemapEnabledCheckbox.Location = new System.Drawing.Point(14, 19);
             this.TilemapEnabledCheckbox.Name = "TilemapEnabledCheckbox";
             this.TilemapEnabledCheckbox.Size = new System.Drawing.Size(105, 17);
-            this.TilemapEnabledCheckbox.TabIndex = 17;
+            this.TilemapEnabledCheckbox.TabIndex = 0;
             this.TilemapEnabledCheckbox.Text = "Tilemap Enabled";
             this.TilemapEnabledCheckbox.UseVisualStyleBackColor = true;
             this.TilemapEnabledCheckbox.CheckedChanged += new System.EventHandler(this.TilemapEnabledCheckbox_CheckedChanged);
@@ -325,7 +325,7 @@
             this.TilesetList.Location = new System.Drawing.Point(48, 165);
             this.TilesetList.Name = "TilesetList";
             this.TilesetList.Size = new System.Drawing.Size(121, 21);
-            this.TilesetList.TabIndex = 18;
+            this.TilesetList.TabIndex = 3;
             this.TilesetList.SelectedIndexChanged += new System.EventHandler(this.TilesetList_SelectedIndexChanged);
             // 
             // TilesetGroup
@@ -337,7 +337,7 @@
             this.TilesetGroup.Location = new System.Drawing.Point(5, 192);
             this.TilesetGroup.Name = "TilesetGroup";
             this.TilesetGroup.Size = new System.Drawing.Size(353, 48);
-            this.TilesetGroup.TabIndex = 19;
+            this.TilesetGroup.TabIndex = 5;
             this.TilesetGroup.TabStop = false;
             this.TilesetGroup.Text = "Tileset Properties";
             // 
@@ -347,7 +347,7 @@
             this.Stride256Checkbox.Location = new System.Drawing.Point(273, 19);
             this.Stride256Checkbox.Name = "Stride256Checkbox";
             this.Stride256Checkbox.Size = new System.Drawing.Size(74, 17);
-            this.Stride256Checkbox.TabIndex = 24;
+            this.Stride256Checkbox.TabIndex = 3;
             this.Stride256Checkbox.Text = "Stride 256";
             this.Stride256Checkbox.UseVisualStyleBackColor = true;
             this.Stride256Checkbox.CheckedChanged += new System.EventHandler(this.LutList_SelectedIndexChanged);
@@ -364,7 +364,7 @@
             this.LutList.Location = new System.Drawing.Point(203, 17);
             this.LutList.Name = "LutList";
             this.LutList.Size = new System.Drawing.Size(62, 21);
-            this.LutList.TabIndex = 23;
+            this.LutList.TabIndex = 2;
             this.LutList.SelectedIndexChanged += new System.EventHandler(this.LutList_SelectedIndexChanged);
             // 
             // TilesetAddress
@@ -373,7 +373,7 @@
             this.TilesetAddress.MaxLength = 6;
             this.TilesetAddress.Name = "TilesetAddress";
             this.TilesetAddress.Size = new System.Drawing.Size(88, 20);
-            this.TilesetAddress.TabIndex = 22;
+            this.TilesetAddress.TabIndex = 1;
             this.TilesetAddress.TextChanged += new System.EventHandler(this.TilesetAddress_TextChanged);
             // 
             // label4
@@ -382,7 +382,7 @@
             this.label4.Location = new System.Drawing.Point(6, 20);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(91, 13);
-            this.label4.TabIndex = 21;
+            this.label4.TabIndex = 0;
             this.label4.Text = "Tileset Address: $";
             // 
             // TileEditor
@@ -403,6 +403,7 @@
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "TileEditor";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Tile Editor";
             this.Load += new System.EventHandler(this.TileEditor_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TileEditor_KeyDown);

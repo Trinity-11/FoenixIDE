@@ -1,6 +1,6 @@
 ﻿namespace FoenixIDE.UI
 {
-    partial class BitmapLoader
+    partial class AssetLoader
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BitmapLoader));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AssetLoader));
             this.BrowseFileButton = new System.Windows.Forms.Button();
             this.FileNameTextBox = new System.Windows.Forms.TextBox();
             this.FileSizeLabel = new System.Windows.Forms.Label();
@@ -41,6 +41,8 @@
             this.FileTypesCombo = new System.Windows.Forms.ComboBox();
             this.LabelLUT = new System.Windows.Forms.Label();
             this.LUTCombo = new System.Windows.Forms.ComboBox();
+            this.ExtensionLabel = new System.Windows.Forms.Label();
+            this.ExtLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // BrowseFileButton
@@ -171,11 +173,34 @@
             this.LUTCombo.Size = new System.Drawing.Size(117, 21);
             this.LUTCombo.TabIndex = 17;
             // 
-            // BitmapLoader
+            // ExtensionLabel
+            // 
+            this.ExtensionLabel.AutoSize = true;
+            this.ExtensionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ExtensionLabel.Location = new System.Drawing.Point(15, 93);
+            this.ExtensionLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.ExtensionLabel.Name = "ExtensionLabel";
+            this.ExtensionLabel.Size = new System.Drawing.Size(66, 13);
+            this.ExtensionLabel.TabIndex = 18;
+            this.ExtensionLabel.Text = "Extension:";
+            // 
+            // ExtLabel
+            // 
+            this.ExtLabel.AutoSize = true;
+            this.ExtLabel.Location = new System.Drawing.Point(131, 93);
+            this.ExtLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.ExtLabel.Name = "ExtLabel";
+            this.ExtLabel.Size = new System.Drawing.Size(29, 13);
+            this.ExtLabel.TabIndex = 19;
+            this.ExtLabel.Text = "Raw";
+            // 
+            // AssetLoader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(476, 145);
+            this.Controls.Add(this.ExtLabel);
+            this.Controls.Add(this.ExtensionLabel);
             this.Controls.Add(this.LUTCombo);
             this.Controls.Add(this.LabelLUT);
             this.Controls.Add(this.FileTypesCombo);
@@ -188,14 +213,16 @@
             this.Controls.Add(this.FileNameTextBox);
             this.Controls.Add(this.BrowseFileButton);
             this.Controls.Add(this.DollarSignLabel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "BitmapLoader";
-            this.Text = "Bitmap/Bin Loader Window";
-            this.Load += new System.EventHandler(this.BitmapLoader_Load);
+            this.Name = "AssetLoader";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Asset Loader";
+            this.Load += new System.EventHandler(this.AssetLoader_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BitmapLoader_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -215,5 +242,7 @@
         private System.Windows.Forms.ComboBox FileTypesCombo;
         private System.Windows.Forms.Label LabelLUT;
         private System.Windows.Forms.ComboBox LUTCombo;
+        private System.Windows.Forms.Label ExtensionLabel;
+        private System.Windows.Forms.Label ExtLabel;
     }
 }

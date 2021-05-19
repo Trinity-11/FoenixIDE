@@ -112,15 +112,15 @@ namespace FoenixIDE.MemoryLocations
             System.Array.Copy(data, SourceAddress, data, DestAddress, Length);
         }
 
-        // Copy data from a buffer to RAM
-        internal void CopyBuffer(byte[] buffer, int SourceAddress, int DestAddress, int Length)
+        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer)
         {
-            System.Array.Copy(buffer, SourceAddress, data, DestAddress, Length);
+            System.Array.Copy(data, srcAddress, buffer, 0, srcLength);
         }
 
-        internal void CopyIntoBuffer(int SourceAddress, byte[] buffer, int DestAddress, int Length)
+        // Copy data from a buffer to RAM
+        public void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length)
         {
-            System.Array.Copy(data, SourceAddress, buffer, DestAddress, Length);
+            System.Array.Copy(src, srcAddress, data, destAddress, length);
         }
     }
 }

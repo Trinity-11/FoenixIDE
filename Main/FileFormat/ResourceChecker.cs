@@ -8,13 +8,22 @@ namespace FoenixIDE.Simulator.FileFormat
 {
     public class ResourceChecker
     {
+        public enum ResourceType
+        {
+            raw,
+            bitmap,
+            tileset,
+            tilemap,
+            sprite,
+            lut
+        }
         public class Resource
         {
             public int StartAddress = 0;
             public int Length = 0;
             public string Name;
             public string SourceFile;
-            public int FileType = 0; // 0 = Raw, 1-5 = tilemap, 6-13 = tileset, 14-77 = sprite
+            public ResourceType FileType = ResourceType.raw;
         }
 
         List<Resource> resources = new List<Resource>();
@@ -52,6 +61,18 @@ namespace FoenixIDE.Simulator.FileFormat
             {
                 return resources;
             }
+        }
+
+        public Resource Find(ResourceType resType, int startAddress)
+        {
+            foreach (Resource res in Items)
+            {
+                if (res.FileType == resType && res.StartAddress == startAddress)
+                {
+                    return res;
+                }
+            }
+            return null;
         }
     }
 }
