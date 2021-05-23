@@ -125,7 +125,7 @@
             this.GenerateASMButton.TabIndex = 0;
             this.GenerateASMButton.Text = "Generate ASM";
             this.GenerateASMButton.UseVisualStyleBackColor = true;
-            this.GenerateASMButton.Click += new System.EventHandler(this.GenerateASMButton_Click);
+            this.GenerateASMButton.Click += new System.EventHandler(this.GenerateASMButton_ClickAsync);
             // 
             // GameGeneratorForm
             // 

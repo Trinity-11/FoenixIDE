@@ -1,0 +1,69 @@
+;Kernel_INC.asm
+;Kernel ROM jump table
+
+BOOT             = $001000 ; Cold boot routine
+RESTORE          = $001004 ; Warm boot routine
+BREAK            = $001008 ; End program and return to command prompt
+READY            = $00100C ; Print prompt and wait for keyboard input
+SCINIT           = $001010 ;
+IOINIT           = $001014 ;
+PUTC             = $001018 ; Print a character to the currently selected channel
+PUTS             = $00101C ; Print a string to the currently selected channel
+PUTB             = $001020 ; Output a byte to the currently selected channel
+PUTBLOCK         = $001024 ; Ouput a binary block to the currently selected channel
+SETLFS           = $001028 ; Obsolete (done in OPEN)
+SETNAM           = $00102C ; Obsolete (done in OPEN)
+OPEN             = $001030 ; Open a channel for reading and/or writing. Use SETLFS and SETNAM to set the channels and filename first.
+CLOSE            = $001034 ; Close a channel
+SETIN            = $001038 ; Set the current input channel
+SETOUT           = $00103C ; Set the current output channel
+GETB             = $001040 ; Get a byte from input channel. Return 0 if no input. Carry is set if no input.
+GETBLOCK         = $001044 ; Get a X byes from input channel. If Carry is set, wait. If Carry is clear, do not wait.
+GETCH            = $001048 ; Get a character from the input channel. A=0 and Carry=1 if no data is wating
+GETCHW           = $00104C ; Get a character from the input channel. Waits until data received. A=0 and Carry=1 if no data is wating
+GETCHE           = $001050 ; Get a character from the input channel and echo to the screen. Wait if data is not ready.
+GETS             = $001054 ; Get a string from the input channel. NULL terminates
+GETLINE          = $001058 ; Get a line of text from input channel. CR or NULL terminates.
+GETFIELD         = $00105C ; Get a field from the input channel. Value in A, CR, or NULL terminates
+TRIM             = $001060 ; Removes spaces at beginning and end of string.
+PRINTC           = $001064 ; Print character to screen. Handles terminal commands
+PRINTS           = $001068 ; Print string to screen. Handles terminal commands
+PRINTCR          = $00106C ; Print Carriage Return
+PRINTF           = $001070 ; Print a float value
+PRINTI           = $001074 ; Prints integer value in TEMP
+PRINTH           = $001078 ; Print Hex value in DP variable
+PRINTAI          = $00107C ; Prints integer value in A
+PRINTAH          = $001080 ; Prints hex value in A. Printed value is 2 wide if M flag is 1, 4 wide if M=0
+LOCATE           = $001084 ;
+PUSHKEY          = $001088 ;
+PUSHKEYS         = $00108C ;
+CSRRIGHT         = $001090 ;
+CSRLEFT          = $001094 ;
+CSRUP            = $001098 ;
+CSRDOWN          = $00109C ;
+CSRHOME          = $0010A0 ;
+SCROLLUP         = $0010A4 ; Scroll the screen up one line. Creates an empty line at the bottom.
+; Undefined label for: SCRGETWORD       = %ADDR% ; Read a current word on the screen. A word ends with a space, punctuation (except _), or any control character (value < 32). Loads the address into CMPTEXT_VAL and length into CMPTEXT_LEN variables.
+CLRSCREEN        = $0010A8 ; Clear the screen
+INITCHLUT        = $0010AC ; Init character look-up table
+INITSUPERIO      = $0010B0 ; Init Super-IO chip
+INITKEYBOARD     = $0010B4 ; Init keyboard
+; Undefined label for: INITRTC          = %ADDR% ; Init Real-Time Clock
+INITCURSOR       = $0010BC ; Init the Cursors registers
+INITFONTSET      = $0010C0 ; Init the Internal FONT Memory
+INITGAMMATABLE   = $0010C4 ; Init the RGB GAMMA Look Up Table
+INITALLLUT       = $0010C8 ; Init the Graphic Engine (Bitmap/Tile/Sprites) LUT
+INITVKYTXTMODE   = $0010CC ; Init the Text Mode @ Reset Time
+INITVKYGRPMODE   = $0010D0 ; Init the Basic Registers for the Graphic Mode
+F_OPEN           = $0010F0 ; open a file for reading/writing/creating
+F_CREATE         = $0010F4 ; create a new file
+F_CLOSE          = $0010F8 ; close a file (make sure last cluster is written)
+F_WRITE          = $0010FC ; write the current cluster to the file
+F_READ           = $001100 ; read the next cluster from the file
+F_DELETE         = $001104 ; delete a file / directory
+F_DIROPEN        = $001108 ; open a directory and seek the first directory entry
+F_DIRNEXT        = $00110C ; seek to the next directory of an open directory
+F_DIRREAD        = $001110 ; Read the directory entry for the specified file
+F_DIRWRITE       = $001114 ; Write any changes in the current directory cluster back to the drive
+F_LOAD           = $001118 ; load a binary file into memory, supports multiple file formats
+F_SAVE           = $00111C ; Save memory to a binary file
