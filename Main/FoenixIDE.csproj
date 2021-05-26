@@ -91,6 +91,7 @@
     <Compile Include="Devices\SDCard\CH376SResponse.cs" />
     <Compile Include="Devices\UART.cs" />
     <Compile Include="FileFormat\DebugLine.cs" />
+    <Compile Include="FileFormat\FoenixLexer.cs" />
     <Compile Include="FileFormat\FoenixmlFile.cs" />
     <Compile Include="FileFormat\HexFile.cs" />
     <Compile Include="Devices\CodecRAM.cs" />
@@ -326,6 +327,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\base_asm\asm.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\Bm437_PhoenixEGA_8x8.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -345,7 +349,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="Resources\base_asm\helper_functions.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\base_asm\interrupt_handler.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\vgm_player.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\GameGeneratorTemplates.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="roms\kernel.lst">

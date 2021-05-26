@@ -204,7 +204,7 @@ namespace FoenixIDE.Simulator.UI
             int width = Convert.ToInt32(Width.Text);
             int height = Convert.ToInt32(Height.Text);
             byte lut = (byte)LutList.SelectedIndex;
-            for (int i = 0; i < width * height * 2 + 1; i = i+ 2)
+            for (int i = 0; i < width * height * 2 + 1; i += 2)
             {
                 MemMgr.WriteByte(tilemapAddress + i, selectedTile);
                 MemMgr.WriteByte(tilemapAddress + i + 1, (byte)((lut << 3) + TilesetList.SelectedIndex));

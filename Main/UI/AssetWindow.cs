@@ -75,11 +75,13 @@ namespace FoenixIDE.UI
                 {
                     // Export the asset to file
                     case 4:
-                        SaveFileDialog saveDlg = new SaveFileDialog();
-                        saveDlg.Title = "Save Asset to File";
-                        saveDlg.Filter = "Raw File (*.bin)|*.bin|Palette File (*.pal)|*.pal |Tilemap File (*.tls)| *.tls";
                         FileInfo info = new FileInfo(res.Name);
-                        saveDlg.FileName = info.Name;
+                        SaveFileDialog saveDlg = new SaveFileDialog
+                        {
+                            Title = "Save Asset to File",
+                            Filter = "Raw File (*.bin)|*.bin|Palette File (*.pal)|*.pal |Tilemap File (*.tls)| *.tls",
+                            FileName = info.Name
+                        };
 
                         if (saveDlg.ShowDialog() == DialogResult.OK)
                         {

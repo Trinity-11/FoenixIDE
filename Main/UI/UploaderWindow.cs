@@ -500,7 +500,7 @@ namespace FoenixIDE.UI
                         for (int j = 0; j < Loop; j++)
                         {
                             PreparePacket2Write(buffer, offset, j * BufferSize, BufferSize);
-                            offset = offset + BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
+                            offset += BufferSize;   // Advance the Pointer to the next location where to write Data in the Foenix
                             UploadProgressBar.Increment(BufferSize);
                         }
                         BufferSize = (size % BufferSize);

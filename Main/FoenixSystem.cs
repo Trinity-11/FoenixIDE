@@ -93,6 +93,7 @@ namespace FoenixIDE
             
             MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
             MemMgr.VDMA.setSystemRam(MemMgr.RAM);
+            MemMgr.VDMA.setVickyRam(MemMgr.VICKY);
             MemMgr.GABE.WriteByte(MemoryMap.GABE_SYS_STAT - MemoryMap.GABE_START, SystemStat);
 
             // Load the kernel.hex if present

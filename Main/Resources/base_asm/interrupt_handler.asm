@@ -59,35 +59,35 @@ EXIT_IRQ_HANDLE
                 RTL
 SOF_INTERRUPT
                 .as
-.include "_sof_handler.asm"
+.include "../_sof_handler.asm"
                 RTS
 
 SOL_INTERRUPT
                 .as
-.include "_sol_handler.asm"
+.include "../_sol_handler.asm"
                 RTS
 
 TIMER0_INTERRUPT
                 .as
-.include "_timer0_handler.asm"
+.include "../_timer0_handler.asm"
                 RTS
 
 TIMER1_INTERRUPT
                 .as
-.include "_timer1_handler.asm"
+.include "../_timer1_handler.asm"
                 RTS
 
 TIMER2_INTERRUPT
                 .as
-.include "_timer2_handler.asm"
+.include "../_timer2_handler.asm"
                 RTS
 
 MOUSE_INTERRUPT
                 .as
-.include "_mouse_handler.asm"
+.include "../_mouse_handler.asm"
                 RTS
 
 KEYBOARD_INTERRUPT
                 .as
-.include "_keyboard_handler.asm"
+.include "../_keyboard_handler.asm"
                 RTS

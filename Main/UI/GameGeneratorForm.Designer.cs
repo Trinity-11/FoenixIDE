@@ -32,6 +32,8 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.CodeTextBox = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.cbSOF = new System.Windows.Forms.CheckBox();
+            this.cbTimer0 = new System.Windows.Forms.CheckBox();
             this.CloseButton = new System.Windows.Forms.Button();
             this.SaveButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
@@ -54,6 +56,8 @@
             // 
             // CodeTextBox
             // 
+            this.CodeTextBox.AcceptsReturn = true;
+            this.CodeTextBox.AcceptsTab = true;
             this.CodeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CodeTextBox.Location = new System.Drawing.Point(0, 0);
             this.CodeTextBox.Multiline = true;
@@ -61,11 +65,14 @@
             this.CodeTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.CodeTextBox.Size = new System.Drawing.Size(452, 531);
             this.CodeTextBox.TabIndex = 0;
+            this.CodeTextBox.WordWrap = false;
             // 
             // panel2
             // 
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Controls.Add(this.cbSOF);
+            this.panel2.Controls.Add(this.cbTimer0);
             this.panel2.Controls.Add(this.CloseButton);
             this.panel2.Controls.Add(this.SaveButton);
             this.panel2.Controls.Add(this.LoadButton);
@@ -75,6 +82,28 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(113, 531);
             this.panel2.TabIndex = 1;
+            // 
+            // cbSOF
+            // 
+            this.cbSOF.AutoSize = true;
+            this.cbSOF.Location = new System.Drawing.Point(8, 162);
+            this.cbSOF.Name = "cbSOF";
+            this.cbSOF.Size = new System.Drawing.Size(76, 21);
+            this.cbSOF.TabIndex = 6;
+            this.cbSOF.Text = "SOF IRQ";
+            this.cbSOF.UseVisualStyleBackColor = true;
+            this.cbSOF.CheckedChanged += new System.EventHandler(this.cbSOF_CheckedChanged);
+            // 
+            // cbTimer0
+            // 
+            this.cbTimer0.AutoSize = true;
+            this.cbTimer0.Location = new System.Drawing.Point(8, 185);
+            this.cbTimer0.Name = "cbTimer0";
+            this.cbTimer0.Size = new System.Drawing.Size(87, 21);
+            this.cbTimer0.TabIndex = 5;
+            this.cbTimer0.Text = "Timer0 IRQ";
+            this.cbTimer0.UseVisualStyleBackColor = true;
+            this.cbTimer0.CheckedChanged += new System.EventHandler(this.cbTimer0_Changed);
             // 
             // CloseButton
             // 
@@ -125,7 +154,7 @@
             this.GenerateASMButton.TabIndex = 0;
             this.GenerateASMButton.Text = "Generate ASM";
             this.GenerateASMButton.UseVisualStyleBackColor = true;
-            this.GenerateASMButton.Click += new System.EventHandler(this.GenerateASMButton_ClickAsync);
+            this.GenerateASMButton.Click += new System.EventHandler(this.GenerateASMButton_Click);
             // 
             // GameGeneratorForm
             // 
@@ -142,6 +171,7 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -156,6 +186,8 @@
         private System.Windows.Forms.Button LoadButton;
         private System.Windows.Forms.Button ViewAssetsButton;
         private System.Windows.Forms.Button GenerateASMButton;
+        private System.Windows.Forms.CheckBox cbTimer0;
+        private System.Windows.Forms.CheckBox cbSOF;
     }
 }
 
