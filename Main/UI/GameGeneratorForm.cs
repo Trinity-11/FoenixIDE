@@ -44,8 +44,16 @@ namespace FoenixIDE.UI
 
                 // Check which checkboxes to check
                 FoenixLexer fl = new FoenixLexer(CodeTextBox.Text);
-                cbTimer0.Checked = fl.GetSub("TIMER0_IRQ_HANDLER") != null;
                 cbSOF.Checked = fl.GetSub("SOF_IRQ_HANDLER") != null;
+                cbSOL.Checked = fl.GetSub("SOL_IRQ_HANDLER") != null;
+                cbTimer0.Checked = fl.GetSub("TIMER0_IRQ_HANDLER") != null;
+                cbTimer1.Checked = fl.GetSub("TIMER1_IRQ_HANDLER") != null;
+                cbTimer2.Checked = fl.GetSub("TIMER2_IRQ_HANDLER") != null;
+                cbMouse.Checked = fl.GetSub("MOUSE_IRQ_HANDLER") != null;
+
+                cbKeyboard.Checked = fl.GetSub("KEYBOARD_IRQ_HANDLER") != null; ;
+                cbCollision0.Checked = fl.GetSub("STS_COL_IRQ_HANDLER") != null;
+                cbCollision1.Checked = fl.GetSub("STT_COL_IRQ_HANDLER") != null;
             }
         }
 
@@ -147,7 +155,7 @@ namespace FoenixIDE.UI
                         case TokenType.ENABLE_IRQS:
                             tm.groups.Clear();
                             tm.groups.Add(BuildIrqReg0String(cbSOF.Checked, cbSOL.Checked, cbTimer0.Checked, cbTimer1.Checked, cbTimer2.Checked, false, false, cbMouse.Checked));
-                            tm.groups.Add("$0");
+                            tm.groups.Add(BuildIrqReg1String(cbKeyboard.Checked, cbCollision0.Checked, cbCollision1.Checked, false, false, false, false, false));
                             tm.groups.Add("$0");
                             tm.groups.Add("$0");
                             lines.AddRange(GetTemplate(tm));

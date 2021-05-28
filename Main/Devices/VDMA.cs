@@ -44,8 +44,13 @@ namespace FoenixIDE.Simulator.Devices
                 MemoryLocations.MemoryRAM destMemory = null;
                 int srcAddr = 0;
                 int destAddr = 0;
-                bool isSystemSource = (Address == 0 && (Value & 0x10) != 0) || (Address == 0x20 && (Value & 0x10) == 0);
-                bool isSystemDest = (Address == 0 && (Value & 0x20) != 0) || (Address == 0x20 && (Value & 0x20) == 0);
+                bool isSystemSource = (Address == 0 && (Value & 0x10) != 0) || (Address == 0x20);
+                bool isSystemDest = (Address == 0 && (Value & 0x20) != 0) || (Address == 0x20 && (Value & 0x10) == 0);
+                // RAM to VRAM is initiated by SDMA
+                if (isSystemSource && !isSystemDest && Address == 0)
+                {
+                    return;
+                }
                 bool isIODest = (Value & 0x30) != 0;
                 bool isFillTransfer = (Value & 4) != 0;
                 bool isSrcTransfer2D = false;
@@ -84,7 +89,7 @@ namespace FoenixIDE.Simulator.Devices
                     
                     if (destMemory == Vicky)
                     {
-                        destAddr -= 0xAF_0000;
+                        destAddr -= Vicky.StartAddress;
                     }
                     isDestTransfer2D = (ReadByte(0x20) & 2) != 0;
                 }

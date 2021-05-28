@@ -47,6 +47,8 @@ CHECK_PENDING_REG1
                 BEQ CHECK_PENDING_REG2   ; BEQ EXIT_IRQ_HANDLE
 ; Keyboard Interrupt
                 check_irq_bit INT_PENDING_REG1, FNX1_INT00_KBD, KEYBOARD_INTERRUPT
+                check_irq_bit INT_PENDING_REG1, FNX1_INT01_SC0, STS_COLLISION_INTERRUPT
+                check_irq_bit INT_PENDING_REG1, FNX1_INT02_SC1, STT_COLLISION_INTERRUPT
 
 ; Third Block of 8 Interrupts
 CHECK_PENDING_REG2
@@ -90,4 +92,14 @@ MOUSE_INTERRUPT
 KEYBOARD_INTERRUPT
                 .as
 .include "../_keyboard_handler.asm"
+                RTS
+
+STS_COLLISION_INTERRUPT
+                .as
+.include "../_collision0_handler.asm"
+                RTS
+
+STT_COLLISION_INTERRUPT
+                .as
+.include "../_collision1_handler.asm"
                 RTS
