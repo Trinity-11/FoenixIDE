@@ -69,7 +69,7 @@ namespace FoenixIDE.UI
 
         private void GenerateASMButton_Click(object sender, EventArgs e)
         {
-            // Parse the code
+            // parse the code and generate .asm file(s)
             FoenixLexer fl = new FoenixLexer(CodeTextBox.Text);
             GG_Validate(fl);
             FolderBrowserDialog saveDlg = new FolderBrowserDialog()
@@ -120,6 +120,7 @@ namespace FoenixIDE.UI
                     ".include \"includes/math_def.asm\"",
                     ".include \"includes/gabe_control_registers_def.asm\"",
                     ".include \"includes/base.asm\"",
+                    ".include \"includes/EXP_C200_EVID_def.asm\"",
                     "",
                     "* = $000500",
                     ".include \"includes/keyboard_def.asm\"",
@@ -145,7 +146,7 @@ namespace FoenixIDE.UI
                             break;
                         case TokenType.ENABLE_IRQS:
                             tm.groups.Clear();
-                            tm.groups.Add(BuildIrqString(cbSOF.Checked, false, cbTimer0.Checked, false, false, false, false, false));
+                            tm.groups.Add(BuildIrqReg0String(cbSOF.Checked, cbSOL.Checked, cbTimer0.Checked, cbTimer1.Checked, cbTimer2.Checked, false, false, cbMouse.Checked));
                             tm.groups.Add("$0");
                             tm.groups.Add("$0");
                             tm.groups.Add("$0");
@@ -159,7 +160,7 @@ namespace FoenixIDE.UI
 
                 foreach (Asset asset in fl.GetAssets())
                 {
-                    //lines.AddRange(GetTemplate(asset));
+                    lines.AddRange(GetTemplate(asset));
                 }
 
                 // Write the code
@@ -172,39 +173,61 @@ namespace FoenixIDE.UI
                 WriteInterruptHandler(folder + Path.DirectorySeparatorChar + "_timer2_handler.asm", fl, IrqType.TIMER2);
                 WriteInterruptHandler(folder + Path.DirectorySeparatorChar + "_mouse_handler.asm", fl, IrqType.MOUSE);
                 WriteInterruptHandler(folder + Path.DirectorySeparatorChar + "_keyboard_handler.asm", fl, IrqType.KEYBOARD);
+                WriteInterruptHandler(folder + Path.DirectorySeparatorChar + "_collision0_handler.asm", fl, IrqType.KEYBOARD);
+                WriteInterruptHandler(folder + Path.DirectorySeparatorChar + "_collision1_handler.asm", fl, IrqType.KEYBOARD);
             }
         }
 
-        private string BuildIrqString(bool irq0, bool irq1, bool irq2, bool irq3, bool irq4, bool irq5, bool irq6, bool irq7)
+        private string BuildIrqReg0String(bool irqSOF, bool irqSOL, bool irqTMR0, bool irqTMR1, bool irqTMR2, bool irqRTC, bool irqFDC, bool irqMOUSE)
         {
             List<string> irqs = new List<string>();
-            if (irq0)
+            if (irqSOF)
             {
                 irqs.Add("FNX0_INT00_SOF");
             }
-            if (irq1)
+            if (irqSOL)
             {
                 irqs.Add("FNX0_INT01_SOL");
             }
-            if (irq2)
+            if (irqTMR0)
             {
                 irqs.Add("FNX0_INT02_TMR0");
             }
-            if (irq3)
+            if (irqTMR1)
             {
                 irqs.Add("FNX0_INT03_TMR1");
             }
-            if (irq4)
+            if (irqTMR2)
             {
                 irqs.Add("FNX0_INT04_TMR2");
             }
-            if (irq7)
+            if (irqMOUSE)
             {
                 irqs.Add("FNX0_INT07_MOUSE");
             }
 
             return string.Join("|", irqs);
         }
+
+
+private string BuildIrqReg1String(bool irqKBD, bool irqSC0, bool irqSC1, bool irqCOM2, bool irqCOM1, bool irqMPU401, bool irqLPT, bool irqSDCARD)
+        {
+            List<string> irqs = new List<string>();
+            if (irqKBD)
+            {
+                irqs.Add("FNX1_INT00_KBD");
+            }
+            if (irqSC0)
+            {
+                irqs.Add("FNX1_INT01_SC0");
+            }
+            if (irqSC1)
+            {
+                irqs.Add("FNX1_INT02_SC1");
+            }
+            return string.Join("|", irqs);
+        }
+
         private void WriteInterruptHandler(string filename, FoenixLexer fl, IrqType irq)
         {
             List<TokenMatch> sub = fl.GetSub(irq.ToString() + "_IRQ_HANDLER");
@@ -302,33 +325,18 @@ namespace FoenixIDE.UI
                 templates.Add(templateName, lines);
             }
         }
-
-        private void cbTimer0_Changed(object sender, EventArgs e)
+        private void cbIRQ_CheckedChanged(object sender, EventArgs e)
         {
-            // if the SOF subroutine doesn't exist, add it.
-            if (cbTimer0.Checked)
+            // if the IRQ subroutine doesn't exist, add it.
+            CheckBox cb = (CheckBox)sender;
+            if (cb.Checked)
             {
+                string irq = cb.Text.Replace("IRQ", "").Trim().ToUpper();
                 FoenixLexer fl = new FoenixLexer(CodeTextBox.Text);
-                if (fl.GetSub("TIMER0_IRQ_HANDLER") == null)
+                if (fl.GetSub(irq + "_IRQ_HANDLER") == null)
                 {
                     CodeTextBox.Text += "\r\n" +
-                        "TIMER0_IRQ_HANDLER\r\n" +
-                        "{\r\n" +
-                        "}\r\n";
-                }
-            }
-        }
-
-        private void cbSOF_CheckedChanged(object sender, EventArgs e)
-        {
-            // if the SOF subroutine doesn't exist, add it.
-            if (cbSOF.Checked)
-            {
-                FoenixLexer fl = new FoenixLexer(CodeTextBox.Text);
-                if (fl.GetSub("SOF_IRQ_HANDLER") == null)
-                {
-                    CodeTextBox.Text += "\r\n" +
-                        "SOF_IRQ_HANDLER\r\n" +
+                        irq + "_IRQ_HANDLER\r\n" +
                         "{\r\n" +
                         "}\r\n";
                 }
