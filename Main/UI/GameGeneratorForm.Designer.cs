@@ -31,12 +31,23 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameGeneratorForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.CodeTextBox = new System.Windows.Forms.TextBox();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();          
+            this.cbSOF = new System.Windows.Forms.CheckBox();
+            this.cbSOL = new System.Windows.Forms.CheckBox();
+            this.cbTimer0 = new System.Windows.Forms.CheckBox();
+            this.cbTimer1 = new System.Windows.Forms.CheckBox();
+            this.cbTimer2 = new System.Windows.Forms.CheckBox();
+            this.cbMouse = new System.Windows.Forms.CheckBox();
+            this.cbKeyboard = new System.Windows.Forms.CheckBox();
+            this.cbCollision0 = new System.Windows.Forms.CheckBox();
+            this.cbCollision1 = new System.Windows.Forms.CheckBox();
+
             this.CloseButton = new System.Windows.Forms.Button();
             this.SaveButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
             this.ViewAssetsButton = new System.Windows.Forms.Button();
             this.GenerateASMButton = new System.Windows.Forms.Button();
+            
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -54,6 +65,8 @@
             // 
             // CodeTextBox
             // 
+            this.CodeTextBox.AcceptsReturn = true;
+            this.CodeTextBox.AcceptsTab = true;
             this.CodeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CodeTextBox.Location = new System.Drawing.Point(0, 0);
             this.CodeTextBox.Multiline = true;
@@ -61,11 +74,23 @@
             this.CodeTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.CodeTextBox.Size = new System.Drawing.Size(452, 531);
             this.CodeTextBox.TabIndex = 0;
+            this.CodeTextBox.WordWrap = false;
             // 
             // panel2
             // 
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Controls.Add(this.cbSOF);
+            this.panel2.Controls.Add(this.cbTimer0);
+            this.panel2.Controls.Add(this.cbCollision1);
+            this.panel2.Controls.Add(this.cbCollision0);
+            this.panel2.Controls.Add(this.cbKeyboard);
+            this.panel2.Controls.Add(this.cbMouse);
+            this.panel2.Controls.Add(this.cbTimer2);
+            this.panel2.Controls.Add(this.cbTimer1);
+            this.panel2.Controls.Add(this.cbSOL);
+            this.panel2.Controls.Add(this.cbSOF);
+            this.panel2.Controls.Add(this.cbTimer0);
             this.panel2.Controls.Add(this.CloseButton);
             this.panel2.Controls.Add(this.SaveButton);
             this.panel2.Controls.Add(this.LoadButton);
@@ -75,6 +100,72 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(113, 531);
             this.panel2.TabIndex = 1;
+            // 
+            // cbMouse
+            // 
+            this.cbMouse.AutoSize = true;
+            this.cbMouse.Location = new System.Drawing.Point(9, 264);
+            this.cbMouse.Name = "cbMouse";
+            this.cbMouse.Size = new System.Drawing.Size(80, 17);
+            this.cbMouse.TabIndex = 10;
+            this.cbMouse.Text = "Mouse IRQ";
+            this.cbMouse.UseVisualStyleBackColor = true;
+            this.cbMouse.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
+            // cbTimer2
+            // 
+            this.cbTimer2.AutoSize = true;
+            this.cbTimer2.Location = new System.Drawing.Point(9, 241);
+            this.cbTimer2.Name = "cbTimer2";
+            this.cbTimer2.Size = new System.Drawing.Size(80, 17);
+            this.cbTimer2.TabIndex = 9;
+            this.cbTimer2.Text = "Timer2 IRQ";
+            this.cbTimer2.UseVisualStyleBackColor = true;
+            this.cbTimer2.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
+            // cbTimer1
+            // 
+            this.cbTimer1.AutoSize = true;
+            this.cbTimer1.Location = new System.Drawing.Point(9, 218);
+            this.cbTimer1.Name = "cbTimer1";
+            this.cbTimer1.Size = new System.Drawing.Size(80, 17);
+            this.cbTimer1.TabIndex = 8;
+            this.cbTimer1.Text = "Timer1 IRQ";
+            this.cbTimer1.UseVisualStyleBackColor = true;
+            this.cbTimer1.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
+            // cbSOL
+            // 
+            this.cbSOL.AutoSize = true;
+            this.cbSOL.Location = new System.Drawing.Point(9, 172);
+            this.cbSOL.Name = "cbSOL";
+            this.cbSOL.Size = new System.Drawing.Size(69, 17);
+            this.cbSOL.TabIndex = 7;
+            this.cbSOL.Text = "SOL IRQ";
+            this.cbSOL.UseVisualStyleBackColor = true;
+            this.cbSOL.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
+            // cbSOF
+            // 
+            this.cbSOF.AutoSize = true;
+            this.cbSOF.Location = new System.Drawing.Point(9, 149);
+            this.cbSOF.Name = "cbSOF";
+            this.cbSOF.Size = new System.Drawing.Size(69, 17);
+            this.cbSOF.TabIndex = 6;
+            this.cbSOF.Text = "SOF IRQ";
+            this.cbSOF.UseVisualStyleBackColor = true;
+            this.cbSOF.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
+            // cbTimer0
+            // 
+            this.cbTimer0.AutoSize = true;
+            this.cbTimer0.Location = new System.Drawing.Point(9, 195);
+            this.cbTimer0.Name = "cbTimer0";
+            this.cbTimer0.Size = new System.Drawing.Size(80, 17);
+            this.cbTimer0.TabIndex = 5;
+            this.cbTimer0.Text = "Timer0 IRQ";
+            this.cbTimer0.UseVisualStyleBackColor = true;
+            this.cbTimer0.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
             // 
             // CloseButton
             // 
@@ -127,6 +218,39 @@
             this.GenerateASMButton.UseVisualStyleBackColor = true;
             this.GenerateASMButton.Click += new System.EventHandler(this.GenerateASMButton_Click);
             // 
+            // cbKeyboard
+            // 
+            this.cbKeyboard.AutoSize = true;
+            this.cbKeyboard.Location = new System.Drawing.Point(9, 297);
+            this.cbKeyboard.Name = "cbKeyboard";
+            this.cbKeyboard.Size = new System.Drawing.Size(93, 17);
+            this.cbKeyboard.TabIndex = 11;
+            this.cbKeyboard.Text = "Keyboard IRQ";
+            this.cbKeyboard.UseVisualStyleBackColor = true;
+            this.cbKeyboard.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
+            // cbCollision0
+            // 
+            this.cbCollision0.AutoSize = true;
+            this.cbCollision0.Location = new System.Drawing.Point(9, 320);
+            this.cbCollision0.Name = "cbCollision0";
+            this.cbCollision0.Size = new System.Drawing.Size(96, 17);
+            this.cbCollision0.TabIndex = 12;
+            this.cbCollision0.Text = "STS_COL IRQ";
+            this.cbCollision0.UseVisualStyleBackColor = true;
+            this.cbCollision0.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
+            // cbCollision1
+            // 
+            this.cbCollision1.AutoSize = true;
+            this.cbCollision1.Location = new System.Drawing.Point(9, 343);
+            this.cbCollision1.Name = "cbCollision1";
+            this.cbCollision1.Size = new System.Drawing.Size(96, 17);
+            this.cbCollision1.TabIndex = 13;
+            this.cbCollision1.Text = "STT_COL IRQ";
+            this.cbCollision1.UseVisualStyleBackColor = true;
+            this.cbCollision1.CheckedChanged += new System.EventHandler(this.cbIRQ_CheckedChanged);
+            // 
             // GameGeneratorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -142,6 +266,7 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -156,6 +281,15 @@
         private System.Windows.Forms.Button LoadButton;
         private System.Windows.Forms.Button ViewAssetsButton;
         private System.Windows.Forms.Button GenerateASMButton;
+        private System.Windows.Forms.CheckBox cbTimer0;
+        private System.Windows.Forms.CheckBox cbSOF;
+        private System.Windows.Forms.CheckBox cbMouse;
+        private System.Windows.Forms.CheckBox cbTimer2;
+        private System.Windows.Forms.CheckBox cbTimer1;
+        private System.Windows.Forms.CheckBox cbSOL;
+        private System.Windows.Forms.CheckBox cbKeyboard;
+        private System.Windows.Forms.CheckBox cbCollision0;
+        private System.Windows.Forms.CheckBox cbCollision1;
     }
 }
 

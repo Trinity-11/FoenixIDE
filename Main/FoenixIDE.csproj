@@ -48,7 +48,7 @@
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
@@ -61,7 +61,13 @@
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>FoenixIDE.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
+      <HintPath>..\packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -91,6 +97,7 @@
     <Compile Include="Devices\SDCard\CH376SResponse.cs" />
     <Compile Include="Devices\UART.cs" />
     <Compile Include="FileFormat\DebugLine.cs" />
+    <Compile Include="FileFormat\FoenixLexer.cs" />
     <Compile Include="FileFormat\FoenixmlFile.cs" />
     <Compile Include="FileFormat\HexFile.cs" />
     <Compile Include="Devices\CodecRAM.cs" />
@@ -133,6 +140,12 @@
     </Compile>
     <Compile Include="UI\AssetWindow.Designer.cs">
       <DependentUpon>AssetWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\AutocompleteSample2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\AutocompleteSample2.designer.cs">
+      <DependentUpon>AutocompleteSample2.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\CharEditor\CharEditorWindow.cs">
       <SubType>Form</SubType>
@@ -254,6 +267,9 @@
     <EmbeddedResource Include="UI\AssetWindow.resx">
       <DependentUpon>AssetWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\AutocompleteSample2.resx">
+      <DependentUpon>AutocompleteSample2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\CharEditor\CharEditorWindow.resx">
       <DependentUpon>CharEditorWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -326,6 +342,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="Resources\base_asm\asm.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\Bm437_PhoenixEGA_8x8.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -348,16 +367,82 @@
     <Content Include="roms\kernel.lst">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="roms\kernel.hex">
+    <Content Include="roms\kernel.hex">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\save_btn.bmp" />
+    </Content>
     <None Include="roms\kernel_U_Plus.hex" />
+    <None Include="roms\kernel_U_Plus.lst" />
+    <None Include="Resources\save_btn.bmp" />
+    <Content Include="Resources\base_asm\EXP_C200_EVID_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\helper_functions.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\interrupt_handler.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\vgm_player.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\VKYII_CFP9553_COLLISION_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\GameGeneratorTemplates.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="UI\Images\memory-btn.png" />
     <None Include="UI\Images\delete-btn.png" />
     <None Include="Resources\foenix-96x96.png" />
     <None Include="Resources\DeleteButton.png" />
-    <None Include="roms\kernel_U_Plus.lst" />
+    <Content Include="Resources\base_asm\bank_00_inc.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\base.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\gabe_control_registers_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\interrupt_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\io_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\kernel_inc.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\keyboard_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\macros_inc.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\math_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\timer_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\vicky_ii_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\VKYII_CFP9553_BITMAP_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\VKYII_CFP9553_SDMA_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\VKYII_CFP9553_SPRITE_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\VKYII_CFP9553_TILEMAP_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\base_asm\VKYII_CFP9553_VDMA_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\PET-ASCII.png" />
   </ItemGroup>
   <ItemGroup>

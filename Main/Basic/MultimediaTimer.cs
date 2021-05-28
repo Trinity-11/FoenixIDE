@@ -304,10 +304,7 @@ namespace FoenixIDE.Timers
         /// </summary>
         protected virtual void OnTimer()
         {
-            if (Elapsed != null)
-            {
-                Elapsed(this, new MultimediaElapsedEventArgs());
-            }
+            Elapsed?.Invoke(this, new MultimediaElapsedEventArgs());
         }
 
         /// <summary>

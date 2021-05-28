@@ -438,8 +438,8 @@ namespace FoenixIDE.Processor
             
             Push(Flags);
 
-            int addr = 0;
-            int emuAddr = 0;
+            int addr;
+            int emuAddr;
             Flags.IrqDisable = true;
             Flags.Decimal = false;
 

@@ -147,7 +147,7 @@ namespace FoenixIDE.Simulator.FileFormat
             // Scan each of the banks and pages and save to an XML file
             // If a page is blank, don't export it.
             int RamLength = kernel.MemMgr.RAM.Length;
-            for (int i = 0; i < RamLength; i = i + 256)
+            for (int i = 0; i < RamLength; i += 256)
             {
                 if (PageChecksum(i) != 0)
                 {
@@ -161,7 +161,7 @@ namespace FoenixIDE.Simulator.FileFormat
             xmlWriter.WriteRaw(tabs.Substring(0, 1));
             xmlWriter.WriteStartElement("vicky");
             xmlWriter.WriteRaw("\r");
-            for (int i = 0xAF_0000; i < 0xB0_0000; i = i + 256)
+            for (int i = 0xAF_0000; i < 0xB0_0000; i += 256)
             {
                 if (PageChecksum(i) != 0)
                 {
@@ -180,7 +180,7 @@ namespace FoenixIDE.Simulator.FileFormat
                 // If the assets were loaded in RAM, they would have been saved already
                 if (res.StartAddress >= 0xB0_0000)
                 {
-                    for (int i = res.StartAddress; i < res.StartAddress + res.Length; i = i + 256)
+                    for (int i = res.StartAddress; i < res.StartAddress + res.Length; i += 256)
                     {
                         if (PageChecksum(i) != 0)
                         {
@@ -262,7 +262,7 @@ namespace FoenixIDE.Simulator.FileFormat
             writer.WriteRaw("\r");
 
             // Write PHRASE_LENGTH bytes per data line
-            for (int i = 0; i < 256; i = i + PHRASE_LENGTH)
+            for (int i = 0; i < 256; i += PHRASE_LENGTH)
             {
                 WritePhrase(startAddress + i, writer, compact);
             }

@@ -91,7 +91,7 @@ namespace FoenixIDE.CharEditor
 
                             var pixel = img.GetPixel(cx, cy);
                             if (pixel.R > 0)
-                                row = row | bit;
+                                row |= bit;
                             bit = (byte)(bit >> 1);
                         }
                         data[pos++] = (byte)row;
@@ -221,10 +221,10 @@ namespace FoenixIDE.CharEditor
                         if ((b & bit) > 0)
                             e.Graphics.FillRectangle(textBrush, x, y, bitWidth, bitHeight);
                         x += bitWidth;
-                        bit = bit >> 1;
+                        bit >>= 1;
                     }
                     x = x0;
-                    y = y + bitHeight;
+                    y += bitHeight;
                 }
                 x = Col1X + ((i + 1) % Columns * CharacterWidth);
                 y = Row1Y + ((int)(i + 1) / Rows) * CharacterHeight;

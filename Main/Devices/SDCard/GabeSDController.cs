@@ -623,7 +623,7 @@ namespace FoenixIDE.Simulator.Devices
         private void UpdateRootEntries()
         {
             // Detect what changed - each entry is 32 bytes
-            for (int i = 0; i < 512; i = i + 0x20)
+            for (int i = 0; i < 512; i += 0x20)
             {
                 byte byte0 = writeBlock[i];
                 byte attrs = writeBlock[i + 0xB];

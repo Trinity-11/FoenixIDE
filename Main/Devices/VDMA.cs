@@ -10,20 +10,26 @@ namespace FoenixIDE.Simulator.Devices
     public class VDMA : MemoryLocations.MemoryRAM
     {
         private MemoryLocations.MemoryRAM System;
+        private MemoryLocations.MemoryRAM Vicky;
         private MemoryLocations.MemoryRAM Video;
 
         public VDMA(int StartAddress, int Length) : base(StartAddress, Length)
         {
         }
 
-        public void setVideoRam(MemoryLocations.MemoryRAM vram)
+        public void setVideoRam(MemoryLocations.MemoryRAM ram)
         {
-            Video = vram;
+            Video = ram;
         }
 
-        public void setSystemRam(MemoryLocations.MemoryRAM vram)
+        public void setSystemRam(MemoryLocations.MemoryRAM ram)
         {
-            System = vram;
+            System = ram;
+        }
+
+        public void setVickyRam(MemoryLocations.MemoryRAM ram)
+        {
+            Vicky = ram;
         }
 
 
@@ -38,8 +44,9 @@ namespace FoenixIDE.Simulator.Devices
                 MemoryLocations.MemoryRAM destMemory = null;
                 int srcAddr = 0;
                 int destAddr = 0;
-                bool isSystemSource = (Value & 0x10) != 0;
-                bool isSystemDest = (Value & 0x20) != 0;
+                bool isSystemSource = (Address == 0 && (Value & 0x10) != 0) || (Address == 0x20 && (Value & 0x10) == 0);
+                bool isSystemDest = (Address == 0 && (Value & 0x20) != 0) || (Address == 0x20 && (Value & 0x20) == 0);
+                bool isIODest = (Value & 0x30) != 0;
                 bool isFillTransfer = (Value & 4) != 0;
                 bool isSrcTransfer2D = false;
                 bool isDestTransfer2D = false;
@@ -60,8 +67,8 @@ namespace FoenixIDE.Simulator.Devices
                 // Check if the source is system or video
                 if (isSystemSource)
                 {
-                    srcMemory = System;
                     srcAddr = ReadLong(0x22); // Address $AF:0422
+                    srcMemory = srcAddr < 0x40_0000 ? System : Vicky;
                     isSrcTransfer2D = (ReadByte(0x20) & 2) != 0;
                 }
                 else
@@ -72,8 +79,13 @@ namespace FoenixIDE.Simulator.Devices
                 }
                 if (isSystemDest)
                 {
-                    destMemory = System;
                     destAddr = ReadLong(0x25); // Address $AF:0425
+                    destMemory = destAddr < 0x40_0000 ? System : Vicky;
+                    
+                    if (destMemory == Vicky)
+                    {
+                        destAddr -= 0xAF_0000;
+                    }
                     isDestTransfer2D = (ReadByte(0x20) & 2) != 0;
                 }
                 else
@@ -93,7 +105,7 @@ namespace FoenixIDE.Simulator.Devices
                     if (!isDestTransfer2D) 
                     {
                         int size1DTransfer = isSystemDest ? ReadLong(0x28) : ReadLong(8); // Address $AF:0408 - maximum 4MB
-                        if (Video != null)
+                        if (destMemory != null)
                         {
                             for (int i = 0; i < size1DTransfer; i++)
                             {

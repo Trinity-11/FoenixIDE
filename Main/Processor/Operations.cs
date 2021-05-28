@@ -56,9 +56,11 @@ namespace FoenixIDE.Processor
         public void OpORA(int val)
         {
             if (cpu.A.Width == 1)
-                val = val & 0xff;
+            {
+                val &= 0xff;
+            }
 
-            cpu.A.Value = cpu.A.Value | val;
+            cpu.A.Value |= val;
             cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
@@ -264,7 +266,7 @@ namespace FoenixIDE.Processor
         {
             int addr = Address;
             addr = bank.GetLongAddress(Address);
-            addr = addr + Index.Value;
+            addr += Index.Value;
             return (width == 1) ? cpu.MemMgr.ReadByte(addr) : cpu.MemMgr.ReadWord(addr);
         }
 
@@ -319,7 +321,7 @@ namespace FoenixIDE.Processor
         public void ExecuteORA(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
-            cpu.A.Value = cpu.A.Value | val;
+            cpu.A.Value |= val;
             cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
@@ -369,16 +371,16 @@ namespace FoenixIDE.Processor
                 case OpcodeList.ASL_Absolute:
                 case OpcodeList.ASL_DirectPageIndexedWithX:
                 case OpcodeList.ASL_AbsoluteIndexedWithX:
-                    val = val << 1;
+                    val <<= 1;
                     if (cpu.A.Width == 1)
                     {
                         cpu.Flags.Carry = val > 0xff;
-                        val = val & 0xff;
+                        val &= 0xff;
                     }
                     else if (cpu.A.Width == 2)
                     {
                         cpu.Flags.Carry = val > 0xffff;
-                        val = val & 0xffff;
+                        val &= 0xffff;
                     }
                     break;
                 case OpcodeList.LSR_DirectPage:
@@ -387,25 +389,25 @@ namespace FoenixIDE.Processor
                 case OpcodeList.LSR_DirectPageIndexedWithX:
                 case OpcodeList.LSR_AbsoluteIndexedWithX:
                     cpu.Flags.Carry = (val & 1) == 1;
-                    val = val >> 1;
+                    val >>= 1;
                     break;
                 case OpcodeList.ROL_DirectPage:
                 case OpcodeList.ROL_Accumulator:
                 case OpcodeList.ROL_Absolute:
                 case OpcodeList.ROL_DirectPageIndexedWithX:
                 case OpcodeList.ROL_AbsoluteIndexedWithX:
-                    val = val << 1;
+                    val <<= 1;
                     if (cpu.Flags.Carry)
                         val += 1;
                     if (cpu.A.Width == 1)
                     {
                         cpu.Flags.Carry = val > 0xff;
-                        val = val & 0xff;
+                        val &= 0xff;
                     }
                     else if (cpu.A.Width == 2)
                     {
                         cpu.Flags.Carry = val > 0xffff;
-                        val = val & 0xffff;
+                        val &= 0xffff;
                     }
                     break;
                 case OpcodeList.ROR_DirectPage:
@@ -421,7 +423,7 @@ namespace FoenixIDE.Processor
                             val += 0x10000;
                     }
                     cpu.Flags.Carry = (val & 1) == 1;
-                    val = val >> 1;
+                    val >>= 1;
                     break;
                 default:
                     throw new NotImplementedException("ExecuteASL() opcode not implemented: " + instruction.ToString("X2"));
@@ -579,11 +581,11 @@ namespace FoenixIDE.Processor
                     // do this by flipping the argument bits, then ANDing 
                     // them to the flag bits 
                     int flip = signature ^ 0xff;
-                    cpu.Flags.Value = cpu.Flags.Value & flip;
+                    cpu.Flags.Value &= flip;
                     break;
                 case OpcodeList.SEP_Immediate:
                     // set flag bits that are 1 in the argument. 
-                    cpu.Flags.Value = cpu.Flags.Value | signature;
+                    cpu.Flags.Value |= signature;
                     break;
                 case OpcodeList.XCE_Implied:
                     cpu.Flags.SwapCE();
@@ -903,7 +905,7 @@ namespace FoenixIDE.Processor
         public void ExecuteAND(byte instruction, AddressModes addressMode, int signature)
         {
             int data = GetValue(addressMode, signature, cpu.A.Width);
-            cpu.A.Value = cpu.A.Value & data;
+            cpu.A.Value &= data;
             cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 
@@ -930,7 +932,7 @@ namespace FoenixIDE.Processor
         public void ExecuteEOR(byte instruction, AddressModes addressMode, int signature)
         {
             int val = GetValue(addressMode, signature, cpu.A.Width);
-            cpu.A.Value = cpu.A.Value ^ val;
+            cpu.A.Value ^= val;
             cpu.Flags.SetNZ(cpu.A.Value, cpu.A.Width);
         }
 

@@ -25,6 +25,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIDI-to-VGM-Converter", "MIDI-to-VGM-Converter\MIDI-to-VGM-Converter.csproj", "{9CA195ED-7CC8-444A-98A3-D20F6A382FBB}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FoenixIDESetup", "FoenixIDESetup\FoenixIDESetup.vdproj", "{E9478995-9CB5-4121-90DC-FFD67660CDEE}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FoenixIDE Setup", "FoenixIDE Setup\FoenixIDE Setup.vdproj", "{43F4AB19-C20E-43B5-A8C4-1111A78E591C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,7 +40,6 @@ Global
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A424125-D4DB-4EC4-A207-AC0A66F6424B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B605CD44-57A1-4EA7-80A9-D65CD6C1C302}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CA195ED-7CC8-444A-98A3-D20F6A382FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

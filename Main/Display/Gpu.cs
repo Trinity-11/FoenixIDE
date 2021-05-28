@@ -567,7 +567,7 @@ namespace FoenixIDE.Display
                 //int offset = (x + line * 640) * 4;
 
                 // For each bit in the font, set the foreground color - if the bit is 0 and overlay is set, skip it (keep the background)
-                for (int b = 0x80; b > 0; b = b >> 1)
+                for (int b = 0x80; b > 0; b >>= 1)
                 {
                     if ((value & b) != 0)
                     {
