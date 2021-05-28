@@ -27,8 +27,44 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_563F86D9D947492CB36C3AA515B42299"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_599E8AA642A24769AEF49E5C094E94C3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_7ADEF7EB358C87F0CD07E1208961D3AA"
         "OwnerKey" = "8:_05BB69B027C149C699B0E2980589B4DF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AAAE3F478D4F44D58F3736376AD3FD57"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BA33F90FF923446195A9FD68BDE2ED45"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C3BF3CBA62F048DCA70048AFBCDF8CCF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E5B0021E526A45D28B87F5F0706277AA"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -158,6 +194,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_563F86D9D947492CB36C3AA515B42299"
+            {
+            "SourcePath" = "8:..\\bin\\Release\\roms\\kernel.hex"
+            "TargetName" = "8:kernel.hex"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_599E8AA642A24769AEF49E5C094E94C3"
+            {
+            "SourcePath" = "8:..\\bin\\Release\\Resources\\CBM-ASCII_8x8.bin"
+            "TargetName" = "8:CBM-ASCII_8x8.bin"
+            "Tag" = "8:"
+            "Folder" = "8:_16053BACFCB84245B80C7CF2A152195E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7ADEF7EB358C87F0CD07E1208961D3AA"
             {
             "AssemblyRegister" = "3:1"
@@ -187,6 +263,86 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AAAE3F478D4F44D58F3736376AD3FD57"
+            {
+            "SourcePath" = "8:..\\bin\\Release\\Resources\\Bm437_PhoenixEGA_8x8.bin"
+            "TargetName" = "8:Bm437_PhoenixEGA_8x8.bin"
+            "Tag" = "8:"
+            "Folder" = "8:_16053BACFCB84245B80C7CF2A152195E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BA33F90FF923446195A9FD68BDE2ED45"
+            {
+            "SourcePath" = "8:..\\bin\\Release\\roms\\kernel.lst"
+            "TargetName" = "8:kernel.lst"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C3BF3CBA62F048DCA70048AFBCDF8CCF"
+            {
+            "SourcePath" = "8:..\\bin\\Release\\Resources\\FOENIX-CHARACTER-ASCII.bin"
+            "TargetName" = "8:FOENIX-CHARACTER-ASCII.bin"
+            "Tag" = "8:"
+            "Folder" = "8:_16053BACFCB84245B80C7CF2A152195E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E5B0021E526A45D28B87F5F0706277AA"
+            {
+            "SourcePath" = "8:..\\bin\\Release\\Resources\\CBM-ASCII_8x16.bin"
+            "TargetName" = "8:CBM-ASCII_8x16.bin"
+            "Tag" = "8:"
+            "Folder" = "8:_16053BACFCB84245B80C7CF2A152195E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
         }
@@ -240,24 +396,13 @@
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_16053BACFCB84245B80C7CF2A152195E"
                     {
-                    "Name" = "8:resources"
+                    "Name" = "8:Resources"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
                     "Property" = "8:_252ACD789A194BC28CD2CA48C583695E"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_113A8BF07E474B56BE4F87E700727232"
-                            {
-                            "Name" = "8:base_asm"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_8B42659808DC432C989C2B91FCDFE6BF"
-                                "Folders"
-                                {
-                                }
-                            }
                         }
                     }
                 }
@@ -279,7 +424,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FoenixIDE Setup"
         "ProductCode" = "8:{0F09CD7A-6292-4AD4-B99E-D088A15D65C9}"
-        "PackageCode" = "8:{C2CAA938-C714-46F0-8FD9-EC0C93496AE5}"
+        "PackageCode" = "8:{B03F184B-E0AA-4C93-BC4B-3C52C6A0DC96}"
         "UpgradeCode" = "8:{A91983FA-7F1D-495E-8BFB-CB92EECA466F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
