@@ -1076,7 +1076,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FoenixIDE Setup"
         "ProductCode" = "8:{0F09CD7A-6292-4AD4-B99E-D088A15D65C9}"
-        "PackageCode" = "8:{B03F184B-E0AA-4C93-BC4B-3C52C6A0DC96}"
+        "PackageCode" = "8:{0E19DF45-8B20-4C7F-9DD9-CF058DC39278}"
         "UpgradeCode" = "8:{A91983FA-7F1D-495E-8BFB-CB92EECA466F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1196,6 +1196,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_254DA7B6A85441C9ADFFABB694DE3B67"
+            {
+            "Name" = "8:Foenix IDE"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_05BB69B027C149C699B0E2980589B4DF"
+            "Folder" = "8:_A6234A0C22CA4380AAF762650CF10031"
+            "WorkingFolder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
+            "Icon" = "8:_12FE5FC46E964761B04C2DAF60E19023"
+            "Feature" = "8:"
+            }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_6F9D1D0DCBAC4515A56C0FCD776CA856"
             {
             "Name" = "8:C256 Foenix IDE"
@@ -1207,20 +1221,6 @@
             "Target" = "8:_0CBD51AF80554C63BE2F41B161B81F65"
             "Folder" = "8:_0CBD51AF80554C63BE2F41B161B81F65"
             "WorkingFolder" = "8:_0CBD51AF80554C63BE2F41B161B81F65"
-            "Icon" = "8:_12FE5FC46E964761B04C2DAF60E19023"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_F7D8759696654F65A922C7D9CC06CB0D"
-            {
-            "Name" = "8:C256 Foenix IDE"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_A6234A0C22CA4380AAF762650CF10031"
-            "Folder" = "8:_A6234A0C22CA4380AAF762650CF10031"
-            "WorkingFolder" = "8:_A6234A0C22CA4380AAF762650CF10031"
             "Icon" = "8:_12FE5FC46E964761B04C2DAF60E19023"
             "Feature" = "8:"
             }
