@@ -141,12 +141,6 @@
     <Compile Include="UI\AssetWindow.Designer.cs">
       <DependentUpon>AssetWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\AutocompleteSample2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\AutocompleteSample2.designer.cs">
-      <DependentUpon>AutocompleteSample2.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\CharEditor\CharEditorWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -267,9 +261,6 @@
     <EmbeddedResource Include="UI\AssetWindow.resx">
       <DependentUpon>AssetWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\AutocompleteSample2.resx">
-      <DependentUpon>AutocompleteSample2.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\CharEditor\CharEditorWindow.resx">
       <DependentUpon>CharEditorWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -284,6 +275,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\GameGeneratorForm.resx">
       <DependentUpon>GameGeneratorForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\JoystickForm.resx">
       <DependentUpon>JoystickForm.cs</DependentUpon>
@@ -364,6 +356,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="Resources\foenix-game-generator-syntax.xml" />
     <Content Include="roms\kernel.lst">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

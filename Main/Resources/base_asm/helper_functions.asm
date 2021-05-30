@@ -32,6 +32,13 @@ COPY_TO_VRAM
         NOP ; From that point on, the CPU is halted (keep that in mind) No IRQ will be processed either during that time
         NOP
         NOP
+
+COPY_TO_VRAM_LOOPA:
+        LDA @l VDMA_STATUS_REG
+        AND #$80
+        CMP #$80  ; Check if bit $80 is cleared to indicate that the VDMA is done.
+        BEQ COPY_TO_VRAM_LOOPA
+
         ; finish by clearing data
         LDA #0
         STA @l SDMA_CTRL_REG0

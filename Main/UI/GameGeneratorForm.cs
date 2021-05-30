@@ -1,4 +1,5 @@
-﻿using FoenixIDE.GameGenerator;
+﻿using FastColoredTextBoxNS;
+using FoenixIDE.GameGenerator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,9 +27,173 @@ namespace FoenixIDE.UI
     public partial class GameGeneratorForm : Form
     {
         Dictionary<string, List<string>> templates;
+
+        AutocompleteMenu popupMenu;
+        string[] keywords = {"ASSET", "COPY", "GOTO", "FILL", "VGM_INIT", "VGM_PLAY", "ENABLE_IRQS" }; 
+        //string[] methods = { "Equals()", "GetHashCode()", "GetType()", "ToString()" };
+        string[] snippets = { "if(^)\n{\n;\n}", "if(^)\n{\n;\n}\nelse\n{\n;\n}", "for(^;;)\n{\n;\n}", "while(^)\n{\n;\n}", "do${\n^;\n}while();", "switch(^)\n{\ncase : break;\n}" };
+        string[] declarationSnippets = {
+               "public class ^\n{\n}", "private class ^\n{\n}", "internal class ^\n{\n}",
+               "public struct ^\n{\n;\n}", "private struct ^\n{\n;\n}", "internal struct ^\n{\n;\n}",
+               "public void ^()\n{\n;\n}", "private void ^()\n{\n;\n}", "internal void ^()\n{\n;\n}", "protected void ^()\n{\n;\n}",
+               "public ^{ get; set; }", "private ^{ get; set; }", "internal ^{ get; set; }", "protected ^{ get; set; }"
+               };
+
         public GameGeneratorForm()
         {
             InitializeComponent();
+
+            //create autocomplete popup menu
+            popupMenu = new AutocompleteMenu(CodeTextBox);
+            //popupMenu.Items.ImageList = imageList1;
+            popupMenu.SearchPattern = @"[\w\.:=!]";
+            popupMenu.AllowTabKey = true;
+            //
+            BuildAutocompleteMenu();
+        }
+
+        private void BuildAutocompleteMenu()
+        {
+            List<AutocompleteItem> items = new List<AutocompleteItem>();
+
+            foreach (var item in snippets)
+                items.Add(new SnippetAutocompleteItem(item) { ImageIndex = 1 });
+            foreach (var item in declarationSnippets)
+                items.Add(new DeclarationSnippet(item) { ImageIndex = 0 });
+            //foreach (var item in methods)
+            //    items.Add(new MethodAutocompleteItem(item) { ImageIndex = 2 });
+            foreach (var item in keywords)
+                items.Add(new AutocompleteItem(item));
+
+            items.Add(new InsertSpaceSnippet());
+            items.Add(new InsertSpaceSnippet(@"^(\w+)([=<>!:]+)(\w+)$"));
+            items.Add(new InsertEnterSnippet());
+
+            //set as autocomplete source
+            popupMenu.Items.SetAutocompleteItems(items);
+        }
+
+        /// <summary>
+        /// This item appears when any part of snippet text is typed
+        /// </summary>
+        class DeclarationSnippet : SnippetAutocompleteItem
+        {
+            public DeclarationSnippet(string snippet)
+                : base(snippet)
+            {
+            }
+
+            public override CompareResult Compare(string fragmentText)
+            {
+                var pattern = Regex.Escape(fragmentText);
+                if (Regex.IsMatch(Text, "\\b" + pattern, RegexOptions.IgnoreCase))
+                    return CompareResult.Visible;
+                return CompareResult.Hidden;
+            }
+        }
+
+        /// <summary>
+        /// Divides numbers and words: "123AND456" -> "123 AND 456"
+        /// Or "i=2" -> "i = 2"
+        /// </summary>
+        class InsertSpaceSnippet : AutocompleteItem
+        {
+            string pattern;
+
+            public InsertSpaceSnippet(string pattern) : base("")
+            {
+                this.pattern = pattern;
+            }
+
+            public InsertSpaceSnippet()
+                : this(@"^(\d+)([a-zA-Z_]+)(\d*)$")
+            {
+            }
+
+            public override CompareResult Compare(string fragmentText)
+            {
+                if (Regex.IsMatch(fragmentText, pattern))
+                {
+                    Text = InsertSpaces(fragmentText);
+                    if (Text != fragmentText)
+                        return CompareResult.Visible;
+                }
+                return CompareResult.Hidden;
+            }
+
+            public string InsertSpaces(string fragment)
+            {
+                var m = Regex.Match(fragment, pattern);
+                if (m == null)
+                    return fragment;
+                if (m.Groups[1].Value == "" && m.Groups[3].Value == "")
+                    return fragment;
+                return (m.Groups[1].Value + " " + m.Groups[2].Value + " " + m.Groups[3].Value).Trim();
+            }
+
+            public override string ToolTipTitle
+            {
+                get
+                {
+                    return Text;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Inerts line break after '}'
+        /// </summary>
+        class InsertEnterSnippet : AutocompleteItem
+        {
+            Place enterPlace = Place.Empty;
+
+            public InsertEnterSnippet()
+                : base("[Line break]")
+            {
+            }
+
+            public override CompareResult Compare(string fragmentText)
+            {
+                var r = Parent.Fragment.Clone();
+                while (r.Start.iChar > 0)
+                {
+                    if (r.CharBeforeStart == '}')
+                    {
+                        enterPlace = r.Start;
+                        return CompareResult.Visible;
+                    }
+
+                    r.GoLeftThroughFolded();
+                }
+
+                return CompareResult.Hidden;
+            }
+
+            public override string GetTextForReplace()
+            {
+                //extend range
+                Range r = Parent.Fragment;
+                Place end = r.End;
+                r.Start = enterPlace;
+                r.End = r.End;
+                //insert line break
+                return Environment.NewLine + r.Text;
+            }
+
+            public override void OnSelected(AutocompleteMenu popupMenu, SelectedEventArgs e)
+            {
+                base.OnSelected(popupMenu, e);
+                if (Parent.Fragment.tb.AutoIndent)
+                    Parent.Fragment.tb.DoAutoIndent();
+            }
+
+            public override string ToolTipTitle
+            {
+                get
+                {
+                    return "Insert line break after '}'";
+                }
+            }
         }
 
         private void LoadButton_Click(object sender, EventArgs e)
@@ -152,7 +317,7 @@ namespace FoenixIDE.UI
                         case TokenType.LABEL:
                             lines.Add(tm.Value);
                             break;
-                        case TokenType.ENABLE_IRQS:
+                        case TokenType.ENABLE_INTERRUPTS:
                             tm.groups.Clear();
                             tm.groups.Add(BuildIrqReg0String(cbSOF.Checked, cbSOL.Checked, cbTimer0.Checked, cbTimer1.Checked, cbTimer2.Checked, false, false, cbMouse.Checked));
                             tm.groups.Add(BuildIrqReg1String(cbKeyboard.Checked, cbCollision0.Checked, cbCollision1.Checked, false, false, false, false, false));
@@ -213,12 +378,18 @@ namespace FoenixIDE.UI
             {
                 irqs.Add("FNX0_INT07_MOUSE");
             }
-
-            return string.Join("|", irqs);
+            if (irqs.Count == 0)
+            {
+                return "$0";
+            }
+            else
+            {
+                return string.Join("|", irqs);
+            }
         }
 
 
-private string BuildIrqReg1String(bool irqKBD, bool irqSC0, bool irqSC1, bool irqCOM2, bool irqCOM1, bool irqMPU401, bool irqLPT, bool irqSDCARD)
+        private string BuildIrqReg1String(bool irqKBD, bool irqSC0, bool irqSC1, bool irqCOM2, bool irqCOM1, bool irqMPU401, bool irqLPT, bool irqSDCARD)
         {
             List<string> irqs = new List<string>();
             if (irqKBD)
@@ -233,7 +404,14 @@ private string BuildIrqReg1String(bool irqKBD, bool irqSC0, bool irqSC1, bool ir
             {
                 irqs.Add("FNX1_INT02_SC1");
             }
-            return string.Join("|", irqs);
+            if (irqs.Count == 0)
+            {
+                return "$0";
+            }
+            else
+            {
+                return string.Join("|", irqs);
+            }
         }
 
         private void WriteInterruptHandler(string filename, FoenixLexer fl, IrqType irq)
@@ -288,12 +466,21 @@ private string BuildIrqReg1String(bool irqKBD, bool irqSC0, bool irqSC1, bool ir
                 foreach (string line in template)
                 {
 
-                    string value = Regex.Replace(line, "(.*)\\{([0-9]*)\\}(.*)", m =>
+                    //string value = Regex.Replace(line, "(.*)\\{([0-9]*)\\}(.*)", m =>
+                    string value = Regex.Replace(line, @"\{([0-9]+)\}", m =>
                     {
                         if (m.Success && m.Groups.Count>0)
                         {
-                            int index = int.Parse(m.Groups[2].Value);
-                            return m.Groups[1].Value + tm.groups[index-1] + m.Groups[3].Value;
+                            int index = int.Parse(m.Groups[1].Value);
+                            if (tm.groups.Count > index-1 )
+                            {
+                                return tm.groups[index - 1];
+                            }
+                            else
+                            {
+                                return m.Value;
+                            }
+
                         }
                         else
                         {

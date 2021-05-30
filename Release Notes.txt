@@ -1,3 +1,9 @@
+Release 0.5.5.3
+---------------
+Fixed the installer issue with the Start Link pointing to the user's programs, instead of the actual application.
+Fixed several issues with the Game Generator.
+Added color code editor for the Game Generator.
+
 Release 0.5.5.0
 ---------------
 Added the Asset Window and connected it to the Asset Loader (used to be bitmap loader).

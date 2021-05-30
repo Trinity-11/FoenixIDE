@@ -20,7 +20,20 @@ namespace FoenixIDE.GameGenerator
         FILL,
         VGM_INIT,
         VGM_PLAY,
-        ENABLE_IRQS
+        ENABLE_INTERRUPTS,
+        // sprites
+        ENABLE_SPRITE,
+        DISABLE_SPRITE,
+        SET_SPRITE_POS,
+        // bitmaps
+        ENABLE_BITMAP,
+        DISABLE_BITMAP,
+        // tilemaps
+        ENABLE_TILEMAP,
+        DISABLE_TILEMAP,
+        SET_TILEMAP_POS,
+        IF,
+        VAR
     }
 
     public class TokenMatch
@@ -98,7 +111,7 @@ namespace FoenixIDE.GameGenerator
         {
             // in multiline regex, the $ catches \n -  be careful
             _tokenDefinitions.Add(new TokenDefinition(TokenType.ASSET, @"^[ \t]*asset\s+("".+""|\S+)\s+(\w+)(\s*//.*^\r)?", 1));
-            _tokenDefinitions.Add(new TokenDefinition(TokenType.SUB, @"(\S+)\s*{([^}]*)}", 1));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.SUB, @"(\S+)\s*{((?>[^{}]+|{(?<c>)|}(?<-c>))*(?(c)(?!)))}", 1));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.COPY, @"^[ \t]*copy\s+(\S*)\s+(\S*)\s+(\S*)(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.ASSIGNMENT, @"^[ \t]*(\w+)\s*=\s*(\S*)(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.LABEL, @"^[ \t]*(\w+)\s*:(\s*//.*^\r)?", 2));
@@ -106,7 +119,20 @@ namespace FoenixIDE.GameGenerator
             _tokenDefinitions.Add(new TokenDefinition(TokenType.FILL, @"^[ \t]*fill\s+(\S*)\s+(\S*)\s+(\S*)(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.VGM_INIT, @"^[ \t]*vgm_init\s+(\S*)(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.VGM_PLAY, @"^[ \t]*vgm_play(\s*//.*^\r)?", 2));
-            _tokenDefinitions.Add(new TokenDefinition(TokenType.ENABLE_IRQS, @"^[ \t]*enable_interrupts(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.ENABLE_INTERRUPTS, @"^[ \t]*enable_interrupts(\s*//.*^\r)?", 2));
+            // sprites
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.ENABLE_SPRITE, @"^[ \t]*enable_sprite\s+([0-6]?[0-9]{1})\s+([0-7])\s+([0-6])\s+(\S+)(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.DISABLE_SPRITE, @"^[ \t]*disable_sprite\s+([0-6]?[0-9]{1})(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.SET_SPRITE_POS, @"^[ \t]*set_sprite_pos\s+([0-6]?[0-9]{1})\s+(\S+)\s+(\S+)(\s*//.*^\r)?", 2));
+            // bitmaps
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.ENABLE_BITMAP, @"^[ \t]*enable_bitmap\s+([0-1]{1})\s+([0-7]{1})\s+(\S+)(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.DISABLE_BITMAP, @"^[ \t]*disable_bitmap\s+([0-1]{1})(\s*//.*^\r)?", 2));
+            // tilemaps
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.ENABLE_TILEMAP, @"^[ \t]*enable_tilemap\s+([0-4]{1})\s+(\S+)\s+(\S+)\s+(\S+)(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.ENABLE_TILEMAP, @"^[ \t]*disable_tilemap\s+([0-4]{1})(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.SET_TILEMAP_POS, @"^[ \t]*set_tilemap_pos\s+([0-4]{1})\s+(\S+)\s+(\S+)(\s*//.*^\r)?", 2));
+
+
 
             foreach (TokenDefinition td in _tokenDefinitions)
             {
@@ -126,10 +152,17 @@ namespace FoenixIDE.GameGenerator
                         tokenMatches.Remove(tm);
                         break;
                     case TokenType.COPY:
-                        int dest_addr = Convert.ToInt32(tm.groups[1].Replace("$", "").Replace("_",""), 16);
-                        if (dest_addr < 0xB0_0000)
+                        try
                         {
-                            tm.TokenType = TokenType.SCOPY;
+                            int dest_addr = Convert.ToInt32(tm.groups[1].Replace("$", "").Replace("_", ""), 16);
+                            if (dest_addr < 0xB0_0000)
+                            {
+                                tm.TokenType = TokenType.SCOPY;
+                            }
+                        }
+                        catch(Exception)
+                        {
+                            // Lookup the token for an address
                         }
                         break;
                     case TokenType.SUB:

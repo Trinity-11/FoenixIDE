@@ -7,7 +7,10 @@
 
 [COPY]
                 .as
-                ; Write the source and destination addresses
+                ; copy template
+                ; Source Address {1}
+                ; Destination Address {2}
+                ; Length {3}
                 LDA #`{1}
                 STA @l SDMA_SRC_ADDY_H
                 LDA #`{2}-$B0_0000   ; offset by $B0 for video RAM
@@ -30,7 +33,10 @@
 
 [SCOPY]
                 .as
-                ; Write the source and destination addresses
+                ; copy template
+                ; Source Address {1}
+                ; Destination Address {2}
+                ; Length {3}
                 LDA #`{1}
                 STA @l SDMA_SRC_ADDY_H
                 LDA #`{2}
@@ -51,7 +57,10 @@
 
 [FILL]
                 .as
-                ; Write the source and destination addresses
+                ; FILL template
+                ; Address {1}
+                ; Length {2}
+                ; Byte {3}
                 LDA #`{1}-$B0_0000   ; offset by $B0 for video RAM
                 STA @l VDMA_DST_ADDY_H
                 LDA #`{2}
@@ -84,7 +93,12 @@
 [VGM_PLAY]
                 JSL VGM_WRITE_REGISTER
 
-[ENABLE_IRQS]
+[ENABLE_INTERRUPTS]
+                ; enable interrupts template
+                ; Reg0 {1}
+                ; Reg1 {2}
+                ; Reg2 {3}
+                ; Reg3 {4}
                 LDA #~({1})
                 STA @l INT_MASK_REG0
                 LDA #~({2})
@@ -94,3 +108,96 @@
                 LDA #~({4})
                 STA @l INT_MASK_REG3
                 CLI
+
+[ENABLE_SPRITE]
+                ; enable sprite template
+                ; sprite #{1}
+                ; LUT {2}
+                ; depth {3}
+                ; address {4}
+                LDA #1+{2}*2+{3}*$10
+                STA SP00_CONTROL_REG + 8*{1}
+                LDA #`{4}-$B0_0000
+                STA SP00_ADDY_PTR_H + 8*{1}
+                setal
+                LDA #<>{4}-$B0_0000
+                STA SP00_ADDY_PTR_L + 8*{1}
+                setas
+
+[DISABLE_SPRITE]
+                ; disable sprite template
+                ; sprite #{1}
+                LDA #0
+                STA SP00_CONTROL_REG + 8*{1}
+
+[SET_SPRITE_POS]
+                ; set sprite position template
+                ; sprite #{1}
+                ; x {2}
+                ; y {3}
+                setal
+                LDA #{2}
+                STA SP00_X_POS_L + 8*{1}
+                LDA #{3}
+                STA SP00_Y_POS_L + 8*{1}
+                setas
+
+[ENABLE_BITMAP]
+                ; enable bitmap template 
+                ; bitmap #{1}
+                ; LUT {2}
+                ; address {3}
+                LDA #1+{2}*2
+                STA BM0_CONTROL_REG + 8*{1}
+                LDA #`{3}-$B0_0000
+                STA BM0_START_ADDY_H + 8*{1}
+                setal
+                LDA #<>{3}-$B0_0000
+                STA BM0_START_ADDY_L + 8*{1}
+                setas
+
+[DISABLE_BITMAP]
+                ; disable bitmap template 
+                ; bitmap #{1}
+                LDA BM0_CONTROL_REG + 8*{1}
+                AND #$FE
+                STA BM0_CONTROL_REG + 8*{1}
+
+[ENABLE_TILEMAP]
+                ; enable tilemap template
+                ; tilemap #{1}
+                ; address {2}
+                ; width {3}
+                ; height {4}
+                LDA #1
+                STA TL0_CONTROL_REG + 12*{1}
+                LDA #`{2}-$B0_0000
+                STA TL0_START_ADDY_H + 12*{1}
+                setal
+                LDA #<>{2}-$B0_0000
+                STA TL0_START_ADDY_L + 12*{1}
+                LDA #{3}
+                AND #$3FF  ; only take 10 bis
+                STA TL0_TOTAL_X_SIZE_L + 12*{1}
+                LDA #{4}
+                AND #$3FF  ; only take 10 bis
+                STA TL0_TOTAL_Y_SIZE_L + 12*{1}
+                setas
+
+[DISABLE_TILEMAP]
+                ; disable tilemap
+                ; tilemap #{1}
+                LDA #0
+                STA TL0_CONTROL_REG + 12*{1}
+
+[SET_TILEMAP_POS]
+                ; set tilemap position template
+                ; tilemap #{1}
+                ; x {2}
+                ; y {3}
+                setal
+                LDA #{2}
+                STA TL0_WINDOW_X_POS_L + {1}*12
+                LDA #{3}
+                STA TL0_WINDOW_Y_POS_L + {1}*12
+                setas
