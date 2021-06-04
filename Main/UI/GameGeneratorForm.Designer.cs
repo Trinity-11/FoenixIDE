@@ -33,6 +33,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.CodeTextBox = new FastColoredTextBoxNS.FastColoredTextBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.cbEVID = new System.Windows.Forms.CheckBox();
             this.cbCollision1 = new System.Windows.Forms.CheckBox();
             this.cbCollision0 = new System.Windows.Forms.CheckBox();
             this.cbKeyboard = new System.Windows.Forms.CheckBox();
@@ -48,7 +49,6 @@
             this.ViewAssetsButton = new System.Windows.Forms.Button();
             this.GenerateASMButton = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.cbEVID = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CodeTextBox)).BeginInit();
             this.panel2.SuspendLayout();
@@ -80,7 +80,7 @@
         '\''};
             this.CodeTextBox.AutoIndentCharsPatterns = "\r\n^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;]+);\r\n^\\s*(case|default)\\s*[^:]" +
     "*(?<range>:)\\s*(?<range>[^;]+);\r\n";
-            this.CodeTextBox.AutoScrollMinSize = new System.Drawing.Size(634, 450);
+            this.CodeTextBox.AutoScrollMinSize = new System.Drawing.Size(634, 480);
             this.CodeTextBox.BackBrush = null;
             this.CodeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.CodeTextBox.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy2;
@@ -131,6 +131,16 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(113, 531);
             this.panel2.TabIndex = 1;
+            // 
+            // cbEVID
+            // 
+            this.cbEVID.AutoSize = true;
+            this.cbEVID.Location = new System.Drawing.Point(8, 388);
+            this.cbEVID.Name = "cbEVID";
+            this.cbEVID.Size = new System.Drawing.Size(91, 30);
+            this.cbEVID.TabIndex = 14;
+            this.cbEVID.Text = "Send Debug\r\nCode to EVID";
+            this.cbEVID.UseVisualStyleBackColor = true;
             // 
             // cbCollision1
             // 
@@ -287,16 +297,6 @@
             this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            // 
-            // cbEVID
-            // 
-            this.cbEVID.AutoSize = true;
-            this.cbEVID.Location = new System.Drawing.Point(8, 388);
-            this.cbEVID.Name = "cbEVID";
-            this.cbEVID.Size = new System.Drawing.Size(91, 30);
-            this.cbEVID.TabIndex = 14;
-            this.cbEVID.Text = "Send Debug\r\nCode to EVID";
-            this.cbEVID.UseVisualStyleBackColor = true;
             // 
             // GameGeneratorForm
             // 

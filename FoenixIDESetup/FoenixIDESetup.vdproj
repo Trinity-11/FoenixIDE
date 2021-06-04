@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_02B9AD39E664BFB03C80ABF08BCAEE25"
+        "OwnerKey" = "8:_05BB69B027C149C699B0E2980589B4DF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_05BB69B027C149C699B0E2980589B4DF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -99,6 +105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_6EC8C89816114AD78C1733F511C5CE42"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_6FDDB1F1722B4E5094B4B6E7CF1F55F3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -165,12 +177,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B423A87FCDE404551AD29B717843A708"
-        "OwnerKey" = "8:_05BB69B027C149C699B0E2980589B4DF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_B7646B74D1344494AA0483CB2EF5407B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -220,7 +226,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B423A87FCDE404551AD29B717843A708"
+        "OwnerKey" = "8:_02B9AD39E664BFB03C80ABF08BCAEE25"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -288,6 +294,11 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
                     "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
                     {
                     "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
@@ -324,6 +335,37 @@
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_02B9AD39E664BFB03C80ABF08BCAEE25"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:FastColoredTextBox, Version=2.16.28.1, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_02B9AD39E664BFB03C80ABF08BCAEE25"
+                    {
+                    "Name" = "8:FastColoredTextBox.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:FastColoredTextBox.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_12B7D8CBF6E540459FE06AE6AE39F9FA"
             {
             "SourcePath" = "8:..\\Main\\Resources\\base_asm\\interrupt_handler.asm"
@@ -584,6 +626,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6EC8C89816114AD78C1733F511C5CE42"
+            {
+            "SourcePath" = "8:..\\Main\\Resources\\foenix-game-generator-syntax.xml"
+            "TargetName" = "8:foenix-game-generator-syntax.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6FDDB1F1722B4E5094B4B6E7CF1F55F3"
             {
             "SourcePath" = "8:..\\Main\\Resources\\base_asm\\timer_def.asm"
@@ -813,37 +875,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B423A87FCDE404551AD29B717843A708"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_B423A87FCDE404551AD29B717843A708"
-                    {
-                    "Name" = "8:FastColoredTextBox.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:FastColoredTextBox.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B7646B74D1344494AA0483CB2EF5407B"
@@ -1076,7 +1107,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FoenixIDE Setup"
         "ProductCode" = "8:{0F09CD7A-6292-4AD4-B99E-D088A15D65C9}"
-        "PackageCode" = "8:{445CF6A4-DD3A-42B3-8209-7384B98B9E97}"
+        "PackageCode" = "8:{0C342159-8165-474E-9E0E-A03DC08270C0}"
         "UpgradeCode" = "8:{A91983FA-7F1D-495E-8BFB-CB92EECA466F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

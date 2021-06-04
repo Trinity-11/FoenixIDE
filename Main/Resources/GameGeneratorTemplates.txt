@@ -79,6 +79,8 @@
                 JSL FILL_VRAM
 
 [VGM_INIT]
+                ; VGM_INIT template
+                ; Address {1}
                 JSL VGM_INIT_TIMERS
                 ; load the game over music
                 LDA #`{1}
@@ -91,6 +93,7 @@
                 JSL VGM_SET_SONG_POINTERS
 
 [VGM_PLAY]
+                ; VGM_PLAY template
                 JSL VGM_WRITE_REGISTER
 
 [ENABLE_INTERRUPTS]
@@ -201,3 +204,23 @@
                 LDA #{3}
                 STA TL0_WINDOW_Y_POS_L + {1}*12
                 setas
+
+[INCR]
+                ; INCR template
+                ; address {1}
+                LDA @l {1}
+                INC A
+                STA @l {1}
+
+[DECR]
+                ; DECR template
+                ; address {1}
+                LDA @l {1}
+                DEC A
+                STA @l {1}
+
+[VAR]
+                ; VAR template
+                ; name {1}
+                ; value {2}
+                {1} .byte {2}

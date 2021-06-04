@@ -19,6 +19,7 @@ namespace FoenixIDE.UI
     {
         public MemoryManager MemMgrRef = null;
         public ResourceChecker ResChecker;
+        public int topLeftPixelColor = 0;
 
         public AssetLoader()
         {
@@ -97,8 +98,23 @@ namespace FoenixIDE.UI
                 FileNameTextBox.Text = openFileDlg.FileName;
                 FileInfo info = new FileInfo(FileNameTextBox.Text);
                 ExtLabel.Text = info.Extension;
+                if (".png".Equals(ExtLabel.Text.ToLower()) || ".bmp".Equals(ExtLabel.Text.ToLower()))
+                {
+                    GetTopLeftPixelColor(FileNameTextBox.Text);
+                }
                 FileSizeResultLabel.Text = FormatAddress((int)info.Length);
                 StoreButton.Enabled = true;
+            }
+        }
+
+        private void GetTopLeftPixelColor(string filename)
+        {
+            Bitmap png = new Bitmap(filename, false);
+            Color clr = png.GetPixel(0, 0);
+            topLeftPixelColor = clr.R * 256 * 256 + clr.G * 256 + clr.B;
+            if (radioTopLeftColor.Checked)
+            {
+                textTransparentColor.Text = topLeftPixelColor.ToString("X6");
             }
         }
 
@@ -292,11 +308,19 @@ namespace FoenixIDE.UI
                 List<int> lut = null;
                 while (!done)
                 {
+                    int transparentColor = 0;
+                    try
+                    {
+                        transparentColor = Convert.ToInt32(textTransparentColor.Text, 16) & ((mask << 16) + (mask << 8) + mask);
+                    }
+                    finally
+                    { }
+
                     done = true;
                     // Reset the Lookup Table
                     lut = new List<int>(256)
                     {
-                        // Always add black and white
+                        // Always add black (transparent) and white
                         0,
                         0xFFFFFF
                     };
@@ -351,7 +375,14 @@ namespace FoenixIDE.UI
                                     break;
                             }
                             int rgb = b + g * 256 + r * 256 * 256;
-                            int index = lut.IndexOf(rgb);
+                            // Check if the RBG matches the transparent color
+                            int index = 0;
+                            if (rgb != transparentColor )
+                            {
+                                // if not, look in the LUT
+                                index = lut.IndexOf(rgb);
+                            }
+                            // If the index is undefined, add a new entry
                             if (index == -1)
                             {
                                 if (lut.Count < 256)
@@ -496,6 +527,23 @@ namespace FoenixIDE.UI
         private byte LowByte(int value)
         {
             return ((byte)(value & 0xFF));
+        }
+
+        private void radioCustomColor_CheckedChanged(object sender, EventArgs e)
+        {
+            textTransparentColor.ReadOnly = false;
+        }
+
+        private void radioBlack_CheckedChanged(object sender, EventArgs e)
+        {
+            textTransparentColor.ReadOnly = true;
+            textTransparentColor.Text = "000000";
+        }
+
+        private void radioTopLeftColor_CheckedChanged(object sender, EventArgs e)
+        {
+            textTransparentColor.ReadOnly = true;
+            textTransparentColor.Text = topLeftPixelColor.ToString("X6");
         }
     }
 }

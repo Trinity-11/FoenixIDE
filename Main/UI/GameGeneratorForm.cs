@@ -297,6 +297,8 @@ namespace FoenixIDE.UI
                     "",
                     "* = $000500",
                     ".include \"includes/keyboard_def.asm\"",
+                    "* = $000710",
+                    ".include \"vars.asm\"",
                     "* = $10000",
                     ".include \"includes/interrupt_handler.asm\"",
                     ".include \"includes/helper_functions.asm\"",
@@ -309,6 +311,7 @@ namespace FoenixIDE.UI
                     ""
                 };
 
+                List<string> variables = new List<string>();
                 List<TokenMatch> codeMatches = fl.GetCode();
                 foreach (TokenMatch tm in codeMatches)
                 {
@@ -325,6 +328,9 @@ namespace FoenixIDE.UI
                             tm.groups.Add("$0");
                             lines.AddRange(GetTemplate(tm));
                             break;
+                        case TokenType.VAR:
+                            variables.AddRange(GetTemplate(tm));
+                            break;
                         default:
                             lines.AddRange(GetTemplate(tm));
                             break;
@@ -338,6 +344,7 @@ namespace FoenixIDE.UI
 
                 // Write the code
                 File.WriteAllLines(folder + Path.DirectorySeparatorChar + "game_main.asm", lines);
+                File.WriteAllLines(folder + Path.DirectorySeparatorChar + "vars.asm", variables);
 
                 WriteInterruptHandler(folder + Path.DirectorySeparatorChar + "_sof_handler.asm", fl, IrqType.SOF);
                 WriteInterruptHandler(folder + Path.DirectorySeparatorChar + "_sol_handler.asm", fl, IrqType.SOL);

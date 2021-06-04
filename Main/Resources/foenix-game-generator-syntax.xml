@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <doc>
-  <brackets left="{" right="}" />
+
   <!-- STYLES -->
   <style name="Maroon" color="Maroon" fontStyle="Bold,Italic" />
   <style name="Blue" color="Blue" fontStyle="Bold"/>
   <style name="Red" color="Red" backColor="#f5f5e5" />
   <style name="Green" color="Green" fontStyle="Italic" />
-  <!-- COMMENTS -->
-  <rule style="Green">//.*</rule>
+  <style name="var" color="Orange" fontStyle="Bold" />
+  <style name="sub" color="Black" fontStyle="Bold" />
+  
   
   <!-- KEYWORDS -->
   <rule style="Blue" options="IgnoreCase">ASSET</rule>
@@ -32,11 +33,20 @@
   <rule style="Maroon">\s+([\w_]+:)</rule>
   
   <!-- ASSIGNMENTS -->
-  <rule style="Maroon">([\w_]+)\s*=\s*</rule>
+  <rule style="Maroon" options="IgnoreCase,Multiline">^\s*(?!var\s*)(?&lt;range&gt;\w+)\s*=.*$</rule>
+  <!-- VAR -->
+  <rule style="var" options="IgnoreCase">\s*(?&lt;range&gt;var\s*\w+)\s*=.*</rule>
+  
   
   <rule style="Red" options="IgnoreCase">[$][0-9a-f]{1,2}:?[0-9a-f]{1,4}</rule>
   <rule style="Red" options="IgnoreCase">(?:GOTO)\s+(?&lt;range&gt;\w+)</rule>
+
+  <!-- COMMENTS -->
+  <rule style="Green">//.*</rule>
+
+  
   <!-- SUB ROUTINES, IF THEN -->
+  <rule style="sub" options="Multiline">(?&lt;range&gt;\S+)\s*{((?&gt;[^{}]+|{(?&lt;c&gt;)|}(?&lt;-c&gt;))*(?(c)(?!)))}</rule>
   
   <folding start="{" finish="}" options="IgnoreCase"/>
 </doc>

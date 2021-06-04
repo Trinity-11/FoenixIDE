@@ -43,6 +43,13 @@
             this.LUTCombo = new System.Windows.Forms.ComboBox();
             this.ExtensionLabel = new System.Windows.Forms.Label();
             this.ExtLabel = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textTransparentColor = new System.Windows.Forms.TextBox();
+            this.radioCustomColor = new System.Windows.Forms.RadioButton();
+            this.radioTopLeftColor = new System.Windows.Forms.RadioButton();
+            this.radioBlack = new System.Windows.Forms.RadioButton();
+            this.labelHash = new System.Windows.Forms.Label();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // BrowseFileButton
@@ -121,7 +128,7 @@
             // 
             this.StoreButton.Enabled = false;
             this.StoreButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StoreButton.Location = new System.Drawing.Point(189, 110);
+            this.StoreButton.Location = new System.Drawing.Point(186, 145);
             this.StoreButton.Margin = new System.Windows.Forms.Padding(2);
             this.StoreButton.Name = "StoreButton";
             this.StoreButton.Size = new System.Drawing.Size(112, 24);
@@ -134,7 +141,7 @@
             // 
             this.TypeLabel.AutoSize = true;
             this.TypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TypeLabel.Location = new System.Drawing.Point(15, 70);
+            this.TypeLabel.Location = new System.Drawing.Point(12, 105);
             this.TypeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.TypeLabel.Name = "TypeLabel";
             this.TypeLabel.Size = new System.Drawing.Size(39, 13);
@@ -145,7 +152,7 @@
             // 
             this.FileTypesCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.FileTypesCombo.FormattingEnabled = true;
-            this.FileTypesCombo.Location = new System.Drawing.Point(137, 67);
+            this.FileTypesCombo.Location = new System.Drawing.Point(134, 102);
             this.FileTypesCombo.Margin = new System.Windows.Forms.Padding(2);
             this.FileTypesCombo.Name = "FileTypesCombo";
             this.FileTypesCombo.Size = new System.Drawing.Size(144, 21);
@@ -156,7 +163,7 @@
             // 
             this.LabelLUT.AutoSize = true;
             this.LabelLUT.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelLUT.Location = new System.Drawing.Point(309, 70);
+            this.LabelLUT.Location = new System.Drawing.Point(306, 105);
             this.LabelLUT.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.LabelLUT.Name = "LabelLUT";
             this.LabelLUT.Size = new System.Drawing.Size(35, 13);
@@ -167,7 +174,7 @@
             // 
             this.LUTCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.LUTCombo.FormattingEnabled = true;
-            this.LUTCombo.Location = new System.Drawing.Point(348, 67);
+            this.LUTCombo.Location = new System.Drawing.Point(345, 102);
             this.LUTCombo.Margin = new System.Windows.Forms.Padding(2);
             this.LUTCombo.Name = "LUTCombo";
             this.LUTCombo.Size = new System.Drawing.Size(117, 21);
@@ -177,7 +184,7 @@
             // 
             this.ExtensionLabel.AutoSize = true;
             this.ExtensionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ExtensionLabel.Location = new System.Drawing.Point(15, 93);
+            this.ExtensionLabel.Location = new System.Drawing.Point(12, 128);
             this.ExtensionLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.ExtensionLabel.Name = "ExtensionLabel";
             this.ExtensionLabel.Size = new System.Drawing.Size(66, 13);
@@ -187,18 +194,93 @@
             // ExtLabel
             // 
             this.ExtLabel.AutoSize = true;
-            this.ExtLabel.Location = new System.Drawing.Point(131, 93);
+            this.ExtLabel.Location = new System.Drawing.Point(128, 128);
             this.ExtLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.ExtLabel.Name = "ExtLabel";
             this.ExtLabel.Size = new System.Drawing.Size(29, 13);
             this.ExtLabel.TabIndex = 19;
             this.ExtLabel.Text = "Raw";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.labelHash);
+            this.groupBox1.Controls.Add(this.textTransparentColor);
+            this.groupBox1.Controls.Add(this.radioCustomColor);
+            this.groupBox1.Controls.Add(this.radioTopLeftColor);
+            this.groupBox1.Controls.Add(this.radioBlack);
+            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Location = new System.Drawing.Point(12, 54);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(452, 38);
+            this.groupBox1.TabIndex = 24;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Transparent Color";
+            // 
+            // textTransparentColor
+            // 
+            this.textTransparentColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textTransparentColor.Location = new System.Drawing.Point(376, 13);
+            this.textTransparentColor.Margin = new System.Windows.Forms.Padding(2);
+            this.textTransparentColor.MaxLength = 6;
+            this.textTransparentColor.Name = "textTransparentColor";
+            this.textTransparentColor.ReadOnly = true;
+            this.textTransparentColor.Size = new System.Drawing.Size(71, 20);
+            this.textTransparentColor.TabIndex = 27;
+            this.textTransparentColor.Text = "000000";
+            // 
+            // radioCustomColor
+            // 
+            this.radioCustomColor.AutoSize = true;
+            this.radioCustomColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.radioCustomColor.Location = new System.Drawing.Point(217, 16);
+            this.radioCustomColor.Name = "radioCustomColor";
+            this.radioCustomColor.Size = new System.Drawing.Size(60, 17);
+            this.radioCustomColor.TabIndex = 26;
+            this.radioCustomColor.Text = "Custom";
+            this.radioCustomColor.UseVisualStyleBackColor = true;
+            this.radioCustomColor.CheckedChanged += new System.EventHandler(this.radioCustomColor_CheckedChanged);
+            // 
+            // radioTopLeftColor
+            // 
+            this.radioTopLeftColor.AutoSize = true;
+            this.radioTopLeftColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.radioTopLeftColor.Location = new System.Drawing.Point(97, 16);
+            this.radioTopLeftColor.Name = "radioTopLeftColor";
+            this.radioTopLeftColor.Size = new System.Drawing.Size(83, 17);
+            this.radioTopLeftColor.TabIndex = 25;
+            this.radioTopLeftColor.Text = "Pixel at (0,0)";
+            this.radioTopLeftColor.UseVisualStyleBackColor = true;
+            this.radioTopLeftColor.CheckedChanged += new System.EventHandler(this.radioTopLeftColor_CheckedChanged);
+            // 
+            // radioBlack
+            // 
+            this.radioBlack.AutoSize = true;
+            this.radioBlack.Checked = true;
+            this.radioBlack.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.radioBlack.Location = new System.Drawing.Point(7, 16);
+            this.radioBlack.Name = "radioBlack";
+            this.radioBlack.Size = new System.Drawing.Size(52, 17);
+            this.radioBlack.TabIndex = 24;
+            this.radioBlack.TabStop = true;
+            this.radioBlack.Text = "Black";
+            this.radioBlack.UseVisualStyleBackColor = true;
+            this.radioBlack.CheckedChanged += new System.EventHandler(this.radioBlack_CheckedChanged);
+            // 
+            // labelHash
+            // 
+            this.labelHash.AutoSize = true;
+            this.labelHash.Location = new System.Drawing.Point(358, 16);
+            this.labelHash.Name = "labelHash";
+            this.labelHash.Size = new System.Drawing.Size(15, 13);
+            this.labelHash.TabIndex = 28;
+            this.labelHash.Text = "#";
+            // 
             // AssetLoader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(476, 145);
+            this.ClientSize = new System.Drawing.Size(476, 177);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ExtLabel);
             this.Controls.Add(this.ExtensionLabel);
             this.Controls.Add(this.LUTCombo);
@@ -224,6 +306,8 @@
             this.Text = "Asset Loader";
             this.Load += new System.EventHandler(this.AssetLoader_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BitmapLoader_KeyDown);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -244,5 +328,11 @@
         private System.Windows.Forms.ComboBox LUTCombo;
         private System.Windows.Forms.Label ExtensionLabel;
         private System.Windows.Forms.Label ExtLabel;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox textTransparentColor;
+        private System.Windows.Forms.RadioButton radioCustomColor;
+        private System.Windows.Forms.RadioButton radioTopLeftColor;
+        private System.Windows.Forms.RadioButton radioBlack;
+        private System.Windows.Forms.Label labelHash;
     }
 }

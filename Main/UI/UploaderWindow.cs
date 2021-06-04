@@ -413,9 +413,10 @@ namespace FoenixIDE.UI
                     tempMem.AllowSave();
                     tempMem.Show();
                 }
+                SendBinaryButton.Enabled = true;
+                DisconnectButton.Enabled = true;
             }
-            SendBinaryButton.Enabled = true;
-            DisconnectButton.Enabled = true;
+            
         }
 
         private void HideProgressBarAfter5Seconds(string message)
@@ -424,6 +425,8 @@ namespace FoenixIDE.UI
             CountdownLabel.Visible = true;
             CountdownLabel.Text = message;
             hideLabelTimer.Enabled = true;
+            SendBinaryButton.Enabled = true;
+            DisconnectButton.Enabled = true;
         }
 
         private void hideLabelTimer_Tick(object sender, EventArgs e)

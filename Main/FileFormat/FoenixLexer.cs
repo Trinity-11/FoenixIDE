@@ -33,7 +33,9 @@ namespace FoenixIDE.GameGenerator
         DISABLE_TILEMAP,
         SET_TILEMAP_POS,
         IF,
-        VAR
+        VAR,
+        INCR,
+        DECR
     }
 
     public class TokenMatch
@@ -113,9 +115,12 @@ namespace FoenixIDE.GameGenerator
             _tokenDefinitions.Add(new TokenDefinition(TokenType.ASSET, @"^[ \t]*asset\s+("".+""|\S+)\s+(\w+)(\s*//.*^\r)?", 1));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.SUB, @"(\S+)\s*{((?>[^{}]+|{(?<c>)|}(?<-c>))*(?(c)(?!)))}", 1));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.COPY, @"^[ \t]*copy\s+(\S*)\s+(\S*)\s+(\S*)(\s*//.*^\r)?", 2));
-            _tokenDefinitions.Add(new TokenDefinition(TokenType.ASSIGNMENT, @"^[ \t]*(\w+)\s*=\s*(\S*)(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.ASSIGNMENT, @"^[ \t]*(?!var\s+)(\w+)\s*=\s*(\S*)(\s*//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.VAR, @"^[ \t]*var\s+(\w+)\s*=\s*(\S*)(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.LABEL, @"^[ \t]*(\w+)\s*:(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.GOTO, @"^[ \t]*goto\s+(\S*)(\s//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.INCR, @"^[ \t]*incr\s+(\S*)(\s//.*^\r)?", 2));
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.DECR, @"^[ \t]*decr\s+(\S*)(\s//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.FILL, @"^[ \t]*fill\s+(\S*)\s+(\S*)\s+(\S*)(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.VGM_INIT, @"^[ \t]*vgm_init\s+(\S*)(\s*//.*^\r)?", 2));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.VGM_PLAY, @"^[ \t]*vgm_play(\s*//.*^\r)?", 2));
