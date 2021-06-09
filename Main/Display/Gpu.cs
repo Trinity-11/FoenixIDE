@@ -682,7 +682,7 @@ namespace FoenixIDE.Display
                 }
                 else
                 {
-                    tilesetOffsets[i] = tilesetPointer + (tile * 256 + (tile % TILE_SIZE) * TILE_SIZE) + tileYOffset * 256;
+                    tilesetOffsets[i] = tilesetPointer + ((tile / TILE_SIZE) * strideX * TILE_SIZE + (tile % TILE_SIZE) * TILE_SIZE) + tileYOffset * strideX;
                 }
             }
 

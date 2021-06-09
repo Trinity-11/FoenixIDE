@@ -321,7 +321,11 @@
             "Tileset 0",
             "Tileset 1",
             "Tileset 2",
-            "Tileset 3"});
+            "Tileset 3",
+            "Tileset 4",
+            "Tileset 5",
+            "Tileset 6",
+            "Tileset 7"});
             this.TilesetList.Location = new System.Drawing.Point(48, 165);
             this.TilesetList.Name = "TilesetList";
             this.TilesetList.Size = new System.Drawing.Size(121, 21);

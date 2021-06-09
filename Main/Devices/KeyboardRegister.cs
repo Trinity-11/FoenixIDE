@@ -55,6 +55,9 @@ namespace FoenixIDE.Simulator.Devices
                         case 0x60:
 
                             break;
+                        case 0xA9:
+                            data[0] = 0;
+                            break;
                         case 0xAA: // self test
                             data[0] = 0x55;
                             data[4] = 1;
