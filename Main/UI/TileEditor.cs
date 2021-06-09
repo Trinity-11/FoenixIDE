@@ -94,15 +94,16 @@ namespace FoenixIDE.Simulator.UI
             int stride = bitmapData.Stride;
             int[] graphicsLUT = LoadLUT(MemMgr.VICKY);
             int lut = LutList.SelectedIndex;
+            int tileStride = Stride256Checkbox.Checked ? 256 : 16;
             int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) - 0xB0_0000;
             for (int y = 0; y < 256; y++)
             {
                 for (int x = 0; x < 256; x++)
                 {
-                    byte pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + y * 256 + x);
+                    byte pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + y * tileStride + (x / tileStride) * 256 + x % tileStride);
                     if (pixel != 0)
                     {
-                        int color = graphicsLUT[lut * 256 + pixel];
+                        int color = graphicsLUT[lut * tileStride + pixel];
                         int destX = x / 16 * TILE_WIDTH + x % 16 + 1;
                         int destY = y / 16 * TILE_WIDTH + y % 16 + 1;
                         System.Runtime.InteropServices.Marshal.WriteInt32(p, (destY * stride + destX * 4), color);

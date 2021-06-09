@@ -664,7 +664,7 @@ namespace FoenixIDE.Display
             {
                 tilesetPointers[i] = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4);
                 byte tilesetConfig = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4 + 3);
-                strides[i] =(tilesetConfig & 8) != 0 ? 256 : 1;
+                strides[i] =(tilesetConfig & 8) != 0 ? 256 : 16;
             }
             for (int i = 0; i< tilemapItemCount; i++)
             {
@@ -676,8 +676,14 @@ namespace FoenixIDE.Display
                 // tileset
                 int tilesetPointer = tilesetPointers[tileset];
                 int strideX = strides[tileset];
-
-                tilesetOffsets[i] = tilesetPointer + ((tile / TILE_SIZE) * strideX * TILE_SIZE + (tile % TILE_SIZE) * TILE_SIZE) + tileYOffset * strideX;
+                if (strideX == 16)
+                {
+                    tilesetOffsets[i] = tilesetPointer + tile * 256 + tileYOffset * 16;
+                }
+                else
+                {
+                    tilesetOffsets[i] = tilesetPointer + (tile * 256 + (tile % TILE_SIZE) * TILE_SIZE) + tileYOffset * 256;
+                }
             }
 
             int* ptr = p + line * STRIDE;
@@ -695,7 +701,7 @@ namespace FoenixIDE.Display
                 //int tilesetPointer = tilesetPointers[tileset];
                 //int strideX = strides[tileset];
 
-                int tilesetOffsetAddress = tilesetOffsets[tileIndex] + (x + tilemapWindowX) % TILE_SIZE;   //((tile / TILE_SIZE) * strideX * TILE_SIZE + (tile % TILE_SIZE) * TILE_SIZE) + tileYOffset * strideX + (x + tilemapWindowX) % TILE_SIZE;
+                int tilesetOffsetAddress = tilesetOffsets[tileIndex] + (x + tilemapWindowX) % TILE_SIZE;   
                 //byte pixelIndex = VRAM.ReadByte(tilesetPointer + tilesetOffsetAddress );
                 byte pixelIndex = VRAM.ReadByte(tilesetOffsetAddress);
                 if (pixelIndex > 0)
