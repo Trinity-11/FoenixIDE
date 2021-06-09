@@ -20,6 +20,10 @@ namespace FoenixIDE.Simulator.Devices
             {
                 return (byte)rng.Next(255);
             }
+            if (Address == (MemoryMap.GABE_RNG_SEED_HI - MemoryMap.GABE_START))
+            {
+                return (byte)rng.Next(255);
+            }
             return data[Address];
         }
     }

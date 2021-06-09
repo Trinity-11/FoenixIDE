@@ -105,6 +105,22 @@ namespace FoenixIDE
             MemMgr.TIMER0.TimerInterruptDelegate += TimerEvent0;
             MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
             MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
+
+            // Set the Vicky rev and subrev
+            MemMgr.VICKY.WriteWord(0x1C, 0x7654);
+            MemMgr.VICKY.WriteWord(0x1E, 0x3456);
+            MemMgr.VICKY.WriteByte(MemoryMap.GAMMA_CTRL_REG - MemoryMap.VICKY_BASE_ADDR, 0x11); // Gamma and hi-res are off
+            // set the date
+            MemMgr.VICKY.WriteByte(MemoryMap.FPGA_DOR - MemoryMap.VICKY_BASE_ADDR, 0x1);
+            MemMgr.VICKY.WriteByte(MemoryMap.FPGA_MOR - MemoryMap.VICKY_BASE_ADDR, 0x2);
+            MemMgr.VICKY.WriteByte(MemoryMap.FPGA_YOR - MemoryMap.VICKY_BASE_ADDR, 0x21);
+
+            // Set board revision
+            MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_C - MemoryMap.GABE_START, (byte)'E');
+            MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_4 - MemoryMap.GABE_START, (byte)'M');
+            MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'U');
+            // Set the rev date
+
         }
 
         private void TimerEvent0()
@@ -242,6 +258,11 @@ namespace FoenixIDE
                 }
             }
             CPU.Reset();
+
+            // Reset the keyboard
+            MemMgr.KEYBOARD.WriteByte(0, 0);
+            MemMgr.KEYBOARD.WriteByte(4, 0);
+
             return true;
         }
 

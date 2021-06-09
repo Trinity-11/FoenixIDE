@@ -716,62 +716,66 @@ namespace FoenixIDE.Display
                 // if the set is not enabled, we're done.
                 byte spriteLayer = (byte)((reg & 0x70) >> 4);
                 int posY = VICKY.ReadWord(addrSprite + 6) - 32;
-                if ((reg & 1) != 0 && layer == spriteLayer && (line >= posY && line < posY + 32))
+                if ((reg & 1) != 0 && layer == spriteLayer)
                 {
-                    // TODO Fix this when Vicky II fixes the LUT issue
-                    byte lutIndex = (byte)(((reg & 14) >> 1));  // 8 possible LUTs 
-                    bool striding = (reg & 0x80) == 0x80;
-
-                    int spriteAddress = VICKY.ReadLong(addrSprite + 1);
-                    int posX = VICKY.ReadWord(addrSprite + 4) - 32;
-
-
-                    if (posX >= (width - borderXSize) || posY >= (height - borderYSize) || posX < 0 || posY < 0)
+                    if ((line >= posY && line < posY + 32))
                     {
-                        continue;
-                    }
-                    int spriteWidth = 32;
-                    int xOffset = 0;
-                    // Check for sprite bleeding on the left-hand-side
-                    if (posX < borderXSize)
-                    {
-                        xOffset = borderXSize - posX;
-                        posX = borderXSize;
-                        spriteWidth = 32 - xOffset;
-                        if (spriteWidth == 0)
+                        // TODO Fix this when Vicky II fixes the LUT issue
+                        byte lutIndex = (byte)(((reg & 14) >> 1));  // 8 possible LUTs 
+                        bool striding = (reg & 0x80) == 0x80;
+
+                        int spriteAddress = VICKY.ReadLong(addrSprite + 1);
+                        int posX = VICKY.ReadWord(addrSprite + 4) - 32;
+
+
+                        if (posX >= (width - borderXSize) || posY >= (height - borderYSize) || (posX +32) < 0 || (posY + 32) < 0)
                         {
                             continue;
                         }
-                    }
-                    // Check for sprite bleeding on the right-hand side
-                    if (posX + 32 > width - borderXSize)
-                    {
-                        spriteWidth = 640 - borderXSize - posX;
-                        if (spriteWidth == 0)
+                        int spriteWidth = 32;
+                        int xOffset = 0;
+                        // Check for sprite bleeding on the left-hand-side
+                        if (posX < borderXSize)
                         {
-                            continue;
+                            xOffset = borderXSize - posX;
+                            posX = borderXSize;
+                            spriteWidth = 32 - xOffset;
+                            if (spriteWidth == 0)
+                            {
+                                continue;
+                            }
+                        }
+                        // Check for sprite bleeding on the right-hand side
+                        if (posX + 32 > width - borderXSize)
+                        {
+                            spriteWidth = 640 - borderXSize - posX;
+                            if (spriteWidth == 0)
+                            {
+                                continue;
+                            }
+                        }
+
+                        int value = 0;
+                        byte pixelIndex = 0;
+
+                        // Sprites are 32 x 32
+                        int sline = line - posY;
+                        int lineOffset = line * STRIDE;
+                        int* ptr = p + lineOffset;
+                        for (int col = xOffset; col < xOffset + spriteWidth; col++)
+                        {
+                            // Lookup the pixel in the tileset - if the value is 0, it's transparent
+                            pixelIndex = VRAM.ReadByte(spriteAddress + col + sline * 32);
+                            if (pixelIndex != 0)
+                            {
+                                value = GetLUTValue(lutIndex, pixelIndex, gammaCorrection);
+
+                                //System.Runtime.InteropServices.Marshal.WriteInt32(p, (lineOffset + (col-xOffset + posX)) * 4, value);
+                                ptr[col - xOffset + posX] = value;
+                            }
                         }
                     }
 
-                    int value = 0;
-                    byte pixelIndex = 0;
-
-                    // Sprites are 32 x 32
-                    int sline = line - posY;
-                    int lineOffset = line * STRIDE;
-                    int* ptr = p + lineOffset;
-                    for (int col = xOffset; col < xOffset + spriteWidth; col++)
-                    {
-                        // Lookup the pixel in the tileset - if the value is 0, it's transparent
-                        pixelIndex = VRAM.ReadByte(spriteAddress + col + sline * 32);
-                        if (pixelIndex != 0)
-                        {
-                            value = GetLUTValue(lutIndex, pixelIndex, gammaCorrection);
-
-                            //System.Runtime.InteropServices.Marshal.WriteInt32(p, (lineOffset + (col-xOffset + posX)) * 4, value);
-                            ptr[col - xOffset + posX] = value;
-                        }
-                    }
                 }
             }
         }

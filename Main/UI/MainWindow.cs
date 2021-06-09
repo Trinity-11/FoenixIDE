@@ -314,14 +314,16 @@ namespace FoenixIDE.UI
             //System.Console.WriteLine(ts.TotalMilliseconds);
             pSof = currentDT;
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
-            //if (!kernel.CPU.DebugPause && ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF))
+            if (!kernel.CPU.DebugPause)
             {
                 // Set the SOF Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 IRQ0 |= (byte)Register0.FNX0_INT00_SOF;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
-                kernel.CPU.Pins.IRQ = true;
+                if ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF)
+                {
+                    kernel.CPU.Pins.IRQ = true;
+                }
             }
         }
 

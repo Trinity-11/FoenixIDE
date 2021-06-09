@@ -359,12 +359,8 @@
     <Content Include="Resources\foenix-game-generator-syntax.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="roms\kernel.lst">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="roms\kernel.hex">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="roms\kernel.lst" />
+    <Content Include="roms\kernel.hex" />
     <None Include="roms\kernel_U_Plus.hex" />
     <None Include="roms\kernel_U_Plus.lst" />
     <None Include="Resources\save_btn.bmp" />

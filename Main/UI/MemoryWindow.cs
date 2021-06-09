@@ -158,15 +158,19 @@ namespace FoenixIDE.UI
 
         private void StartAddressText_Validated(object sender, EventArgs e)
         {
+            int requestedAddress = 0;
             try
             {
-                int requestedAddress = Convert.ToInt32(this.StartAddressText.Text, 16) & 0xFFFF00;
-                GotoAddress(requestedAddress);
-                FindMatchedDropDownEntry(requestedAddress);
+                requestedAddress = Convert.ToInt32(this.StartAddressText.Text, 16) & 0xFFFF00;
             }
-            catch (global::System.FormatException ex)
+            catch (Exception ex)
             {
                 global::System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            finally
+            {
+                GotoAddress(requestedAddress);
+                FindMatchedDropDownEntry(requestedAddress);
             }
         }
 

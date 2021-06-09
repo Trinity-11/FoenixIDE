@@ -11,6 +11,7 @@ namespace FoenixIDE.MemoryLocations
         #region Vicky Memory Map
 
         public const int VICKY_BASE_ADDR = 0xAF_0000;
+        public const int GAMMA_CTRL_REG = 0xAF_0002;
         public const int BORDER_CTRL_REG = 0xAF_0004; // border is enabled if bit 0 is 1.
 
         public const int BORDER_X_SIZE = 0xAF_0008; // X-  Values: 0 - 32 (Default: 32)
@@ -99,6 +100,9 @@ namespace FoenixIDE.MemoryLocations
         public const int SCREEN_PAGE0 = 0xAF_A000; // 8192 Bytes First page of display RAM. This is used at boot time to display the welcome screen and the BASIC or MONITOR command screens. 
         public const int SCREEN_PAGE1 = 0xAF_C000; // 8192 Bytes Additional page of display RAM. This can be used for page flipping or to handle multiple edit buffers. 
 
+        public const int REVOFPCB_C = 0xAF_E805;
+        public const int REVOFPCB_4 = 0xAF_E806;
+        public const int REVOFPCB_A = 0xAF_E807;
         #endregion
     }
 }

@@ -27,11 +27,12 @@ namespace FoenixIDE.Simulator.Devices
         {
             // In order to avoid an infinite loop, we write to the device directly
             data[Address] = Value;
+            
+            
             switch (Address)
             {
                 case 0:
-                    byte command = data[0];
-                    switch (command)
+                    switch (Value)
                     {
                         case 0x69:
                             data[4] = 1;
@@ -49,33 +50,55 @@ namespace FoenixIDE.Simulator.Devices
                     }
                     break;
                 case 4:
-                    byte reg = data[4];
-                    switch (reg)
+                    switch (Value)
                     {
-                        case 0x20:
-                            data[4] = 1;
-                            break;
                         case 0x60:
-                            data[4] = 0;
+
                             break;
-                        case 0xAA:
+                        case 0xAA: // self test
                             data[0] = 0x55;
                             data[4] = 1;
                             break;
-                        case 0xA8:
-                            data[4] = 1;
-                            break;
-                        case 0xA9:
+                        case 0xAB: // keyboard test
                             data[0] = 0;
                             data[4] = 1;
                             break;
-                        case 0xAB:
+                        case 0xAD: // disable keyboard
                             data[0] = 0;
+                            data[1] = 0;
                             break;
-                        case 0xD4:
+                        case 0xAE: // re-enabled sending data
                             data[4] = 1;
                             break;
+                        case 0xFF:  // reset 
+                            data[4] = 0xAA;
+                            break;
+                        //case 0x20:
+                        //    data[4] = 1;
+                        //    break;
+                        //case 0x60:
+                        //    data[4] = 0;
+                        //    break;
+                        //case 0xAA:
+                        //    data[0] = 0x55;
+                        //    data[4] = 1;
+                        //    break;
+                        //case 0xA8:
+                        //    data[4] = 1;
+                        //    break;
+                        //case 0xA9:
+                        //    data[0] = 0;
+                        //    data[4] = 1;
+                        //    break;
+                        //case 0xAB:
+                        //    data[0] = 0;
+                        //    break;
+                        //case 0xD4:
+                        //    data[4] = 1;
+                        //    break;
+                        
                     }
+                    
                     break;
             }
         }
@@ -100,8 +123,13 @@ namespace FoenixIDE.Simulator.Devices
                     // raise interrupt
                     TriggerMouseInterrupt();
                 }
+                return data[0];
             }
-            return base.ReadByte(Address);
+            else if (Address == 5)
+            {
+                return 0;
+            }
+            return data[Address];
         }
         public void WriteKey(ScanCode key)
         {
