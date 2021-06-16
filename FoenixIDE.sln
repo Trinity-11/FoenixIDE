@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIDI-to-VGM-Converter", "MI
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FoenixIDESetup", "FoenixIDESetup\FoenixIDESetup.vdproj", "{E9478995-9CB5-4121-90DC-FFD67660CDEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenXUploader", "GenXUploader\GenXUploader.csproj", "{6AFE1567-D6D8-47FF-88C7-D3DBD2026B52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{E9478995-9CB5-4121-90DC-FFD67660CDEE}.Debug|Any CPU.ActiveCfg = Debug
 		{E9478995-9CB5-4121-90DC-FFD67660CDEE}.Release|Any CPU.ActiveCfg = Release
 		{E9478995-9CB5-4121-90DC-FFD67660CDEE}.Release|Any CPU.Build.0 = Release
+		{6AFE1567-D6D8-47FF-88C7-D3DBD2026B52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AFE1567-D6D8-47FF-88C7-D3DBD2026B52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AFE1567-D6D8-47FF-88C7-D3DBD2026B52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AFE1567-D6D8-47FF-88C7-D3DBD2026B52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
