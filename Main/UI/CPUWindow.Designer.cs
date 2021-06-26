@@ -135,7 +135,6 @@
             // 
             // BPLabel
             // 
-            this.BPLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.BPLabel.Location = new System.Drawing.Point(379, 2);
             this.BPLabel.Name = "BPLabel";
             this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);

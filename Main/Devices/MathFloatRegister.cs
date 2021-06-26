@@ -130,7 +130,7 @@ namespace FoenixIDE.Simulator.Devices
         {
             float fractional = 0;
             float bit = 0.5f;
-            for (short mask = 0b1000_0000_0000; mask > 1; mask = (short)(mask >> 1))
+            for (short mask = 0b1000_0000_0000; mask > 0; mask = (short)(mask >> 1))
             {
                 fractional += (value & mask) != 0 ? bit : 0;
                 bit /= 2;
@@ -144,7 +144,7 @@ namespace FoenixIDE.Simulator.Devices
             float remainder = value - intVal;
             float bit = 0.5f;
             uint result = (uint)(intVal << 12);
-            for (short mask = 0b1000_0000_0000; mask > 1; mask = (short)(mask >> 1))
+            for (short mask = 0b1000_0000_0000; mask > 0; mask = (short)(mask >> 1))
             {
                 if (remainder > bit)
                 {

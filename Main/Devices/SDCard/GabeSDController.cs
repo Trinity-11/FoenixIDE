@@ -173,7 +173,7 @@ namespace FoenixIDE.Simulator.Devices
                                 int writeAddress = ReadWord(7) + (ReadWord(9) << 16);
                                 if (GetISOMode())
                                 {
-                                    SetData_ISO((writeAddress - BOOT_SECTOR_ADDR) / 512, writeBlock); // write the 512 Byte buffer
+                                    SetData_ISO((writeAddress - (mbrPresent ? 0 : BOOT_SECTOR_ADDR)) / 512, writeBlock); // write the 512 Byte buffer
                                 }
                                 else
                                 {

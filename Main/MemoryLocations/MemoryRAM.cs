@@ -62,7 +62,11 @@ namespace FoenixIDE.MemoryLocations
         /// <returns></returns>
         public virtual byte ReadByte(int Address)
         {
-            return data[Address];
+            var d = data;
+            if (Address >= 0 && Address < Length)
+                return d[Address];
+            else
+                return 0x40;
         }
 
         /// <summary>
@@ -72,8 +76,9 @@ namespace FoenixIDE.MemoryLocations
         /// <returns></returns>
         public int ReadWord(int Address)
         {
-            return ReadByte(Address) + (ReadByte(Address + 1) << 8);
-            //return BitConverter.ToUInt16(data, Address);
+            var d = data;
+            //return ReadByte(Address) + (ReadByte(Address + 1) << 8);
+            return BitConverter.ToUInt16(d, Address);
         }
 
         /// <summary>
@@ -83,21 +88,24 @@ namespace FoenixIDE.MemoryLocations
         /// <returns></returns>
         internal int ReadLong(int Address)
         {
+            var d = data;
             //return ReadByte(Address) + (ReadByte(Address + 1) << 8) + (ReadByte(Address + 2) << 16);
-            return (int)BitConverter.ToInt32(data, Address) & 0xFF_FFFF;
+            return (int)BitConverter.ToInt32(d, Address) & 0xFF_FFFF;
         }
 
         internal void Load(byte[] SourceData, int SrcStart, int DestStart, int copyLength)
         {
+            var d = data;
             for (int i = 0; i < copyLength; i++)
             {
-                this.data[DestStart + i] = SourceData[SrcStart + i];
+                d[DestStart + i] = SourceData[SrcStart + i];
             }
         }
 
         public virtual void WriteByte(int Address, byte Value)
         {
-            data[Address] = Value;
+            var d = data;
+            d[Address] = Value;
         }
 
         public void WriteWord(int Address, int Value)
@@ -109,18 +117,21 @@ namespace FoenixIDE.MemoryLocations
         // Duplicate a memory block
         internal void Duplicate(int SourceAddress, int DestAddress, int Length)
         {
-            System.Array.Copy(data, SourceAddress, data, DestAddress, Length);
+            var d = data;
+            System.Array.Copy(d, SourceAddress, d, DestAddress, Length);
         }
 
         public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer)
         {
-            System.Array.Copy(data, srcAddress, buffer, 0, srcLength);
+            var d = data;
+            System.Array.Copy(d, srcAddress, buffer, 0, srcLength);
         }
 
         // Copy data from a buffer to RAM
         public void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length)
         {
-            System.Array.Copy(src, srcAddress, data, destAddress, length);
+            var d = data;
+            System.Array.Copy(src, srcAddress, d, destAddress, length);
         }
     }
 }

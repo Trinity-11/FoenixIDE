@@ -312,6 +312,14 @@ namespace FoenixIDE.UI
                 };
 
                 List<string> variables = new List<string>();
+                if (cbEVID.Checked)
+                {
+                    // Add code to push the address of start_debug_text to stack
+                    // Add code to JSL to Display_EVID_Log
+                    // Add variable to start_debug_text
+                }
+
+
                 List<TokenMatch> codeMatches = fl.GetCode();
                 foreach (TokenMatch tm in codeMatches)
                 {

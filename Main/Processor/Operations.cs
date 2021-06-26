@@ -715,14 +715,14 @@ namespace FoenixIDE.Processor
                     //return cpu.ProgramBank.GetLongAddress(ptr);
                     return (cpu.PC & 0xFF_0000) + ptr;
                 case AddressModes.DirectPageIndirect:
-                    addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
+                    addr = Bank.GetLongAddress(cpu.DirectPage.GetLongAddress(SignatureBytes) & 0xFFFF);
                     ptr = cpu.MemMgr.ReadWord(addr);
-                    return cpu.DataBank.GetLongAddress(ptr);
+                    return ptr;
                 case AddressModes.DirectPageIndirectIndexedWithY:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.MemMgr.ReadWord(addr) + cpu.Y.Value;
                     //return cpu.ProgramBank.GetLongAddress(ptr);
-                    return (cpu.PC & 0xFF_0000) + ptr;
+                    return ptr;
                 case AddressModes.DirectPageIndirectLong:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.MemMgr.ReadLong(addr);
@@ -1011,11 +1011,20 @@ namespace FoenixIDE.Processor
             if (cpu.Flags.Decimal)
                 nv = HexVal(BCDVal(val) + BCDVal(cpu.A.Value) + cpu.Flags.CarryBit);
             else
+            { 
                 nv = val + cpu.A.Value + cpu.Flags.CarryBit;
             
+                // We need to detect a wraparound - when the sign changes but there is no overflow
+                if (cpu.A.Width == 1)
+                {
+                    cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((val + cpu.Flags.CarryBit) ^ nv) & 0x80) != 0;
+                }
+                else
+                {
+                    cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((val + cpu.Flags.CarryBit) ^ nv) & 0x8000) != 0;
+                }
+            }
             cpu.Flags.Carry = (nv < 0 || nv > cpu.A.MaxUnsigned);
-            // We need to detect a wraparound - when the sign changes but there is no overflow
-            cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & (val ^ nv) & 0x80) != 0;
             cpu.Flags.SetNZ(nv, cpu.A.Width);
 
             cpu.A.Value = nv;
@@ -1035,18 +1044,19 @@ namespace FoenixIDE.Processor
             if (cpu.Flags.Decimal)
                 nv = HexVal(BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
             else
+            {
                 nv = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;
 
+                if (cpu.A.Width == 1)
+                {
+                    cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((0x100 - val - 1 + cpu.Flags.CarryBit) ^ nv) & 0x80) != 0;
+                }
+                else
+                {
+                    cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((0x10000 - val - 1 + cpu.Flags.CarryBit) ^ nv) & 0x8000) != 0;
+                }
+            }
             cpu.Flags.Carry = (nv >= 0 && nv <= cpu.A.MaxUnsigned);
-            if (cpu.A.Width == 1)
-            {
-                cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((256 - val) ^ nv) & 0x80) != 0;
-            }
-            else
-            {
-                cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((65536 - val) ^ nv) & 0x8000) != 0;
-            }
-                      
             cpu.Flags.SetNZ(nv, cpu.A.Width);
 
             cpu.A.Value = nv;

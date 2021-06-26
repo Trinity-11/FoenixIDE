@@ -76,9 +76,9 @@ namespace FoenixIDE.Simulator.Devices
                         case 0xFF:  // reset 
                             data[4] = 0xAA;
                             break;
-                        //case 0x20:
-                        //    data[4] = 1;
-                        //    break;
+                        case 0x20:
+                            data[4] = 1;
+                            break;
                         //case 0x60:
                         //    data[4] = 0;
                         //    break;
@@ -96,10 +96,10 @@ namespace FoenixIDE.Simulator.Devices
                         //case 0xAB:
                         //    data[0] = 0;
                         //    break;
-                        //case 0xD4:
-                        //    data[4] = 1;
-                        //    break;
-                        
+                        case 0xD4:
+                            data[4] = 1;
+                            break;
+
                     }
                     
                     break;

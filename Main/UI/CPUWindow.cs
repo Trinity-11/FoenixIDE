@@ -448,7 +448,7 @@ namespace FoenixIDE.UI
             kernel.CPU.DebugPause = true;
             UpdateTraceTimer.Enabled = false;
             kernel.CPU.Halt();
-            kernel.CPU.CPUThread?.Join();
+            //kernel.CPU.CPUThread.Join();
             RefreshStatus();
             RunButton.Text = "Run (F5)";
             RunButton.Tag = "0";
@@ -599,9 +599,10 @@ namespace FoenixIDE.UI
             StepCounter++;
             DebugLine line = null;
             int previousPC = kernel.CPU.PC;
+
             if (!kernel.CPU.ExecuteNext())
             {
-                
+
                 int nextPC = kernel.CPU.PC;
                 if (nextPC > MemoryLimit)
                 {
@@ -618,19 +619,19 @@ namespace FoenixIDE.UI
                     }
                     return;
                 }
-                if ( knl_breakpoints.ContainsKey(nextPC) || 
-                     kernel.CPU.CurrentOpcode.Value == 0 || 
-                     (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()) )
-                   )
+                if (knl_breakpoints.ContainsKey(nextPC) ||
+                        kernel.CPU.CurrentOpcode.Value == 0 ||
+                        (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()))
+                    )
                 {
                     if (kernel.CPU.CurrentOpcode.Value == 0)
                     {
                         if (lastLine.InvokeRequired)
                         {
                             lastLine.Invoke((MethodInvoker)delegate
-                           {
-                               lastLine.Text = "BRK OpCode read";
-                           });
+                            {
+                                lastLine.Text = "BRK OpCode read";
+                            });
                         }
                         else
                         {
@@ -669,6 +670,7 @@ namespace FoenixIDE.UI
                     GenerateNextInstruction(pc);
                 }
             }
+                    
         }
 
         private delegate void lastLineDelegate(string line);
@@ -719,15 +721,21 @@ namespace FoenixIDE.UI
             }
             // find the proper place to insert the line, based on the PC
             int index = 0;
+            bool lineAdded = false;
             for (index = 0; index < codeList.Count; index++)
             {
                 DebugLine l = codeList[index];
                 if (l.PC > pc)
                 {
+                    codeList.Insert(index, line);
+                    lineAdded = true;
                     break;
                 }
             }
-            codeList.Add(line);
+            if (!lineAdded)
+            {
+                codeList.Add(line);
+            }
         }
 
         private void UpdateDebugLines(int newDebugLine, bool state)

@@ -80,7 +80,7 @@
         '\''};
             this.CodeTextBox.AutoIndentCharsPatterns = "\r\n^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;]+);\r\n^\\s*(case|default)\\s*[^:]" +
     "*(?<range>:)\\s*(?<range>[^;]+);\r\n";
-            this.CodeTextBox.AutoScrollMinSize = new System.Drawing.Size(634, 480);
+            this.CodeTextBox.AutoScrollMinSize = new System.Drawing.Size(634, 675);
             this.CodeTextBox.BackBrush = null;
             this.CodeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.CodeTextBox.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy2;

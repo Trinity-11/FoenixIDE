@@ -37,16 +37,23 @@
   <!-- VAR -->
   <rule style="var" options="IgnoreCase">\s*(?&lt;range&gt;var\s*\w+)\s*=.*</rule>
   
+  <!-- += -->
+  <rule style="var" options="IgnoreCase,Multiline">^\s*(?!var\s*)(?&lt;range&gt;\w+)\s*\+=.*$</rule>
+  
   
   <rule style="Red" options="IgnoreCase">[$][0-9a-f]{1,2}:?[0-9a-f]{1,4}</rule>
   <rule style="Red" options="IgnoreCase">(?:GOTO)\s+(?&lt;range&gt;\w+)</rule>
 
   <!-- COMMENTS -->
   <rule style="Green">//.*</rule>
-
+  <rule style="Green" options="Singleline">/\*.*\*/</rule>
   
-  <!-- SUB ROUTINES, IF THEN -->
+  <!-- SUB ROUTINES -->
   <rule style="sub" options="Multiline">(?&lt;range&gt;\S+)\s*{((?&gt;[^{}]+|{(?&lt;c&gt;)|}(?&lt;-c&gt;))*(?(c)(?!)))}</rule>
+  
+  <!-- IF ELSE -->
+  <rule style="sub" options="Multiline,IgnoreCase">if\s+\(.*\)\s*{((?&gt;[^{}]+|{(?&lt;c&gt;)|}(?&lt;-c&gt;))*(?(c)(?!)))}\s*else\s*{((?&gt;[^{}]+|{(?&lt;c&gt;)|}(?&lt;-c&gt;))*(?(c)(?!)))}</rule>
+  
   
   <folding start="{" finish="}" options="IgnoreCase"/>
 </doc>

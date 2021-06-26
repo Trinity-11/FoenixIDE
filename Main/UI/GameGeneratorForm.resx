@@ -136,8 +136,9 @@
 </value>
   </data>
   <data name="CodeTextBox.Text" xml:space="preserve">
-    <value>// Sample Game File
-
+    <value>/*
+ Sample Game File
+*/
 ASSET "foenix-96x96.bin" LOGO
 FILL $B0:0000 $1:2c00  0         // clear 320x240
 COPY LOGO $B0:0000 $7800 
@@ -147,6 +148,8 @@ VGM_PLAY
 
 VAR MY_VALUE =  $B1
 VAR MY_VAR = 43
+
+MY_VALUE += 5
 
 KERNEL_REG = $4f
 
@@ -160,6 +163,14 @@ my_function
     // put some code here
     FILL $B0:0000 $1:2c00  0         // clear 320x240
     ENABLE_SPRITE 0 1 0 $B2:0000
+    if (condition == 0)
+    {
+        set_sprite_pos 0 32 32
+    }
+    else
+    {
+        disable_sprite 0
+    }
 }
 
 more_function
@@ -167,6 +178,8 @@ more_function
     DISABLE_BITMAP 0
     ENABLE_TILEMAP 0 $B4:0000 40 30 // tilemap:0, address:TILEMAP, width:40, height:30
 }
+
+
 </value>
   </data>
   <metadata name="imageList1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

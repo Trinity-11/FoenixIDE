@@ -109,3 +109,10 @@ FILL_VRAM_LOOPA:
         LDA #0
         STA @l VDMA_CONTROL_REG
         RTL
+
+LOG_EVID_MSG:
+        ; get the current cursor position
+        ; write the text
+        ; move to next line
+        ; if at last line, move the screen up one line
+        RTL

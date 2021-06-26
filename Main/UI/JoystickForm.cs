@@ -46,27 +46,27 @@ namespace FoenixIDE.Simulator.UI
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    value = 0x9B;
+                    value = 0xDB;
                     LeftButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.S:
-                    value = 0x9D;
+                    value = 0xDD;
                     DownButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.D:
-                    value = 0x97;
+                    value = 0xD7;
                     RightButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.W:
-                    value = 0x9E;
+                    value = 0xDE;
                     UpButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.Q:
-                    value = 0x8F;
+                    value = 0xCF;
                     Fire1Button.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.E:
-                    value = 0x1F;
+                    value = 0x5F;
                     Fire2Button.BackColor = SystemColors.ControlDark;
                     break;
             }
@@ -77,7 +77,7 @@ namespace FoenixIDE.Simulator.UI
         }
         private void JoystickForm_KeyUp(object sender, KeyEventArgs e)
         {
-            SendJoystickValue(0, 0x9F);
+            SendJoystickValue(0, 0xDF);
             switch (e.KeyCode)
             {
                 case Keys.A:
@@ -106,14 +106,14 @@ namespace FoenixIDE.Simulator.UI
          */
         private void AllButtonsUp(object sender, MouseEventArgs e)
         {
-            SendJoystickValue(0, 0x9F);
+            SendJoystickValue(0, 0xDF);
         }
         private void AllButtonsDown(object sender, MouseEventArgs e)
         {
             if (sender is Control ctrl)
             {
                 int buttonPressed = int.Parse((string)(ctrl.Tag));
-                byte value = (byte)(0x9F & ~buttonPressed);
+                byte value = (byte)(0xDF & ~buttonPressed);
                 SendJoystickValue(0, value);
             }
         }

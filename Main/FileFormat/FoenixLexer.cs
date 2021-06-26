@@ -35,7 +35,10 @@ namespace FoenixIDE.GameGenerator
         IF,
         VAR,
         INCR,
-        DECR
+        DECR,
+        VAR_INCR,
+        IF_ELSE,
+        COMMENT
     }
 
     public class TokenMatch
@@ -112,6 +115,7 @@ namespace FoenixIDE.GameGenerator
         public FoenixLexer(string code)
         {
             // in multiline regex, the $ catches \n -  be careful
+            _tokenDefinitions.Add(new TokenDefinition(TokenType.COMMENT, @"(?s)/\*.*\*/", 1));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.ASSET, @"^[ \t]*asset\s+("".+""|\S+)\s+(\w+)(\s*//.*^\r)?", 1));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.SUB, @"(\S+)\s*{((?>[^{}]+|{(?<c>)|}(?<-c>))*(?(c)(?!)))}", 1));
             _tokenDefinitions.Add(new TokenDefinition(TokenType.COPY, @"^[ \t]*copy\s+(\S*)\s+(\S*)\s+(\S*)(\s*//.*^\r)?", 2));
@@ -154,6 +158,9 @@ namespace FoenixIDE.GameGenerator
                             label = tm.groups[1],
                             filename = tm.groups[0]
                         });
+                        tokenMatches.Remove(tm);
+                        break;
+                    case TokenType.COMMENT:
                         tokenMatches.Remove(tm);
                         break;
                     case TokenType.COPY:
@@ -201,6 +208,10 @@ namespace FoenixIDE.GameGenerator
         {
             List<TokenMatch> result;
             subs.TryGetValue(fname, out result);
+            if (result != null)
+            {
+                result = result.OrderBy(x => x.StartIndex).ToList();
+            }
             return result;
         }
     }

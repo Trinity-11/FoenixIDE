@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Display
 {
-    public partial class Gpu : UserControl
+    public unsafe partial class Gpu : UserControl
     {
 
         private const int REGISTER_BLOCK_SIZE = 256;
@@ -60,7 +60,8 @@ namespace FoenixIDE.Display
         //    Interval = 15
         //};
         private MultimediaTimer hiresTimer = new MultimediaTimer(16);
-        private int[] lutCache;
+        private static readonly int[] vs = new int[256 * 8];
+        private int[] lutCache = vs;
 
         public Gpu()
         {
@@ -167,7 +168,6 @@ namespace FoenixIDE.Display
 
             int resX = 640;
             int resY = 480;
-            bool isPixelDoubled = false;
             switch (MCRHigh)
             {
                 case 1:
@@ -177,12 +177,10 @@ namespace FoenixIDE.Display
                 case 2:
                     resX = 320;
                     resY = 240;
-                    isPixelDoubled = true;
                     break;
                 case 3:
                     resX = 400;
                     resY = 300;
-                    isPixelDoubled = true;
                     break;
             }
 
@@ -258,7 +256,8 @@ namespace FoenixIDE.Display
             int SOLLine1Addr = MemoryMap.VKY_LINE1_CMP_VALUE_LO - MemoryMap.VICKY_BASE_ADDR;
 
             // Reset LUT Cache
-            lutCache = new int[256 * 8]; // 8 LUTs
+            //lutCache = new int[256 * 8]; // 8 LUTs
+            Array.Clear(lutCache, 0, 256 * 8);
 
 
             for (int line = 0; line < resY; line++)
@@ -427,18 +426,19 @@ namespace FoenixIDE.Display
         }
 
         // We only cache items that are requested, instead of precomputing all 1024 colors.
-        private int GetLUTValue(byte lutIndex, byte color, bool gamma)
+        private int GetLUTValue(in byte lutIndex, in byte color, in bool gamma)
         {
             //int offset = lutIndex * 256 + color;
-            int value = lutCache[lutIndex * 256 + color];
-            
+            var lc = lutCache;
+            int value = lc[lutIndex * 256 + color];
+
             if (value == 0)
             {
-                
+
                 int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + (lutIndex * 256 + color) * 4;
                 byte red = VICKY.ReadByte(lutAddress);
-                byte green = VICKY.ReadByte(lutAddress+1);
-                byte blue = VICKY.ReadByte(lutAddress+2);
+                byte green = VICKY.ReadByte(lutAddress + 1);
+                byte blue = VICKY.ReadByte(lutAddress + 2);
                 if (gamma)
                 {
                     int baseAddr = MemoryMap.GAMMA_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
@@ -447,7 +447,7 @@ namespace FoenixIDE.Display
                     red = VICKY.ReadByte(baseAddr + 0x200 + red);     // gammaCorrection[0x200 + fgValueRed];
                 }
                 value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
-                lutCache[lutIndex * 256 + color] = value;
+                lc[lutIndex * 256 + color] = value;
             }
             return value;
         }
@@ -457,7 +457,8 @@ namespace FoenixIDE.Display
         private int[] GetTextLUT(byte fg, byte bg, bool gamma)
         {
             int[] values = new int[2];
-            if (FGTextLUT[fg] == 0)
+            var fgt = FGTextLUT;
+            if (fgt[fg] == 0)
             {
                 // Read the color lookup tables
                 int fgLUTAddress = MemoryLocations.MemoryMap.FG_CHAR_LUT_PTR - VICKY.StartAddress;
@@ -476,13 +477,14 @@ namespace FoenixIDE.Display
                 }
 
                 values[0] = (int)((fgValueBlue << 16) + (fgValueGreen << 8) + fgValueRed + 0xFF000000);
-                FGTextLUT[fg] = values[0];
+                fgt[fg] = values[0];
             }
             else
             {
-                values[0] = FGTextLUT[fg];
+                values[0] = fgt[fg];
             }
-            if (BGTextLUT[bg] == 0)
+            var bgt = BGTextLUT;
+            if (bgt[bg] == 0)
             {
                 // Read the color lookup tables
                 int bgLUTAddress = MemoryLocations.MemoryMap.BG_CHAR_LUT_PTR - VICKY.StartAddress;
@@ -500,11 +502,11 @@ namespace FoenixIDE.Display
                 }
 
                 values[1] = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
-                BGTextLUT[bg] = values[1];
+                bgt[bg] = values[1];
             }
             else
             {
-                values[1] = BGTextLUT[bg];
+                values[1] = bgt[bg];
             }
             return values;
         }
@@ -601,7 +603,7 @@ namespace FoenixIDE.Display
             int xOffset = VICKY.ReadWord(regAddr + 4);
             int yOffset = VICKY.ReadWord(regAddr + 6);
 
-            int colorVal = 0;
+            int clrVal = 0;
             int offsetAddress = bitmapAddress + line * width;
             int pixelOffset = line * STRIDE;
             int* ptr = p + pixelOffset;
@@ -609,23 +611,25 @@ namespace FoenixIDE.Display
             byte pixVal = 0;
             VRAM.CopyIntoBuffer(offsetAddress, width, pixVals);
 
+            int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + lutIndex * 1024;
+
             //while (col < width - borderXSize)
             for (int col = borderXSize; col < width - borderXSize; col++)
             {
-                colorVal = bgndColor;
+                clrVal = bgndColor;
                 pixVal = pixVals[col];
                 if (pixVal != 0)
                 {
-                    colorVal = GetLUTValue(lutIndex, pixVal, gammaCorrection);
-                    ptr[col] = colorVal;
+                    clrVal = GetLUTValue(lutIndex, pixVal, gammaCorrection);
+                    ptr[col] = clrVal;
                 }
             }
         }
 
-        private unsafe void DrawTiles(int* p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, int borderXSize, int line, int width)
+        private unsafe void DrawTiles(int* p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, in int borderXSize, in int line, in int width)
         {
             // There are four possible tilemaps to choose from
-            int addrTileCtrlReg = MemoryMap.TILE_CONTROL_REGISTER_ADDR + layer * 12 - MemoryMap.VICKY_BASE_ADDR;
+            int addrTileCtrlReg = MemoryMap.TILE_CONTROL_REGISTER_ADDR - MemoryMap.VICKY_BASE_ADDR + layer * 12;
             int reg = VICKY.ReadByte(addrTileCtrlReg);
             // if the set is not enabled, we're done.
             if ((reg & 0x01) == 00)
@@ -634,14 +638,14 @@ namespace FoenixIDE.Display
             }
 
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
-            int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
+            //int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
             int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 );
             
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
             bool dirUp = (tilemapWindowX & 0x4000) != 0;
             byte scrollX = (byte)(tilemapWindowX & 0x3C00 >> 10);
             tilemapWindowX &= 0x3FF;
-            byte tileXOffset = (byte)(tilemapWindowX % TILE_SIZE);
+            int tileXOffset = tilemapWindowX % TILE_SIZE;
 
             int tilemapWindowY = VICKY.ReadWord(addrTileCtrlReg + 10);
             bool dirRight = (tilemapWindowY & 0x4000) != 0;
@@ -664,7 +668,7 @@ namespace FoenixIDE.Display
             {
                 tilesetPointers[i] = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4);
                 byte tilesetConfig = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4 + 3);
-                strides[i] =(tilesetConfig & 8) != 0 ? 256 : 16;
+                strides[i] = (tilesetConfig & 8) != 0 ? 256 : 16;
             }
             for (int i = 0; i< tilemapItemCount; i++)
             {
@@ -689,26 +693,49 @@ namespace FoenixIDE.Display
             int* ptr = p + line * STRIDE;
 
             // Ensure that only one line gets drawn, this avoid incorrect wrapping
-            for (int x = borderXSize; x < width - borderXSize; x ++)
+            //int endX = width - borderXSize;
+            //for (int x = borderXSize; x < endX; x++)
+            //{
+            //    int tileIndex = (x + tileXOffset) / TILE_SIZE;
+            //    byte tilesetReg = tiles[tileIndex * 2 + 1];
+            //    byte tileLUT = (byte)((tilesetReg & 0x38) >> 3);
+
+            //    int tilesetOffsetAddress = tilesetOffsets[tileIndex] + (x + tilemapWindowX) % TILE_SIZE;
+            //    byte pixelIndex = VRAM.ReadByte(tilesetOffsetAddress);
+            //    if (pixelIndex > 0)
+            //    {
+            //        int clrVal = GetLUTValue(tileLUT, pixelIndex, gammaCorrection);
+            //        ptr[x] = clrVal;
+            //    }
+            //}
+            // alternate display style - avoids repeating the loop so often
+            int startTileX = (borderXSize + tileXOffset) / TILE_SIZE;
+            int endTileX = (width - borderXSize + tileXOffset) / TILE_SIZE + 1;
+            int startOffset = (borderXSize + tilemapWindowX) % TILE_SIZE;
+            int x = borderXSize;
+            byte[] tilepix = new byte[16];
+            int clrVal = 0;
+            for (int t = startTileX; t < endTileX; t++)
             {
-                int tileIndex = (x + tileXOffset) / TILE_SIZE;
-                //byte tile = tiles[tileIndex];
-                byte tilesetReg = tiles[tileIndex*2 + 1];
-                //byte tileset = (byte)(tilesetReg & 7);
-                byte tileLUT = (byte)((tilesetReg & 0x38) >> 3);
+                byte tilesetReg = tiles[t * 2 + 1];
+                byte lutIndex = (byte)((tilesetReg & 0x38) >> 3);
+                int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + lutIndex * 1024;
+                int tilesetOffsetAddress = tilesetOffsets[t];  // + startOffset
 
-                // tileset
-                //int tilesetPointer = tilesetPointers[tileset];
-                //int strideX = strides[tileset];
-
-                int tilesetOffsetAddress = tilesetOffsets[tileIndex] + (x + tilemapWindowX) % TILE_SIZE;   
-                //byte pixelIndex = VRAM.ReadByte(tilesetPointer + tilesetOffsetAddress );
-                byte pixelIndex = VRAM.ReadByte(tilesetOffsetAddress);
-                if (pixelIndex > 0)
+                VRAM.CopyIntoBuffer(tilesetOffsetAddress, 16, tilepix);
+                do
                 {
-                    int value = GetLUTValue(tileLUT, pixelIndex, gammaCorrection);
-                    ptr[x] = value;
-                }
+                    byte pixVal = tilepix[startOffset];
+                    if (pixVal > 0)
+                    {
+                        clrVal = GetLUTValue(lutIndex, pixVal, gammaCorrection); 
+                        ptr[x] = clrVal;
+                    }
+                    x++;
+                    startOffset++;
+                    tilesetOffsetAddress++;
+                } while (startOffset != 16);
+                startOffset = 0;
             }
         }
 
@@ -721,13 +748,14 @@ namespace FoenixIDE.Display
                 byte reg = VICKY.ReadByte(addrSprite);
                 // if the set is not enabled, we're done.
                 byte spriteLayer = (byte)((reg & 0x70) >> 4);
-                int posY = VICKY.ReadWord(addrSprite + 6) - 32;
                 if ((reg & 1) != 0 && layer == spriteLayer)
                 {
+                    int posY = VICKY.ReadWord(addrSprite + 6) - 32;
                     if ((line >= posY && line < posY + 32))
                     {
                         // TODO Fix this when Vicky II fixes the LUT issue
-                        byte lutIndex = (byte)(((reg & 14) >> 1));  // 8 possible LUTs 
+                        byte lutIndex = (byte)(((reg & 14) >> 1));  // 8 possible LUTs
+                        int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + lutIndex * 1024;
                         bool striding = (reg & 0x80) == 0x80;
 
                         int spriteAddress = VICKY.ReadLong(addrSprite + 1);
@@ -754,15 +782,15 @@ namespace FoenixIDE.Display
                         // Check for sprite bleeding on the right-hand side
                         if (posX + 32 > width - borderXSize)
                         {
-                            spriteWidth = 640 - borderXSize - posX;
+                            spriteWidth = width - borderXSize - posX;
                             if (spriteWidth == 0)
                             {
                                 continue;
                             }
                         }
 
-                        int value = 0;
-                        byte pixelIndex = 0;
+                        int clrVal = 0;
+                        byte pixVal = 0;
 
                         // Sprites are 32 x 32
                         int sline = line - posY;
@@ -771,13 +799,12 @@ namespace FoenixIDE.Display
                         for (int col = xOffset; col < xOffset + spriteWidth; col++)
                         {
                             // Lookup the pixel in the tileset - if the value is 0, it's transparent
-                            pixelIndex = VRAM.ReadByte(spriteAddress + col + sline * 32);
-                            if (pixelIndex != 0)
+                            pixVal = VRAM.ReadByte(spriteAddress + col + sline * 32);
+                            if (pixVal != 0)
                             {
-                                value = GetLUTValue(lutIndex, pixelIndex, gammaCorrection);
-
+                                clrVal = GetLUTValue(lutIndex, pixVal, gammaCorrection);
                                 //System.Runtime.InteropServices.Marshal.WriteInt32(p, (lineOffset + (col-xOffset + posX)) * 4, value);
-                                ptr[col - xOffset + posX] = value;
+                                ptr[col - xOffset + posX] = clrVal;
                             }
                         }
                     }

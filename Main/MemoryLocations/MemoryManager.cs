@@ -216,7 +216,7 @@ namespace FoenixIDE.MemoryLocations
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
             if (device == null)
-                return 0xff;
+                return 0x40;
             return device.ReadByte(deviceAddress);
         }
 
@@ -228,7 +228,8 @@ namespace FoenixIDE.MemoryLocations
         public int ReadWord(int Address)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
-            // TODO - if device is null, generate a software interrupt.
+            if (device == null)
+                return 0x4040;
             return device.ReadByte(deviceAddress) | (device.ReadByte(deviceAddress + 1) << 8);
         }
 
@@ -240,6 +241,8 @@ namespace FoenixIDE.MemoryLocations
         public int ReadLong(int Address)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
+            if (device == null)
+                return 0x40_4040;
             return device.ReadByte(deviceAddress)
                 | (device.ReadByte(deviceAddress + 1) << 8)
                 | (device.ReadByte(deviceAddress + 2) << 16);
@@ -248,28 +251,41 @@ namespace FoenixIDE.MemoryLocations
         public virtual void WriteByte(int Address, byte Value)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
-            device.WriteByte(deviceAddress, Value);
+            if (device != null)
+            {
+                device.WriteByte(deviceAddress, Value);
+            }
         }
 
         public void WriteWord(int Address, int Value)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
-            device.WriteByte(deviceAddress, (byte)(Value & 0xff));
-            device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
+            if (device != null)
+            {
+                device.WriteByte(deviceAddress, (byte)(Value & 0xff));
+                device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
+            }
         }
 
         public void WriteLong(int Address, int Value)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
-            device.WriteByte(deviceAddress, (byte)(Value & 0xff));
-            device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
-            device.WriteByte(deviceAddress + 2, (byte)(Value >> 16 & 0xff));
+            if (device != null)
+            {
+                device.WriteByte(deviceAddress, (byte)(Value & 0xff));
+                device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
+                device.WriteByte(deviceAddress + 2, (byte)(Value >> 16 & 0xff));
+            }
         }
 
         public int Read(int Address, int Length)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
             int addr = deviceAddress;
+            if (device == null)
+            {
+                return 0x40;
+            }
             int ret = device.ReadByte(addr);
             if (Length >= 2)
                 ret += device.ReadByte(addr + 1) << 8;
@@ -281,13 +297,14 @@ namespace FoenixIDE.MemoryLocations
         internal void Write(int Address, int Value, int Length)
         {
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
-            if (device == null)
-                throw new Exception("No device at " + Address.ToString("X6"));
-            device.WriteByte(deviceAddress, (byte)(Value & 0xff));
-            if (Length >= 2)
-                device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
-            if (Length >= 3)
-                device.WriteByte(deviceAddress + 2, (byte)(Value >> 16 & 0xff));
+            if (device != null)
+            {
+                device.WriteByte(deviceAddress, (byte)(Value & 0xff));
+                if (Length >= 2)
+                    device.WriteByte(deviceAddress + 1, (byte)(Value >> 8 & 0xff));
+                if (Length >= 3)
+                    device.WriteByte(deviceAddress + 2, (byte)(Value >> 16 & 0xff));
+            }
         }
 
         public void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length)

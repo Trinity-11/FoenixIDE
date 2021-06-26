@@ -159,6 +159,7 @@ namespace FoenixIDE.Processor
             SignatureBytes = ReadSignature(OpcodeLength, PC);
 
             PC += OpcodeLength;
+            
             CurrentOpcode.Execute(SignatureBytes);
             clockCyles += OpcodeCycles;
             return false;
@@ -174,7 +175,7 @@ namespace FoenixIDE.Processor
         {
             if (CPUThread != null && CPUThread.ThreadState == ThreadState.Running)
             {
-                CPUThread.Abort();
+                DebugPause = true;
                 CPUThread = null;
             }
         }
