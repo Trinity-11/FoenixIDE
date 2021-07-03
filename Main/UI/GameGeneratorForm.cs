@@ -29,15 +29,18 @@ namespace FoenixIDE.UI
         Dictionary<string, List<string>> templates;
 
         AutocompleteMenu popupMenu;
-        string[] keywords = {"ASSET", "COPY", "GOTO", "FILL", "VGM_INIT", "VGM_PLAY", "ENABLE_IRQS" }; 
+        string[] keywords = {"ASSET", "COPY", "GOTO", "FILL", "VGM_INIT", "VGM_PLAY", "ENABLE_INTERRUPTS", 
+            "ENABLE_SPRITE", "DISABLE_SPRITE", "SET_SPRITE_POS",
+            "ENABLE_BITMAP", "DISABLE_BITMAP", "ENABLE_TILEMAP", "DISABLE_TILEMAP", "SET_TILEMAP_POS", 
+            "IF", "ELSE", "VAR", "INCR", "DECR", "FOR"}; 
         //string[] methods = { "Equals()", "GetHashCode()", "GetType()", "ToString()" };
         string[] snippets = { "if(^)\n{\n;\n}", "if(^)\n{\n;\n}\nelse\n{\n;\n}", "for(^;;)\n{\n;\n}", "while(^)\n{\n;\n}", "do${\n^;\n}while();", "switch(^)\n{\ncase : break;\n}" };
-        string[] declarationSnippets = {
+        /*string[] declarationSnippets = {
                "public class ^\n{\n}", "private class ^\n{\n}", "internal class ^\n{\n}",
                "public struct ^\n{\n;\n}", "private struct ^\n{\n;\n}", "internal struct ^\n{\n;\n}",
                "public void ^()\n{\n;\n}", "private void ^()\n{\n;\n}", "internal void ^()\n{\n;\n}", "protected void ^()\n{\n;\n}",
                "public ^{ get; set; }", "private ^{ get; set; }", "internal ^{ get; set; }", "protected ^{ get; set; }"
-               };
+               };*/
 
         public GameGeneratorForm()
         {
@@ -58,8 +61,8 @@ namespace FoenixIDE.UI
 
             foreach (var item in snippets)
                 items.Add(new SnippetAutocompleteItem(item) { ImageIndex = 1 });
-            foreach (var item in declarationSnippets)
-                items.Add(new DeclarationSnippet(item) { ImageIndex = 0 });
+            //foreach (var item in declarationSnippets)
+            //    items.Add(new DeclarationSnippet(item) { ImageIndex = 0 });
             //foreach (var item in methods)
             //    items.Add(new MethodAutocompleteItem(item) { ImageIndex = 2 });
             foreach (var item in keywords)

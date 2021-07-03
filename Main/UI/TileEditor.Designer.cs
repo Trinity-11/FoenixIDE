@@ -61,6 +61,7 @@
             this.LutList = new System.Windows.Forms.ComboBox();
             this.TilesetAddress = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnMemory = new System.Windows.Forms.Button();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TilesetViewer)).BeginInit();
             this.TilemapGroup.SuspendLayout();
@@ -164,6 +165,7 @@
             // 
             // TilemapGroup
             // 
+            this.TilemapGroup.Controls.Add(this.btnMemory);
             this.TilemapGroup.Controls.Add(this.WindowY);
             this.TilemapGroup.Controls.Add(this.WindowX);
             this.TilemapGroup.Controls.Add(this.label2);
@@ -179,7 +181,7 @@
             this.TilemapGroup.Controls.Add(this.TilemapEnabledCheckbox);
             this.TilemapGroup.Location = new System.Drawing.Point(5, 30);
             this.TilemapGroup.Name = "TilemapGroup";
-            this.TilemapGroup.Size = new System.Drawing.Size(353, 133);
+            this.TilemapGroup.Size = new System.Drawing.Size(355, 133);
             this.TilemapGroup.TabIndex = 1;
             this.TilemapGroup.TabStop = false;
             this.TilemapGroup.Text = "Tilemap Properties";
@@ -286,10 +288,10 @@
             // 
             // TilemapAddress
             // 
-            this.TilemapAddress.Location = new System.Drawing.Point(257, 17);
+            this.TilemapAddress.Location = new System.Drawing.Point(251, 17);
             this.TilemapAddress.MaxLength = 6;
             this.TilemapAddress.Name = "TilemapAddress";
-            this.TilemapAddress.Size = new System.Drawing.Size(88, 20);
+            this.TilemapAddress.Size = new System.Drawing.Size(76, 20);
             this.TilemapAddress.TabIndex = 2;
             this.TilemapAddress.TextChanged += new System.EventHandler(this.TilemapAddress_TextChanged);
             // 
@@ -340,7 +342,7 @@
             this.TilesetGroup.Controls.Add(this.label4);
             this.TilesetGroup.Location = new System.Drawing.Point(5, 192);
             this.TilesetGroup.Name = "TilesetGroup";
-            this.TilesetGroup.Size = new System.Drawing.Size(353, 48);
+            this.TilesetGroup.Size = new System.Drawing.Size(355, 48);
             this.TilesetGroup.TabIndex = 5;
             this.TilesetGroup.TabStop = false;
             this.TilesetGroup.Text = "Tileset Properties";
@@ -388,6 +390,16 @@
             this.label4.Size = new System.Drawing.Size(91, 13);
             this.label4.TabIndex = 0;
             this.label4.Text = "Tileset Address: $";
+            // 
+            // btnMemory
+            // 
+            this.btnMemory.Image = global::FoenixIDE.Simulator.Properties.Resources.memory_btn;
+            this.btnMemory.Location = new System.Drawing.Point(329, 14);
+            this.btnMemory.Name = "btnMemory";
+            this.btnMemory.Size = new System.Drawing.Size(24, 24);
+            this.btnMemory.TabIndex = 13;
+            this.btnMemory.UseVisualStyleBackColor = true;
+            this.btnMemory.Click += new System.EventHandler(this.btnMemory_Click);
             // 
             // TileEditor
             // 
@@ -452,5 +464,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox Stride256Checkbox;
         private System.Windows.Forms.ComboBox LutList;
+        private System.Windows.Forms.Button btnMemory;
     }
 }

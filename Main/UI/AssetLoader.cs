@@ -327,7 +327,7 @@ namespace FoenixIDE.UI
 
                     for (int i = 2; i < 256; i++)
                     {
-                        int value = MemMgrRef.VICKY.ReadLong(lutBaseAddress + 4 * i);
+                        int value = MemMgrRef.VICKY.ReadLong(lutBaseAddress + 4 * i) & 0x3F_FFFF;
                         if (value != 0)
                         {
                             lut.Add(value);

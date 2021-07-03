@@ -599,7 +599,7 @@ namespace FoenixIDE.Display
             }
             byte lutIndex = (byte)((reg >> 1) & 7);  // 8 possible LUTs
 
-            int bitmapAddress = VICKY.ReadLong(regAddr + 1);
+            int bitmapAddress = VICKY.ReadLong(regAddr + 1) & 0x3F_FFFF;
             int xOffset = VICKY.ReadWord(regAddr + 4);
             int yOffset = VICKY.ReadWord(regAddr + 6);
 
@@ -639,7 +639,7 @@ namespace FoenixIDE.Display
 
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
             //int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
-            int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 );
+            int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 ) & 0x3F_FFFF;
             
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
             bool dirUp = (tilemapWindowX & 0x4000) != 0;
@@ -666,7 +666,7 @@ namespace FoenixIDE.Display
             int[] strides = new int[8];
             for (int i=0;i<8;i++)
             {
-                tilesetPointers[i] = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4);
+                tilesetPointers[i] = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4) & 0x3F_FFFF;
                 byte tilesetConfig = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4 + 3);
                 strides[i] = (tilesetConfig & 8) != 0 ? 256 : 16;
             }
@@ -758,7 +758,7 @@ namespace FoenixIDE.Display
                         int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + lutIndex * 1024;
                         bool striding = (reg & 0x80) == 0x80;
 
-                        int spriteAddress = VICKY.ReadLong(addrSprite + 1);
+                        int spriteAddress = VICKY.ReadLong(addrSprite + 1) & 0x3F_FFFF;
                         int posX = VICKY.ReadWord(addrSprite + 4) - 32;
 
 
