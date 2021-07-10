@@ -81,6 +81,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basic\ScanCodes.cs" />
+    <Compile Include="Controls\ColorCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Devices\BoardVersion.cs" />
     <Compile Include="Devices\GabeRAM.cs" />
     <Compile Include="Devices\InterruptController.cs" />
@@ -356,9 +359,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="Resources\base_asm\VKYII_CFP9553_GENERAL_def.asm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\foenix-game-generator-syntax.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\zero.bmp" />
     <Content Include="roms\kernel.lst" />
     <Content Include="roms\kernel.hex" />
     <None Include="roms\kernel_U_Plus.hex" />
@@ -414,9 +421,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\base_asm\timer_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\vicky_ii_def.asm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\base_asm\VKYII_CFP9553_BITMAP_def.asm">

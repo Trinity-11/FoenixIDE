@@ -135,12 +135,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_944C207290DD4465B1DEC1E24DE2B090"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_97ED8AC2650A4AF1AE552E30015BD9EF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -148,6 +142,12 @@
         "Entry"
         {
         "MsmKey" = "8:_997CD1FAF6CF4BC390F7E9018B0C0B14"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9C1708C0257F4DAFB3C32023098E2F72"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -737,26 +737,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_944C207290DD4465B1DEC1E24DE2B090"
-            {
-            "SourcePath" = "8:..\\Main\\Resources\\base_asm\\vicky_ii_def.asm"
-            "TargetName" = "8:vicky_ii_def.asm"
-            "Tag" = "8:"
-            "Folder" = "8:_2CED8A43FBFA44579E2CA91207C3D167"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_97ED8AC2650A4AF1AE552E30015BD9EF"
             {
             "SourcePath" = "8:..\\Main\\Resources\\base_asm\\interrupt_def.asm"
@@ -781,6 +761,26 @@
             {
             "SourcePath" = "8:..\\Main\\Resources\\base_asm\\VKYII_CFP9553_SDMA_def.asm"
             "TargetName" = "8:VKYII_CFP9553_SDMA_def.asm"
+            "Tag" = "8:"
+            "Folder" = "8:_2CED8A43FBFA44579E2CA91207C3D167"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9C1708C0257F4DAFB3C32023098E2F72"
+            {
+            "SourcePath" = "8:..\\Main\\Resources\\base_asm\\VKYII_CFP9553_GENERAL_def.asm"
+            "TargetName" = "8:VKYII_CFP9553_GENERAL_def.asm"
             "Tag" = "8:"
             "Folder" = "8:_2CED8A43FBFA44579E2CA91207C3D167"
             "Condition" = "8:"

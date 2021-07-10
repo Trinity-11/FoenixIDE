@@ -45,6 +45,7 @@ namespace FoenixIDE.UI
             MemoryWindowTooltips.SetToolTip(MCRBit2Button, "Enable Graphics Mode");
             MemoryWindowTooltips.SetToolTip(MCRBit1Button, "Enable Text Overlay");
             MemoryWindowTooltips.SetToolTip(MCRBit0Button, "Enable Text");
+            MemoryWindowTooltips.SetToolTip(ZeroButton, "Reset Page to Zeroes");
 
             // Set the MCR
             MCRBit0Button.Tag = 0;
@@ -67,6 +68,7 @@ namespace FoenixIDE.UI
                 HighlightPanel.ReadOnly = true;
                 FooterPanel.Visible = false;
                 UpdateDisplayTimer.Enabled = false;
+                ZeroButton.Visible = false;
             }
             else
             {
@@ -512,6 +514,12 @@ namespace FoenixIDE.UI
                 outputFile.Flush();
                 outputFile.Close();
             }
+        }
+
+        private void ZeroButton_Click(object sender, EventArgs e)
+        {
+            byte[] buffer = new byte[256];
+            Memory.CopyBuffer(buffer, 0, StartAddress, 256);
         }
     }
 }

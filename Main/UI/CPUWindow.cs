@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Processor;
+using FoenixIDE.Simulator.Controls;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using Microsoft.VisualBasic;
@@ -426,7 +427,12 @@ namespace FoenixIDE.UI
             {
                 // Clear the interrupt
                 IRQPC = -1;
-                
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, 0);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(1, 0);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
+                InterruptMatchesCheckboxes();
+
                 kernel.CPU.DebugPause = false;
                 lastLine.Text = "";
                 kernel.CPU.CPUThread = new Thread(new ThreadStart(ThreadProc));
@@ -856,47 +862,93 @@ namespace FoenixIDE.UI
         {
             // Read Interrupt Register 0
             byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
+            bool result = false;
             if (SOFCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT00_SOF) != 0)
             {
-                return true;
+                SOFCheckbox.IsActive = true;
+                result = true;
+            } 
+            else
+            {
+                if (SOFCheckbox.IsActive) SOFCheckbox.IsActive = false;
             }
             if (SOLCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT01_SOL) != 0)
             {
-                return true;
+                SOLCheckbox.IsActive = true;
+                result = true;
+            }
+            else
+            {
+                if (SOLCheckbox.IsActive) SOLCheckbox.IsActive = false;
             }
             if (TMR0Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT02_TMR0) != 0)
             {
-                return true;
+                TMR0Checkbox.IsActive = true;
+                result = true;
+            }
+            else
+            {
+                if (TMR0Checkbox.IsActive) TMR0Checkbox.IsActive = false;
             }
 
             if (TMR1Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT03_TMR1) != 0)
             {
-                return true;
+                TMR1Checkbox.IsActive = true;
+                result = true;
+            }
+            else
+            {
+                if (TMR1Checkbox.IsActive)
+                    TMR1Checkbox.IsActive = false;
             }
             if (TMR2Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT04_TMR2) != 0)
             {
-                return true;
+                TMR2Checkbox.IsActive = true;
+                result = true;
+            }
+            else
+            {
+                if (TMR2Checkbox.IsActive)
+                    TMR2Checkbox.IsActive = false;
             }
             if (MouseCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0)
             {
-                return true;
+                MouseCheckbox.IsActive = true;
+                result = true;
+            }
+            else
+            {
+                if (MouseCheckbox.IsActive)
+                    MouseCheckbox.IsActive = false;
             }
 
             // Read Interrupt Register 1
             byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
             if (SDCardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT07_SDCARD ) != 0)
             {
-                return true;
+                SDCardCheckBox.IsActive = true;
+                result = true;
+            }
+            else
+            {
+                if (SDCardCheckBox.IsActive)
+                    SDCardCheckBox.IsActive = false;
             }
             if (KeyboardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT00_KBD) != 0)
             {
-                return true;
+                KeyboardCheckBox.IsActive = true;
+                result = true;
+            }
+            else
+            {
+                if (KeyboardCheckBox.IsActive)
+                    KeyboardCheckBox.IsActive = false;
             }
             //Read Interrupt Register 2
             byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
             //Read Interrupt Register 3
             byte reg3 = kernel.MemMgr.INTERRUPT.ReadByte(3);
-            return false;
+            return result;
         }
 
         private void ResetButton_Click(object sender, EventArgs e)
@@ -926,6 +978,15 @@ namespace FoenixIDE.UI
                     kernel.WatchList.Add(address, mem);
                     MainWindow.Instance.WatchListToolStripMenuItem_Click(sender, e);
                 }
+            }
+        }
+
+        private void IRQCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is ColorCheckBox)
+            {
+                ColorCheckBox ccb = (ColorCheckBox)sender;
+                ccb.IsActive = false;
             }
         }
     }

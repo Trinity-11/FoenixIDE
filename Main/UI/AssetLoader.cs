@@ -278,6 +278,7 @@ namespace FoenixIDE.UI
             else
             {
                 // Keep the Asset Loader open
+                StoreButton.Enabled = true;
             }
             
         }
@@ -306,7 +307,7 @@ namespace FoenixIDE.UI
                 bool done = false;
                 byte mask = 0xFF;
                 List<int> lut = null;
-                while (!done)
+                while (!done && mask != 0xc0)
                 {
                     int transparentColor = 0;
                     try
@@ -325,16 +326,20 @@ namespace FoenixIDE.UI
                         0xFFFFFF
                     };
 
-                    for (int i = 2; i < 256; i++)
+                    // The user may decide to overwrite the palette from this bitmap
+                    if (!checkOverwriteLUT.Checked)
                     {
-                        int value = MemMgrRef.VICKY.ReadLong(lutBaseAddress + 4 * i) & 0x3F_FFFF;
-                        if (value != 0)
+                        for (int i = 2; i < 256; i++)
                         {
-                            lut.Add(value);
-                        }
-                        else
-                        {
-                            break;
+                            int value = MemMgrRef.VICKY.ReadLong(lutBaseAddress + 4 * i);
+                            if (value != 0)
+                            {
+                                lut.Add(value);
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
 
@@ -351,9 +356,9 @@ namespace FoenixIDE.UI
                                 case 1:
                                     byte palIndex = bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel];
                                     System.Drawing.Color palValue = bitmap.Palette.Entries[palIndex];
-                                    b = palValue.B;
-                                    g = palValue.G;
-                                    r = palValue.R;
+                                    b = (byte)(palValue.B & mask);
+                                    g = (byte)(palValue.G & mask);
+                                    r = (byte)(palValue.R & mask);
                                     break;
                                 case 2:
                                     ushort wordValue = (ushort)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel] + bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel + 1] * 256);
@@ -411,40 +416,53 @@ namespace FoenixIDE.UI
                         }
                     }
                 }
-                
-                int videoAddress = resource.StartAddress - 0xB0_0000;
 
-                MemMgrRef.VIDEO.CopyBuffer(data, 0, videoAddress, data.Length);
-
-                if (lut != null)
+                if (mask != 0xc0)
                 {
-                    for (int i = 0; i < lut.Count; i++)
+                    int videoAddress = resource.StartAddress - 0xB0_0000;
+
+                    MemMgrRef.VIDEO.CopyBuffer(data, 0, videoAddress, data.Length);
+
+                    if (lut != null)
                     {
-                        int rbg = lut[i];
-                        MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i, LowByte(rbg));
-                        MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 1, MidByte(rbg));
-                        MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 2, HighByte(rbg));
+                        for (int i = 0; i < lut.Count; i++)
+                        {
+                            int rbg = lut[i];
+                            MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i, LowByte(rbg));
+                            MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 1, MidByte(rbg));
+                            MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 2, HighByte(rbg));
+                        }
+                    }
+
+                    // Check if a LUT matching our index is present in the Resources, if so don't do anything.
+                    Resource resLut = ResChecker.Find(ResourceType.lut, lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
+                    if (resLut == null)
+                    {
+                        Resource lutPlaceholder = new Resource
+                        {
+                            Length = 0x400,
+                            FileType = ResourceType.lut,
+                            Name = "Generated LUT",
+                            StartAddress = lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
+                        };
+                        ResChecker.Add(lutPlaceholder);
                     }
                 }
-
-                // Check if a LUT matching our index is present in the Resources, if so don't do anything.
-                Resource resLut = ResChecker.Find(ResourceType.lut, lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
-                if (resLut == null) {
-                    Resource lutPlaceholder = new Resource
-                    {
-                        Length = 0x400,
-                        FileType = ResourceType.lut,
-                        Name = "Generated LUT",
-                        StartAddress = lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
-                    };
-                    ResChecker.Add(lutPlaceholder);
+                else
+                {
+                    MessageBox.Show("An error occured converting the image colors to LUT.\n" +
+                        "You can try loading the image with a different LUT or\n" +
+                        "Zero one of the LUTs or\n" +
+                        "Check the Overwrite Existing LUT checkbox");
+                    
+                    ResChecker.Items.Remove(resource);
+                    resource.Length = -1;
                 }
 
             }
             else
             {
                 resource.Length = -1;
-                StoreButton.Enabled = true;
             }
         }
 

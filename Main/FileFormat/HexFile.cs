@@ -51,7 +51,7 @@ namespace FoenixIDE.Simulator.FileFormat
                         // data row. The next n bytes are data to be loaded into memory
                         case "00":
                             address = GetByte(offset, 0, 2);
-                            if (startAddress == -1)
+                            if (startAddress == -1 && ((address & 0xFF00) != 0xFF00))
                             {
                                 startAddress = bank + address;
                             }
@@ -74,7 +74,7 @@ namespace FoenixIDE.Simulator.FileFormat
 
                         // end of file - just ignore
                         case "01":
-                            length = bank + address - startAddress;
+                            length = address;
                             break;
 
                         case "02":

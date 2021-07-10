@@ -1,4 +1,6 @@
-﻿namespace FoenixIDE.UI
+﻿using FoenixIDE.Simulator.Controls;
+
+namespace FoenixIDE.UI
 {
     partial class CPUWindow
     {
@@ -55,32 +57,32 @@
             this.InspectOverlayButton = new System.Windows.Forms.Button();
             this.StepOverOverlayButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.SDCardCheckBox = new System.Windows.Forms.CheckBox();
-            this.OPL2LCheckbox = new System.Windows.Forms.CheckBox();
-            this.OPL2RCheckbox = new System.Windows.Forms.CheckBox();
-            this.MPU401Checkbox = new System.Windows.Forms.CheckBox();
-            this.COM1Checkbox = new System.Windows.Forms.CheckBox();
-            this.COM2Checkbox = new System.Windows.Forms.CheckBox();
-            this.FDCCheckbox = new System.Windows.Forms.CheckBox();
-            this.MouseCheckbox = new System.Windows.Forms.CheckBox();
-            this.RTCCheckbox = new System.Windows.Forms.CheckBox();
-            this.TMR2Checkbox = new System.Windows.Forms.CheckBox();
-            this.TMR1Checkbox = new System.Windows.Forms.CheckBox();
-            this.TMR0Checkbox = new System.Windows.Forms.CheckBox();
-            this.SOLCheckbox = new System.Windows.Forms.CheckBox();
+            this.irqPanel = new System.Windows.Forms.Panel();
+            this.SDCardCheckBox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.OPL2LCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.OPL2RCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.MPU401Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.COM1Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.COM2Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.FDCCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.MouseCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.RTCCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.TMR2Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.TMR1Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.TMR0Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.SOLCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.Reg2Label = new System.Windows.Forms.Label();
             this.Reg1Label = new System.Windows.Forms.Label();
             this.Reg0Label = new System.Windows.Forms.Label();
-            this.KeyboardCheckBox = new System.Windows.Forms.CheckBox();
-            this.SOFCheckbox = new System.Windows.Forms.CheckBox();
+            this.KeyboardCheckBox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.SOFCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
             this.LabelOverlayButton = new System.Windows.Forms.Button();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
-            this.panel1.SuspendLayout();
+            this.irqPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // HeaderPanel
@@ -377,161 +379,211 @@
             this.HeaderTextbox.UseCompatibleTextRendering = true;
             this.HeaderTextbox.UseMnemonic = false;
             // 
-            // panel1
+            // irqPanel
             // 
-            this.panel1.Controls.Add(this.SDCardCheckBox);
-            this.panel1.Controls.Add(this.OPL2LCheckbox);
-            this.panel1.Controls.Add(this.OPL2RCheckbox);
-            this.panel1.Controls.Add(this.MPU401Checkbox);
-            this.panel1.Controls.Add(this.COM1Checkbox);
-            this.panel1.Controls.Add(this.COM2Checkbox);
-            this.panel1.Controls.Add(this.FDCCheckbox);
-            this.panel1.Controls.Add(this.MouseCheckbox);
-            this.panel1.Controls.Add(this.RTCCheckbox);
-            this.panel1.Controls.Add(this.TMR2Checkbox);
-            this.panel1.Controls.Add(this.TMR1Checkbox);
-            this.panel1.Controls.Add(this.TMR0Checkbox);
-            this.panel1.Controls.Add(this.SOLCheckbox);
-            this.panel1.Controls.Add(this.Reg2Label);
-            this.panel1.Controls.Add(this.Reg1Label);
-            this.panel1.Controls.Add(this.Reg0Label);
-            this.panel1.Controls.Add(this.KeyboardCheckBox);
-            this.panel1.Controls.Add(this.SOFCheckbox);
-            this.panel1.Controls.Add(this.BreakOnIRQCheckBox);
-            this.panel1.Location = new System.Drawing.Point(372, 25);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(230, 74);
-            this.panel1.TabIndex = 12;
+            this.irqPanel.Controls.Add(this.SDCardCheckBox);
+            this.irqPanel.Controls.Add(this.OPL2LCheckbox);
+            this.irqPanel.Controls.Add(this.OPL2RCheckbox);
+            this.irqPanel.Controls.Add(this.MPU401Checkbox);
+            this.irqPanel.Controls.Add(this.COM1Checkbox);
+            this.irqPanel.Controls.Add(this.COM2Checkbox);
+            this.irqPanel.Controls.Add(this.FDCCheckbox);
+            this.irqPanel.Controls.Add(this.MouseCheckbox);
+            this.irqPanel.Controls.Add(this.RTCCheckbox);
+            this.irqPanel.Controls.Add(this.TMR2Checkbox);
+            this.irqPanel.Controls.Add(this.TMR1Checkbox);
+            this.irqPanel.Controls.Add(this.TMR0Checkbox);
+            this.irqPanel.Controls.Add(this.SOLCheckbox);
+            this.irqPanel.Controls.Add(this.Reg2Label);
+            this.irqPanel.Controls.Add(this.Reg1Label);
+            this.irqPanel.Controls.Add(this.Reg0Label);
+            this.irqPanel.Controls.Add(this.KeyboardCheckBox);
+            this.irqPanel.Controls.Add(this.SOFCheckbox);
+            this.irqPanel.Controls.Add(this.BreakOnIRQCheckBox);
+            this.irqPanel.Location = new System.Drawing.Point(372, 25);
+            this.irqPanel.Name = "irqPanel";
+            this.irqPanel.Size = new System.Drawing.Size(230, 74);
+            this.irqPanel.TabIndex = 12;
             // 
             // SDCardCheckBox
             // 
             this.SDCardCheckBox.Checked = true;
             this.SDCardCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.SDCardCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SDCardCheckBox.IsActive = false;
             this.SDCardCheckBox.Location = new System.Drawing.Point(88, 38);
             this.SDCardCheckBox.Name = "SDCardCheckBox";
             this.SDCardCheckBox.Size = new System.Drawing.Size(15, 14);
             this.SDCardCheckBox.TabIndex = 34;
+            this.SDCardCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SDCardCheckBox.UseVisualStyleBackColor = true;
+            this.SDCardCheckBox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // OPL2LCheckbox
             // 
             this.OPL2LCheckbox.Checked = true;
             this.OPL2LCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.OPL2LCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.OPL2LCheckbox.IsActive = false;
             this.OPL2LCheckbox.Location = new System.Drawing.Point(189, 56);
             this.OPL2LCheckbox.Name = "OPL2LCheckbox";
             this.OPL2LCheckbox.Size = new System.Drawing.Size(15, 14);
             this.OPL2LCheckbox.TabIndex = 33;
+            this.OPL2LCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OPL2LCheckbox.UseVisualStyleBackColor = true;
+            this.OPL2LCheckbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // OPL2RCheckbox
             // 
             this.OPL2RCheckbox.Checked = true;
             this.OPL2RCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.OPL2RCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.OPL2RCheckbox.IsActive = false;
             this.OPL2RCheckbox.Location = new System.Drawing.Point(206, 56);
             this.OPL2RCheckbox.Name = "OPL2RCheckbox";
             this.OPL2RCheckbox.Size = new System.Drawing.Size(15, 14);
             this.OPL2RCheckbox.TabIndex = 32;
+            this.OPL2RCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OPL2RCheckbox.UseVisualStyleBackColor = true;
+            this.OPL2RCheckbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // MPU401Checkbox
             // 
             this.MPU401Checkbox.Checked = true;
             this.MPU401Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MPU401Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.MPU401Checkbox.IsActive = false;
             this.MPU401Checkbox.Location = new System.Drawing.Point(122, 38);
             this.MPU401Checkbox.Name = "MPU401Checkbox";
             this.MPU401Checkbox.Size = new System.Drawing.Size(15, 14);
             this.MPU401Checkbox.TabIndex = 31;
+            this.MPU401Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.MPU401Checkbox.UseVisualStyleBackColor = true;
+            this.MPU401Checkbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // COM1Checkbox
             // 
             this.COM1Checkbox.Checked = true;
             this.COM1Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.COM1Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.COM1Checkbox.IsActive = false;
             this.COM1Checkbox.Location = new System.Drawing.Point(139, 38);
             this.COM1Checkbox.Name = "COM1Checkbox";
             this.COM1Checkbox.Size = new System.Drawing.Size(15, 14);
             this.COM1Checkbox.TabIndex = 30;
+            this.COM1Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.COM1Checkbox.UseVisualStyleBackColor = true;
+            this.COM1Checkbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // COM2Checkbox
             // 
             this.COM2Checkbox.Checked = true;
             this.COM2Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.COM2Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.COM2Checkbox.IsActive = false;
             this.COM2Checkbox.Location = new System.Drawing.Point(156, 38);
             this.COM2Checkbox.Name = "COM2Checkbox";
             this.COM2Checkbox.Size = new System.Drawing.Size(15, 14);
             this.COM2Checkbox.TabIndex = 29;
+            this.COM2Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.COM2Checkbox.UseVisualStyleBackColor = true;
+            this.COM2Checkbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // FDCCheckbox
             // 
             this.FDCCheckbox.Checked = true;
             this.FDCCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.FDCCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.FDCCheckbox.IsActive = false;
             this.FDCCheckbox.Location = new System.Drawing.Point(105, 21);
             this.FDCCheckbox.Name = "FDCCheckbox";
             this.FDCCheckbox.Size = new System.Drawing.Size(15, 14);
             this.FDCCheckbox.TabIndex = 28;
+            this.FDCCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.FDCCheckbox.UseVisualStyleBackColor = true;
             // 
             // MouseCheckbox
             // 
             this.MouseCheckbox.Checked = true;
             this.MouseCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MouseCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.MouseCheckbox.IsActive = false;
             this.MouseCheckbox.Location = new System.Drawing.Point(88, 21);
             this.MouseCheckbox.Name = "MouseCheckbox";
             this.MouseCheckbox.Size = new System.Drawing.Size(15, 14);
             this.MouseCheckbox.TabIndex = 27;
+            this.MouseCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.MouseCheckbox.UseVisualStyleBackColor = true;
+            this.MouseCheckbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // RTCCheckbox
             // 
             this.RTCCheckbox.Checked = true;
             this.RTCCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.RTCCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.RTCCheckbox.IsActive = false;
             this.RTCCheckbox.Location = new System.Drawing.Point(122, 21);
             this.RTCCheckbox.Name = "RTCCheckbox";
             this.RTCCheckbox.Size = new System.Drawing.Size(15, 14);
             this.RTCCheckbox.TabIndex = 26;
+            this.RTCCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.RTCCheckbox.UseVisualStyleBackColor = true;
             // 
             // TMR2Checkbox
             // 
             this.TMR2Checkbox.Checked = true;
             this.TMR2Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.TMR2Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.TMR2Checkbox.IsActive = false;
             this.TMR2Checkbox.Location = new System.Drawing.Point(139, 21);
             this.TMR2Checkbox.Name = "TMR2Checkbox";
             this.TMR2Checkbox.Size = new System.Drawing.Size(15, 14);
             this.TMR2Checkbox.TabIndex = 25;
+            this.TMR2Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TMR2Checkbox.UseVisualStyleBackColor = true;
             // 
             // TMR1Checkbox
             // 
             this.TMR1Checkbox.Checked = true;
             this.TMR1Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.TMR1Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.TMR1Checkbox.IsActive = false;
             this.TMR1Checkbox.Location = new System.Drawing.Point(156, 21);
             this.TMR1Checkbox.Name = "TMR1Checkbox";
             this.TMR1Checkbox.Size = new System.Drawing.Size(15, 14);
             this.TMR1Checkbox.TabIndex = 24;
+            this.TMR1Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TMR1Checkbox.UseVisualStyleBackColor = true;
             // 
             // TMR0Checkbox
             // 
+            this.TMR0Checkbox.BackColor = System.Drawing.SystemColors.Control;
             this.TMR0Checkbox.Checked = true;
             this.TMR0Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.TMR0Checkbox.FlatAppearance.BorderSize = 0;
+            this.TMR0Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.TMR0Checkbox.IsActive = false;
             this.TMR0Checkbox.Location = new System.Drawing.Point(173, 21);
             this.TMR0Checkbox.Name = "TMR0Checkbox";
             this.TMR0Checkbox.Size = new System.Drawing.Size(15, 14);
             this.TMR0Checkbox.TabIndex = 23;
-            this.TMR0Checkbox.UseVisualStyleBackColor = true;
+            this.TMR0Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.TMR0Checkbox.UseVisualStyleBackColor = false;
+            this.TMR0Checkbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // SOLCheckbox
             // 
             this.SOLCheckbox.Checked = true;
             this.SOLCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.SOLCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SOLCheckbox.IsActive = false;
             this.SOLCheckbox.Location = new System.Drawing.Point(190, 21);
             this.SOLCheckbox.Name = "SOLCheckbox";
             this.SOLCheckbox.Size = new System.Drawing.Size(15, 14);
             this.SOLCheckbox.TabIndex = 22;
+            this.SOLCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SOLCheckbox.UseVisualStyleBackColor = true;
+            this.SOLCheckbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // Reg2Label
             // 
@@ -564,25 +616,34 @@
             // 
             this.KeyboardCheckBox.Checked = true;
             this.KeyboardCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.KeyboardCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.KeyboardCheckBox.IsActive = false;
             this.KeyboardCheckBox.Location = new System.Drawing.Point(206, 39);
             this.KeyboardCheckBox.Name = "KeyboardCheckBox";
             this.KeyboardCheckBox.Size = new System.Drawing.Size(15, 14);
             this.KeyboardCheckBox.TabIndex = 18;
+            this.KeyboardCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.KeyboardCheckBox.UseVisualStyleBackColor = true;
+            this.KeyboardCheckBox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // SOFCheckbox
             // 
             this.SOFCheckbox.Checked = true;
             this.SOFCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.SOFCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SOFCheckbox.IsActive = false;
             this.SOFCheckbox.Location = new System.Drawing.Point(206, 21);
             this.SOFCheckbox.Name = "SOFCheckbox";
             this.SOFCheckbox.Size = new System.Drawing.Size(15, 14);
             this.SOFCheckbox.TabIndex = 17;
+            this.SOFCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SOFCheckbox.UseVisualStyleBackColor = true;
+            this.SOFCheckbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
             // BreakOnIRQCheckBox
             // 
             this.BreakOnIRQCheckBox.AutoSize = true;
+            this.BreakOnIRQCheckBox.BackColor = System.Drawing.SystemColors.Control;
             this.BreakOnIRQCheckBox.Checked = true;
             this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(3, 3);
@@ -590,7 +651,7 @@
             this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
             this.BreakOnIRQCheckBox.TabIndex = 16;
             this.BreakOnIRQCheckBox.Text = "Break on IRQ";
-            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = true;
+            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = false;
             this.BreakOnIRQCheckBox.CheckedChanged += new System.EventHandler(this.BreakOnIRQCheckBox_CheckedChanged);
             // 
             // LabelOverlayButton
@@ -625,7 +686,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(758, 517);
             this.Controls.Add(this.LabelOverlayButton);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.irqPanel);
             this.Controls.Add(this.HeaderTextbox);
             this.Controls.Add(this.StepOverOverlayButton);
             this.Controls.Add(this.InspectOverlayButton);
@@ -655,8 +716,8 @@
             this.SecondPanel.ResumeLayout(false);
             this.SecondPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.irqPanel.ResumeLayout(false);
+            this.irqPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -687,29 +748,29 @@
         private System.Windows.Forms.Button StepOverOverlayButton;
         private System.Windows.Forms.Label HeaderTextbox;
         private System.Windows.Forms.Label BPLabel;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.CheckBox KeyboardCheckBox;
-        private System.Windows.Forms.CheckBox SOFCheckbox;
+        private System.Windows.Forms.Panel irqPanel;
         private System.Windows.Forms.CheckBox BreakOnIRQCheckBox;
-        private System.Windows.Forms.CheckBox SOLCheckbox;
         private System.Windows.Forms.Label Reg2Label;
         private System.Windows.Forms.Label Reg1Label;
         private System.Windows.Forms.Label Reg0Label;
-        private System.Windows.Forms.CheckBox MPU401Checkbox;
-        private System.Windows.Forms.CheckBox COM1Checkbox;
-        private System.Windows.Forms.CheckBox COM2Checkbox;
-        private System.Windows.Forms.CheckBox FDCCheckbox;
-        private System.Windows.Forms.CheckBox MouseCheckbox;
-        private System.Windows.Forms.CheckBox RTCCheckbox;
-        private System.Windows.Forms.CheckBox TMR2Checkbox;
-        private System.Windows.Forms.CheckBox TMR1Checkbox;
-        private System.Windows.Forms.CheckBox TMR0Checkbox;
-        private System.Windows.Forms.CheckBox OPL2LCheckbox;
-        private System.Windows.Forms.CheckBox OPL2RCheckbox;
-        private System.Windows.Forms.CheckBox SDCardCheckBox;
         private System.Windows.Forms.Button StepOverButton;
         private System.Windows.Forms.Button LabelOverlayButton;
         private System.Windows.Forms.Button ResetButton;
         private System.Windows.Forms.Button WatchButton;
+        private ColorCheckBox SOLCheckbox;
+        private ColorCheckBox MPU401Checkbox;
+        private ColorCheckBox COM1Checkbox;
+        private ColorCheckBox COM2Checkbox;
+        private ColorCheckBox FDCCheckbox;
+        private ColorCheckBox MouseCheckbox;
+        private ColorCheckBox RTCCheckbox;
+        private ColorCheckBox TMR2Checkbox;
+        private ColorCheckBox TMR1Checkbox;
+        private ColorCheckBox TMR0Checkbox;
+        private ColorCheckBox OPL2LCheckbox;
+        private ColorCheckBox OPL2RCheckbox;
+        private ColorCheckBox SDCardCheckBox;
+        private ColorCheckBox SOFCheckbox;
+        private ColorCheckBox KeyboardCheckBox;
     }
 }

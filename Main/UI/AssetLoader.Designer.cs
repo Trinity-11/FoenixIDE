@@ -44,11 +44,12 @@
             this.ExtensionLabel = new System.Windows.Forms.Label();
             this.ExtLabel = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.labelHash = new System.Windows.Forms.Label();
             this.textTransparentColor = new System.Windows.Forms.TextBox();
             this.radioCustomColor = new System.Windows.Forms.RadioButton();
             this.radioTopLeftColor = new System.Windows.Forms.RadioButton();
             this.radioBlack = new System.Windows.Forms.RadioButton();
-            this.labelHash = new System.Windows.Forms.Label();
+            this.checkOverwriteLUT = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -216,6 +217,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Transparent Color";
             // 
+            // labelHash
+            // 
+            this.labelHash.AutoSize = true;
+            this.labelHash.Location = new System.Drawing.Point(358, 16);
+            this.labelHash.Name = "labelHash";
+            this.labelHash.Size = new System.Drawing.Size(15, 13);
+            this.labelHash.TabIndex = 28;
+            this.labelHash.Text = "#";
+            // 
             // textTransparentColor
             // 
             this.textTransparentColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -266,20 +276,22 @@
             this.radioBlack.UseVisualStyleBackColor = true;
             this.radioBlack.CheckedChanged += new System.EventHandler(this.radioBlack_CheckedChanged);
             // 
-            // labelHash
+            // checkOverwriteLUT
             // 
-            this.labelHash.AutoSize = true;
-            this.labelHash.Location = new System.Drawing.Point(358, 16);
-            this.labelHash.Name = "labelHash";
-            this.labelHash.Size = new System.Drawing.Size(15, 13);
-            this.labelHash.TabIndex = 28;
-            this.labelHash.Text = "#";
+            this.checkOverwriteLUT.AutoSize = true;
+            this.checkOverwriteLUT.Location = new System.Drawing.Point(330, 127);
+            this.checkOverwriteLUT.Name = "checkOverwriteLUT";
+            this.checkOverwriteLUT.Size = new System.Drawing.Size(134, 17);
+            this.checkOverwriteLUT.TabIndex = 25;
+            this.checkOverwriteLUT.Text = "Overwrite Existing LUT";
+            this.checkOverwriteLUT.UseVisualStyleBackColor = true;
             // 
             // AssetLoader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(476, 177);
+            this.Controls.Add(this.checkOverwriteLUT);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ExtLabel);
             this.Controls.Add(this.ExtensionLabel);
@@ -334,5 +346,6 @@
         private System.Windows.Forms.RadioButton radioTopLeftColor;
         private System.Windows.Forms.RadioButton radioBlack;
         private System.Windows.Forms.Label labelHash;
+        private System.Windows.Forms.CheckBox checkOverwriteLUT;
     }
 }

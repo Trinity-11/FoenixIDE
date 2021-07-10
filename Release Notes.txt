@@ -1,3 +1,11 @@
+Release 0.5.5.7
+---------------
+Added Zero button in Memory window to reset a page to zero.
+Fixed Asset Loading - when LUT data already exists, we often ended up in an infinite loop, for 8bpp image.  We now exit the LUT loop when the mask equals $C0 (only 2 bits).
+Added an "Overwrite LUT" checkbox in the Asset Loader.
+Updated the Game Generator to use the new VICKY "GENERAL" file.
+Added specialized checkboxes to display which interrupt was triggered, in the CPU window.
+
 Release 0.5.5.6
 ---------------
 Fixed an issue that cause the emulator to crash when Video Address written in Vicky are not offset properly.

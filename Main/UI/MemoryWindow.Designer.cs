@@ -56,6 +56,7 @@
             this.HighlightPanel = new System.Windows.Forms.TextBox();
             this.PositionLabel = new System.Windows.Forms.Label();
             this.SaveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ZeroButton = new System.Windows.Forms.Button();
             this.HeaderPanel.SuspendLayout();
             this.FooterPanel.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +65,7 @@
             // 
             this.HeaderPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.HeaderPanel.Controls.Add(this.ZeroButton);
             this.HeaderPanel.Controls.Add(this.SaveButton);
             this.HeaderPanel.Controls.Add(this.AddressCombo);
             this.HeaderPanel.Controls.Add(this.PreviousButton);
@@ -407,6 +409,19 @@
             this.SaveDialog.Filter = "Binary files|*.bin";
             this.SaveDialog.Title = "Save Memory to File";
             // 
+            // ZeroButton
+            // 
+            this.ZeroButton.BackColor = System.Drawing.SystemColors.Control;
+            this.ZeroButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.ZeroButton.Image = global::FoenixIDE.Simulator.Properties.Resources.zero;
+            this.ZeroButton.Location = new System.Drawing.Point(449, 1);
+            this.ZeroButton.Margin = new System.Windows.Forms.Padding(0);
+            this.ZeroButton.Name = "ZeroButton";
+            this.ZeroButton.Size = new System.Drawing.Size(25, 23);
+            this.ZeroButton.TabIndex = 12;
+            this.ZeroButton.UseVisualStyleBackColor = false;
+            this.ZeroButton.Click += new System.EventHandler(this.ZeroButton_Click);
+            // 
             // MemoryWindow
             // 
             this.AcceptButton = this.ViewButton;
@@ -464,5 +479,6 @@
         private System.Windows.Forms.SaveFileDialog SaveDialog;
         private System.Windows.Forms.Button MCRBit8Button;
         private System.Windows.Forms.Button MCRBit9Button;
+        private System.Windows.Forms.Button ZeroButton;
     }
 }
