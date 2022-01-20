@@ -46,20 +46,22 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MIDIOutputText.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MIDIOutputText.Location = new System.Drawing.Point(12, 59);
+            this.MIDIOutputText.Location = new System.Drawing.Point(16, 73);
+            this.MIDIOutputText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MIDIOutputText.MaxLength = 65536;
             this.MIDIOutputText.Multiline = true;
             this.MIDIOutputText.Name = "MIDIOutputText";
             this.MIDIOutputText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.MIDIOutputText.Size = new System.Drawing.Size(776, 379);
+            this.MIDIOutputText.Size = new System.Drawing.Size(1033, 466);
             this.MIDIOutputText.TabIndex = 3;
             this.MIDIOutputText.WordWrap = false;
             // 
             // ReadFileButton
             // 
-            this.ReadFileButton.Location = new System.Drawing.Point(12, 3);
+            this.ReadFileButton.Location = new System.Drawing.Point(16, 4);
+            this.ReadFileButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.ReadFileButton.Name = "ReadFileButton";
-            this.ReadFileButton.Size = new System.Drawing.Size(75, 23);
+            this.ReadFileButton.Size = new System.Drawing.Size(100, 28);
             this.ReadFileButton.TabIndex = 2;
             this.ReadFileButton.Text = "Read File";
             this.ReadFileButton.UseVisualStyleBackColor = true;
@@ -68,9 +70,10 @@
             // FileLabel
             // 
             this.FileLabel.AutoSize = true;
-            this.FileLabel.Location = new System.Drawing.Point(93, 11);
+            this.FileLabel.Location = new System.Drawing.Point(124, 14);
+            this.FileLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.FileLabel.Name = "FileLabel";
-            this.FileLabel.Size = new System.Drawing.Size(0, 13);
+            this.FileLabel.Size = new System.Drawing.Size(0, 17);
             this.FileLabel.TabIndex = 4;
             // 
             // GeneratePanel
@@ -80,9 +83,10 @@
             this.GeneratePanel.Controls.Add(this.PercussionMode);
             this.GeneratePanel.Controls.Add(this.GenerateVGMButton);
             this.GeneratePanel.Enabled = false;
-            this.GeneratePanel.Location = new System.Drawing.Point(10, 27);
+            this.GeneratePanel.Location = new System.Drawing.Point(13, 33);
+            this.GeneratePanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.GeneratePanel.Name = "GeneratePanel";
-            this.GeneratePanel.Size = new System.Drawing.Size(778, 26);
+            this.GeneratePanel.Size = new System.Drawing.Size(1037, 32);
             this.GeneratePanel.TabIndex = 10;
             // 
             // SingleChannel
@@ -107,28 +111,31 @@
             "Channel 14",
             "Channel 15",
             "Channel 16"});
-            this.SingleChannel.Location = new System.Drawing.Point(346, 3);
+            this.SingleChannel.Location = new System.Drawing.Point(461, 4);
+            this.SingleChannel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.SingleChannel.Name = "SingleChannel";
-            this.SingleChannel.Size = new System.Drawing.Size(121, 21);
+            this.SingleChannel.Size = new System.Drawing.Size(160, 24);
             this.SingleChannel.TabIndex = 14;
             // 
             // SingleChannelLabel
             // 
             this.SingleChannelLabel.AutoSize = true;
-            this.SingleChannelLabel.Location = new System.Drawing.Point(294, 6);
+            this.SingleChannelLabel.Location = new System.Drawing.Point(409, 7);
+            this.SingleChannelLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.SingleChannelLabel.Name = "SingleChannelLabel";
-            this.SingleChannelLabel.Size = new System.Drawing.Size(46, 13);
+            this.SingleChannelLabel.Size = new System.Drawing.Size(44, 17);
             this.SingleChannelLabel.TabIndex = 13;
-            this.SingleChannelLabel.Text = "Channel";
+            this.SingleChannelLabel.Text = "Track";
             // 
             // PercussionMode
             // 
             this.PercussionMode.AutoSize = true;
             this.PercussionMode.Checked = true;
             this.PercussionMode.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.PercussionMode.Location = new System.Drawing.Point(109, 5);
+            this.PercussionMode.Location = new System.Drawing.Point(145, 6);
+            this.PercussionMode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.PercussionMode.Name = "PercussionMode";
-            this.PercussionMode.Size = new System.Drawing.Size(174, 17);
+            this.PercussionMode.Size = new System.Drawing.Size(228, 21);
             this.PercussionMode.TabIndex = 11;
             this.PercussionMode.Text = "Enable Percussion Mode ($BD)";
             this.PercussionMode.UseVisualStyleBackColor = true;
@@ -136,9 +143,10 @@
             // 
             // GenerateVGMButton
             // 
-            this.GenerateVGMButton.Location = new System.Drawing.Point(2, 1);
+            this.GenerateVGMButton.Location = new System.Drawing.Point(3, 1);
+            this.GenerateVGMButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.GenerateVGMButton.Name = "GenerateVGMButton";
-            this.GenerateVGMButton.Size = new System.Drawing.Size(100, 23);
+            this.GenerateVGMButton.Size = new System.Drawing.Size(133, 28);
             this.GenerateVGMButton.TabIndex = 10;
             this.GenerateVGMButton.Text = "Generate VGM";
             this.GenerateVGMButton.UseVisualStyleBackColor = true;
@@ -146,14 +154,15 @@
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1067, 554);
             this.Controls.Add(this.GeneratePanel);
             this.Controls.Add(this.FileLabel);
             this.Controls.Add(this.MIDIOutputText);
             this.Controls.Add(this.ReadFileButton);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainForm";
             this.Text = "MIDI to VGM Conversion";
             this.GeneratePanel.ResumeLayout(false);

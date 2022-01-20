@@ -30,9 +30,8 @@ namespace MIDI_to_VGM_Converter
         private byte RunningStatus = 0;
         private int samplesPerTick = 0;
         private const int samplesPerSecond = 44100;
-
-        // ordered list of events - all mixed together
-        public List<MidiEvent> events = null;
+        private Dictionary<String, String> meta;
+        private int songTime = 0;
 
         private int microSecondsPerQuarter = 0; // ie. tempo
         private int BPM = 0;
@@ -53,7 +52,6 @@ namespace MIDI_to_VGM_Converter
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 RunningStatus = 0;
-                events = new List<MidiEvent>();
                 FileLabel.Text = dialog.FileName;
                 FileInfo info = new FileInfo(dialog.FileName);
                 int fileLength = (int)info.Length;
@@ -65,24 +63,34 @@ namespace MIDI_to_VGM_Converter
                 ReadMIDIFile();
                 file.Close();
                 GeneratePanel.Enabled = true;
+                SingleChannel.SelectedIndex = 0;
             }
         }
 
+        /**
+         * Read the MIDI file header and the tracks while outputting to a StringBuilder.
+         */
         private void ReadMIDIFile()
         {
             MIDIOutputText.Clear();
             sb = new StringBuilder();
+            meta = new Dictionary<string, string>();
             ReadHeader();
+            sb.AppendLine();
             ReadTracks();
             MIDIOutputText.Text = sb.ToString();
         }
 
         private void ReadHeader()
         {
+            // Check the file header of the file
             if (buffer[0] == 'M' && buffer[1] == 'T' && buffer[2] == 'h' && buffer[3] == 'd')
             {
                 // Read the header length - big endian
                 int headerLength = buffer[7] + (buffer[6] <<8) + (buffer[5] <<16) + (buffer[4] << 24);
+                // filetype 0: single multi channel track
+                // filetype 1: simultaneous tracks
+                // filetype 2: independent sequence tracks
                 short filetype = (short)(buffer[9] + (buffer[8] << 8));
                 trackCount = (short)(buffer[11] + (buffer[10] << 8));
                 short division = (short)(buffer[13] + (buffer[12] << 8));
@@ -141,6 +149,7 @@ namespace MIDI_to_VGM_Converter
         private int ReadTrackLength(int index)
         {
             int ptr = tracks[index].startOffset;
+            // Check the track header
             if (buffer[ptr] == 'M' && buffer[ptr + 1] == 'T' && buffer[ptr + 2] == 'r' && buffer[ptr + 3] == 'k')
             {
                 // Read the track length - big endian
@@ -151,28 +160,29 @@ namespace MIDI_to_VGM_Converter
             return -1;
         }
 
-        public class MidiEventComparer : IComparer<MidiEvent>
-        {
-            public int Compare(MidiEvent e1, MidiEvent e2)
-            {
-                return (e1.index - e2.index) + (e1.type - e2.type) * 16 + (e1.midiChannel - e2.midiChannel);
-            }
-        }
-
         private void ReadTracks()
         {
-            
+            songTime = 0;
             // Read Track 0
             ReadTrack(0);
+            if (tracks[0].totalDeltaTime > songTime)
+            {
+                songTime = tracks[0].totalDeltaTime;
+            }
             for (int i = 1; i < trackCount; i ++)
             {
                 ReadTrack(i);
+                if (tracks[i].totalDeltaTime > songTime)
+                {
+                    songTime = tracks[i].totalDeltaTime;
+                }
             }
         }
 
         private void ReadTrack(int index)
         {
             // Read events
+            sb.AppendLine(string.Format("--------- Track {0}---------", index));
             tracks[index].totalDeltaTime = ReadEvents(tracks[index], tracks[index].startOffset + 8, tracks[index].length);
             sb.AppendLine("-----------------------------------");
             sb.Append("Total Track Time: ").AppendLine(tracks[index].totalDeltaTime.ToString());
@@ -183,6 +193,7 @@ namespace MIDI_to_VGM_Converter
         {
             int offset = 0;
             int totalTime = 0;
+            track.events = new List<MidiEvent>();
             while (offset < length)
             {
                 // Read the variable-length delta time
@@ -199,17 +210,17 @@ namespace MIDI_to_VGM_Converter
                 sb.AppendFormat("{0,6} {1,6} {2,6} ", ev.index, ev.deltaTime, ev.wait);
 
                 offset += varlen;
-                byte EventType = buffer[ptr + offset];
-                if ((EventType & 0x80) == 0)
+                byte eventType = buffer[ptr + offset];
+                if ((eventType & 0x80) == 0)
                 {
-                    EventType = RunningStatus;
+                    eventType = RunningStatus;
                     offset--;
                 }
                 else
                 {
-                    RunningStatus = EventType;
+                    RunningStatus = eventType;
                 }
-                switch (EventType)
+                switch (eventType)
                 {
                     case 0xFF:
                         // Meta
@@ -225,7 +236,7 @@ namespace MIDI_to_VGM_Converter
                     case 0xF7:
                         // system exclusive message
                         int sysexLength = ReadVarInt(ptr + offset + 1, out varlen);
-                        sb.Append("System Exclusive Event: ").Append(EventType).Append(", Length: ").Append(sysexLength).Append(Environment.NewLine);
+                        sb.Append("System Exclusive Event: ").Append(eventType).Append(", Length: ").Append(sysexLength).Append(Environment.NewLine);
                         offset += varlen + 1;
                         // do stuff
 
@@ -234,7 +245,7 @@ namespace MIDI_to_VGM_Converter
                         break;
                     default:
                         // MIDI message
-                        ReadMidiEvent(track, ev, EventType, ptr + offset, out varlen);
+                        ReadMidiEvent(track, ev, eventType, ptr + offset, out varlen);
                         offset += varlen + 1;
                         break;
                 }
@@ -257,13 +268,14 @@ namespace MIDI_to_VGM_Converter
             varlen = len;
             return value;
         }
-        private void ReadMeta(Track track, int meta, int length, int ptr)
+        private void ReadMeta(Track track, int iMeta, int length, int ptr)
         {
             sb.Append("Meta ");
-            switch (meta)
+            switch (iMeta)
             {
                 case 0:
                     short seqNumber = (short)(buffer[ptr + 1] + (buffer[ptr] << 8));
+                    meta.Add("seq-number", string.Format("{0}", seqNumber));
                     sb.Append("Sequence Number: ").Append(seqNumber);
                     break;
                 case 1:
@@ -272,10 +284,12 @@ namespace MIDI_to_VGM_Converter
                     break;
                 case 2:
                     string copyright = ReadText(ptr, length);
+                    meta.Add("copyright", copyright);
                     sb.Append("Copyright Notice: ").Append(copyright);
                     break;
                 case 3:
                     string trackName = ReadText(ptr, length);
+                    track.name = trackName;
                     sb.Append("Track Name: ").Append(trackName);
                     break;
                 case 4:
@@ -288,6 +302,7 @@ namespace MIDI_to_VGM_Converter
                     break;
                 case 6:
                     string marker = ReadText(ptr, length);
+                    meta.Add("song-name", marker);
                     sb.Append("Marker Name: ").Append(marker);
                     break;
                 case 7:
@@ -388,7 +403,7 @@ namespace MIDI_to_VGM_Converter
                     sb.Append("Sequencer Specific: ").Append(seqSpecific);
                     break;
                 default:
-                    sb.Append("Unknown Event: ").Append(meta.ToString("X2"));
+                    sb.Append("Unknown Event: ").Append(iMeta.ToString("X2"));
                     break;
             }
             sb.Append(Environment.NewLine);
@@ -434,8 +449,8 @@ namespace MIDI_to_VGM_Converter
                     sb.AppendFormat("Note Off Channel: {0,2}, Note: {1,3}, Velocity: {2,3}", channel, note, velocity).AppendLine();
                     varlen = 2;
                     e.note = note;
-                    e.type = METype.noteoff;
-                    events.Add(e);
+                    e.type = MidiEventType.noteoff;
+                    track.events.Add(e);
                     break;
                 case 9:
                     note = buffer[ptr + 1];
@@ -444,7 +459,7 @@ namespace MIDI_to_VGM_Converter
                     varlen = 2;
                     e.note = note;
                     e.velocity = velocity;
-                    events.Add(e);
+                    track.events.Add(e);
                     break;
                 case 0xA:
                     note = buffer[ptr + 1];
@@ -468,9 +483,9 @@ namespace MIDI_to_VGM_Converter
                     byte program = buffer[ptr + 1];
                     sb.AppendFormat("Prog Chg Channel: {0,2}, Program: {1,3}", channel, program).AppendLine();
                     varlen = 1;
-                    e.type = METype.progchange;
+                    e.type = MidiEventType.progchange;
                     e.program = program;
-                    events.Add(e);
+                    track.events.Add(e);
                     break;
                 case 0xD:
                     byte pressure = buffer[ptr + 1];
@@ -490,156 +505,212 @@ namespace MIDI_to_VGM_Converter
         }
 
         public static byte[] ChannelKSL = new byte[18];
-        // midi channel to opl3 channel map - $F0 is unassigned, $FF is not played.
-        public static byte[] channelMap = new byte[16];  
+        public static bool drumValueChanged;
 
         private void GenerateVGMButton_Click(object sender, EventArgs e)
         {
-            // Print all events
-            events.Sort(new MidiEventComparer());
-
-            StringBuilder sb = new StringBuilder();
-
-            // First pass - map midi channels to OPL3 channels
-            byte fourOps = 0;
-            byte twoOps = 0;
-            List<byte> availableChannels = new List<byte>();
-            availableChannels.Add(0);
-            availableChannels.Add(1);
-            availableChannels.Add(2);
-            availableChannels.Add(3);
-            availableChannels.Add(4);
-            availableChannels.Add(5);
-            if (PercussionSet == 0)
+            // Gather all events into one list
+            List<MidiEvent> allEvents = new List<MidiEvent>();
+            drumValueChanged = false;
+            if (SingleChannel.SelectedIndex != 0)
             {
-                availableChannels.Add(6);
-                availableChannels.Add(7);
-                availableChannels.Add(8);
-            }
-            availableChannels.Add(9);
-            availableChannels.Add(10);
-            availableChannels.Add(11);
-            availableChannels.Add(12);
-            availableChannels.Add(13);
-            availableChannels.Add(14);
-            availableChannels.Add(15);
-            availableChannels.Add(16);
-            availableChannels.Add(17);
-            byte[] twoOpChannels = new byte[15];
-            for (int i = 0; i < channelMap.Length; i++)
-            {
-                channelMap[i] = 0xF0;
-            }
-            if (PercussionSet != 0)
-            {
-                channelMap[9] = 6;
-            }
-
-            foreach (MidiEvent ev in events)
-            {
-                if (ev.type != METype.progchange)
-                {
-                    break;
-                }
-
-                if (ev.midiChannel != 9 || PercussionSet != 0)
-                {
-                    byte[] prog = GeneralMidi.GetInstrument(ev.program);
-                    if (prog[0] == 4)
-                    {
-                        // allocate 4 ops until you can't
-                        if (fourOps < 7)
-                        {
-                            // check if the channel has already been assigned
-                            if (channelMap[ev.midiChannel] == 0xF0)
-                            {
-                                byte opChnl = (byte)(fourOps < 3 ? fourOps : fourOps + 5);
-                                channelMap[ev.midiChannel] = opChnl;
-                                availableChannels.Remove(opChnl);
-                                availableChannels.Remove((byte)(opChnl + 3));
-                                fourOps++;
-                            }
-                        }
-                        else
-                        {
-                            // disable this channel
-                            channelMap[ev.midiChannel] = 0xFF;
-                        }
-                    }
-                    else
-                    {
-                        twoOpChannels[twoOps] = ev.midiChannel;
-                        twoOps++;
-                    }
-                }
-            }
-            if (fourOps * 4 + twoOps * 2 + 6 > 36)
-            {
-                throw new Exception("Insufficient number of operators!");
+                allEvents = tracks[SingleChannel.SelectedIndex].events;
             }
             else
             {
-                sb.AppendFormat("Two Op Channels: {0}, Four Op Channels: {1}", twoOps, fourOps).AppendLine();
+                int ix = 0;
+                int nexti = 999_999;  // just a big number
+                while (ix < songTime)
+                {   
+                    for (int t = 0; t < trackCount; t++)
+                    {
+                        int evc = tracks[t].events.Count;
+                        for (int c = 0; c < evc; c++)
+                        {
+                            if (tracks[t].events[c].index == ix)
+                            {
+                                allEvents.Add(tracks[t].events[c]);
+                            }
+                            else if (tracks[t].events[c].index > ix)
+                            {
+                                if (tracks[t].events[c].index < nexti)
+                                {
+                                    nexti = tracks[t].events[c].index;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    ix = nexti;
+                    nexti = 999_999;  // just a big number
+                }
             }
-            // given a number of 4 operator channels, return the starting offset
-            for (int i = 0; i < twoOps; i++)
+
+            StringBuilder sb = new StringBuilder();
+
+            // First pass - map midi channels to 18 OPL3 channels, with 2 operators or 9 channels with 4 operators.
+            byte fourOps = 9;
+            // midi channel to opl3 channel map - $F0 is unassigned, $FF is not played.
+            byte[] midiToOpMap = new byte[16];
+            for (int i = 0; i< 9; i++)
             {
-                byte top = availableChannels[0];
-                channelMap[twoOpChannels[i]] = top;
-                availableChannels.Remove(top);
+                midiToOpMap[i] = (byte)i;
             }
+            for (int i = 9; i < 16; i++)
+            {
+                midiToOpMap[i] = 0xF0;
+            }
+            if (PercussionSet != 0)
+            {
+                midiToOpMap[9-1] = 6;
+                midiToOpMap[6] = 0xF0;
+            }
+
+            //byte twoOps = 0;
+            //List<byte> availableChannels = new List<byte>();
+            //availableChannels.Add(0);
+            //availableChannels.Add(1);
+            //availableChannels.Add(2);
+            //availableChannels.Add(3);
+            //availableChannels.Add(4);
+            //availableChannels.Add(5);
+            //// If a drum track is selected, channels 6, 7 and 8 are reserved
+            //if (PercussionSet == 0)
+            //{
+            //    availableChannels.Add(6);
+            //    availableChannels.Add(7);
+            //    availableChannels.Add(8);
+            //}
+            //availableChannels.Add(9);
+            //availableChannels.Add(10);
+            //availableChannels.Add(11);
+            //availableChannels.Add(12);
+            //availableChannels.Add(13);
+            //availableChannels.Add(14);
+            //availableChannels.Add(15);
+            //availableChannels.Add(16);
+            //availableChannels.Add(17);
+
+            //byte[] twoOpChannels = new byte[15];
+            //// set all channels to unassigned
+            //for (int i = 0; i < channelMap.Length; i++)
+            //{
+            //    channelMap[i] = 0xF0;
+            //}
+
+
+            // Find the program changes
+            //foreach (MidiEvent ev in allEvents)
+            //{
+            //    if (ev.type != MidiEventType.progchange)
+            //    {
+            //        break;
+            //    }
+
+            //    if (ev.midiChannel != 9 || PercussionSet != 0)
+            //    {
+            //        byte[] prog = GeneralMidi.GetInstrument(ev.program);
+            //        // Check if the program uses 4 operators
+            //        if (prog[0] == 4)
+            //        {
+            //            // allocate 4 ops until you can't
+            //            if (fourOps < 7)
+            //            {
+            //                // check if the channel has already been assigned
+            //                if (channelMap[ev.midiChannel] == 0xF0)
+            //                {
+            //                    byte opChnl = (byte)(fourOps < 3 ? fourOps : fourOps + 5);
+            //                    channelMap[ev.midiChannel] = opChnl;
+            //                    availableChannels.Remove(opChnl);
+            //                    availableChannels.Remove((byte)(opChnl + 3));
+            //                    fourOps++;
+            //                }
+            //            }
+            //            else
+            //            {
+            //                // disable this channel
+            //                channelMap[ev.midiChannel] = 0xFF;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            twoOpChannels[twoOps] = ev.midiChannel;
+            //            twoOps++;
+            //        }
+            //    }
+            //}
+            //if (fourOps * 4 + twoOps * 2 + 6 > 36)
+            //{
+            //    throw new Exception("Insufficient number of operators!");
+            //}
+            //else
+            //{
+            //    sb.AppendFormat("Two Op Channels: {0}, Four Op Channels: {1}", twoOps, fourOps).AppendLine();
+            //}
+            //// given a number of 4 operator channels, return the starting offset
+            //for (int i = 0; i < twoOps; i++)
+            //{
+            //    byte top = availableChannels[0];
+            //    channelMap[twoOpChannels[i]] = top;
+            //    availableChannels.Remove(top);
+            //}
             byte OPL3Mode = (byte)(fourOps != 0 ? 1 : 0);
-            byte connectionSel = (byte)(Math.Pow(2, fourOps) -1);
+            //byte connectionSel = (byte)(Math.Pow(2, fourOps) -1);
             
             int totalWaits = 0;
             int totalBytes = 0;
             MemoryStream ms = new MemoryStream();
             // set the machine in OPL3 mode - no timers
             byte[] initialRegister = {
-                0x5f, 5, OPL3Mode,     // OPL3 mode
-                0x5e, 1, 0x20,  // Waveform Select - Test Registers
-                0x5e, 2, 0,     // timer 1
-                0x5e, 3, 0,     // timer 2
-                0x5e, 4, 0x60,  // RST, Timer Masks, Timer Starts
-                0x5e, 8, 0x40,  // Keyboard Split
+                0x5f, 5, OPL3Mode,      // OPL3 mode
+                0x5e, 1, 0x20,          // Waveform Select - Test Registers
+                0x5e, 2, 0,             // timer 1
+                0x5e, 3, 0,             // timer 2
+                0x5e, 4, 0x60,          // RST, Timer Masks, Timer Starts
+                0x5e, 8, 0x40,          // Keyboard Split
                 0x5e, 0xBD, PercussionSet,  // Drum Mode
                 // address 1
-                0x5f, 1, 0x0,              // Waveform Select - Test Registers
-                0x5f, 4, 0,        // connection sel
-                0x5e, 0xB6, 0xc,     // clearing KEY ON for percussion
-                0x5e, 0xB7, 0xc,     // clearing KEY ON for percussion
-                0x5e, 0xB8, 0xc,     // clearing KEY ON for percussion
-                0x5e, 0xA6, 0xf0,   // freq bd
-                0x5e, 0xA7, 0xf0,   // freq sn
-                0x5e, 0xA8, 0xf0,   // freq tt
+                0x5f, 1, 0x0,           // Waveform Select - Test Registers
+                0x5f, 4, 0,             // connection sel
+                0x5e, 0xB6, 0xc,        // clearing KEY ON for percussion
+                0x5e, 0xB7, 0xc,        // clearing KEY ON for percussion
+                0x5e, 0xB8, 0xc,        // clearing KEY ON for percussion
+                0x5e, 0xA6, 0xf0,       // freq bd
+                0x5e, 0xA7, 0xf0,       // freq sn
+                0x5e, 0xA8, 0xf0,       // freq tt
 
-                //0x5e, 0xC0, 0x0,   // enabling output
-                //0x5e, 0xC1, 0x0,   // enabling output
-                //0x5e, 0xC2, 0x0,   // enabling output
-                //0x5e, 0xC3, 0x0,   // enabling output
-                //0x5e, 0xC4, 0x0,   // enabling output
-                //0x5e, 0xC5, 0x0,   // enabling output
-                0x5e, 0xC6, 0x0,   // enabling output
-                0x5e, 0xC7, 0x0,   // enabling output
-                0x5e, 0xC8, 0x0,   // enabling output
-
-                // default snare sound
-                //01 f6 08 05 0 0c 08 20 f6 04 01 0 0 0  
-                0x5e, 0x20 + 0x14, 01,
-                0x5e, 0x60 + 0x14, 0xf6,
-                0x5e, 0x80 + 0x14, 8,
-                0x5e, 0xE0 + 0x14, 5,
-                0x5e, 0x40 + 0x14, 0 + 0xC
-
+                0x5e, 0xC0, 0x0,        // enabling output
+                0x5e, 0xC1, 0x0,        // enabling output
+                0x5e, 0xC2, 0x0,        // enabling output
+                0x5e, 0xC3, 0x0,        // enabling output
+                0x5e, 0xC4, 0x0,        // enabling output
+                0x5e, 0xC5, 0x0,        // enabling output
+                0x5e, 0xC6, 0x0,        // enabling output
+                0x5e, 0xC7, 0x0,        // enabling output
+                0x5e, 0xC8, 0x0,        // enabling output
             };
             ms.Write(initialRegister, 0, initialRegister.Length);
             totalBytes += initialRegister.Length;
 
+            // Convert MIDI events to VGM
             int idx = 0;
-            foreach (MidiEvent ev in events)
+            foreach (MidiEvent ev in allEvents)
             {
                 if (ev.index - idx > 0)
                 {
+                    // we accumulate the drum notes into one byte for register $BD
+                    if (drumValueChanged)
+                    {
+                        byte[] drumBuffer = new byte[3];
+                        drumBuffer[0] = 0x5e;
+                        drumBuffer[1] = 0xBD;
+                        drumBuffer[2] = PercussionSet;
+                        drumValueChanged = false;
+                        ms.Write(drumBuffer, 0, drumBuffer.Length);
+                        totalBytes += 3;
+                    }
+
+                    // now compute the wait time
                     int wait = (ev.index - idx) * samplesPerTick;
                     totalWaits += wait;
                     while (wait > 65535)
@@ -656,17 +727,26 @@ namespace MIDI_to_VGM_Converter
                         totalBytes += 3;
                     }
                 }
-                if (SingleChannel.SelectedIndex == 0 || (SingleChannel.SelectedIndex - 1 == ev.midiChannel))
+                sb.Append(ev.index).Append("\t").Append(ev).AppendLine();
+                byte[] opl3bytes = ev.GetOPL3Bytes(midiToOpMap);
+                if (opl3bytes != null)
                 {
-                    sb.Append(ev.index).Append("\t").Append(ev).AppendLine();
-                    byte[] partial = ev.GetBytes();
-                    if (partial != null)
-                    {
-                        ms.Write(partial, 0, partial.Length);
-                        totalBytes += partial.Length;
-                    }
+                    ms.Write(opl3bytes, 0, opl3bytes.Length);
+                    totalBytes += opl3bytes.Length;
                 }
+                
                 idx = ev.index;
+            }
+            // Empty the drum buffer
+            if (drumValueChanged)
+            {
+                byte[] drumBuffer = new byte[3];
+                drumBuffer[0] = 0x5e;
+                drumBuffer[1] = 0xBD;
+                drumBuffer[2] = PercussionSet;
+                drumValueChanged = false;
+                ms.Write(drumBuffer, 0, drumBuffer.Length);
+                totalBytes += 3;
             }
             ms.Write(new byte[1] { 0x66 }, 0, 1); // end of song
             totalBytes += 1;
@@ -734,12 +814,20 @@ namespace MIDI_to_VGM_Converter
 
         private byte[] CreateGD3()
         {
-            byte[] buffer = new byte[100];
-            buffer[0] = (byte)'G';
-            buffer[1] = (byte)'d';
-            buffer[2] = (byte)'3';
-            buffer[3] = (byte)' ';
-            return buffer;
+            byte[] header = new byte[8] { (byte)'G', (byte)'d', (byte)'3', (byte)' ', 0x0, 0x1, 0x0, 0x0};
+            MemoryStream ms = new MemoryStream();
+            ms.Write(header, 0, 8);
+
+            // Next, write the size of the data - each character is 2 bytes and each eol is 2 bytes.
+            ms.Write(BitConverter.GetBytes(22), 0, 4);
+
+            for (int i=0;i<11;i++)
+            {
+                //write the next string
+                ms.Write(new byte[2] { 0, 0 }, 0, 2);
+            }
+            ms.Flush();
+            return ms.ToArray();
         }
     }
 }

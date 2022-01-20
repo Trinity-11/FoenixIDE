@@ -12,9 +12,12 @@ namespace MIDI_to_VGM_Converter
         public int length = 0;
         public TimeSignature timeSignature;
         public int totalDeltaTime = 0;
+        public string name = "unnamed";
+        // ordered list of events
+        public List<MidiEvent> events;
     }
 
-    public enum METype
+    public enum MidiEventType
     {
         progchange, noteoff, noteon
     }
@@ -38,7 +41,7 @@ namespace MIDI_to_VGM_Converter
         public int deltaTime;
         public int index; // index in time
         public int wait; // this is the converted sample count at 44100 Hz.
-        public METype type = METype.noteon;
+        public MidiEventType type = MidiEventType.noteon;
         public byte note;
         public byte velocity = 0;
         public byte program = 0;
@@ -54,7 +57,7 @@ namespace MIDI_to_VGM_Converter
             sb.Append(" T:").Append(type).Append(" C:").Append(midiChannel);
             switch(type)
             {
-                case METype.progchange:
+                case MidiEventType.progchange:
                     sb.Append(" P:").Append(program);
                     break;
                 default:
@@ -65,116 +68,120 @@ namespace MIDI_to_VGM_Converter
             return sb.ToString();
         }
 
+        public byte[] GetInstrumentBuffer(byte baseAddress, int channel, byte[] gmData, byte[] buffer, int offset)
+        {
+            // Single voice channel
+            // operator 1
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x20 + channelToOperatorOffset[channel % 9]), gmData[4] }, 0, buffer, offset, 3);  // tremolo/vibrato/sustain/KSR/Freq Mult
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x60 + channelToOperatorOffset[channel % 9]), gmData[5] }, 0, buffer, 3 + offset, 3);  // attack/decay
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x80 + channelToOperatorOffset[channel % 9]), gmData[6] }, 0, buffer, 6 + offset, 3);  // sustain/release
+            Array.Copy(new byte[3] { baseAddress, (byte)(0xE0 + channelToOperatorOffset[channel % 9]), gmData[7] }, 0, buffer, 9 + offset, 3);  // Waveform select
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x40 + channelToOperatorOffset[channel % 9]), (byte)(gmData[8] + gmData[9]) }, 0, buffer, 12 + offset, 3);  // KSL/Output Level
+            Array.Copy(new byte[3] { baseAddress, (byte)(0xC0 + channel % 9), (byte)(0xF0 | gmData[10]) }, 0, buffer, 15 + offset, 3);  // Speaker/Feedback/Syn Type
+                                                                                                                           // operator 2
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x23 + channelToOperatorOffset[channel % 9]), gmData[11] }, 0, buffer, 18 + offset, 3);  // tremolo/vibrato/sustain/KSR/Freq Mult
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x63 + channelToOperatorOffset[channel % 9]), gmData[12] }, 0, buffer, 21 + offset, 3);  // attack/decay
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x83 + channelToOperatorOffset[channel % 9]), gmData[13] }, 0, buffer, 24 + offset, 3);  // sustain/release
+            Array.Copy(new byte[3] { baseAddress, (byte)(0xE3 + channelToOperatorOffset[channel % 9]), gmData[14] }, 0, buffer, 27 + offset, 3);  // Waveform select
+            Array.Copy(new byte[3] { baseAddress, (byte)(0x43 + channelToOperatorOffset[channel % 9]), (byte)(gmData[15] + gmData[16]) }, 0, buffer, 30 + offset, 3);  // KSL/Output Level
+            return buffer;
+        }
+
         // We're mapping channels to use the drums
         private readonly byte[] channelToOperatorOffset = { 0, 1, 2, 8, 9, 0xA, 0x10, 0x11, 0x12};
-        public byte[] GetBytes()
+        public byte[] GetOPL3Bytes(byte[] channelMap)
         {
             byte[] buffer = null;
-            byte oplChnl = MainForm.channelMap[midiChannel];
+            byte oplChnl = channelMap[midiChannel-1];
             if (oplChnl < 18)
             {
                 byte baseReg = (oplChnl < 9) ? (byte)0x5e : (byte)0x5f;
                 switch (type)
                 {
-                    case METype.progchange:
-                        // read the patch file
-                        byte[] gmData = GeneralMidi.GetInstrument(program);
-                        MainForm.ChannelKSL[oplChnl] = gmData[8];
-
-                        if ((gmData[0] & 4) != 0)
+                    case MidiEventType.progchange:
+                        if (midiChannel == 9 && MainForm.PercussionSet != 0)
                         {
-                            buffer = new byte[66];
-                            // double voice instrument
-                            // operator 1
-                            byte addr1 = 0x20;
-                            byte addr2 = 0x28;
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + channelToOperatorOffset[oplChnl % 9]), gmData[4] }, 0, buffer, 0, 3);  
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0x40 + channelToOperatorOffset[oplChnl % 9]), gmData[5] }, 0, buffer, 3, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0x60 + channelToOperatorOffset[oplChnl % 9]), gmData[6] }, 0, buffer, 6, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0xC0 + channelToOperatorOffset[oplChnl % 9]), gmData[7] }, 0, buffer, 9, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0x20 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[8] + gmData[9]) }, 0, buffer, 12, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0xA0 + oplChnl % 9), (byte)(gmData[10] | 0x30) }, 0, buffer, 15, 3);
-                            // operator 2
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[11] }, 0, buffer, 18, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0x40 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[12] }, 0, buffer, 21, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0x60 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[13] }, 0, buffer, 24, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0xC0 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[14] }, 0, buffer, 27, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr1 + 0x20 + 3 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[15] | gmData[16]) }, 0, buffer, 30, 3);
-                            // operator 3
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + channelToOperatorOffset[oplChnl % 9]), gmData[20] }, 0, buffer, 33, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x40 + channelToOperatorOffset[oplChnl % 9]), gmData[21] }, 0, buffer, 36, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x60 + channelToOperatorOffset[oplChnl % 9]), gmData[22] }, 0, buffer, 39, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0xC0 + channelToOperatorOffset[oplChnl % 9]), gmData[23] }, 0, buffer, 42, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x20 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[24] + gmData[25]) }, 0, buffer, 45, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0xA0 + oplChnl % 9), (byte)(gmData[26] | 0x30) }, 0, buffer, 48, 3);
-                            // operator 4
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[27] }, 0, buffer, 51, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x40 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[28] }, 0, buffer, 54, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x60 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[29] }, 0, buffer, 57, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0xC0 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[30] }, 0, buffer, 60, 3);
-                            Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x20 + 3 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[31] | gmData[32]) }, 0, buffer, 63, 3);
+                            buffer = new byte[99];
+                            // Channel 7 - Base Drum
+                            byte[] gmData = GeneralMidi.GetInstrument(128);
+                            GetInstrumentBuffer(baseReg, 6, gmData, buffer, 0);
+                            // Channel 8 - HH and TT
+                            gmData = GeneralMidi.GetInstrument(129);
+                            GetInstrumentBuffer(baseReg, 7, gmData, buffer, 33);
+                            // Channel 9 - SD and CY
+                            gmData = GeneralMidi.GetInstrument(130);
+                            GetInstrumentBuffer(baseReg, 8, gmData, buffer, 66);
                         }
                         else
                         {
-                            buffer = new byte[33];
-                            // Single voice channel
-                            // operator 1
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x20 + channelToOperatorOffset[oplChnl % 9]), gmData[4] }, 0, buffer, 0, 3);  // tremolo/vibrato/sustain/KSR/Freq Mult
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x60 + channelToOperatorOffset[oplChnl % 9]), gmData[5] }, 0, buffer, 3, 3);  // attack/decay
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x80 + channelToOperatorOffset[oplChnl % 9]), gmData[6] }, 0, buffer, 6, 3);  // sustain/release
-                            Array.Copy(new byte[3] { baseReg, (byte)(0xE0 + channelToOperatorOffset[oplChnl % 9]), gmData[7] }, 0, buffer, 9, 3);  // Waveform select
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x40 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[8] + gmData[9]) }, 0, buffer, 12, 3);  // KSL/Output Level
-                            Array.Copy(new byte[3] { baseReg, (byte)(0xC0 + oplChnl % 9), (byte)(gmData[10] | 0xF0) }, 0, buffer, 15, 3);  // Speaker/Feedback/Syn Type
-                                                                                                                                           // operator 2
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x23 + channelToOperatorOffset[oplChnl % 9]), gmData[11] }, 0, buffer, 18, 3);  // tremolo/vibrato/sustain/KSR/Freq Mult
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x63 + channelToOperatorOffset[oplChnl % 9]), gmData[12] }, 0, buffer, 21, 3);  // attack/decay
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x83 + channelToOperatorOffset[oplChnl % 9]), gmData[13] }, 0, buffer, 24, 3);  // sustain/release
-                            Array.Copy(new byte[3] { baseReg, (byte)(0xE3 + channelToOperatorOffset[oplChnl % 9]), gmData[14] }, 0, buffer, 27, 3);  // Waveform select
-                            Array.Copy(new byte[3] { baseReg, (byte)(0x43 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[15] + gmData[16]) }, 0, buffer, 30, 3);  // KSL/Output Level
+                            // read the patch file
+                            byte[] gmData = GeneralMidi.GetInstrument(program);
+                            MainForm.ChannelKSL[oplChnl] = gmData[8];
+
+                            if ((gmData[0] & 4) != 0)
+                            {
+                                buffer = new byte[66];
+                                // double voice instrument
+                                // operator 1
+                                GetInstrumentBuffer(baseReg, oplChnl, gmData, buffer, 0);
+
+                                // operator 3
+                                byte addr2 = 0x28;
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + channelToOperatorOffset[oplChnl % 9]), gmData[20] }, 0, buffer, 33, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x40 + channelToOperatorOffset[oplChnl % 9]), gmData[21] }, 0, buffer, 36, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x60 + channelToOperatorOffset[oplChnl % 9]), gmData[22] }, 0, buffer, 39, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0xC0 + channelToOperatorOffset[oplChnl % 9]), gmData[23] }, 0, buffer, 42, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x20 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[24] + gmData[25]) }, 0, buffer, 45, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0xA0 + oplChnl % 9), (byte)(gmData[26] | 0xF0) }, 0, buffer, 48, 3);
+                                // operator 4
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[27] }, 0, buffer, 51, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x40 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[28] }, 0, buffer, 54, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x60 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[29] }, 0, buffer, 57, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0xC0 + 3 + channelToOperatorOffset[oplChnl % 9]), gmData[30] }, 0, buffer, 60, 3);
+                                Array.Copy(new byte[3] { baseReg, (byte)(addr2 + 0x20 + 3 + channelToOperatorOffset[oplChnl % 9]), (byte)(gmData[31] + gmData[32]) }, 0, buffer, 63, 3);
+                            }
+                            else
+                            {
+                                buffer = new byte[33];
+                                GetInstrumentBuffer(baseReg, oplChnl, gmData, buffer, 0);
+                            }
                         }
                         break;
-                    case METype.noteon:
+                    case MidiEventType.noteon:
 
                         if (midiChannel == 9 && MainForm.PercussionSet != 0 )
                         {
-                            buffer = new byte[6];
-                            bool BD = (note == 35) | (note == 36);
-                            bool SN = (note == 38) | (note == 40);
-                            bool TT = (note == 41) | (note == 45);
+                            bool BD = (note == 35) | (note == 36) | (note == 39);
+                            bool SN = (note == 38) | (note == 40) | (note == 28);
+                            bool TT = (note == 41) | (note == 45) | (note == 60);
                             bool CY = (note == 49) | (note == 55) | (note == 57);
-                            bool HH = (note == 46) | (note == 42);
+                            bool HH = (note == 46) | (note == 42) | (note == 44);
 
-                            buffer[0] = 0x5e;
-                            buffer[1] = 0xBD;
-                            buffer[3] = 0x5e;
                             if (BD)
                             {
                                 MainForm.PercussionSet = velocity == 0 ? (byte)(MainForm.PercussionSet & ~0x10) : (byte)(MainForm.PercussionSet | 0x10);
-                                buffer[4] = (byte)(0x40 + 0x10);
-
+                                MainForm.drumValueChanged = true;
                             }
                             if (SN)
                             {
                                 MainForm.PercussionSet = velocity == 0 ? (byte)(MainForm.PercussionSet & ~0x8) : (byte)(MainForm.PercussionSet | 0x8);
-                                buffer[4] = (byte)(0x40 + 0x14);
+                                MainForm.drumValueChanged = true;
                             }
                             if (TT)
                             {
                                 MainForm.PercussionSet = velocity == 0 ? (byte)(MainForm.PercussionSet & ~0x4) : (byte)(MainForm.PercussionSet | 0x4);
-                                buffer[4] = (byte)(0x40 + 0x12);
+                                MainForm.drumValueChanged = true;
                             }
                             if (CY)
                             {
                                 MainForm.PercussionSet = velocity == 0 ? (byte)(MainForm.PercussionSet & ~0x2) : (byte)(MainForm.PercussionSet | 0x2);
-                                buffer[4] = (byte)(0x40 + 0x15);
+                                MainForm.drumValueChanged = true;
                             }
                             if (HH)
                             {
                                 MainForm.PercussionSet = velocity == 0 ? (byte)(MainForm.PercussionSet & ~0x1) : (byte)(MainForm.PercussionSet | 0x1);
-                                buffer[4] = (byte)(0x40 + 0x11);
+                                MainForm.drumValueChanged = true;
                             }
-                            buffer[2] = MainForm.PercussionSet;
-                            buffer[5] = (byte)(0x3F - (velocity >> 1));  // attenuation
                         }
                         else
                         {
@@ -192,47 +199,45 @@ namespace MIDI_to_VGM_Converter
                             buffer[8] = (byte)(MainForm.ChannelKSL[oplChnl] | (0x3F - (velocity >> 1)));  // attenuation
                         }
                         break;
-                    case METype.noteoff:
-                        buffer = new byte[3];
-                        byte[] offFreq = GetFreq(note);
+                    case MidiEventType.noteoff:
+                        
                         if (midiChannel == 9 && MainForm.PercussionSet != 0)
                         {
                             bool BD = (note == 35) | (note == 36);
                             bool SN = (note == 38) | (note == 40);
-                            bool TT = (note == 41) | (note == 45);
-                            bool CY = (note == 49) | (note == 57);
-                            bool HH = (note == 46) | (note == 42);
-                            buffer[0] = 0x5e;
-                            buffer[1] = 0xBD;
+                            bool TT = (note == 41) | (note == 45) | (note == 60);
+                            bool CY = (note == 49) | (note == 55) | (note == 57);
+                            bool HH = (note == 46) | (note == 42) | (note == 44);
+                            
                             if (BD)
                             {
                                 MainForm.PercussionSet = (byte)(MainForm.PercussionSet & ~0x10);
-                                buffer[2] = (byte)(0x40 + 0x10);
-
+                                MainForm.drumValueChanged = true;
                             }
                             if (SN)
                             {
                                 MainForm.PercussionSet = (byte)(MainForm.PercussionSet & ~0x8);
-                                buffer[2] = (byte)(0x40 + 0x14);
+                                MainForm.drumValueChanged = true;
                             }
                             if (TT)
                             {
                                 MainForm.PercussionSet = (byte)(MainForm.PercussionSet & ~0x4);
-                                buffer[2] = (byte)(0x40 + 0x12);
+                                MainForm.drumValueChanged = true;
                             }
                             if (CY)
                             {
                                 MainForm.PercussionSet = (byte)(MainForm.PercussionSet & ~0x2);
-                                buffer[2] = (byte)(0x40 + 0x15);
+                                MainForm.drumValueChanged = true;
                             }
                             if (HH)
                             {
                                 MainForm.PercussionSet = (byte)(MainForm.PercussionSet & ~0x1);
-                                buffer[2] = (byte)(0x40 + 0x11);
+                                MainForm.drumValueChanged = true;
                             }
                         }
                         else
                         {
+                            buffer = new byte[3];
                             buffer[0] = baseReg;
                             buffer[1] = (byte)(0xB0 + oplChnl % 9);
                             buffer[2] = 0;
