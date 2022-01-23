@@ -63,7 +63,6 @@ namespace MIDI_to_VGM_Converter
                 ReadMIDIFile();
                 file.Close();
                 GeneratePanel.Enabled = true;
-                SingleChannel.SelectedIndex = 0;
             }
         }
 
@@ -78,6 +77,8 @@ namespace MIDI_to_VGM_Converter
             ReadHeader();
             sb.AppendLine();
             ReadTracks();
+            gridSummary.DataSource = tracks;
+            gridSummary.ClearSelection();
             MIDIOutputText.Text = sb.ToString();
         }
 
@@ -130,10 +131,15 @@ namespace MIDI_to_VGM_Converter
                 sb.AppendLine("-----------------------------------");
 
                 tracks = new Track[trackCount];
+                // Initialize the Track dropdown list
                 for (int i = 0; i< trackCount; i++)
                 {
                     tracks[i] = new Track()
                     {
+                        Index = i,
+                        MidiChannel = -1,
+                        isMultiChannel = false,
+                        isPoly = false,
                         startOffset = i == 0 ? 8 + headerLength : 8 + tracks[i - 1].length + tracks[i - 1].startOffset
                     };
                     tracks[i].length = ReadTrackLength(i);
@@ -163,13 +169,7 @@ namespace MIDI_to_VGM_Converter
         private void ReadTracks()
         {
             songTime = 0;
-            // Read Track 0
-            ReadTrack(0);
-            if (tracks[0].totalDeltaTime > songTime)
-            {
-                songTime = tracks[0].totalDeltaTime;
-            }
-            for (int i = 1; i < trackCount; i ++)
+            for (int i = 0; i < trackCount; i ++)
             {
                 ReadTrack(i);
                 if (tracks[i].totalDeltaTime > songTime)
@@ -185,7 +185,23 @@ namespace MIDI_to_VGM_Converter
             sb.AppendLine(string.Format("--------- Track {0}---------", index));
             tracks[index].totalDeltaTime = ReadEvents(tracks[index], tracks[index].startOffset + 8, tracks[index].length);
             sb.AppendLine("-----------------------------------");
-            sb.Append("Total Track Time: ").AppendLine(tracks[index].totalDeltaTime.ToString());
+            sb.Append("Total Track Time [" + index + "]: ").AppendLine(tracks[index].totalDeltaTime.ToString());
+            if (isTrackPolyphonic(tracks[index]))
+            {
+                sb.Append("Track is polyphonic. ");
+            }
+            else
+            {
+                sb.Append("Track is monophonic. ");
+            }
+            if (isTrackMultichannel(tracks[index]))
+            {
+                sb.AppendLine("Track is multi-channel.");
+            }
+            else
+            {
+                sb.AppendLine("Track is single-channel.");
+            }
             sb.AppendLine("-----------------------------------");
         }
 
@@ -284,7 +300,15 @@ namespace MIDI_to_VGM_Converter
                     break;
                 case 2:
                     string copyright = ReadText(ptr, length);
-                    meta.Add("copyright", copyright);
+                    if (meta.ContainsKey("copyright"))
+                    {
+                        String newCopyRight = meta["copyright"] + "\r\n" + copyright;
+                        meta["copyright"] = newCopyRight;
+                    }
+                    else
+                    {
+                        meta.Add("copyright", copyright);
+                    }
                     sb.Append("Copyright Notice: ").Append(copyright);
                     break;
                 case 3:
@@ -512,9 +536,9 @@ namespace MIDI_to_VGM_Converter
             // Gather all events into one list
             List<MidiEvent> allEvents = new List<MidiEvent>();
             drumValueChanged = false;
-            if (SingleChannel.SelectedIndex != 0)
+            if (gridSummary.SelectedRows.Count == 1)
             {
-                allEvents = tracks[SingleChannel.SelectedIndex].events;
+                allEvents = tracks[gridSummary.SelectedRows[0].Index].events;
             }
             else
             {
@@ -828,6 +852,88 @@ namespace MIDI_to_VGM_Converter
             }
             ms.Flush();
             return ms.ToArray();
+        }
+
+        /**
+         * For each track, try to determine if they are polyphonic.
+         * The Drum track is usually polyphonic.  If Rhythm is enabled in OPL3, then 6 channels are used to produce these.
+         * Melodic tracks can have multiple notes on at the same time, so the purpose of this function is to allow other channels in the OPL3 for this.
+         */
+        private void btnPolyphonic_Click(object sender, EventArgs e)
+        {
+            for (int t=0;t<trackCount;t++)
+            {
+                Track track = tracks[t];
+                
+            }
+        }
+
+        /** 
+         * Check if a track has polyphonic events.
+         * Polyphony to be true, two notes on the same channel must be ON at the same time.
+         */
+        public bool isTrackPolyphonic(Track track)
+        {
+            List<int> notes = new List<int>();
+            for (int i = 0; i < track.events.Count; i++)
+            {
+                MidiEvent ev = track.events[i];
+                switch (ev.type)
+                {
+                    case MidiEventType.noteon:
+                        // velocity = 0 means it's now off.
+                        if (ev.velocity == 0)
+                        {
+                            notes.Remove(ev.midiChannel * 128 + ev.note);
+                        }
+                        else
+                        {
+                            if (!notes.Contains(ev.midiChannel * 128 + ev.note))
+                            {
+                                notes.Add(ev.midiChannel * 128 + ev.note);
+                            }
+                        }
+                        break;
+
+                    case MidiEventType.noteoff:
+                        notes.Remove(ev.midiChannel * 128 + ev.note);
+                        break;
+                }
+                if (notes.Count > 1)
+                {
+                    track.isPoly = true;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool isTrackMultichannel(Track track)
+        {
+            List<int> channels = new List<int>();
+            for (int i = 0; i < track.events.Count; i++)
+            {
+                MidiEvent ev = track.events[i];
+                if (!channels.Contains(ev.midiChannel))
+                {
+                    channels.Add(ev.midiChannel);
+                }
+                if (channels.Count > 1)
+                {
+                    track.isMultiChannel = true;
+                    return true;
+                }
+            }
+            if (channels.Count == 1)
+            {
+                track.MidiChannel = channels[0];
+            }
+            return false;
+        }
+
+        private void gridSummary_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

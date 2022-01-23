@@ -28,16 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.MIDIOutputText = new System.Windows.Forms.TextBox();
             this.ReadFileButton = new System.Windows.Forms.Button();
             this.FileLabel = new System.Windows.Forms.Label();
             this.GeneratePanel = new System.Windows.Forms.Panel();
-            this.SingleChannel = new System.Windows.Forms.ComboBox();
-            this.SingleChannelLabel = new System.Windows.Forms.Label();
             this.PercussionMode = new System.Windows.Forms.CheckBox();
             this.GenerateVGMButton = new System.Windows.Forms.Button();
+            this.gridSummary = new System.Windows.Forms.DataGridView();
+            this.colTrackNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDuration = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMidiEventCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMidiChannel = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPolyBool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.colMultiChannelBool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.GeneratePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridSummary)).BeginInit();
             this.SuspendLayout();
             // 
             // MIDIOutputText
@@ -46,20 +54,20 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MIDIOutputText.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MIDIOutputText.Location = new System.Drawing.Point(16, 73);
-            this.MIDIOutputText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MIDIOutputText.Location = new System.Drawing.Point(525, 101);
+            this.MIDIOutputText.Margin = new System.Windows.Forms.Padding(4);
             this.MIDIOutputText.MaxLength = 65536;
             this.MIDIOutputText.Multiline = true;
             this.MIDIOutputText.Name = "MIDIOutputText";
             this.MIDIOutputText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.MIDIOutputText.Size = new System.Drawing.Size(1033, 466);
+            this.MIDIOutputText.Size = new System.Drawing.Size(524, 438);
             this.MIDIOutputText.TabIndex = 3;
             this.MIDIOutputText.WordWrap = false;
             // 
             // ReadFileButton
             // 
             this.ReadFileButton.Location = new System.Drawing.Point(16, 4);
-            this.ReadFileButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ReadFileButton.Margin = new System.Windows.Forms.Padding(4);
             this.ReadFileButton.Name = "ReadFileButton";
             this.ReadFileButton.Size = new System.Drawing.Size(100, 28);
             this.ReadFileButton.TabIndex = 2;
@@ -78,62 +86,22 @@
             // 
             // GeneratePanel
             // 
-            this.GeneratePanel.Controls.Add(this.SingleChannel);
-            this.GeneratePanel.Controls.Add(this.SingleChannelLabel);
             this.GeneratePanel.Controls.Add(this.PercussionMode);
             this.GeneratePanel.Controls.Add(this.GenerateVGMButton);
             this.GeneratePanel.Enabled = false;
-            this.GeneratePanel.Location = new System.Drawing.Point(13, 33);
-            this.GeneratePanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GeneratePanel.Location = new System.Drawing.Point(13, 65);
+            this.GeneratePanel.Margin = new System.Windows.Forms.Padding(4);
             this.GeneratePanel.Name = "GeneratePanel";
             this.GeneratePanel.Size = new System.Drawing.Size(1037, 32);
             this.GeneratePanel.TabIndex = 10;
-            // 
-            // SingleChannel
-            // 
-            this.SingleChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.SingleChannel.FormattingEnabled = true;
-            this.SingleChannel.Items.AddRange(new object[] {
-            "All",
-            "Channel 1",
-            "Channel 2",
-            "Channel 3",
-            "Channel 4",
-            "Channel 5",
-            "Channel 6",
-            "Channel 7",
-            "Channel 8",
-            "Channel 9",
-            "Channel 10 (Drums)",
-            "Channel 11",
-            "Channel 12",
-            "Channel 13",
-            "Channel 14",
-            "Channel 15",
-            "Channel 16"});
-            this.SingleChannel.Location = new System.Drawing.Point(461, 4);
-            this.SingleChannel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.SingleChannel.Name = "SingleChannel";
-            this.SingleChannel.Size = new System.Drawing.Size(160, 24);
-            this.SingleChannel.TabIndex = 14;
-            // 
-            // SingleChannelLabel
-            // 
-            this.SingleChannelLabel.AutoSize = true;
-            this.SingleChannelLabel.Location = new System.Drawing.Point(409, 7);
-            this.SingleChannelLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.SingleChannelLabel.Name = "SingleChannelLabel";
-            this.SingleChannelLabel.Size = new System.Drawing.Size(44, 17);
-            this.SingleChannelLabel.TabIndex = 13;
-            this.SingleChannelLabel.Text = "Track";
             // 
             // PercussionMode
             // 
             this.PercussionMode.AutoSize = true;
             this.PercussionMode.Checked = true;
             this.PercussionMode.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.PercussionMode.Location = new System.Drawing.Point(145, 6);
-            this.PercussionMode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PercussionMode.Location = new System.Drawing.Point(144, 6);
+            this.PercussionMode.Margin = new System.Windows.Forms.Padding(4);
             this.PercussionMode.Name = "PercussionMode";
             this.PercussionMode.Size = new System.Drawing.Size(228, 21);
             this.PercussionMode.TabIndex = 11;
@@ -144,7 +112,7 @@
             // GenerateVGMButton
             // 
             this.GenerateVGMButton.Location = new System.Drawing.Point(3, 1);
-            this.GenerateVGMButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GenerateVGMButton.Margin = new System.Windows.Forms.Padding(4);
             this.GenerateVGMButton.Name = "GenerateVGMButton";
             this.GenerateVGMButton.Size = new System.Drawing.Size(133, 28);
             this.GenerateVGMButton.TabIndex = 10;
@@ -152,21 +120,141 @@
             this.GenerateVGMButton.UseVisualStyleBackColor = true;
             this.GenerateVGMButton.Click += new System.EventHandler(this.GenerateVGMButton_Click);
             // 
+            // gridSummary
+            // 
+            this.gridSummary.AllowUserToAddRows = false;
+            this.gridSummary.AllowUserToDeleteRows = false;
+            this.gridSummary.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.gridSummary.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.gridSummary.ColumnHeadersHeight = 25;
+            this.gridSummary.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.gridSummary.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colTrackNumber,
+            this.colDuration,
+            this.colMidiEventCount,
+            this.colMidiChannel,
+            this.colPolyBool,
+            this.colMultiChannelBool});
+            this.gridSummary.EnableHeadersVisualStyles = false;
+            this.gridSummary.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.gridSummary.Location = new System.Drawing.Point(13, 104);
+            this.gridSummary.MultiSelect = false;
+            this.gridSummary.Name = "gridSummary";
+            this.gridSummary.ReadOnly = true;
+            this.gridSummary.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.gridSummary.RowHeadersVisible = false;
+            this.gridSummary.RowHeadersWidth = 21;
+            this.gridSummary.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Lime;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.Empty;
+            this.gridSummary.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.gridSummary.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.Empty;
+            this.gridSummary.RowTemplate.Height = 19;
+            this.gridSummary.RowTemplate.ReadOnly = true;
+            this.gridSummary.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridSummary.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.gridSummary.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridSummary.ShowCellErrors = false;
+            this.gridSummary.ShowCellToolTips = false;
+            this.gridSummary.ShowEditingIcon = false;
+            this.gridSummary.ShowRowErrors = false;
+            this.gridSummary.Size = new System.Drawing.Size(505, 438);
+            this.gridSummary.TabIndex = 11;
+            this.gridSummary.Click += new System.EventHandler(this.gridSummary_Click);
+            // 
+            // colTrackNumber
+            // 
+            this.colTrackNumber.DataPropertyName = "Index";
+            this.colTrackNumber.HeaderText = "Track";
+            this.colTrackNumber.MaxInputLength = 2;
+            this.colTrackNumber.MinimumWidth = 6;
+            this.colTrackNumber.Name = "colTrackNumber";
+            this.colTrackNumber.ReadOnly = true;
+            this.colTrackNumber.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.colTrackNumber.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colTrackNumber.Width = 65;
+            // 
+            // colDuration
+            // 
+            this.colDuration.DataPropertyName = "TotalTime";
+            this.colDuration.HeaderText = "Duration";
+            this.colDuration.MaxInputLength = 10;
+            this.colDuration.MinimumWidth = 6;
+            this.colDuration.Name = "colDuration";
+            this.colDuration.ReadOnly = true;
+            this.colDuration.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.colDuration.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colDuration.Width = 90;
+            // 
+            // colMidiEventCount
+            // 
+            this.colMidiEventCount.DataPropertyName = "EventCount";
+            this.colMidiEventCount.HeaderText = "Event #";
+            this.colMidiEventCount.MinimumWidth = 6;
+            this.colMidiEventCount.Name = "colMidiEventCount";
+            this.colMidiEventCount.ReadOnly = true;
+            this.colMidiEventCount.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.colMidiEventCount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colMidiEventCount.Width = 75;
+            // 
+            // colMidiChannel
+            // 
+            this.colMidiChannel.DataPropertyName = "MidiChannel";
+            this.colMidiChannel.HeaderText = "Chnl";
+            this.colMidiChannel.MinimumWidth = 6;
+            this.colMidiChannel.Name = "colMidiChannel";
+            this.colMidiChannel.ReadOnly = true;
+            this.colMidiChannel.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.colMidiChannel.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colMidiChannel.Width = 40;
+            // 
+            // colPolyBool
+            // 
+            this.colPolyBool.DataPropertyName = "isPoly";
+            this.colPolyBool.HeaderText = "Poly";
+            this.colPolyBool.MinimumWidth = 2;
+            this.colPolyBool.Name = "colPolyBool";
+            this.colPolyBool.ReadOnly = true;
+            this.colPolyBool.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.colPolyBool.Width = 40;
+            // 
+            // colMultiChannelBool
+            // 
+            this.colMultiChannelBool.DataPropertyName = "isMultiChannel";
+            this.colMultiChannelBool.HeaderText = "MD";
+            this.colMultiChannelBool.MinimumWidth = 2;
+            this.colMultiChannelBool.Name = "colMultiChannelBool";
+            this.colMultiChannelBool.ReadOnly = true;
+            this.colMultiChannelBool.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.colMultiChannelBool.Width = 40;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.Controls.Add(this.gridSummary);
             this.Controls.Add(this.GeneratePanel);
             this.Controls.Add(this.FileLabel);
             this.Controls.Add(this.MIDIOutputText);
             this.Controls.Add(this.ReadFileButton);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "MIDI to VGM Conversion";
             this.GeneratePanel.ResumeLayout(false);
             this.GeneratePanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridSummary)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -178,10 +266,15 @@
         private System.Windows.Forms.Button ReadFileButton;
         private System.Windows.Forms.Label FileLabel;
         private System.Windows.Forms.Panel GeneratePanel;
-        private System.Windows.Forms.ComboBox SingleChannel;
-        private System.Windows.Forms.Label SingleChannelLabel;
         private System.Windows.Forms.CheckBox PercussionMode;
         private System.Windows.Forms.Button GenerateVGMButton;
+        private System.Windows.Forms.DataGridView gridSummary;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTrackNumber;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDuration;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMidiEventCount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMidiChannel;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colPolyBool;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn colMultiChannelBool;
     }
 }
 

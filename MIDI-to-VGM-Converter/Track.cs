@@ -8,13 +8,46 @@ namespace MIDI_to_VGM_Converter
 {
     public class Track
     {
+        public int Index
+        {
+            get;
+            set;
+        }
         public int startOffset = -1;
         public int length = 0;
         public TimeSignature timeSignature;
         public int totalDeltaTime = 0;
+        public int TotalTime
+        {
+            get => totalDeltaTime;
+        }
+
         public string name = "unnamed";
         // ordered list of events
         public List<MidiEvent> events;
+        public int EventCount
+        {
+            get => events.Count;
+        }
+
+        // does the track contain polyphonic events on a single MIDI channel?
+        public bool isPoly
+        {
+            get;
+            set;
+        }
+        // does the track contain multiple channel events?
+        public bool isMultiChannel
+        {
+            get;
+            set;
+        }
+
+        // if the Track is single channel, then this is stored here.
+        public int MidiChannel
+        {
+            get;set;
+        }
     }
 
     public enum MidiEventType
@@ -92,7 +125,7 @@ namespace MIDI_to_VGM_Converter
         public byte[] GetOPL3Bytes(byte[] channelMap)
         {
             byte[] buffer = null;
-            byte oplChnl = channelMap[midiChannel-1];
+            byte oplChnl = channelMap[midiChannel];
             if (oplChnl < 18)
             {
                 byte baseReg = (oplChnl < 9) ? (byte)0x5e : (byte)0x5f;
