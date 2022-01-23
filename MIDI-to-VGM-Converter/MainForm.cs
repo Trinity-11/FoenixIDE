@@ -137,7 +137,6 @@ namespace MIDI_to_VGM_Converter
                     tracks[i] = new Track()
                     {
                         Index = i,
-                        MidiChannel = -1,
                         isMultiChannel = false,
                         isPoly = false,
                         startOffset = i == 0 ? 8 + headerLength : 8 + tracks[i - 1].length + tracks[i - 1].startOffset
@@ -926,7 +925,7 @@ namespace MIDI_to_VGM_Converter
             }
             if (channels.Count == 1)
             {
-                track.MidiChannel = channels[0];
+                track.midiChannel = channels[0];
             }
             return false;
         }

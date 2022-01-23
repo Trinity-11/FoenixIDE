@@ -44,9 +44,10 @@ namespace MIDI_to_VGM_Converter
         }
 
         // if the Track is single channel, then this is stored here.
-        public int MidiChannel
+        public int midiChannel = -1;
+        public string MidiChannel
         {
-            get;set;
+            get => midiChannel != -1? (midiChannel + 1).ToString():"";
         }
     }
 
