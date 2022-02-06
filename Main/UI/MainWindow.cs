@@ -1272,6 +1272,12 @@ namespace FoenixIDE.UI
                 assetWindow.BringToFront();
             }
         }
+
+        private void mIDIToVGMConvertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MIDI_VGM_From midiForm = new MIDI_VGM_From();
+            midiForm.Show();
+        }
     }
 }
 

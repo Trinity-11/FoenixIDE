@@ -1,6 +1,6 @@
-﻿namespace MIDI_to_VGM_Converter
+﻿namespace FoenixIDE.UI
 {
-    partial class MainForm
+    partial class MIDI_VGM_From
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MIDI_VGM_From));
             this.MIDIOutputText = new System.Windows.Forms.TextBox();
             this.ReadFileButton = new System.Windows.Forms.Button();
             this.FileLabel = new System.Windows.Forms.Label();
