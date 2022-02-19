@@ -89,7 +89,7 @@ namespace FoenixIDE.UI
             {
                 Title = "Load Bitmap",
                 DefaultExt = ".bin",
-                Filter = "Asset Files (*.bmp *.png *.bin *.data *.pal *.aseprite)|*.bmp;*.png;*.bin;*.data;*.pal;*.aseprite|Binary Files|*.bin|Palette Files|*.pal|Bitmap Files|*.bmp;*.png|Data Files|*.data|Any File|*.*"
+                Filter = "Asset Files (*.bmp *.png *.bin *.data *.pal *.tls *.aseprite)|*.bmp;*.png;*.bin;*.data;*.pal;*.tls;*.aseprite|Binary Files|*.bin|Palette Files|*.pal|Bitmap Files|*.bmp;*.png|Data Files|*.data|Tilemap Files|*.tls|Any File|*.*"
             };
 
             // Load content of file in a TextBlock

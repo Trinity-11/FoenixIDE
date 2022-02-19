@@ -752,9 +752,12 @@ namespace FoenixIDE.UI
             Point size = gpu.GetScreenSize();
             double ratioW = gpu.Width / (double)size.X;
             double ratioH = gpu.Height / (double)size.Y;
+            bool borderEnabled = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_CTRL_REG) == 1;
+            double borderWidth = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_X_SIZE) : 0;
+            double borderHeight = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_Y_SIZE) : 0;
             if (gpu.TileEditorMode)
             {
-                if ((e.X / ratioW > 32 && e.X / ratioW < size.X -32) && (e.Y / ratioH > 32 && e.Y / ratioH < size.Y -32))
+                if ((e.X / ratioW > borderWidth && e.X / ratioW < size.X - borderWidth) && (e.Y / ratioH > borderHeight && e.Y / ratioH < size.Y - borderHeight))
                 {
                     this.Cursor = Cursors.Hand;
                     if (e.Button == MouseButtons.Left)
@@ -778,6 +781,18 @@ namespace FoenixIDE.UI
             Point size = gpu.GetScreenSize();
             double ratioW = gpu.Width / (double)size.X;
             double ratioH = gpu.Height / (double)size.Y;
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    left = true;
+                    break;
+                case MouseButtons.Right:
+                    right = true;
+                    break;
+                case MouseButtons.Middle:
+                    middle = true;
+                    break;
+            }
             if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
             {
                 TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
@@ -791,8 +806,25 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseUp(object sender, MouseEventArgs e)
         {
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    left = false;
+                    break;
+                case MouseButtons.Right:
+                    right = false;
+                    break;
+                case MouseButtons.Middle:
+                    middle = false;
+                    break;
+            }
             GenerateMouseInterrupt(e);
         }
+
+        // Remember the state of the mouse buttons
+        bool left = false;
+        bool right = false;
+        bool middle = false;
 
         private void GenerateMouseInterrupt(MouseEventArgs e)
         {
@@ -801,12 +833,12 @@ namespace FoenixIDE.UI
             double ratioH = gpu.Height / (double)size.Y;
             int X = (int)(e.X / ratioW);
             int Y = (int)(e.Y / ratioH);
-            bool middle = e.Button == MouseButtons.Middle;
-            bool left = e.Button == MouseButtons.Left;
-            bool right = e.Button == MouseButtons.Right;
+            
+            byte buttons = (byte)((left ? 1 : 0) + (right ? 2 : 0) + (middle ? 4 : 0));
 
             kernel.MemMgr.VICKY.WriteWord(0x702, X);
             kernel.MemMgr.VICKY.WriteWord(0x704, Y);
+            kernel.MemMgr.VICKY.WriteByte(0x706, buttons);
             
             // Generate three interrupts - to emulate how the PS/2 controller works
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
@@ -819,6 +851,9 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseLeave(object sender, EventArgs e)
         {
+            left = false;
+            right = false;
+            middle = false;
             if (gpu.IsMousePointerVisible() || gpu.TileEditorMode)
             {
                 Cursor.Show();

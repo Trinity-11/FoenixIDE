@@ -229,7 +229,7 @@ namespace FoenixIDE.Simulator.UI
             Resource resource = new Resource()
             {
                 Name = "Tile Editor Map",
-                Length = width * height,
+                Length = width * height * 2,
                 FileType = ResourceType.tilemap,
                 StartAddress = tilemapAddress
             };
