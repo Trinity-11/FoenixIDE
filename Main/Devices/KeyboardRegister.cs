@@ -1,16 +1,15 @@
 ﻿using FoenixIDE.Basic;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
     public class KeyboardRegister: MemoryLocations.MemoryRAM
     {
         private bool mouseDevice = false;
+        private bool breakKey = false;
         private byte ps2PacketCntr = 0;
-        private byte[] ps2packet = new byte[3];
+        private int packetLength = 0;
+        private byte[] ps2packet = new byte[6];
         private FoenixSystem kernel;
 
         public KeyboardRegister(int StartAddress, int Length) : base(StartAddress, Length)
@@ -111,20 +110,40 @@ namespace FoenixIDE.Simulator.Devices
             // Whenever the buffer is read, set the buffer to empty.
             if (Address == 0)
             {
-                if (!mouseDevice)
+                if (!mouseDevice && !breakKey)
                 {
                     data[4] = 0;
                 }
-                else if (ps2PacketCntr != 0)
+                else if (packetLength != 0)
                 {
-                    // send the next byte in the packet
-                    data[4] = ps2packet[ps2PacketCntr++];
-                    if (ps2PacketCntr == 3)
-                    {
-                        ps2PacketCntr = 0;
-                    }
+                    
+
                     // raise interrupt
-                    TriggerMouseInterrupt();
+                    if (mouseDevice)
+                    {
+                        // send the next byte in the packet
+                        data[4] = ps2packet[ps2PacketCntr++];
+                        TriggerMouseInterrupt();
+                        if (ps2PacketCntr == packetLength)
+                        {
+                            ps2PacketCntr = 0;
+                            mouseDevice = false;
+                            packetLength = 0;
+                        }
+                    } 
+                    else if (breakKey)  // this doesn't work yet
+                    {
+                        // send the next byte in the packet
+                        data[0] = ps2packet[ps2PacketCntr++];
+                        data[4] = 0;
+                        TriggerKeyboardInterrupt();
+                        if (ps2PacketCntr == packetLength)
+                        {
+                            ps2PacketCntr = 0;
+                            breakKey = false;
+                            packetLength = 0;
+                        }
+                    }
                 }
                 return data[0];
             }
@@ -142,23 +161,40 @@ namespace FoenixIDE.Simulator.Devices
             {
                 kernel.MemMgr.KEYBOARD.WriteByte(0, (byte)key);
                 kernel.MemMgr.KEYBOARD.WriteByte(4, 0);
-                // Set the Keyboard Interrupt
-                byte IRQ1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
-                IRQ1 |= (byte)Register1.FNX1_INT00_KBD;
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IRQ1);
-                kernel.CPU.Pins.IRQ = true;
+
+                TriggerKeyboardInterrupt();
             }
         }
 
+        public void WriteScanCodeSequence(byte[] codes, int seqLength)
+        {
+            breakKey = true;
+            data[0] = codes[0];
+            data[4] = 0;
+            ps2PacketCntr = 1;
+            packetLength = seqLength;
+            Array.Copy(codes, ps2packet, seqLength);
+
+            TriggerKeyboardInterrupt();
+        }
+        private void TriggerKeyboardInterrupt()
+        {
+            // Set the Keyboard Interrupt
+            byte IRQ1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
+            IRQ1 |= (byte)Register1.FNX1_INT00_KBD;
+            kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IRQ1);
+            kernel.CPU.Pins.IRQ = true;
+        }
         
         public void MousePackets(byte buttons, byte X, byte Y)
         {
             mouseDevice = true;
             data[0] = buttons;
+            ps2PacketCntr = 1;
+            packetLength = 3;
             ps2packet[0] = buttons;
             ps2packet[1] = X;
             ps2packet[2] = Y;
-            ps2PacketCntr = 1;
 
             TriggerMouseInterrupt();
         }

@@ -654,6 +654,7 @@ namespace FoenixIDE.Display
 
             int tileRow = ( line + tilemapWindowY ) / TILE_SIZE;
             int tileYOffset = (line + tilemapWindowY) % TILE_SIZE;
+            int maxX = width - borderXSize;
 
             // we always read tiles 0 to width/TILE_SIZE + 1 - this is to ensure we can display partial tiles, with X,Y offsets
             int tilemapItemCount = width / TILE_SIZE + 1;
@@ -719,9 +720,9 @@ namespace FoenixIDE.Display
             {
                 byte tilesetReg = tiles[t * 2 + 1];
                 byte lutIndex = (byte)((tilesetReg & 0x38) >> 3);
-                int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + lutIndex * 1024;
+                //int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + lutIndex * 1024;
                 int tilesetOffsetAddress = tilesetOffsets[t];  // + startOffset
-
+                
                 VRAM.CopyIntoBuffer(tilesetOffsetAddress, 16, tilepix);
                 do
                 {
@@ -734,8 +735,12 @@ namespace FoenixIDE.Display
                     x++;
                     startOffset++;
                     tilesetOffsetAddress++;
-                } while (startOffset != 16);
+                } while (startOffset != 16 && x < maxX);
                 startOffset = 0;
+                if (x == maxX)
+                {
+                    break;
+                }
             }
         }
 

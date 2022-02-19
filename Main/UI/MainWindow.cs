@@ -422,8 +422,17 @@ namespace FoenixIDE.UI
                     kernel.MemMgr.KEYBOARD.WriteKey(scanCode);
                 }
             }
-            else
+            else if (e.KeyCode == Keys.Pause)
             {
+                e.Handled = true;
+                if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
+                {
+                    kernel.MemMgr.KEYBOARD.WriteScanCodeSequence(new byte[] { 0xe1, 0x1d, 0x45, 0xe1, 0x9d, 0xc5 }, 6);
+                }
+                lastKeyPressed.Text = "Break";
+            }
+            else
+            { 
                 lastKeyPressed.Text = "";
             }
         }

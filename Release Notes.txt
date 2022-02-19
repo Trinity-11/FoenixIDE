@@ -1,3 +1,8 @@
+Release 0.5.6.2
+---------------
+Handle the BREAK key scan codes.  Useful for stopping a BASIC program.
+Fixed the tiles from bleeding into the right border.
+
 Release 0.5.5.7
 ---------------
 Added Zero button in Memory window to reset a page to zero.
