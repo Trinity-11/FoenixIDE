@@ -42,7 +42,7 @@ namespace FoenixIDE.UI
 
         // Local variables and events
         private byte previousGraphicMode;
-        private delegate void TileClickEvent(Point tile);
+        private delegate void TileClickEvent(Point tile, bool leftButton);
         private TileClickEvent TileClicked;
         private ResourceChecker ResChecker = new ResourceChecker();
         private delegate void TransmitByteFunction(byte Value);
@@ -764,15 +764,13 @@ namespace FoenixIDE.UI
             bool borderEnabled = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_CTRL_REG) == 1;
             double borderWidth = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_X_SIZE) : 0;
             double borderHeight = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_Y_SIZE) : 0;
-            if (gpu.TileEditorMode)
+            if (gpu.TileEditorMode && e.Button != MouseButtons.None)
             {
                 if ((e.X / ratioW > borderWidth && e.X / ratioW < size.X - borderWidth) && (e.Y / ratioH > borderHeight && e.Y / ratioH < size.Y - borderHeight))
                 {
                     this.Cursor = Cursors.Hand;
-                    if (e.Button == MouseButtons.Left)
-                    {
-                        TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
-                    }
+                    bool leftButton = e.Button == MouseButtons.Left;
+                    TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)), leftButton);
                 }
                 else
                 {
@@ -804,7 +802,8 @@ namespace FoenixIDE.UI
             }
             if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
             {
-                TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)));
+                bool leftButton = e.Button == MouseButtons.Left;
+                TileClicked?.Invoke(new Point((int)(e.X / ratioW / 16), (int)(e.Y / ratioH / 16)), leftButton);
             }
             else
             {

@@ -721,8 +721,9 @@ namespace FoenixIDE.Processor
                 case AddressModes.DirectPageIndirectIndexedWithY:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.MemMgr.ReadWord(addr) + cpu.Y.Value;
-                    //return cpu.ProgramBank.GetLongAddress(ptr);
-                    return ptr;
+                    // why do I keep flipping on this?
+                    return cpu.DataBank.GetLongAddress(ptr);
+                    //return ptr;
                 case AddressModes.DirectPageIndirectLong:
                     addr = cpu.DirectPage.GetLongAddress(SignatureBytes);
                     ptr = cpu.MemMgr.ReadLong(addr);

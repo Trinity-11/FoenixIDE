@@ -16,8 +16,9 @@ namespace FoenixIDE.Simulator.UI
 {
     public partial class TileEditor : Form
     {
-        private int selectedX = -1;
-        private int selectedY = -1;
+        
+        private int selectedLeft = -1;
+        private int selectedRight = -1;
         private int hoverX = -1;
         private int hoverY = -1;
         private const int TILE_WIDTH = 17;
@@ -127,18 +128,124 @@ namespace FoenixIDE.Simulator.UI
                 e.Graphics.DrawRectangle(yellowPen, hoverX * TILE_WIDTH, hoverY * TILE_WIDTH, TILE_WIDTH, TILE_WIDTH);
                 e.Graphics.DrawString((hoverY * 16 + hoverX).ToString("X2"), SystemFonts.DefaultFont, whiteBrush, hoverX * TILE_WIDTH, hoverY * TILE_WIDTH + 2);
             }
-            if (selectedX > -1 && selectedY > -1)
+            if (selectedLeft != -1)
             {
-                e.Graphics.DrawRectangle(redPen, selectedX * TILE_WIDTH - 1, selectedY * TILE_WIDTH - 1, TILE_WIDTH + 2, TILE_WIDTH + 2);
-                e.Graphics.DrawRectangle(redPen, selectedX * TILE_WIDTH, selectedY * TILE_WIDTH, TILE_WIDTH, TILE_WIDTH);
+                int X = selectedLeft % 16;
+                int Y = selectedLeft / 16;
+                Point[] triangle = new Point[3];
+                triangle[0] = new Point(X * TILE_WIDTH - 1, Y * TILE_WIDTH - 1);
+                triangle[1] = new Point(X * TILE_WIDTH - 1 + TILE_WIDTH/2, Y * TILE_WIDTH - 1);
+                triangle[2] = new Point(X * TILE_WIDTH - 1, Y * TILE_WIDTH - 1 + TILE_WIDTH / 2);
+                Brush redBrush = Brushes.Red;
+                e.Graphics.FillPolygon(redBrush, triangle);
+            }
+            if (selectedRight != -1)
+            {
+                int X = selectedRight % 16;
+                int Y = selectedRight / 16;
+                Point[] triangle = new Point[3];
+                triangle[0] = new Point((X + 1) * TILE_WIDTH + 1, (Y + 1) * TILE_WIDTH + 1);
+                triangle[1] = new Point((X + 1) * TILE_WIDTH + 1, Y * TILE_WIDTH + TILE_WIDTH/2);
+                triangle[2] = new Point(X * TILE_WIDTH + TILE_WIDTH / 2, (Y + 1) * TILE_WIDTH + 1);
+                Brush redBrush = Brushes.Red;
+                e.Graphics.FillPolygon(redBrush, triangle);
+            }
+        }
+
+        private void leftTile_Paint(object sender, PaintEventArgs e)
+        {
+            if (selectedLeft != -1)
+            {
+                Rectangle rect = new Rectangle(0, 0, 16, 16);
+                Bitmap frameBuffer = new Bitmap(16, 16, PixelFormat.Format32bppArgb);
+                BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                IntPtr p = bitmapData.Scan0;
+                int stride = bitmapData.Stride;
+                int[] graphicsLUT = LoadLUT(MemMgr.VICKY);
+                int lut = LutList.SelectedIndex;
+                int tileStride = Stride256Checkbox.Checked ? 256 : 16;
+                int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) + (selectedLeft / 16) * tileStride * 16 + (selectedLeft % 16) * 16 - 0xB0_0000;
+                for (int y = 0; y < 16; y++)
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        byte pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + (y * tileStride + x));
+                        if (pixel != 0)
+                        {
+                            int color = graphicsLUT[lut * 256 + pixel];
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, (y * stride + x * 4), color);
+                        }
+                    }
+                }
+                e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                // Bilinear interpolation has effect very similar to real HW 
+                e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                //e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                frameBuffer.UnlockBits(bitmapData);
+                //frameBuffer.Save("c:\\temp\\test.bmp");
+                e.Graphics.DrawImage(frameBuffer, leftTile.ClientRectangle);
+                frameBuffer.Dispose();
+            }
+        }
+
+        private void RightTile_Paint(object sender, PaintEventArgs e)
+        {
+            if (selectedRight != -1)
+            {
+                Rectangle rect = new Rectangle(0, 0, 16, 16);
+                Bitmap frameBuffer = new Bitmap(16, 16, PixelFormat.Format32bppArgb);
+                BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                IntPtr p = bitmapData.Scan0;
+                int stride = bitmapData.Stride;
+                int[] graphicsLUT = LoadLUT(MemMgr.VICKY);
+                int lut = LutList.SelectedIndex;
+                int tileStride = Stride256Checkbox.Checked ? 256 : 16;
+                int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) + (selectedRight / 16) * tileStride * 16 + (selectedRight % 16) * 16 - 0xB0_0000;
+                for (int y = 0; y < 16; y++)
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        byte pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + (y * tileStride + x));
+                        if (pixel != 0)
+                        {
+                            int color = graphicsLUT[lut * 256 + pixel];
+                            System.Runtime.InteropServices.Marshal.WriteInt32(p, (y * stride + x * 4), color);
+                        }
+                    }
+                }
+                e.Graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                // Bilinear interpolation has effect very similar to real HW 
+                e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                //e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                frameBuffer.UnlockBits(bitmapData);
+                e.Graphics.DrawImage(frameBuffer, RightTile.ClientRectangle);
+                frameBuffer.Dispose();
             }
         }
 
         private void TilesetViewer_MouseClick(object sender, MouseEventArgs e)
         {
-            selectedX = e.X / TILE_WIDTH;
-            selectedY = e.Y / TILE_WIDTH;
-            TileSelectedLabel.Text = "Tile Selected: $" + (selectedY * 16 + selectedX).ToString("X2");
+            int X = e.X / TILE_WIDTH;
+            int Y = e.Y / TILE_WIDTH;
+            if (e.Button == MouseButtons.Left)
+            {
+                selectedLeft = Y * 16 + X;
+                LeftTileSelectedLabel.Text = "Left Tile: $" + (selectedLeft).ToString("X2");
+                leftTile.Refresh();
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                selectedRight = Y * 16 + X;
+                RightTileSelectedLabel.Text = "Right Tile: $" + (selectedRight).ToString("X2");
+                RightTile.Refresh();
+            }
+            
             TilesetViewer.Refresh();
         }
 
@@ -163,8 +270,8 @@ namespace FoenixIDE.Simulator.UI
 
             int width = MemMgr.ReadWord(addrOffset + 4) & 0x3FF;  // max 1024
             int height = MemMgr.ReadWord(addrOffset + 6) & 0x3FF; // max 1024
-            Width.Text = width.ToString();
-            Height.Text = height.ToString();
+            TilemapWidth.Text = width.ToString();
+            TilemapHeight.Text = height.ToString();
 
             int windowX = MemMgr.ReadWord(addrOffset + 8);
             int windowY = MemMgr.ReadWord(addrOffset + 10);
@@ -175,15 +282,16 @@ namespace FoenixIDE.Simulator.UI
         /**
          * When a tile is clicked in the GPU window, write the selected tile in memory.
          */
-        public void TileClicked_Click(Point tile)
+        public void TileClicked_Click(Point tile, bool leftButton)
         {
 
             int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
-            int offset = (tile.Y * Convert.ToInt32(Width.Text) + tile.X + 1) * 2;
-            if (selectedX != -1 && selectedY != -1)
+            int offset = (tile.Y * Convert.ToInt32(TilemapWidth.Text) + tile.X + 1) * 2;
+
+            if ((leftButton ? selectedLeft : selectedRight) != -1)
             {
                 // Write the tile value
-                byte value = (byte)(selectedY * 16 + selectedX);
+                byte value = (byte)(leftButton ? selectedLeft : selectedRight);
                 MemMgr.WriteByte(tilemapAddress + offset, value);
                 // Write the tileset and LUT - this way we can mix tiles from multiple tilesets in a single map
                 MemMgr.WriteByte(tilemapAddress + offset + 1, (byte)((LutList.SelectedIndex << 3) + TilesetList.SelectedIndex));
@@ -209,9 +317,9 @@ namespace FoenixIDE.Simulator.UI
         private void ClearTilemapButton_Click(object sender, EventArgs e)
         {
             int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
-            byte selectedTile = (byte)(selectedY * 16 + selectedX);
-            int width = Convert.ToInt32(Width.Text);
-            int height = Convert.ToInt32(Height.Text);
+            byte selectedTile = (byte)(selectedLeft);
+            int width = Convert.ToInt32(TilemapWidth.Text);
+            int height = Convert.ToInt32(TilemapHeight.Text);
             byte lut = (byte)LutList.SelectedIndex;
             for (int i = 0; i < width * height * 2 + 1; i += 2)
             {
@@ -224,8 +332,8 @@ namespace FoenixIDE.Simulator.UI
         {
             // Create a new resource
             int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
-            int width = Convert.ToInt32(Width.Text);
-            int height = Convert.ToInt32(Height.Text);
+            int width = Convert.ToInt32(TilemapWidth.Text);
+            int height = Convert.ToInt32(TilemapHeight.Text);
             Resource resource = new Resource()
             {
                 Name = "Tile Editor Map",
@@ -266,9 +374,9 @@ namespace FoenixIDE.Simulator.UI
         private void Width_TextChanged(object sender, EventArgs e)
         {
             int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            if (Width.Text.Length > 0)
+            if (TilemapWidth.Text.Length > 0)
             {
-                int newValue = Convert.ToInt32(Width.Text) & 0x3FF;
+                int newValue = Convert.ToInt32(TilemapWidth.Text) & 0x3FF;
                 MemMgr.WriteWord(tilemapBaseAddr + 4, newValue);
             }
         }
@@ -276,9 +384,9 @@ namespace FoenixIDE.Simulator.UI
         private void Height_TextChanged(object sender, EventArgs e)
         {
             int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            if (Height.Text.Length > 0)
+            if (TilemapHeight.Text.Length > 0)
             {
-                int newValue = Convert.ToInt32(Height.Text) & 0x3FF;
+                int newValue = Convert.ToInt32(TilemapHeight.Text) & 0x3FF;
                 MemMgr.WriteWord(tilemapBaseAddr + 6, newValue);
             }
         }
