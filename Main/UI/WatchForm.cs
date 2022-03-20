@@ -46,6 +46,11 @@ namespace FoenixIDE.UI
             WatchGrid.Invalidate();
         }
 
+        public void UpdateList()
+        {
+            WatchGrid.RowCount = kernel_ref.WatchList.Count;
+        }
+
         private void WatchGrid_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
             try

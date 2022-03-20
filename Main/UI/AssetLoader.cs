@@ -155,7 +155,7 @@ namespace FoenixIDE.UI
             else if (FileTypesCombo.SelectedIndex < 6)
             { 
                 operationType = ResourceType.tilemap;
-                ExtLabel.Text = ".data";
+                ExtLabel.Text = ".bin";
             }
             else if (FileTypesCombo.SelectedIndex < 14)
             {
@@ -167,12 +167,12 @@ namespace FoenixIDE.UI
             {
                 operationType = ResourceType.sprite;
                 conversionStride = 32;
-                maxHeight = 32;
+                maxHeight = 256;
             }
             else
             {
                 operationType = ResourceType.lut;
-                ExtLabel.Text = ".data";
+                ExtLabel.Text = ".pal";
             }
 
             ResourceChecker.Resource res = new ResourceChecker.Resource
@@ -283,6 +283,12 @@ namespace FoenixIDE.UI
             
         }
 
+        /*
+         * Convert an image file into 'bitmap', 'tileset' or 'sprites'
+         * Bitmaps are converted as-is.
+         * Tileset have a maximum width of 256 pixels.
+         * Sprites are 32x32: the image may contain an array of sprites that need to be "de-interlaced".
+         */
         private unsafe void ConvertBitmapToRaw(Bitmap bitmap, ResourceChecker.Resource resource, byte lutIndex, int stride, int maxHeight)
         {             
             if (ResChecker.Add(resource))
@@ -294,19 +300,22 @@ namespace FoenixIDE.UI
 
                 // Limit how much data is imported based on the type of image
                 int importedLines = maxHeight < bitmap.Height ? maxHeight : bitmap.Height;
-                int importedCols = stride < bitmap.Width ? stride : bitmap.Width;
-
-                byte[] data = new byte[stride * importedLines]; // the bitmap is based on resolution of the machine
-                resource.Length = stride * bitmap.Height;  // one byte per pixel - palette is separate
-
+                int importedCols = (bitmap.Width / stride) * stride < bitmap.Width ? (bitmap.Width / stride) * stride : bitmap.Width;
+                
                 Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
                 BitmapData bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, bitmap.PixelFormat);
-                int bytesPerPixel = bitmapData.Stride / bitmap.Width;
                 byte* bitmapPointer = (byte*)bitmapData.Scan0.ToPointer();
+                int bytesPerPixel = bitmapData.Stride / bitmap.Width;
+
+                byte[] data = new byte[importedCols * importedLines]; // the bitmap is based on resolution of the machine
+                resource.Length = importedCols * importedLines;  // one byte per pixel - palette is separate
+
                 bool tooManyColours = false;
                 bool done = false;
                 byte mask = 0xFF;
                 List<int> lut = null;
+
+                
                 while (!done && mask != 0xc0)
                 {
                     int transparentColor = 0;
@@ -403,7 +412,7 @@ namespace FoenixIDE.UI
                             }
                             if (index != -1)
                             {
-                                data[line * stride + col] = (byte)index;
+                                data[line * importedCols + col] = (byte)index;
                             }
                         }
                         if (tooManyColours)
@@ -416,12 +425,39 @@ namespace FoenixIDE.UI
                         }
                     }
                 }
+                bitmap.UnlockBits(bitmapData);
 
                 if (mask != 0xc0)
                 {
                     int videoAddress = resource.StartAddress - 0xB0_0000;
 
-                    MemMgrRef.VIDEO.CopyBuffer(data, 0, videoAddress, data.Length);
+                    // Reorganize the bitmap for sprites
+                    if (stride < bitmap.Width)
+                    {
+                        byte[] deinterlaced = new byte[data.Length];  // same lenght as data
+
+                        // Create a new bitmap to de-interlace the sprite sheet
+                        int lineWidthInBytes = stride;
+                        int stridelineCount = (bitmap.Height / stride) * (bitmap.Width / stride) * stride;
+                        int lineWidth = bitmap.Width;
+
+                        for (int y = 0; y < stridelineCount; y++)
+                        {
+                            for (int x = 0; x < lineWidthInBytes; x++)
+                            {
+                                deinterlaced[x + y * lineWidthInBytes] = data[x +
+                                    (y / stride) * lineWidthInBytes +
+                                    (y % lineWidthInBytes) * lineWidth +
+                                    (y / bitmap.Width) * bitmap.Width * (stride -1)
+                                    ];
+                            }
+                        }
+                        MemMgrRef.VIDEO.CopyBuffer(deinterlaced, 0, videoAddress, deinterlaced.Length);
+                    }
+                    else
+                    {
+                        MemMgrRef.VIDEO.CopyBuffer(data, 0, videoAddress, data.Length);
+                    }
 
                     if (lut != null)
                     {

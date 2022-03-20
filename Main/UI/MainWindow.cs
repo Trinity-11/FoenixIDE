@@ -280,6 +280,7 @@ namespace FoenixIDE.UI
             {
                 watchWindow.BringToFront();
             }
+            watchWindow.UpdateList();
         }
 
         /*
@@ -564,6 +565,7 @@ namespace FoenixIDE.UI
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.UpdateMCRButtons();
+                ResetSDCard();
 
                 // Restart the CPU
                 debugWindow.RunButton_Click(null, null);
@@ -584,6 +586,8 @@ namespace FoenixIDE.UI
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.UpdateMCRButtons();
+                ResetSDCard();
+
                 debugWindow.Refresh();
             }
         }

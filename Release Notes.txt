@@ -1,3 +1,10 @@
+Release 0.5.6.3
+---------------
+Extended the Asset Loader to convert sprite sheets wider than 32 pixels.  The sprites will be de-interlaced.
+Added the "big tile" images in the Tile Editor.
+Now, users can pick two tiles, associated with the left and righ button, to make drawing a little bit easier.
+When resetting the CPU (from the Main window or the CPU window), if the SD card is loaded, reload the contents.
+
 Release 0.5.6.2
 ---------------
 Handle the BREAK key scan codes.  Useful for stopping a BASIC program.
