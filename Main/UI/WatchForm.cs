@@ -36,11 +36,12 @@ namespace FoenixIDE.UI
          */
         private void WatchUpdateTimer_Tick(object sender, EventArgs e)
         {
-            foreach (KeyValuePair<int, WatchedMemory> kvp in kernel_ref.WatchList)
+            foreach (KeyValuePair<string, WatchedMemory> kvp in kernel_ref.WatchList)
             {
                 WatchedMemory mem = kvp.Value;
                 mem.val8bit = kernel_ref.MemMgr.ReadByte(mem.address);
                 mem.val16bit = kernel_ref.MemMgr.ReadWord(mem.address);
+                mem.val24bit = kernel_ref.MemMgr.ReadLong(mem.address);
             }
             WatchGrid.RowCount = kernel_ref.WatchList.Count;
             WatchGrid.Invalidate();
@@ -55,7 +56,7 @@ namespace FoenixIDE.UI
         {
             try
             {
-                KeyValuePair<int, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
+                KeyValuePair<string, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
                 switch (e.ColumnIndex)
                 {
                     case 0:
@@ -69,6 +70,9 @@ namespace FoenixIDE.UI
                         break;
                     case 3:
                         e.Value = kvp.Value.val16bit.ToString("X4");
+                        break;
+                    case 4:
+                        e.Value = kvp.Value.val24bit.ToString("X6");
                         break;
                 }
                 
@@ -84,18 +88,17 @@ namespace FoenixIDE.UI
             // Get the address for the RowIndex
             if (e.RowIndex > -1)
             {
-                KeyValuePair<int, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
+                KeyValuePair<string, WatchedMemory> kvp = kernel_ref.WatchList.ElementAt(e.RowIndex);
                 switch (e.ColumnIndex)
                 {
                     // Browse this page in the Memory Window
-                    case 4:
-                        MemoryWindow.Instance.GotoAddress(kvp.Key & 0xFFFF00);
+                    case 5:
+                        MemoryWindow.Instance.GotoAddress(kvp.Value.address & 0xFFFF00);
                         break;
                     // Delete the row, but copy the values into our input boxes
-                    case 5:
-
+                    case 6:
                         NameText.Text = kvp.Value.name;
-                        AddressText.Text = "$" + kvp.Value.address.ToString("X6");
+                        AddressText.Text = kvp.Value.address.ToString("X6");
                         kernel_ref.WatchList.Remove(kvp.Key);
                         WatchGrid.RowCount -= 1;
                         break;
@@ -110,15 +113,16 @@ namespace FoenixIDE.UI
                 int addressVal = Convert.ToInt32(AddressText.Text.Replace("$", "").Replace(":", ""), 16);
                 if (NameText.Text.Length > 0 && addressVal > 0)
                 {
-                    if (kernel_ref.WatchList.ContainsKey(addressVal))
+                    if (kernel_ref.WatchList.ContainsKey(NameText.Text))
                     {
-                        kernel_ref.WatchList.Remove(addressVal);
+                        kernel_ref.WatchList.Remove(NameText.Text);
                     }
                     WatchedMemory mem = new WatchedMemory(NameText.Text, addressVal,
                         kernel_ref.MemMgr.ReadByte(addressVal),
-                        kernel_ref.MemMgr.ReadWord(addressVal)
+                        kernel_ref.MemMgr.ReadWord(addressVal),
+                        kernel_ref.MemMgr.ReadLong(addressVal)
                     );
-                    kernel_ref.WatchList.Add(addressVal, mem);
+                    kernel_ref.WatchList.Add(NameText.Text, mem);
                     WatchGrid.RowCount = kernel_ref.WatchList.Count;
                     NameText.Text = "";
                     AddressText.Text = "";
@@ -142,7 +146,7 @@ namespace FoenixIDE.UI
 
         private void WatchForm_Resize(object sender, EventArgs e)
         {
-            WatchGrid.Columns[0].Width = Width - 274;
+            WatchGrid.Columns[0].Width = Width - 274-80;
         }
     }
 }

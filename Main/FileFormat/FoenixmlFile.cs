@@ -17,7 +17,7 @@ namespace FoenixIDE.Simulator.FileFormat
         private Processor.Breakpoints BreakPoints;
         private SortedList<int, DebugLine> codeList;
         private FoenixSystem kernel;
-        private SortedList<int, WatchedMemory> watchList;
+        private SortedList<string, WatchedMemory> watchList;
         public BoardVersion Version;
 
         private FoeniXmlFile() { }
@@ -116,12 +116,12 @@ namespace FoenixIDE.Simulator.FileFormat
                 xmlWriter.WriteStartElement("watches");
                 xmlWriter.WriteRaw("\r");
 
-                foreach (KeyValuePair<int, WatchedMemory> nvp in watchList)
+                foreach (KeyValuePair<string, WatchedMemory> nvp in watchList)
                 {
                     xmlWriter.WriteRaw(tabs.Substring(0, 2));
                     xmlWriter.WriteStartElement("watch");
-                    xmlWriter.WriteAttributeString("address", nvp.Key.ToString("X6"));
-                    xmlWriter.WriteAttributeString("label", nvp.Value.name);
+                    xmlWriter.WriteAttributeString("address", nvp.Value.address.ToString("X6"));
+                    xmlWriter.WriteAttributeString("label", nvp.Key);
                     xmlWriter.WriteEndElement();  // end resource
                     xmlWriter.WriteRaw("\r");
                 }
@@ -214,12 +214,12 @@ namespace FoenixIDE.Simulator.FileFormat
                 xmlWriter.WriteStartElement("watches");
                 xmlWriter.WriteRaw("\r");
 
-                foreach (KeyValuePair<int, WatchedMemory> nvp in watchList)
+                foreach (KeyValuePair<string, WatchedMemory> nvp in watchList)
                 {
                     xmlWriter.WriteRaw(tabs.Substring(0, 1));
                     xmlWriter.WriteStartElement("watch");
-                    xmlWriter.WriteAttributeString("address", nvp.Key.ToString("X6"));
-                    xmlWriter.WriteAttributeString("label", nvp.Value.name);
+                    xmlWriter.WriteAttributeString("address", nvp.Value.address.ToString("X6"));
+                    xmlWriter.WriteAttributeString("label", nvp.Key);
                     xmlWriter.WriteEndElement();  // end resource
                     xmlWriter.WriteRaw("\r");
                 }
@@ -242,12 +242,12 @@ namespace FoenixIDE.Simulator.FileFormat
                     {
                         int address = Convert.ToInt32(reader.GetAttribute("address"), 16);
                         string name = reader.GetAttribute("label");
-                        WatchedMemory mem = new WatchedMemory(name, address, 0, 0);
-                        if (watchList.ContainsKey(address))
+                        WatchedMemory mem = new WatchedMemory(name, address, 0, 0, 0);
+                        if (watchList.ContainsKey(name))
                         {
-                            watchList.Remove(address);
+                            watchList.Remove(name);
                         }
-                        watchList.Add(address, mem);
+                        watchList.Add(name, mem);
                     }
                 }
             }
@@ -389,12 +389,12 @@ namespace FoenixIDE.Simulator.FileFormat
                     {
                         int address = Convert.ToInt32(reader.GetAttribute("address"), 16);
                         string name = reader.GetAttribute("label");
-                        WatchedMemory mem = new WatchedMemory(name, address, 0, 0);
-                        if (watchList.ContainsKey(address))
+                        WatchedMemory mem = new WatchedMemory(name, address, 0, 0, 0);
+                        if (watchList.ContainsKey(name))
                         {
-                            watchList.Remove(address);
+                            watchList.Remove(name);
                         }
-                        watchList.Add(address, mem);
+                        watchList.Add(name, mem);
                     }
                 }
             }

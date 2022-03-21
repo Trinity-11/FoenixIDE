@@ -970,12 +970,12 @@ namespace FoenixIDE.UI
                 {
                     string name = line.GetAddressName();
                     int address = line.GetAddress();
-                    WatchedMemory mem = new WatchedMemory(name, address, 0, 0);
-                    if (kernel.WatchList.ContainsKey(address))
+                    WatchedMemory mem = new WatchedMemory(name, address, 0, 0, 0);
+                    if (kernel.WatchList.ContainsKey(name))
                     {
-                        kernel.WatchList.Remove(address);
+                        kernel.WatchList.Remove(name);
                     }
-                    kernel.WatchList.Add(address, mem);
+                    kernel.WatchList.Add(name, mem);
                     MainWindow.Instance.WatchListToolStripMenuItem_Click(sender, e);
                 }
             }

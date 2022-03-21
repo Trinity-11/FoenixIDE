@@ -21,7 +21,7 @@ namespace FoenixIDE
         public Processor.Breakpoints Breakpoints = new Processor.Breakpoints();
         public ListFile lstFile;
         private BoardVersion boardVersion;
-        public SortedList<int, WatchedMemory> WatchList = new SortedList<int, WatchedMemory>();
+        public SortedList<string, WatchedMemory> WatchList = new SortedList<string, WatchedMemory>();
         private string LoadedKernel;
 
         public FoenixSystem(BoardVersion version, string DefaultKernel)

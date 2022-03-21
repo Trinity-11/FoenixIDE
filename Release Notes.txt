@@ -1,3 +1,7 @@
+Release 0.5.6.4
+---------------
+Added 24-bit value to the watch list.
+
 Release 0.5.6.3
 ---------------
 Extended the Asset Loader to convert sprite sheets wider than 32 pixels.  The sprites will be de-interlaced.
