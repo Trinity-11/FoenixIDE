@@ -1,3 +1,8 @@
+Release 0.5.6.5
+---------------
+Fixed the Asset Loader to use *.tlm for tilemaps, instead of .tls.
+
+
 Release 0.5.6.4
 ---------------
 Added 24-bit value to the watch list.

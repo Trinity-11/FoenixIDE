@@ -830,7 +830,10 @@ namespace FoenixIDE.UI
                     middle = false;
                     break;
             }
-            GenerateMouseInterrupt(e);
+            if (!gpu.TileEditorMode)
+            { 
+                GenerateMouseInterrupt(e);
+            }
         }
 
         // Remember the state of the mouse buttons
