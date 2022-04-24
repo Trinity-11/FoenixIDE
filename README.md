@@ -21,6 +21,12 @@ The C256 Foenix and its associated materials are owned by Stefany Allaire. There
 
 The FoenixIDE looks for kernel.hex and kernel.lst files in the ROMs folder colocated with the executable.  Obtain the Kernel from the sister repository: https://github.com/Trinity-11/Kernel_FMX
 
+# Keyboard shortcuts
+* Shift+F11 - toggle fullscreen
+* Shift+F5 - Run, or Pause in the debugger
+
+Other keyboard activity is forwarded to the emulated C256 itself.
+
 # License 
 Please see License.txt.
 
