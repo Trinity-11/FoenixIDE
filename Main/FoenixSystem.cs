@@ -118,7 +118,22 @@ namespace FoenixIDE
             // Set board revision
             MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_C - MemoryMap.GABE_START, (byte)'E');
             MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_4 - MemoryMap.GABE_START, (byte)'M');
-            MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'U');
+            switch (boardVersion)
+            {
+                case BoardVersion.RevB:
+                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'B');
+                    break;
+                case BoardVersion.RevC:
+                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'C');
+                    break;
+                case BoardVersion.RevU:
+                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'U');
+                    break;
+                case BoardVersion.RevUPlus:
+                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'+');
+                    break;
+            }
+            
             // Set the rev date
 
         }

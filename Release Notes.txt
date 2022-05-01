@@ -1,7 +1,8 @@
 Release 0.5.6.5
 ---------------
 Fixed the Asset Loader to use *.tlm for tilemaps, instead of .tls.
-
+Added the "Restart with Default Kernel" menu item to reload the default kernel, instead of the last program.
+Changed the PCB Revision to EMB, EMC, EMU and EM+ for Rev B, Rev C, Rev U and Rev U+ respectively.
 
 Release 0.5.6.4
 ---------------

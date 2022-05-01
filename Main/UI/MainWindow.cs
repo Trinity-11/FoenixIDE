@@ -600,6 +600,25 @@ namespace FoenixIDE.UI
             }
         }
 
+        private void DefaultKernelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            previousCounter = 0;
+            debugWindow.Pause();
+            if (kernel.ResetCPU(defaultKernel))
+            {
+                gpu.Refresh();
+                debugWindow.SetKernel(kernel);
+                debugWindow.ClearTrace();
+                SetDipSwitchMemory();
+                memoryWindow.Memory = kernel.CPU.MemMgr;
+                memoryWindow.UpdateMCRButtons();
+                ResetSDCard();
+
+                // Restart the CPU
+                debugWindow.RunButton_Click(null, null);
+            }
+        }
+
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             gpu.StartOfFrame = null;
@@ -1019,6 +1038,7 @@ namespace FoenixIDE.UI
         {
             RestartMenuItem.Enabled = true;
             DebugMenuItem.Enabled = true;
+            DefaultKernelToolStripMenuItem.Enabled = true;
         }
 
         /*
@@ -1049,16 +1069,17 @@ namespace FoenixIDE.UI
                 int width = ((ToolStripLabel)sender).Width;
                 int height = ((ToolStripLabel)sender).Height;
                 e.Graphics.FillRectangle(Brushes.Red, new Rectangle(0, 0, width, height));
-                e.Graphics.DrawString("OFF", SystemFonts.SmallCaptionFont, Brushes.White, 0, 9);
-                e.Graphics.DrawString("ON", SystemFonts.SmallCaptionFont, Brushes.White, 2, -2);
+                Font smallFont = new Font(FontFamily.GenericMonospace, 7.0f);
+                e.Graphics.DrawString("ON", smallFont, Brushes.White, 2, -1);  // ON above
+                e.Graphics.DrawString("OFF", smallFont, Brushes.White, 0, 7);  // OFF below
 
                 for (int i = 0; i < 8; i++)
                 {
                     // Draw the switch slide
-                    e.Graphics.FillRectangle(Brushes.LightGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
-                    e.Graphics.DrawRectangle(Pens.DarkGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
+                    e.Graphics.FillRectangle(Brushes.DarkSlateGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
+                    e.Graphics.DrawRectangle(Pens.LightGray, new Rectangle(textOffset + (i * switchWidth), offset, switchWidth - offset, bankHeight - offset * 2));
                     int top = (switches[i]) ? offset + 1 : offset + dipHeight;
-                    e.Graphics.FillEllipse(Brushes.DarkSlateGray, new Rectangle(textOffset + (i * switchWidth) + 1, top, switchWidth - offset * 2, dipHeight));
+                    e.Graphics.FillEllipse(Brushes.Wheat, new Rectangle(textOffset + (i * switchWidth) + 1, top, switchWidth - offset * 2, dipHeight));
                 }
             }
         }

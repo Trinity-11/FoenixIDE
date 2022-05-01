@@ -98,16 +98,18 @@ namespace FoenixIDE.UI
             this.HeaderPanel.Controls.Add(this.RunButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
+            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.HeaderPanel.Name = "HeaderPanel";
-            this.HeaderPanel.Size = new System.Drawing.Size(608, 24);
+            this.HeaderPanel.Size = new System.Drawing.Size(1118, 44);
             this.HeaderPanel.TabIndex = 2;
             // 
             // WatchButton
             // 
             this.WatchButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.WatchButton.Location = new System.Drawing.Point(305, 0);
+            this.WatchButton.Location = new System.Drawing.Point(559, 0);
+            this.WatchButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.WatchButton.Name = "WatchButton";
-            this.WatchButton.Size = new System.Drawing.Size(75, 24);
+            this.WatchButton.Size = new System.Drawing.Size(138, 44);
             this.WatchButton.TabIndex = 5;
             this.WatchButton.Text = "Watch";
             this.WatchButton.UseVisualStyleBackColor = true;
@@ -116,9 +118,10 @@ namespace FoenixIDE.UI
             // ResetButton
             // 
             this.ResetButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.ResetButton.Location = new System.Drawing.Point(235, 0);
+            this.ResetButton.Location = new System.Drawing.Point(431, 0);
+            this.ResetButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.ResetButton.Name = "ResetButton";
-            this.ResetButton.Size = new System.Drawing.Size(70, 24);
+            this.ResetButton.Size = new System.Drawing.Size(128, 44);
             this.ResetButton.TabIndex = 4;
             this.ResetButton.Text = "Reset";
             this.ResetButton.UseVisualStyleBackColor = true;
@@ -127,9 +130,10 @@ namespace FoenixIDE.UI
             // StepOverButton
             // 
             this.StepOverButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.StepOverButton.Location = new System.Drawing.Point(145, 0);
+            this.StepOverButton.Location = new System.Drawing.Point(266, 0);
+            this.StepOverButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.StepOverButton.Name = "StepOverButton";
-            this.StepOverButton.Size = new System.Drawing.Size(90, 24);
+            this.StepOverButton.Size = new System.Drawing.Size(165, 44);
             this.StepOverButton.TabIndex = 3;
             this.StepOverButton.Text = "Step Over (F7)";
             this.StepOverButton.UseVisualStyleBackColor = true;
@@ -137,10 +141,11 @@ namespace FoenixIDE.UI
             // 
             // BPLabel
             // 
-            this.BPLabel.Location = new System.Drawing.Point(379, 2);
+            this.BPLabel.Location = new System.Drawing.Point(695, 4);
+            this.BPLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.BPLabel.Name = "BPLabel";
-            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.BPLabel.Size = new System.Drawing.Size(58, 17);
+            this.BPLabel.Padding = new System.Windows.Forms.Padding(0, 7, 0, 0);
+            this.BPLabel.Size = new System.Drawing.Size(106, 31);
             this.BPLabel.TabIndex = 9;
             this.BPLabel.Text = "Breakpoint";
             this.BPLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -148,16 +153,18 @@ namespace FoenixIDE.UI
             // BPCombo
             // 
             this.BPCombo.FormattingEnabled = true;
-            this.BPCombo.Location = new System.Drawing.Point(439, 2);
+            this.BPCombo.Location = new System.Drawing.Point(805, 4);
+            this.BPCombo.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.BPCombo.Name = "BPCombo";
-            this.BPCombo.Size = new System.Drawing.Size(121, 21);
+            this.BPCombo.Size = new System.Drawing.Size(219, 32);
             this.BPCombo.TabIndex = 6;
             // 
             // AddBPButton
             // 
-            this.AddBPButton.Location = new System.Drawing.Point(560, 0);
+            this.AddBPButton.Location = new System.Drawing.Point(1027, 0);
+            this.AddBPButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.AddBPButton.Name = "AddBPButton";
-            this.AddBPButton.Size = new System.Drawing.Size(24, 24);
+            this.AddBPButton.Size = new System.Drawing.Size(44, 44);
             this.AddBPButton.TabIndex = 7;
             this.AddBPButton.Text = "+";
             this.AddBPButton.UseVisualStyleBackColor = true;
@@ -165,9 +172,10 @@ namespace FoenixIDE.UI
             // 
             // DeleteBPButton
             // 
-            this.DeleteBPButton.Location = new System.Drawing.Point(584, 0);
+            this.DeleteBPButton.Location = new System.Drawing.Point(1071, 0);
+            this.DeleteBPButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.DeleteBPButton.Name = "DeleteBPButton";
-            this.DeleteBPButton.Size = new System.Drawing.Size(24, 24);
+            this.DeleteBPButton.Size = new System.Drawing.Size(44, 44);
             this.DeleteBPButton.TabIndex = 8;
             this.DeleteBPButton.Text = "-";
             this.DeleteBPButton.UseVisualStyleBackColor = true;
@@ -176,9 +184,10 @@ namespace FoenixIDE.UI
             // StepButton
             // 
             this.StepButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.StepButton.Location = new System.Drawing.Point(75, 0);
+            this.StepButton.Location = new System.Drawing.Point(138, 0);
+            this.StepButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.StepButton.Name = "StepButton";
-            this.StepButton.Size = new System.Drawing.Size(70, 24);
+            this.StepButton.Size = new System.Drawing.Size(128, 44);
             this.StepButton.TabIndex = 2;
             this.StepButton.Text = "Step (F6)";
             this.StepButton.UseVisualStyleBackColor = true;
@@ -188,8 +197,9 @@ namespace FoenixIDE.UI
             // 
             this.RunButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.RunButton.Location = new System.Drawing.Point(0, 0);
+            this.RunButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.RunButton.Name = "RunButton";
-            this.RunButton.Size = new System.Drawing.Size(75, 24);
+            this.RunButton.Size = new System.Drawing.Size(138, 44);
             this.RunButton.TabIndex = 1;
             this.RunButton.Tag = "0";
             this.RunButton.Text = "Run (F5)";
@@ -199,10 +209,11 @@ namespace FoenixIDE.UI
             // locationLabel
             // 
             this.locationLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.locationLabel.Location = new System.Drawing.Point(145, 0);
+            this.locationLabel.Location = new System.Drawing.Point(266, 0);
+            this.locationLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.locationLabel.Name = "locationLabel";
-            this.locationLabel.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.locationLabel.Size = new System.Drawing.Size(64, 24);
+            this.locationLabel.Padding = new System.Windows.Forms.Padding(0, 7, 0, 0);
+            this.locationLabel.Size = new System.Drawing.Size(117, 44);
             this.locationLabel.TabIndex = 9;
             this.locationLabel.Text = "Location $";
             // 
@@ -210,9 +221,10 @@ namespace FoenixIDE.UI
             // 
             this.locationInput.Dock = System.Windows.Forms.DockStyle.Left;
             this.locationInput.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.locationInput.Location = new System.Drawing.Point(209, 0);
+            this.locationInput.Location = new System.Drawing.Point(383, 0);
+            this.locationInput.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.locationInput.Name = "locationInput";
-            this.locationInput.Size = new System.Drawing.Size(64, 23);
+            this.locationInput.Size = new System.Drawing.Size(114, 27);
             this.locationInput.TabIndex = 10;
             this.locationInput.Text = "00:0000";
             this.locationInput.Validated += new System.EventHandler(this.LocationInput_Validated);
@@ -220,9 +232,10 @@ namespace FoenixIDE.UI
             // JumpButton
             // 
             this.JumpButton.Dock = System.Windows.Forms.DockStyle.Left;
-            this.JumpButton.Location = new System.Drawing.Point(75, 0);
+            this.JumpButton.Location = new System.Drawing.Point(138, 0);
+            this.JumpButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.JumpButton.Name = "JumpButton";
-            this.JumpButton.Size = new System.Drawing.Size(70, 24);
+            this.JumpButton.Size = new System.Drawing.Size(128, 44);
             this.JumpButton.TabIndex = 10;
             this.JumpButton.Text = "Jump";
             this.JumpButton.UseVisualStyleBackColor = true;
@@ -234,10 +247,11 @@ namespace FoenixIDE.UI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lastLine.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.lastLine.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lastLine.Location = new System.Drawing.Point(0, 493);
+            this.lastLine.Location = new System.Drawing.Point(0, 910);
+            this.lastLine.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.lastLine.Name = "lastLine";
             this.lastLine.ReadOnly = true;
-            this.lastLine.Size = new System.Drawing.Size(605, 23);
+            this.lastLine.Size = new System.Drawing.Size(1106, 27);
             this.lastLine.TabIndex = 4;
             this.lastLine.Text = "Click [Step] to execute an instruction";
             this.lastLine.WordWrap = false;
@@ -248,11 +262,12 @@ namespace FoenixIDE.UI
             this.stackText.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.stackText.Dock = System.Windows.Forms.DockStyle.Right;
             this.stackText.Font = new System.Drawing.Font("Consolas", 10F);
-            this.stackText.Location = new System.Drawing.Point(608, 0);
+            this.stackText.Location = new System.Drawing.Point(1118, 0);
+            this.stackText.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.stackText.Multiline = true;
             this.stackText.Name = "stackText";
             this.stackText.ReadOnly = true;
-            this.stackText.Size = new System.Drawing.Size(150, 517);
+            this.stackText.Size = new System.Drawing.Size(272, 940);
             this.stackText.TabIndex = 3;
             // 
             // UpdateTraceTimer
@@ -265,17 +280,19 @@ namespace FoenixIDE.UI
             this.SecondPanel.Controls.Add(this.locationLabel);
             this.SecondPanel.Controls.Add(this.JumpButton);
             this.SecondPanel.Controls.Add(this.ClearTraceButton);
-            this.SecondPanel.Location = new System.Drawing.Point(0, 25);
+            this.SecondPanel.Location = new System.Drawing.Point(0, 46);
+            this.SecondPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.SecondPanel.Name = "SecondPanel";
-            this.SecondPanel.Size = new System.Drawing.Size(366, 24);
+            this.SecondPanel.Size = new System.Drawing.Size(671, 44);
             this.SecondPanel.TabIndex = 5;
             // 
             // ClearTraceButton
             // 
             this.ClearTraceButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.ClearTraceButton.Location = new System.Drawing.Point(0, 0);
+            this.ClearTraceButton.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.ClearTraceButton.Name = "ClearTraceButton";
-            this.ClearTraceButton.Size = new System.Drawing.Size(75, 24);
+            this.ClearTraceButton.Size = new System.Drawing.Size(138, 44);
             this.ClearTraceButton.TabIndex = 9;
             this.ClearTraceButton.Text = "Clear Trace";
             this.ClearTraceButton.UseVisualStyleBackColor = true;
@@ -287,10 +304,10 @@ namespace FoenixIDE.UI
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.DebugPanel.Location = new System.Drawing.Point(0, 126);
-            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.DebugPanel.Location = new System.Drawing.Point(0, 233);
+            this.DebugPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.DebugPanel.Name = "DebugPanel";
-            this.DebugPanel.Size = new System.Drawing.Size(605, 367);
+            this.DebugPanel.Size = new System.Drawing.Size(1108, 676);
             this.DebugPanel.TabIndex = 6;
             this.DebugPanel.TabStop = false;
             this.DebugPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseClick);
@@ -301,10 +318,10 @@ namespace FoenixIDE.UI
             this.AddBPOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.AddBPOverlayButton.FlatAppearance.BorderSize = 0;
             this.AddBPOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.AddBPOverlayButton.Location = new System.Drawing.Point(99, 200);
-            this.AddBPOverlayButton.Margin = new System.Windows.Forms.Padding(2);
+            this.AddBPOverlayButton.Location = new System.Drawing.Point(182, 369);
+            this.AddBPOverlayButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.AddBPOverlayButton.Name = "AddBPOverlayButton";
-            this.AddBPOverlayButton.Size = new System.Drawing.Size(18, 18);
+            this.AddBPOverlayButton.Size = new System.Drawing.Size(33, 33);
             this.AddBPOverlayButton.TabIndex = 7;
             this.AddBPOverlayButton.TabStop = false;
             this.AddBPOverlayButton.Text = "+";
@@ -317,10 +334,10 @@ namespace FoenixIDE.UI
             this.DeleteBPOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.DeleteBPOverlayButton.FlatAppearance.BorderSize = 0;
             this.DeleteBPOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.DeleteBPOverlayButton.Location = new System.Drawing.Point(118, 200);
-            this.DeleteBPOverlayButton.Margin = new System.Windows.Forms.Padding(2);
+            this.DeleteBPOverlayButton.Location = new System.Drawing.Point(216, 369);
+            this.DeleteBPOverlayButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.DeleteBPOverlayButton.Name = "DeleteBPOverlayButton";
-            this.DeleteBPOverlayButton.Size = new System.Drawing.Size(18, 18);
+            this.DeleteBPOverlayButton.Size = new System.Drawing.Size(33, 33);
             this.DeleteBPOverlayButton.TabIndex = 8;
             this.DeleteBPOverlayButton.TabStop = false;
             this.DeleteBPOverlayButton.Text = "-";
@@ -333,10 +350,10 @@ namespace FoenixIDE.UI
             this.InspectOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.InspectOverlayButton.FlatAppearance.BorderSize = 0;
             this.InspectOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.InspectOverlayButton.Location = new System.Drawing.Point(137, 200);
-            this.InspectOverlayButton.Margin = new System.Windows.Forms.Padding(1);
+            this.InspectOverlayButton.Location = new System.Drawing.Point(251, 369);
+            this.InspectOverlayButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.InspectOverlayButton.Name = "InspectOverlayButton";
-            this.InspectOverlayButton.Size = new System.Drawing.Size(38, 18);
+            this.InspectOverlayButton.Size = new System.Drawing.Size(70, 33);
             this.InspectOverlayButton.TabIndex = 9;
             this.InspectOverlayButton.TabStop = false;
             this.InspectOverlayButton.Text = "Mem";
@@ -350,10 +367,10 @@ namespace FoenixIDE.UI
             this.StepOverOverlayButton.FlatAppearance.BorderSize = 0;
             this.StepOverOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.StepOverOverlayButton.Font = new System.Drawing.Font("Arial Narrow", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StepOverOverlayButton.Location = new System.Drawing.Point(176, 200);
-            this.StepOverOverlayButton.Margin = new System.Windows.Forms.Padding(1);
+            this.StepOverOverlayButton.Location = new System.Drawing.Point(323, 369);
+            this.StepOverOverlayButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.StepOverOverlayButton.Name = "StepOverOverlayButton";
-            this.StepOverOverlayButton.Size = new System.Drawing.Size(21, 18);
+            this.StepOverOverlayButton.Size = new System.Drawing.Size(39, 33);
             this.StepOverOverlayButton.TabIndex = 10;
             this.StepOverOverlayButton.TabStop = false;
             this.StepOverOverlayButton.Text = "►";
@@ -370,11 +387,11 @@ namespace FoenixIDE.UI
             this.HeaderTextbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.HeaderTextbox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.HeaderTextbox.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.HeaderTextbox.Location = new System.Drawing.Point(2, 102);
+            this.HeaderTextbox.Location = new System.Drawing.Point(4, 188);
             this.HeaderTextbox.Margin = new System.Windows.Forms.Padding(0);
             this.HeaderTextbox.Name = "HeaderTextbox";
-            this.HeaderTextbox.Padding = new System.Windows.Forms.Padding(2, 3, 2, 2);
-            this.HeaderTextbox.Size = new System.Drawing.Size(603, 22);
+            this.HeaderTextbox.Padding = new System.Windows.Forms.Padding(4, 6, 4, 4);
+            this.HeaderTextbox.Size = new System.Drawing.Size(1106, 41);
             this.HeaderTextbox.TabIndex = 11;
             this.HeaderTextbox.UseCompatibleTextRendering = true;
             this.HeaderTextbox.UseMnemonic = false;
@@ -400,9 +417,10 @@ namespace FoenixIDE.UI
             this.irqPanel.Controls.Add(this.KeyboardCheckBox);
             this.irqPanel.Controls.Add(this.SOFCheckbox);
             this.irqPanel.Controls.Add(this.BreakOnIRQCheckBox);
-            this.irqPanel.Location = new System.Drawing.Point(372, 25);
+            this.irqPanel.Location = new System.Drawing.Point(682, 46);
+            this.irqPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.irqPanel.Name = "irqPanel";
-            this.irqPanel.Size = new System.Drawing.Size(230, 74);
+            this.irqPanel.Size = new System.Drawing.Size(422, 137);
             this.irqPanel.TabIndex = 12;
             // 
             // SDCardCheckBox
@@ -411,9 +429,10 @@ namespace FoenixIDE.UI
             this.SDCardCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SDCardCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SDCardCheckBox.IsActive = false;
-            this.SDCardCheckBox.Location = new System.Drawing.Point(88, 38);
+            this.SDCardCheckBox.Location = new System.Drawing.Point(161, 70);
+            this.SDCardCheckBox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.SDCardCheckBox.Name = "SDCardCheckBox";
-            this.SDCardCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.SDCardCheckBox.Size = new System.Drawing.Size(28, 26);
             this.SDCardCheckBox.TabIndex = 34;
             this.SDCardCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SDCardCheckBox.UseVisualStyleBackColor = true;
@@ -425,9 +444,10 @@ namespace FoenixIDE.UI
             this.OPL2LCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.OPL2LCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.OPL2LCheckbox.IsActive = false;
-            this.OPL2LCheckbox.Location = new System.Drawing.Point(189, 56);
+            this.OPL2LCheckbox.Location = new System.Drawing.Point(347, 103);
+            this.OPL2LCheckbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.OPL2LCheckbox.Name = "OPL2LCheckbox";
-            this.OPL2LCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.OPL2LCheckbox.Size = new System.Drawing.Size(28, 26);
             this.OPL2LCheckbox.TabIndex = 33;
             this.OPL2LCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OPL2LCheckbox.UseVisualStyleBackColor = true;
@@ -439,9 +459,10 @@ namespace FoenixIDE.UI
             this.OPL2RCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.OPL2RCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.OPL2RCheckbox.IsActive = false;
-            this.OPL2RCheckbox.Location = new System.Drawing.Point(206, 56);
+            this.OPL2RCheckbox.Location = new System.Drawing.Point(378, 103);
+            this.OPL2RCheckbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.OPL2RCheckbox.Name = "OPL2RCheckbox";
-            this.OPL2RCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.OPL2RCheckbox.Size = new System.Drawing.Size(28, 26);
             this.OPL2RCheckbox.TabIndex = 32;
             this.OPL2RCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OPL2RCheckbox.UseVisualStyleBackColor = true;
@@ -453,9 +474,10 @@ namespace FoenixIDE.UI
             this.MPU401Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MPU401Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.MPU401Checkbox.IsActive = false;
-            this.MPU401Checkbox.Location = new System.Drawing.Point(122, 38);
+            this.MPU401Checkbox.Location = new System.Drawing.Point(224, 70);
+            this.MPU401Checkbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.MPU401Checkbox.Name = "MPU401Checkbox";
-            this.MPU401Checkbox.Size = new System.Drawing.Size(15, 14);
+            this.MPU401Checkbox.Size = new System.Drawing.Size(28, 26);
             this.MPU401Checkbox.TabIndex = 31;
             this.MPU401Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.MPU401Checkbox.UseVisualStyleBackColor = true;
@@ -467,9 +489,10 @@ namespace FoenixIDE.UI
             this.COM1Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.COM1Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.COM1Checkbox.IsActive = false;
-            this.COM1Checkbox.Location = new System.Drawing.Point(139, 38);
+            this.COM1Checkbox.Location = new System.Drawing.Point(255, 70);
+            this.COM1Checkbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.COM1Checkbox.Name = "COM1Checkbox";
-            this.COM1Checkbox.Size = new System.Drawing.Size(15, 14);
+            this.COM1Checkbox.Size = new System.Drawing.Size(28, 26);
             this.COM1Checkbox.TabIndex = 30;
             this.COM1Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.COM1Checkbox.UseVisualStyleBackColor = true;
@@ -481,9 +504,10 @@ namespace FoenixIDE.UI
             this.COM2Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.COM2Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.COM2Checkbox.IsActive = false;
-            this.COM2Checkbox.Location = new System.Drawing.Point(156, 38);
+            this.COM2Checkbox.Location = new System.Drawing.Point(286, 70);
+            this.COM2Checkbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.COM2Checkbox.Name = "COM2Checkbox";
-            this.COM2Checkbox.Size = new System.Drawing.Size(15, 14);
+            this.COM2Checkbox.Size = new System.Drawing.Size(28, 26);
             this.COM2Checkbox.TabIndex = 29;
             this.COM2Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.COM2Checkbox.UseVisualStyleBackColor = true;
@@ -495,9 +519,10 @@ namespace FoenixIDE.UI
             this.FDCCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.FDCCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.FDCCheckbox.IsActive = false;
-            this.FDCCheckbox.Location = new System.Drawing.Point(105, 21);
+            this.FDCCheckbox.Location = new System.Drawing.Point(193, 39);
+            this.FDCCheckbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.FDCCheckbox.Name = "FDCCheckbox";
-            this.FDCCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.FDCCheckbox.Size = new System.Drawing.Size(28, 26);
             this.FDCCheckbox.TabIndex = 28;
             this.FDCCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.FDCCheckbox.UseVisualStyleBackColor = true;
@@ -508,9 +533,10 @@ namespace FoenixIDE.UI
             this.MouseCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MouseCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.MouseCheckbox.IsActive = false;
-            this.MouseCheckbox.Location = new System.Drawing.Point(88, 21);
+            this.MouseCheckbox.Location = new System.Drawing.Point(161, 39);
+            this.MouseCheckbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.MouseCheckbox.Name = "MouseCheckbox";
-            this.MouseCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.MouseCheckbox.Size = new System.Drawing.Size(28, 26);
             this.MouseCheckbox.TabIndex = 27;
             this.MouseCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.MouseCheckbox.UseVisualStyleBackColor = true;
@@ -522,9 +548,10 @@ namespace FoenixIDE.UI
             this.RTCCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.RTCCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RTCCheckbox.IsActive = false;
-            this.RTCCheckbox.Location = new System.Drawing.Point(122, 21);
+            this.RTCCheckbox.Location = new System.Drawing.Point(224, 39);
+            this.RTCCheckbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.RTCCheckbox.Name = "RTCCheckbox";
-            this.RTCCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.RTCCheckbox.Size = new System.Drawing.Size(28, 26);
             this.RTCCheckbox.TabIndex = 26;
             this.RTCCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.RTCCheckbox.UseVisualStyleBackColor = true;
@@ -535,9 +562,10 @@ namespace FoenixIDE.UI
             this.TMR2Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.TMR2Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.TMR2Checkbox.IsActive = false;
-            this.TMR2Checkbox.Location = new System.Drawing.Point(139, 21);
+            this.TMR2Checkbox.Location = new System.Drawing.Point(255, 39);
+            this.TMR2Checkbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.TMR2Checkbox.Name = "TMR2Checkbox";
-            this.TMR2Checkbox.Size = new System.Drawing.Size(15, 14);
+            this.TMR2Checkbox.Size = new System.Drawing.Size(28, 26);
             this.TMR2Checkbox.TabIndex = 25;
             this.TMR2Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TMR2Checkbox.UseVisualStyleBackColor = true;
@@ -548,9 +576,10 @@ namespace FoenixIDE.UI
             this.TMR1Checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.TMR1Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.TMR1Checkbox.IsActive = false;
-            this.TMR1Checkbox.Location = new System.Drawing.Point(156, 21);
+            this.TMR1Checkbox.Location = new System.Drawing.Point(286, 39);
+            this.TMR1Checkbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.TMR1Checkbox.Name = "TMR1Checkbox";
-            this.TMR1Checkbox.Size = new System.Drawing.Size(15, 14);
+            this.TMR1Checkbox.Size = new System.Drawing.Size(28, 26);
             this.TMR1Checkbox.TabIndex = 24;
             this.TMR1Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TMR1Checkbox.UseVisualStyleBackColor = true;
@@ -563,9 +592,10 @@ namespace FoenixIDE.UI
             this.TMR0Checkbox.FlatAppearance.BorderSize = 0;
             this.TMR0Checkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.TMR0Checkbox.IsActive = false;
-            this.TMR0Checkbox.Location = new System.Drawing.Point(173, 21);
+            this.TMR0Checkbox.Location = new System.Drawing.Point(317, 39);
+            this.TMR0Checkbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.TMR0Checkbox.Name = "TMR0Checkbox";
-            this.TMR0Checkbox.Size = new System.Drawing.Size(15, 14);
+            this.TMR0Checkbox.Size = new System.Drawing.Size(28, 26);
             this.TMR0Checkbox.TabIndex = 23;
             this.TMR0Checkbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.TMR0Checkbox.UseVisualStyleBackColor = false;
@@ -577,9 +607,10 @@ namespace FoenixIDE.UI
             this.SOLCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SOLCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SOLCheckbox.IsActive = false;
-            this.SOLCheckbox.Location = new System.Drawing.Point(190, 21);
+            this.SOLCheckbox.Location = new System.Drawing.Point(348, 39);
+            this.SOLCheckbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.SOLCheckbox.Name = "SOLCheckbox";
-            this.SOLCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.SOLCheckbox.Size = new System.Drawing.Size(28, 26);
             this.SOLCheckbox.TabIndex = 22;
             this.SOLCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SOLCheckbox.UseVisualStyleBackColor = true;
@@ -588,27 +619,30 @@ namespace FoenixIDE.UI
             // Reg2Label
             // 
             this.Reg2Label.AutoSize = true;
-            this.Reg2Label.Location = new System.Drawing.Point(3, 57);
+            this.Reg2Label.Location = new System.Drawing.Point(6, 105);
+            this.Reg2Label.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.Reg2Label.Name = "Reg2Label";
-            this.Reg2Label.Size = new System.Drawing.Size(58, 13);
+            this.Reg2Label.Size = new System.Drawing.Size(102, 25);
             this.Reg2Label.TabIndex = 21;
             this.Reg2Label.Text = "IRQ Reg 2";
             // 
             // Reg1Label
             // 
             this.Reg1Label.AutoSize = true;
-            this.Reg1Label.Location = new System.Drawing.Point(3, 39);
+            this.Reg1Label.Location = new System.Drawing.Point(6, 72);
+            this.Reg1Label.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.Reg1Label.Name = "Reg1Label";
-            this.Reg1Label.Size = new System.Drawing.Size(58, 13);
+            this.Reg1Label.Size = new System.Drawing.Size(102, 25);
             this.Reg1Label.TabIndex = 20;
             this.Reg1Label.Text = "IRQ Reg 1";
             // 
             // Reg0Label
             // 
             this.Reg0Label.AutoSize = true;
-            this.Reg0Label.Location = new System.Drawing.Point(3, 22);
+            this.Reg0Label.Location = new System.Drawing.Point(6, 41);
+            this.Reg0Label.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.Reg0Label.Name = "Reg0Label";
-            this.Reg0Label.Size = new System.Drawing.Size(58, 13);
+            this.Reg0Label.Size = new System.Drawing.Size(102, 25);
             this.Reg0Label.TabIndex = 19;
             this.Reg0Label.Text = "IRQ Reg 0";
             // 
@@ -618,9 +652,10 @@ namespace FoenixIDE.UI
             this.KeyboardCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.KeyboardCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.KeyboardCheckBox.IsActive = false;
-            this.KeyboardCheckBox.Location = new System.Drawing.Point(206, 39);
+            this.KeyboardCheckBox.Location = new System.Drawing.Point(378, 72);
+            this.KeyboardCheckBox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.KeyboardCheckBox.Name = "KeyboardCheckBox";
-            this.KeyboardCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.KeyboardCheckBox.Size = new System.Drawing.Size(28, 26);
             this.KeyboardCheckBox.TabIndex = 18;
             this.KeyboardCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.KeyboardCheckBox.UseVisualStyleBackColor = true;
@@ -632,9 +667,10 @@ namespace FoenixIDE.UI
             this.SOFCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SOFCheckbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SOFCheckbox.IsActive = false;
-            this.SOFCheckbox.Location = new System.Drawing.Point(206, 21);
+            this.SOFCheckbox.Location = new System.Drawing.Point(378, 39);
+            this.SOFCheckbox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.SOFCheckbox.Name = "SOFCheckbox";
-            this.SOFCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.SOFCheckbox.Size = new System.Drawing.Size(28, 26);
             this.SOFCheckbox.TabIndex = 17;
             this.SOFCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SOFCheckbox.UseVisualStyleBackColor = true;
@@ -646,9 +682,10 @@ namespace FoenixIDE.UI
             this.BreakOnIRQCheckBox.BackColor = System.Drawing.SystemColors.Control;
             this.BreakOnIRQCheckBox.Checked = true;
             this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(3, 3);
+            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(6, 6);
+            this.BreakOnIRQCheckBox.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.BreakOnIRQCheckBox.Name = "BreakOnIRQCheckBox";
-            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(151, 29);
             this.BreakOnIRQCheckBox.TabIndex = 16;
             this.BreakOnIRQCheckBox.Text = "Break on IRQ";
             this.BreakOnIRQCheckBox.UseVisualStyleBackColor = false;
@@ -659,10 +696,10 @@ namespace FoenixIDE.UI
             this.LabelOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.LabelOverlayButton.FlatAppearance.BorderSize = 0;
             this.LabelOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.LabelOverlayButton.Location = new System.Drawing.Point(198, 200);
-            this.LabelOverlayButton.Margin = new System.Windows.Forms.Padding(2);
+            this.LabelOverlayButton.Location = new System.Drawing.Point(363, 369);
+            this.LabelOverlayButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.LabelOverlayButton.Name = "LabelOverlayButton";
-            this.LabelOverlayButton.Size = new System.Drawing.Size(18, 18);
+            this.LabelOverlayButton.Size = new System.Drawing.Size(33, 33);
             this.LabelOverlayButton.TabIndex = 13;
             this.LabelOverlayButton.TabStop = false;
             this.LabelOverlayButton.Text = "L";
@@ -673,18 +710,18 @@ namespace FoenixIDE.UI
             // registerDisplay1
             // 
             this.registerDisplay1.CPU = null;
-            this.registerDisplay1.Location = new System.Drawing.Point(2, 50);
-            this.registerDisplay1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.registerDisplay1.Location = new System.Drawing.Point(4, 92);
+            this.registerDisplay1.Margin = new System.Windows.Forms.Padding(11, 9, 11, 9);
             this.registerDisplay1.Name = "registerDisplay1";
-            this.registerDisplay1.Size = new System.Drawing.Size(366, 49);
+            this.registerDisplay1.Size = new System.Drawing.Size(671, 90);
             this.registerDisplay1.TabIndex = 0;
             this.registerDisplay1.MouseEnter += new System.EventHandler(this.DebugPanel_Leave);
             // 
             // CPUWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(758, 517);
+            this.ClientSize = new System.Drawing.Size(1390, 940);
             this.Controls.Add(this.LabelOverlayButton);
             this.Controls.Add(this.irqPanel);
             this.Controls.Add(this.HeaderTextbox);
@@ -702,10 +739,11 @@ namespace FoenixIDE.UI
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(1280, 0);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(1024, 556);
+            this.MaximumSize = new System.Drawing.Size(1862, 987);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(774, 556);
+            this.MinimumSize = new System.Drawing.Size(1404, 987);
             this.Name = "CPUWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "CPU Window";

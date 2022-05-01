@@ -58,6 +58,7 @@ namespace FoenixIDE.UI
             this.ConvertHexToPGXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ConvertBinToPGXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gameEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mIDIToVGMConvertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autorunEmulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,12 +70,12 @@ namespace FoenixIDE.UI
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RestartMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.DebugMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DefaultKernelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.gpu = new FoenixIDE.Display.Gpu();
-            this.mIDIToVGMConvertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -338,6 +339,13 @@ namespace FoenixIDE.UI
             this.gameEditorToolStripMenuItem.Text = "Game Editor";
             this.gameEditorToolStripMenuItem.Click += new System.EventHandler(this.GameEditorToolStripMenuItem_Click);
             // 
+            // mIDIToVGMConvertToolStripMenuItem
+            // 
+            this.mIDIToVGMConvertToolStripMenuItem.Name = "mIDIToVGMConvertToolStripMenuItem";
+            this.mIDIToVGMConvertToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.mIDIToVGMConvertToolStripMenuItem.Text = "MIDI to VGM Convert";
+            this.mIDIToVGMConvertToolStripMenuItem.Click += new System.EventHandler(this.mIDIToVGMConvertToolStripMenuItem_Click);
+            // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -412,6 +420,7 @@ namespace FoenixIDE.UI
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.DefaultKernelToolStripMenuItem,
             this.RestartMenuItem,
             this.DebugMenuItem});
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
@@ -424,7 +433,7 @@ namespace FoenixIDE.UI
             // 
             this.RestartMenuItem.Enabled = false;
             this.RestartMenuItem.Name = "RestartMenuItem";
-            this.RestartMenuItem.Size = new System.Drawing.Size(138, 26);
+            this.RestartMenuItem.Size = new System.Drawing.Size(237, 26);
             this.RestartMenuItem.Text = "&Restart";
             this.RestartMenuItem.Click += new System.EventHandler(this.RestartMenuItemClick);
             // 
@@ -432,9 +441,17 @@ namespace FoenixIDE.UI
             // 
             this.DebugMenuItem.Enabled = false;
             this.DebugMenuItem.Name = "DebugMenuItem";
-            this.DebugMenuItem.Size = new System.Drawing.Size(138, 26);
+            this.DebugMenuItem.Size = new System.Drawing.Size(237, 26);
             this.DebugMenuItem.Text = "&Debug";
             this.DebugMenuItem.Click += new System.EventHandler(this.DebugToolStripMenuItem_Click);
+            // 
+            // DefaultKernelToolStripMenuItem
+            // 
+            this.DefaultKernelToolStripMenuItem.Enabled = false;
+            this.DefaultKernelToolStripMenuItem.Name = "DefaultKernelToolStripMenuItem";
+            this.DefaultKernelToolStripMenuItem.Size = new System.Drawing.Size(237, 26);
+            this.DefaultKernelToolStripMenuItem.Text = "Restart Default &Kernel";
+            this.DefaultKernelToolStripMenuItem.Click += new System.EventHandler(this.DefaultKernelToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -468,7 +485,7 @@ namespace FoenixIDE.UI
             this.gpu.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gpu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.gpu.Location = new System.Drawing.Point(0, 32);
-            this.gpu.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+            this.gpu.Margin = new System.Windows.Forms.Padding(7);
             this.gpu.MinimumSize = new System.Drawing.Size(1173, 886);
             this.gpu.Name = "gpu";
             this.gpu.Size = new System.Drawing.Size(1228, 994);
@@ -480,13 +497,6 @@ namespace FoenixIDE.UI
             this.gpu.MouseLeave += new System.EventHandler(this.Gpu_MouseLeave);
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
             this.gpu.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseUp);
-            // 
-            // mIDIToVGMConvertToolStripMenuItem
-            // 
-            this.mIDIToVGMConvertToolStripMenuItem.Name = "mIDIToVGMConvertToolStripMenuItem";
-            this.mIDIToVGMConvertToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
-            this.mIDIToVGMConvertToolStripMenuItem.Text = "MIDI to VGM Convert";
-            this.mIDIToVGMConvertToolStripMenuItem.Click += new System.EventHandler(this.mIDIToVGMConvertToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -502,7 +512,7 @@ namespace FoenixIDE.UI
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(300, 300);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+            this.Margin = new System.Windows.Forms.Padding(7);
             this.MinimumSize = new System.Drawing.Size(1243, 1086);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -567,6 +577,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem autorunEmulatorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem assetListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mIDIToVGMConvertToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem DefaultKernelToolStripMenuItem;
     }
 }
 

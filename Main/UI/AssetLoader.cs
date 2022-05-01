@@ -316,7 +316,7 @@ namespace FoenixIDE.UI
                 List<int> lut = null;
 
                 
-                while (!done && mask != 0xc0)
+                while (!done && mask != 0x80)
                 {
                     int transparentColor = 0;
                     try
@@ -379,6 +379,8 @@ namespace FoenixIDE.UI
                                     b = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel] & mask);
                                     g = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel + 1] & mask);
                                     r = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel + 2] & mask);
+                                    // TODO - try this approximation
+                                    //
                                     break;
                                 case 4:
                                     b = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel] & mask);
@@ -388,7 +390,12 @@ namespace FoenixIDE.UI
 
                                     break;
                             }
-                            int rgb = b + g * 256 + r * 256 * 256;
+                            int rgb = rgb = b + g * 256 + r * 256 * 256;
+                            if (rgb != 0 && bytesPerPixel == 3 && mask == 0xc0)
+                            {
+                                rgb = (r * 7 / 255) << 5 + (g * 7 / 255) << 2 + (b * 3 / 255);
+                            }
+                            
                             // Check if the RBG matches the transparent color
                             int index = 0;
                             if (rgb != transparentColor )
