@@ -58,6 +58,9 @@ namespace FoenixIDE.UI
 
         public MainWindow(Dictionary<string, string> context)
         {
+            bool autoRunCommandLineSpecified = false;
+            bool boardVersionCommandLineSpecified = false;
+            
             if (context != null)
             {
                 if (context.ContainsKey("jumpStartAddress"))
@@ -71,6 +74,7 @@ namespace FoenixIDE.UI
                 if (context.ContainsKey("autoRun"))
                 {
                     autoRun = "true".Equals(context["autoRun"]);
+                    autoRunCommandLineSpecified = true;
                 }
                 if (context.ContainsKey("disabledIRQs"))
                 {
@@ -90,12 +94,16 @@ namespace FoenixIDE.UI
                     {
                         version = BoardVersion.RevUPlus;
                     }
+                    boardVersionCommandLineSpecified = true;
                 }
             }
             // If the user didn't specify context switches, read the ini setting
-            if (context == null)
+            if (!autoRunCommandLineSpecified)
             {
                 autoRun = Simulator.Properties.Settings.Default.Autorun;
+            }
+            if (!boardVersionCommandLineSpecified)
+            {
                 switch (Simulator.Properties.Settings.Default.BoardRevision)
                 {
                     case "B":
