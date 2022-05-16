@@ -142,9 +142,9 @@ namespace FoenixIDE.Processor
             switch (byteLength)
             {
                 case 2:
-                    return "$" + Value.ToString("X4");
+                    return Value.ToString("X4");
                 case 1:
-                    return "$" + Value.ToString("X2");
+                    return Value.ToString("X2");
                 default:
                     return Value.ToString();
             }

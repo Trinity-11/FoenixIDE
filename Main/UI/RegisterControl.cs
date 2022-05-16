@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FoenixIDE.Processor;
 using System.ComponentModel;
-using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using FoenixIDE.Processor;
 
 namespace FoenixIDE.UI
 {
@@ -18,6 +13,7 @@ namespace FoenixIDE.UI
 
         string _caption;
         string _value;
+        bool _readOnly;
         FoenixIDE.Processor.Register _register = null;
         FoenixIDE.Processor.RegisterBankNumber _bank = null;
 
@@ -45,6 +41,20 @@ namespace FoenixIDE.UI
             }
         }
 
+        public bool ReadOnly
+        {
+            get
+            {
+                return this._readOnly;
+            }
+
+            set
+            {
+                this._readOnly = value;
+                this.textBox1.ReadOnly = value;
+            }
+        }
+
         [Browsable(false)]
         public Register Register
         {
@@ -60,7 +70,7 @@ namespace FoenixIDE.UI
                 {
                     UpdateValue();
                 }
-                
+
             }
         }
 
@@ -84,6 +94,43 @@ namespace FoenixIDE.UI
                 this._bank = value;
                 UpdateValue();
             }
+        }
+
+        private void textBox1_TextChanged(object sender, System.EventArgs e)
+        {
+            //if (!ignoreChange)
+            //{
+            //    if (Bank != null && Register != null)
+            //    {
+            //        _register.Value = System.Convert.ToInt16(textBox1.Text, 16) & 0xFFFF;
+            //    }
+            //    else if (Register is Flags)
+            //    {
+            //        string val = textBox1.Text;
+            //        byte bits = 0;
+            //        byte bit = 0x80;
+            //        for (int i = 0; i < 8; i++)
+            //        {
+            //            if (!'-'.Equals(val[i]))
+            //            {
+            //                bits += bit;
+            //            }
+            //            bit >>= 1;
+            //        }
+            //        _register.Value = bits;
+            //    }
+            //    else if (Register != null)
+            //    {
+            //        try
+            //        {
+            //            _register.Value = System.Convert.ToInt16(textBox1.Text, 16) & 0xFFFF;
+            //        }
+            //        catch (System.Exception)
+            //        {
+            //            textBox1.Text = _register.ToString();
+            //        }
+            //    }
+            //}
         }
     }
 }

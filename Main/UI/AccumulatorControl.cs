@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Processor;
 
@@ -20,6 +14,7 @@ namespace FoenixIDE.UI
 
         string _caption;
         string _value;
+        bool _readOnly;
         FoenixIDE.Processor.RegisterAccumulator _register = null;
 
         public string Caption
@@ -49,11 +44,26 @@ namespace FoenixIDE.UI
                 }
                 else
                 {
-                    regB.ForeColor = SystemColors.WindowText;
-                    regB.BackColor = SystemColors.Window;
+                    regB.ForeColor = regA.ForeColor;
+                    regB.BackColor = regA.BackColor;
                 }
                 this.regB.Text = value.Substring(0, 2);
                 this.regA.Text = value.Substring(2, 2);
+            }
+        }
+
+        public bool ReadOnly
+        {
+            get
+            {
+                return this._readOnly;
+            }
+
+            set
+            {
+                this._readOnly = value;
+                this.regA.ReadOnly = value;
+                this.regB.ReadOnly = value;
             }
         }
 
@@ -82,6 +92,31 @@ namespace FoenixIDE.UI
             {
                 this.Value = _register.Value16.ToString("X4");
             }
+        }
+
+        private void regA_TextChanged(object sender, System.EventArgs e)
+        {
+            //try
+            //{
+            //    _register.Value = System.Convert.ToInt16(regA.Text, 16) & 0xFF;
+            //}
+            //catch (System.Exception)
+            //{
+            //    this.regA.Text = _value.Substring(2, 2);
+            //}
+            
+        }
+
+        private void regB_TextChanged(object sender, System.EventArgs e)
+        {
+            //try
+            //{
+            //    _register.Value16 = System.Convert.ToInt16(regB.Text + regA.Text, 16) & 0xFFFF;
+            //}
+            //catch (System.Exception)
+            //{
+            //    this.regB.Text = _value.Substring(0, 2);
+            //}
         }
     }
 }

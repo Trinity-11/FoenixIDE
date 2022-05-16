@@ -182,7 +182,14 @@ namespace FoenixIDE.GameGenerator
                         tokenMatches.Remove(tm);
                         // Move tokens that are between start and end index
                         List<TokenMatch> functionSub = tokenMatches.FindAll(m => m.StartIndex > tm.StartIndex && m.EndIndex < tm.EndIndex);
-                        subs.Add(tm.groups[0], functionSub);
+                        if (!subs.ContainsKey(tm.groups[0]))
+                        {
+                            subs.Add(tm.groups[0], functionSub);
+                        }
+                        else
+                        {
+                            subs.Add(tm.groups[0] + "_dup", functionSub);
+                        }
                         tokenMatches.RemoveAll(m => m.StartIndex > tm.StartIndex && m.EndIndex < tm.EndIndex);
                         break;
                 }

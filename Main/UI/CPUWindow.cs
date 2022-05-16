@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using FoenixIDE.Processor;
 using FoenixIDE.Simulator.Controls;
@@ -39,6 +37,7 @@ namespace FoenixIDE.UI
             InitializeComponent();
             Instance = this;
             DisableIRQs(true);
+            registerDisplay1.RegistersReadOnly(false);
         }
 
         public void SetKernel(FoenixSystem kernel)
@@ -432,7 +431,8 @@ namespace FoenixIDE.UI
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
                 InterruptMatchesCheckboxes();
-
+                registerDisplay1.RegistersReadOnly(true);
+                MainWindow.Instance.setGpuPeriod(16);
                 kernel.CPU.DebugPause = false;
                 lastLine.Text = "";
                 kernel.CPU.CPUThread = new Thread(new ThreadStart(ThreadProc));
@@ -440,7 +440,6 @@ namespace FoenixIDE.UI
                 kernel.CPU.CPUThread.Start();
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
-                registerDisplay1.updateRegisterTimer.Enabled = true;
                 DebugPanel.Refresh();
             }
             else
@@ -455,10 +454,26 @@ namespace FoenixIDE.UI
             UpdateTraceTimer.Enabled = false;
             kernel.CPU.Halt();
             //kernel.CPU.CPUThread.Join();
-            RefreshStatus();
             RunButton.Text = "Run (F5)";
             RunButton.Tag = "0";
-            registerDisplay1.updateRegisterTimer.Enabled = true;
+            RefreshStatus();
+            registerDisplay1.RegistersReadOnly(false);
+            MainWindow.Instance.setGpuPeriod(500);
+        }
+
+        private void StepButton_Click(object sender, EventArgs e)
+        {
+            DebugPanel_Leave(sender, e);
+            kernel.CPU.DebugPause = true;
+            //kernel.CPU.CPUThread?.Join();
+            RunButton.Text = "Run (F5)";
+            RunButton.Tag = "0";
+            UpdateTraceTimer.Enabled = false;
+            ExecuteStep();
+            RefreshStatus();
+            registerDisplay1.RegistersReadOnly(false);
+            MainWindow.Instance.setGpuPeriod(500);
+            kernel.CPU.DebugPause = true;
         }
 
         private void StepOverOverlayButton_Click(object sender, EventArgs e)
@@ -508,6 +523,8 @@ namespace FoenixIDE.UI
                     isStepOver = true;
                     RunButton.Text = "Run (F5)";
                     RunButton.Tag = "0";
+                    registerDisplay1.RegistersReadOnly(false);
+                    MainWindow.Instance.setGpuPeriod(500);
                 }
             }
             else
@@ -515,20 +532,6 @@ namespace FoenixIDE.UI
                 ExecuteStep();
                 RefreshStatus();
             }
-        }
-
-        private void StepButton_Click(object sender, EventArgs e)
-        {
-            DebugPanel_Leave(sender, e);
-            kernel.CPU.DebugPause = true;
-            kernel.CPU.CPUThread?.Join();
-            RunButton.Text = "Run (F5)";
-            RunButton.Tag = "0";
-            UpdateTraceTimer.Enabled = false;
-            RunButton.Enabled = true;
-            ExecuteStep();
-            RefreshStatus();
-            kernel.CPU.DebugPause = true;
         }
 
         private void RefreshStatus()
@@ -591,8 +594,7 @@ namespace FoenixIDE.UI
             }
             
             RefreshStatus();
-            RunButton.Enabled = true;
-            
+            registerDisplay1.RegistersReadOnly(false);
         }
         private delegate void nullParamMethod();
 

@@ -1,6 +1,4 @@
-﻿
-using FoenixIDE.Simulator.FileFormat;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Forms;
 using static FoenixIDE.Simulator.FileFormat.ResourceChecker;
