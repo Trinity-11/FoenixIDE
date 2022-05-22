@@ -187,78 +187,7 @@ namespace FoenixIDE.UI
                     }
                     break;
             }
-
-            if (res.Length > 0)
-            {
-                // write address offset by bank $b0
-                int imageAddress = destAddress - 0xB0_0000;
-                int regAddress = -1;
-                byte lutValue = (byte)LUTCombo.SelectedIndex;
-
-                // Determine which addresses to store the bitmap into.
-                if (FileTypesCombo.SelectedIndex < 2)
-                {
-                    // Bitmaps
-                    regAddress = MemoryLocations.MemoryMap.BITMAP_CONTROL_REGISTER_ADDR + FileTypesCombo.SelectedIndex * 8;
-                    // enable the bitmap - TODO add the LUT
-                    MemMgrRef.WriteByte(regAddress,(byte)(1 + lutValue * 2));
-                    
-                }
-                else if (FileTypesCombo.SelectedIndex < 6)
-                {
-                    // Tilemaps 4
-                    int tilemapIndex = FileTypesCombo.SelectedIndex - 1;
-                    regAddress = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + tilemapIndex * 12;
-                    
-                    // enable the tilemap
-                    MemMgrRef.WriteByte(regAddress, (byte)(1 + (lutValue << 1)));
-
-                    // TODO: Need to write the size of the tilemap
-                }
-                else if (FileTypesCombo.SelectedIndex < 14)
-                {
-                    // Tilesets 8
-                    int tilesetIndex = FileTypesCombo.SelectedIndex - 5;
-                    regAddress = MemoryLocations.MemoryMap.TILESET_BASE_ADDR + tilesetIndex * 4;
-
-                    MemMgrRef.WriteByte(regAddress + 3, lutValue);  // TODO: Add the stride 256 bit 3.
-                }
-                else
-                {
-                    // Sprites 64
-                    int spriteIndex = FileTypesCombo.SelectedIndex - 14;
-                    regAddress = MemoryLocations.MemoryMap.SPRITE_CONTROL_REGISTER_ADDR + spriteIndex * 8;
-
-                    // enable the tilemap
-                    MemMgrRef.WriteByte(regAddress, (byte)(1 + (lutValue << 1)));  // TODO: Add sprite depth
-                                                                                   // write address offset by bank $b0
-                    // Set the sprite at (32,32)
-                    MemMgrRef.WriteWord(regAddress + 4, 32);
-                    MemMgrRef.WriteWord(regAddress + 6, 32);
-                }
-                // write address offset by bank $b0
-                MemMgrRef.WriteByte(regAddress + 1, LowByte(imageAddress));
-                MemMgrRef.WriteByte(regAddress + 2, MidByte(imageAddress));
-                MemMgrRef.WriteByte(regAddress + 3, HighByte(imageAddress));
-
-                StoreButton.Enabled = true;
-            }
-            if (res.Length != -1)
-            {
-                this.DialogResult = DialogResult.OK;
-                if (FileTypesCombo.SelectedIndex > 1 && FileTypesCombo.SelectedIndex < 6)
-                {
-                    int layer = FileTypesCombo.SelectedIndex - 2;
-                    //OnTileLoaded?.Invoke(layer);
-                }
-                Close();
-            }
-            else
-            {
-                // Keep the Asset Loader open
-                StoreButton.Enabled = true;
-            }
-            
+            StoreButton.Enabled = res.Length > 0;
         }
 
         /*
