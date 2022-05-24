@@ -2,13 +2,8 @@
 using FoenixIDE.GameGenerator;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FoenixIDE.UI
@@ -29,10 +24,10 @@ namespace FoenixIDE.UI
         Dictionary<string, List<string>> templates;
 
         AutocompleteMenu popupMenu;
-        string[] keywords = {"ASSET", "COPY", "GOTO", "FILL", "VGM_INIT", "VGM_PLAY", "ENABLE_INTERRUPTS", 
+        string[] keywords = {"ASSET", "COPY", "GOTO", "FILL", "VGM_INIT", "VGM_PLAY", "ENABLE_INTERRUPTS",
             "ENABLE_SPRITE", "DISABLE_SPRITE", "SET_SPRITE_POS",
-            "ENABLE_BITMAP", "DISABLE_BITMAP", "ENABLE_TILEMAP", "DISABLE_TILEMAP", "SET_TILEMAP_POS", 
-            "IF", "ELSE", "VAR", "INCR", "DECR", "FOR"}; 
+            "ENABLE_BITMAP", "DISABLE_BITMAP", "ENABLE_TILEMAP", "DISABLE_TILEMAP", "SET_TILEMAP_POS",
+            "IF", "ELSE", "VAR", "INCR", "DECR", "FOR"};
         //string[] methods = { "Equals()", "GetHashCode()", "GetType()", "ToString()" };
         string[] snippets = { "if(^)\n{\n;\n}", "if(^)\n{\n;\n}\nelse\n{\n;\n}", "for(^;;)\n{\n;\n}", "while(^)\n{\n;\n}", "do${\n^;\n}while();", "switch(^)\n{\ncase : break;\n}" };
         /*string[] declarationSnippets = {
@@ -493,10 +488,10 @@ namespace FoenixIDE.UI
                     //string value = Regex.Replace(line, "(.*)\\{([0-9]*)\\}(.*)", m =>
                     string value = Regex.Replace(line, @"\{([0-9]+)\}", m =>
                     {
-                        if (m.Success && m.Groups.Count>0)
+                        if (m.Success && m.Groups.Count > 0)
                         {
                             int index = int.Parse(m.Groups[1].Value);
-                            if (tm.groups.Count > index-1 )
+                            if (tm.groups.Count > index - 1)
                             {
                                 return tm.groups[index - 1];
                             }

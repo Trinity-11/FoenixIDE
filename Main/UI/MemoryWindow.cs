@@ -1,14 +1,9 @@
-﻿using FoenixIDE.Simulator.FileFormat;
-using FoenixIDE.MemoryLocations;
+﻿using FoenixIDE.MemoryLocations;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml;
 using System.IO;
+using System.Text;
+using System.Windows.Forms;
 
 namespace FoenixIDE.UI
 {
@@ -101,7 +96,7 @@ namespace FoenixIDE.UI
                 {
                     s.Append(i.ToString("X6"));
                 }
-                
+
                 s.Append("  ");
                 StringBuilder text = new StringBuilder();
                 for (int j = 0; j < 16; j++)
@@ -124,7 +119,7 @@ namespace FoenixIDE.UI
                     }
                     s.Append(" ");
 
-                    
+
 
                     // Group 8 bytes together
                     if (j == 7 || j == 15)
@@ -132,14 +127,14 @@ namespace FoenixIDE.UI
                         s.Append(" ");
                         text.Append(" ");
                     }
-                    
+
                 }
                 s.Append(text);
                 if ((i - StartAddress) < 256)
                 {
                     s.AppendLine();
                 }
-                
+
             }
             MemoryText.Text = s.ToString();
         }
@@ -290,7 +285,8 @@ namespace FoenixIDE.UI
             if (e.KeyCode == Keys.PageDown)
             {
                 this.NextButton_Click(sender, e);
-            } else if (e.KeyCode == Keys.PageUp)
+            }
+            else if (e.KeyCode == Keys.PageUp)
             {
                 this.PreviousButton_Click(sender, e);
             }
@@ -300,7 +296,7 @@ namespace FoenixIDE.UI
          * Change the Master Control Register (MCR).
          * This allows for displaying text, overlay on top of graphics.
          */
-                private void MCRBitButton_Click(object sender, EventArgs e)
+        private void MCRBitButton_Click(object sender, EventArgs e)
         {
             // toggle the button tag 0 or 1
             Button btn = ((Button)sender);
@@ -374,7 +370,7 @@ namespace FoenixIDE.UI
                 SetHiRes?.Invoke(newHires != 0);
             }
             SetMCRButton(MCRBit9Button, (value & 0x02) != 0);
-            
+
         }
 
         private void SetMCRButton(Button btn, bool value)
@@ -407,7 +403,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        Point mem = new Point(-1,-1);
+        Point mem = new Point(-1, -1);
         // Retrieve the memory location of the mouse location
         private void GetAddressPosition(Point mouse)
         {

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FoenixIDE.Processor;
+using System;
 using System.Windows.Forms;
-using FoenixIDE.Processor;
 
 namespace FoenixIDE
 {
@@ -57,9 +52,17 @@ namespace FoenixIDE
                 }
             }
         }
-        private void Timer1_Tick(object sender, EventArgs e)
+
+        public void RegistersReadOnly(bool state)
         {
-            UpdateRegisters();
+            PC.ReadOnly = state;
+            A.ReadOnly = state;
+            X.ReadOnly = state;
+            Y.ReadOnly = state;
+            Stack.ReadOnly = state;
+            DBR.ReadOnly = state;
+            D.ReadOnly = state;
+            Flags.ReadOnly = state;
         }
     }
 }

@@ -28,25 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.Flags = new FoenixIDE.UI.RegisterControl();
             this.panel7 = new System.Windows.Forms.Panel();
-            this.D = new FoenixIDE.UI.RegisterControl();
             this.panel6 = new System.Windows.Forms.Panel();
-            this.DBR = new FoenixIDE.UI.RegisterControl();
             this.panel5 = new System.Windows.Forms.Panel();
-            this.Stack = new FoenixIDE.UI.RegisterControl();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.Y = new FoenixIDE.UI.RegisterControl();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.X = new FoenixIDE.UI.RegisterControl();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.A = new FoenixIDE.UI.AccumulatorControl();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.PC = new FoenixIDE.UI.RegisterControl();
             this.panel8 = new System.Windows.Forms.Panel();
-            this.updateRegisterTimer = new System.Windows.Forms.Timer(this.components);
+            this.Flags = new FoenixIDE.UI.RegisterControl();
+            this.D = new FoenixIDE.UI.RegisterControl();
+            this.DBR = new FoenixIDE.UI.RegisterControl();
+            this.Stack = new FoenixIDE.UI.RegisterControl();
+            this.Y = new FoenixIDE.UI.RegisterControl();
+            this.X = new FoenixIDE.UI.RegisterControl();
+            this.A = new FoenixIDE.UI.AccumulatorControl();
+            this.PC = new FoenixIDE.UI.RegisterControl();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,183 +68,205 @@
             this.groupBox1.Controls.Add(this.panel8);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(466, 53);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(6);
+            this.groupBox1.Size = new System.Drawing.Size(854, 98);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Registers";
+            // 
+            // panel7
+            // 
+            this.panel7.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel7.Location = new System.Drawing.Point(513, 28);
+            this.panel7.Margin = new System.Windows.Forms.Padding(6);
+            this.panel7.Name = "panel7";
+            this.panel7.Size = new System.Drawing.Size(7, 64);
+            this.panel7.TabIndex = 13;
+            // 
+            // panel6
+            // 
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel6.Location = new System.Drawing.Point(445, 28);
+            this.panel6.Margin = new System.Windows.Forms.Padding(6);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(7, 64);
+            this.panel6.TabIndex = 11;
+            // 
+            // panel5
+            // 
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel5.Location = new System.Drawing.Point(377, 28);
+            this.panel5.Margin = new System.Windows.Forms.Padding(6);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(7, 64);
+            this.panel5.TabIndex = 9;
+            // 
+            // panel4
+            // 
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel4.Location = new System.Drawing.Point(309, 28);
+            this.panel4.Margin = new System.Windows.Forms.Padding(6);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(7, 64);
+            this.panel4.TabIndex = 7;
+            // 
+            // panel3
+            // 
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel3.Location = new System.Drawing.Point(241, 28);
+            this.panel3.Margin = new System.Windows.Forms.Padding(6);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(7, 64);
+            this.panel3.TabIndex = 5;
+            // 
+            // panel2
+            // 
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel2.Location = new System.Drawing.Point(173, 28);
+            this.panel2.Margin = new System.Windows.Forms.Padding(6);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(7, 64);
+            this.panel2.TabIndex = 3;
+            // 
+            // panel1
+            // 
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel1.Location = new System.Drawing.Point(94, 28);
+            this.panel1.Margin = new System.Windows.Forms.Padding(6);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(7, 64);
+            this.panel1.TabIndex = 1;
+            // 
+            // panel8
+            // 
+            this.panel8.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel8.Location = new System.Drawing.Point(6, 28);
+            this.panel8.Margin = new System.Windows.Forms.Padding(6);
+            this.panel8.Name = "panel8";
+            this.panel8.Size = new System.Drawing.Size(7, 64);
+            this.panel8.TabIndex = 15;
             // 
             // Flags
             // 
             this.Flags.Bank = null;
             this.Flags.Caption = "Flags";
             this.Flags.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Flags.Location = new System.Drawing.Point(283, 16);
+            this.Flags.Location = new System.Drawing.Point(520, 28);
+            this.Flags.Margin = new System.Windows.Forms.Padding(11);
             this.Flags.Name = "Flags";
+            this.Flags.ReadOnly = true;
             this.Flags.Register = null;
-            this.Flags.Size = new System.Drawing.Size(76, 34);
+            this.Flags.Size = new System.Drawing.Size(139, 64);
             this.Flags.TabIndex = 14;
             this.Flags.Value = "XXXXXXXX";
-            // 
-            // panel7
-            // 
-            this.panel7.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel7.Location = new System.Drawing.Point(279, 16);
-            this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(4, 34);
-            this.panel7.TabIndex = 13;
             // 
             // D
             // 
             this.D.Bank = null;
             this.D.Caption = "Direct";
             this.D.Dock = System.Windows.Forms.DockStyle.Left;
-            this.D.Location = new System.Drawing.Point(246, 16);
+            this.D.Location = new System.Drawing.Point(452, 28);
+            this.D.Margin = new System.Windows.Forms.Padding(11);
             this.D.Name = "D";
+            this.D.ReadOnly = true;
             this.D.Register = null;
-            this.D.Size = new System.Drawing.Size(33, 34);
+            this.D.Size = new System.Drawing.Size(61, 64);
             this.D.TabIndex = 12;
             this.D.Value = "0000";
-            // 
-            // panel6
-            // 
-            this.panel6.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel6.Location = new System.Drawing.Point(242, 16);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(4, 34);
-            this.panel6.TabIndex = 11;
             // 
             // DBR
             // 
             this.DBR.Bank = null;
             this.DBR.Caption = "DBR";
             this.DBR.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DBR.Location = new System.Drawing.Point(209, 16);
+            this.DBR.Location = new System.Drawing.Point(384, 28);
+            this.DBR.Margin = new System.Windows.Forms.Padding(11);
             this.DBR.Name = "DBR";
+            this.DBR.ReadOnly = true;
             this.DBR.Register = null;
-            this.DBR.Size = new System.Drawing.Size(33, 34);
+            this.DBR.Size = new System.Drawing.Size(61, 64);
             this.DBR.TabIndex = 10;
             this.DBR.Value = "00";
-            // 
-            // panel5
-            // 
-            this.panel5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel5.Location = new System.Drawing.Point(205, 16);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(4, 34);
-            this.panel5.TabIndex = 9;
             // 
             // Stack
             // 
             this.Stack.Bank = null;
             this.Stack.Caption = "S";
             this.Stack.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Stack.Location = new System.Drawing.Point(172, 16);
+            this.Stack.Location = new System.Drawing.Point(316, 28);
+            this.Stack.Margin = new System.Windows.Forms.Padding(11);
             this.Stack.Name = "Stack";
+            this.Stack.ReadOnly = true;
             this.Stack.Register = null;
-            this.Stack.Size = new System.Drawing.Size(33, 34);
+            this.Stack.Size = new System.Drawing.Size(61, 64);
             this.Stack.TabIndex = 8;
             this.Stack.Value = "0000";
-            // 
-            // panel4
-            // 
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel4.Location = new System.Drawing.Point(168, 16);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(4, 34);
-            this.panel4.TabIndex = 7;
             // 
             // Y
             // 
             this.Y.Bank = null;
             this.Y.Caption = "Y";
             this.Y.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Y.Location = new System.Drawing.Point(135, 16);
+            this.Y.Location = new System.Drawing.Point(248, 28);
+            this.Y.Margin = new System.Windows.Forms.Padding(11);
             this.Y.Name = "Y";
+            this.Y.ReadOnly = true;
             this.Y.Register = null;
-            this.Y.Size = new System.Drawing.Size(33, 34);
+            this.Y.Size = new System.Drawing.Size(61, 64);
             this.Y.TabIndex = 6;
             this.Y.Value = "0000";
-            // 
-            // panel3
-            // 
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel3.Location = new System.Drawing.Point(131, 16);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(4, 34);
-            this.panel3.TabIndex = 5;
             // 
             // X
             // 
             this.X.Bank = null;
             this.X.Caption = "X";
             this.X.Dock = System.Windows.Forms.DockStyle.Left;
-            this.X.Location = new System.Drawing.Point(98, 16);
+            this.X.Location = new System.Drawing.Point(180, 28);
+            this.X.Margin = new System.Windows.Forms.Padding(11);
             this.X.Name = "X";
+            this.X.ReadOnly = true;
             this.X.Register = null;
-            this.X.Size = new System.Drawing.Size(33, 34);
+            this.X.Size = new System.Drawing.Size(61, 64);
             this.X.TabIndex = 4;
             this.X.Value = "0000";
-            // 
-            // panel2
-            // 
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel2.Location = new System.Drawing.Point(94, 16);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(4, 34);
-            this.panel2.TabIndex = 3;
             // 
             // A
             // 
             this.A.Caption = "A";
             this.A.Dock = System.Windows.Forms.DockStyle.Left;
-            this.A.Location = new System.Drawing.Point(55, 16);
+            this.A.Location = new System.Drawing.Point(101, 28);
+            this.A.Margin = new System.Windows.Forms.Padding(11);
             this.A.Name = "A";
+            this.A.ReadOnly = true;
             this.A.Register = null;
-            this.A.Size = new System.Drawing.Size(39, 34);
+            this.A.Size = new System.Drawing.Size(72, 64);
             this.A.TabIndex = 2;
             this.A.Value = "0000";
-            // 
-            // panel1
-            // 
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(51, 16);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(4, 34);
-            this.panel1.TabIndex = 1;
             // 
             // PC
             // 
             this.PC.Bank = null;
             this.PC.Caption = "PC";
             this.PC.Dock = System.Windows.Forms.DockStyle.Left;
-            this.PC.Location = new System.Drawing.Point(7, 16);
+            this.PC.Location = new System.Drawing.Point(13, 28);
+            this.PC.Margin = new System.Windows.Forms.Padding(11);
             this.PC.Name = "PC";
+            this.PC.ReadOnly = true;
             this.PC.Register = null;
-            this.PC.Size = new System.Drawing.Size(44, 34);
+            this.PC.Size = new System.Drawing.Size(81, 64);
             this.PC.TabIndex = 0;
             this.PC.Value = "000000";
             // 
-            // panel8
-            // 
-            this.panel8.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel8.Location = new System.Drawing.Point(3, 16);
-            this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(4, 34);
-            this.panel8.TabIndex = 15;
-            // 
-            // updateRegisterTimer
-            // 
-            this.updateRegisterTimer.Interval = 1000;
-            this.updateRegisterTimer.Tick += new System.EventHandler(this.Timer1_Tick);
-            // 
             // RegisterDisplay
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.groupBox1);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "RegisterDisplay";
-            this.Size = new System.Drawing.Size(466, 53);
+            this.Size = new System.Drawing.Size(854, 98);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -271,6 +291,5 @@
         private global::System.Windows.Forms.Panel panel6;
         private global::System.Windows.Forms.Panel panel8;
         public UI.RegisterControl PC;
-        public System.Windows.Forms.Timer updateRegisterTimer;
     }
 }

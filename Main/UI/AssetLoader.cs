@@ -2,16 +2,11 @@
 using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.IO.Ports;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static FoenixIDE.Simulator.FileFormat.ResourceChecker;
-using static FoenixIDE.UI.MainWindow;
 
 namespace FoenixIDE.UI
 {
@@ -29,32 +24,12 @@ namespace FoenixIDE.UI
         private void AssetLoader_Load(object sender, EventArgs e)
         {
             // Add items to the combo box
-            // Tiles Registers: $AF:0100 to $AF:013F
-            FileTypesCombo.Items.Add("Bitmap Layer 0");
-            FileTypesCombo.Items.Add("Bitmap Layer 1");
-
-            for (int i = 0; i < 4; i++)
-            {
-                FileTypesCombo.Items.Add("Tilemap " + i);
-            }
-            for (int i = 0; i < 8; i++)
-            {
-                FileTypesCombo.Items.Add("Tileset " + i);
-            }
-            for (int i = 0; i < 64; i++)
-            {
-                FileTypesCombo.Items.Add("Sprite " + i);
-            }
-            FileTypesCombo.SelectedItem = 0; // Bitmap layer 0
-            for (int i = 0; i < 4; i++)
-            {
-                FileTypesCombo.Items.Add("LUT " + i);
-            }
-
-            for (int i = 0; i < 4; i++)
-            {
-                LUTCombo.Items.Add("LUT " + i);
-            }
+            FileTypesCombo.Items.Add("Bitmap");
+            FileTypesCombo.Items.Add("Tilemap");
+            FileTypesCombo.Items.Add("Tileset 16x16");
+            FileTypesCombo.Items.Add("Tileset   8x8");
+            FileTypesCombo.Items.Add("Sprite");
+            LUTCombo.Items.Add("LUT");
             FileTypesCombo.SelectedIndex = 0;
             LUTCombo.SelectedIndex = 0;
         }
@@ -147,32 +122,35 @@ namespace FoenixIDE.UI
             ResourceType operationType = ResourceType.raw;
             int conversionStride = 0;
             int maxHeight = screenResY;
-            if (FileTypesCombo.SelectedIndex < 2)
+            switch (FileTypesCombo.SelectedIndex)
             {
-                operationType = ResourceType.bitmap;
-                conversionStride = screenResX;
-            }
-            else if (FileTypesCombo.SelectedIndex < 6)
-            { 
-                operationType = ResourceType.tilemap;
-                ExtLabel.Text = ".bin";
-            }
-            else if (FileTypesCombo.SelectedIndex < 14)
-            {
-                operationType = ResourceType.tileset;
-                conversionStride = 256;
-                maxHeight = 256;
-            }
-            else if (FileTypesCombo.SelectedIndex < 78)
-            {
-                operationType = ResourceType.sprite;
-                conversionStride = 32;
-                maxHeight = 256;
-            }
-            else
-            {
-                operationType = ResourceType.lut;
-                ExtLabel.Text = ".pal";
+                case 0:  // bitmaps
+                    operationType = ResourceType.bitmap;
+                    conversionStride = screenResX;
+                    break;
+                case 1:  // tilemaps
+                    operationType = ResourceType.tilemap;
+                    ExtLabel.Text = ".bin";
+                    break;
+                case 2:  // tilesets 16 x 16
+                    operationType = ResourceType.tileset;
+                    conversionStride = 256;
+                    maxHeight = 256;
+                    break;
+                case 3:  // tilesets 8 x 8
+                    operationType = ResourceType.tileset;
+                    conversionStride = 128;
+                    maxHeight = 128;
+                    break;
+                case 4:  // sprites
+                    operationType = ResourceType.sprite;
+                    conversionStride = 32;
+                    maxHeight = 256;
+                    break;
+                case 5:  // luts
+                    operationType = ResourceType.lut;
+                    ExtLabel.Text = ".pal";
+                    break;
             }
 
             ResourceChecker.Resource res = new ResourceChecker.Resource
@@ -316,7 +294,7 @@ namespace FoenixIDE.UI
                 List<int> lut = null;
 
                 
-                while (!done && mask != 0xc0)
+                while (!done && mask != 0x80)
                 {
                     int transparentColor = 0;
                     try
@@ -379,6 +357,8 @@ namespace FoenixIDE.UI
                                     b = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel] & mask);
                                     g = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel + 1] & mask);
                                     r = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel + 2] & mask);
+                                    // TODO - try this approximation
+                                    //
                                     break;
                                 case 4:
                                     b = (byte)(bitmapPointer[line * bitmapData.Stride + col * bytesPerPixel] & mask);
@@ -388,7 +368,12 @@ namespace FoenixIDE.UI
 
                                     break;
                             }
-                            int rgb = b + g * 256 + r * 256 * 256;
+                            int rgb = rgb = b + g * 256 + r * 256 * 256;
+                            if (rgb != 0 && bytesPerPixel == 3 && mask == 0xc0)
+                            {
+                                rgb = (r * 7 / 255) << 5 + (g * 7 / 255) << 2 + (b * 3 / 255);
+                            }
+                            
                             // Check if the RBG matches the transparent color
                             int index = 0;
                             if (rgb != transparentColor )

@@ -8,7 +8,7 @@ namespace FoenixIDE.UI
 {
     public enum FileType
     {
-        SINGLE_MULTI_CHNL_TRACK, 
+        SINGLE_MULTI_CHNL_TRACK,
         SIMULTANEOUS_TRACKS,
         INDEPENDENT_SEQ_TRACKS
     }
@@ -82,7 +82,7 @@ namespace FoenixIDE.UI
             if (buffer[0] == 'M' && buffer[1] == 'T' && buffer[2] == 'h' && buffer[3] == 'd')
             {
                 // Read the header length - big endian
-                int headerLength = buffer[7] + (buffer[6] <<8) + (buffer[5] <<16) + (buffer[4] << 24);
+                int headerLength = buffer[7] + (buffer[6] << 8) + (buffer[5] << 16) + (buffer[4] << 24);
                 // filetype 0: single multi channel track
                 // filetype 1: simultaneous tracks
                 // filetype 2: independent sequence tracks
@@ -126,7 +126,7 @@ namespace FoenixIDE.UI
 
                 tracks = new Track[trackCount];
                 // Initialize the Track dropdown list
-                for (int i = 0; i< trackCount; i++)
+                for (int i = 0; i < trackCount; i++)
                 {
                     tracks[i] = new Track()
                     {
@@ -162,7 +162,7 @@ namespace FoenixIDE.UI
         private void ReadTracks()
         {
             songTime = 0;
-            for (int i = 0; i < trackCount; i ++)
+            for (int i = 0; i < trackCount; i++)
             {
                 ReadTrack(i);
                 if (tracks[i].totalDeltaTime > songTime)
@@ -208,7 +208,7 @@ namespace FoenixIDE.UI
                 // Read the variable-length delta time
                 int deltatime = ReadVarInt(ptr + offset, out int varlen);
                 totalTime += deltatime;
-                
+
 
                 MidiEvent ev = new MidiEvent()
                 {
@@ -258,7 +258,7 @@ namespace FoenixIDE.UI
                         offset += varlen + 1;
                         break;
                 }
-                
+
             }
             return totalTime;
         }
@@ -366,10 +366,10 @@ namespace FoenixIDE.UI
                     string sig = (majMin == 0 ? "Major" : "Minor");
                     string key = majMin == 0 ? "C" : "a";
 
-                    switch(sharpFlats)
+                    switch (sharpFlats)
                     {
                         case -1:
-                            key = majMin == 0 ? "F": "d";
+                            key = majMin == 0 ? "F" : "d";
                             break;
                         case -2:
                             key = majMin == 0 ? "B♭" : "g";
@@ -389,7 +389,7 @@ namespace FoenixIDE.UI
                         case -7:
                             key = majMin == 0 ? "B" : "g♯";
                             break;
-                        
+
                         case 1:
                             key = majMin == 0 ? "G" : "e";
                             break;
@@ -412,7 +412,7 @@ namespace FoenixIDE.UI
                             key = majMin == 0 ? "C♯" : "a♯";
                             break;
                     }
-                    
+
                     sb.Append("Key Signature Event: ").AppendFormat("{0} {1}", key, sig);
                     break;
                 case 0x7F:
@@ -538,7 +538,7 @@ namespace FoenixIDE.UI
                 int ix = 0;
                 int nexti = 999_999;  // just a big number
                 while (ix < songTime)
-                {   
+                {
                     for (int t = 0; t < trackCount; t++)
                     {
                         int evc = tracks[t].events.Count;
@@ -569,7 +569,7 @@ namespace FoenixIDE.UI
             byte fourOps = 9;
             // midi channel to opl3 channel map - $F0 is unassigned, $FF is not played.
             byte[] midiToOpMap = new byte[16];
-            for (int i = 0; i< 9; i++)
+            for (int i = 0; i < 9; i++)
             {
                 midiToOpMap[i] = (byte)i;
             }
@@ -579,7 +579,7 @@ namespace FoenixIDE.UI
             }
             if (PercussionSet != 0)
             {
-                midiToOpMap[9-1] = 6;
+                midiToOpMap[9 - 1] = 6;
                 midiToOpMap[6] = 0xF0;
             }
 
@@ -673,7 +673,7 @@ namespace FoenixIDE.UI
             //}
             byte OPL3Mode = (byte)(fourOps != 0 ? 1 : 0);
             //byte connectionSel = (byte)(Math.Pow(2, fourOps) -1);
-            
+
             int totalWaits = 0;
             int totalBytes = 0;
             MemoryStream ms = new MemoryStream();
@@ -751,7 +751,7 @@ namespace FoenixIDE.UI
                     ms.Write(opl3bytes, 0, opl3bytes.Length);
                     totalBytes += opl3bytes.Length;
                 }
-                
+
                 idx = ev.index;
             }
             // Empty the drum buffer
@@ -831,14 +831,14 @@ namespace FoenixIDE.UI
 
         private byte[] CreateGD3()
         {
-            byte[] header = new byte[8] { (byte)'G', (byte)'d', (byte)'3', (byte)' ', 0x0, 0x1, 0x0, 0x0};
+            byte[] header = new byte[8] { (byte)'G', (byte)'d', (byte)'3', (byte)' ', 0x0, 0x1, 0x0, 0x0 };
             MemoryStream ms = new MemoryStream();
             ms.Write(header, 0, 8);
 
             // Next, write the size of the data - each character is 2 bytes and each eol is 2 bytes.
             ms.Write(BitConverter.GetBytes(22), 0, 4);
 
-            for (int i=0;i<11;i++)
+            for (int i = 0; i < 11; i++)
             {
                 //write the next string
                 ms.Write(new byte[2] { 0, 0 }, 0, 2);
@@ -854,10 +854,10 @@ namespace FoenixIDE.UI
          */
         private void btnPolyphonic_Click(object sender, EventArgs e)
         {
-            for (int t=0;t<trackCount;t++)
+            for (int t = 0; t < trackCount; t++)
             {
                 Track track = tracks[t];
-                
+
             }
         }
 

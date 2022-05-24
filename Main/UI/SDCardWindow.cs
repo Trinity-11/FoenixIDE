@@ -55,7 +55,7 @@ namespace FoenixIDE.Simulator.UI
                 SDCardEnabled.Checked = false;
                 SDCardFolderText.Text = "";
             }
-            
+
         }
         public string GetPath()
         {

@@ -1,7 +1,15 @@
+Release 0.5.6.6
+---------------
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+When in debug mode, only redraw the display twice per second instead of 60 times in run mode.
+Added support for small tiles 8x8.
+
 Release 0.5.6.5
 ---------------
 Fixed the Asset Loader to use *.tlm for tilemaps, instead of .tls.
-
+Added the "Restart with Default Kernel" menu item to reload the default kernel, instead of the last program.
+Changed the PCB Revision to EMB, EMC, EMU and EM+ for Rev B, Rev C, Rev U and Rev U+ respectively.
 
 Release 0.5.6.4
 ---------------

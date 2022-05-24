@@ -24,7 +24,6 @@ namespace FoenixIDE.Display
 
         const int CHAR_WIDTH = 8;
         const int CHAR_HEIGHT = 8;
-        const byte TILE_SIZE = 16;
         const int SPRITE_SIZE = 32;
 
         public MemoryRAM VRAM = null;
@@ -59,7 +58,8 @@ namespace FoenixIDE.Display
         //{
         //    Interval = 15
         //};
-        private MultimediaTimer hiresTimer = new MultimediaTimer(16);
+        // In debug mode, draw the screen twice per second, instead of 60 times.
+        private MultimediaTimer hiresTimer = new MultimediaTimer(500);
         private static readonly int[] vs = new int[256 * 8];
         private int[] lutCache = vs;
 
@@ -106,6 +106,12 @@ namespace FoenixIDE.Display
             {
                 GpuUpdated?.Invoke();
             }
+        }
+
+        public void setRefreshPeriod(uint time)
+        {
+            hiresTimer.Interval = time;
+            hiresTimer.Start();
         }
 
         /*
@@ -637,6 +643,10 @@ namespace FoenixIDE.Display
             {
                 return;
             }
+            bool smallTiles = (reg & 8) > 0;
+            
+            int tileSize = (smallTiles ? 8 : 16);
+            int strideLine = tileSize * 16;
 
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
             //int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
@@ -646,22 +656,22 @@ namespace FoenixIDE.Display
             bool dirUp = (tilemapWindowX & 0x4000) != 0;
             byte scrollX = (byte)(tilemapWindowX & 0x3C00 >> 10);
             tilemapWindowX &= 0x3FF;
-            int tileXOffset = tilemapWindowX % TILE_SIZE;
+            int tileXOffset = tilemapWindowX % tileSize;
 
             int tilemapWindowY = VICKY.ReadWord(addrTileCtrlReg + 10);
             bool dirRight = (tilemapWindowY & 0x4000) != 0;
             byte scrollY = (byte)(tilemapWindowY & 0x3C00 >> 10);
             tilemapWindowY &= 0x3FF;
 
-            int tileRow = ( line + tilemapWindowY ) / TILE_SIZE;
-            int tileYOffset = (line + tilemapWindowY) % TILE_SIZE;
+            int tileRow = ( line + tilemapWindowY ) / tileSize;
+            int tileYOffset = (line + tilemapWindowY) % tileSize;
             int maxX = width - borderXSize;
 
             // we always read tiles 0 to width/TILE_SIZE + 1 - this is to ensure we can display partial tiles, with X,Y offsets
-            int tilemapItemCount = width / TILE_SIZE + 1;
+            int tilemapItemCount = width / tileSize + 1;
             byte[] tiles = new byte[tilemapItemCount * 2];
             int[] tilesetOffsets = new int[tilemapItemCount];
-            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / TILE_SIZE) * 2 + (tileRow + 0) * tilemapWidth * 2, tilemapItemCount * 2, tiles);
+            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tilemapItemCount * 2, tiles);
 
             // cache of tilesetPointers
             int[] tilesetPointers = new int[8];
@@ -670,7 +680,7 @@ namespace FoenixIDE.Display
             {
                 tilesetPointers[i] = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4) & 0x3F_FFFF;
                 byte tilesetConfig = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + i * 4 + 3);
-                strides[i] = (tilesetConfig & 8) != 0 ? 256 : 16;
+                strides[i] = (tilesetConfig & 8) != 0 ? strideLine : tileSize;
             }
             for (int i = 0; i< tilemapItemCount; i++)
             {
@@ -682,13 +692,13 @@ namespace FoenixIDE.Display
                 // tileset
                 int tilesetPointer = tilesetPointers[tileset];
                 int strideX = strides[tileset];
-                if (strideX == 16)
+                if (strideX == tileSize)
                 {
-                    tilesetOffsets[i] = tilesetPointer + tile * 256 + tileYOffset * 16;
+                    tilesetOffsets[i] = tilesetPointer + (tile % 16 ) * strideLine + (tile / 16) * strideLine * 16 + tileYOffset * tileSize;
                 }
                 else
                 {
-                    tilesetOffsets[i] = tilesetPointer + ((tile / TILE_SIZE) * strideX * TILE_SIZE + (tile % TILE_SIZE) * TILE_SIZE) + tileYOffset * strideX;
+                    tilesetOffsets[i] = tilesetPointer + ((tile / 16) * strideX * tileSize + (tile % 16) * tileSize) + tileYOffset * strideX;
                 }
             }
 
@@ -711,11 +721,11 @@ namespace FoenixIDE.Display
             //    }
             //}
             // alternate display style - avoids repeating the loop so often
-            int startTileX = (borderXSize + tileXOffset) / TILE_SIZE;
-            int endTileX = (width - borderXSize + tileXOffset) / TILE_SIZE + 1;
-            int startOffset = (borderXSize + tilemapWindowX) % TILE_SIZE;
+            int startTileX = (borderXSize + tileXOffset) / tileSize;
+            int endTileX = (width - borderXSize + tileXOffset) / tileSize + 1;
+            int startOffset = (borderXSize + tilemapWindowX) % tileSize;
             int x = borderXSize;
-            byte[] tilepix = new byte[16];
+            byte[] tilepix = new byte[tileSize];
             int clrVal = 0;
             for (int t = startTileX; t < endTileX; t++)
             {
@@ -724,7 +734,7 @@ namespace FoenixIDE.Display
                 //int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR + lutIndex * 1024;
                 int tilesetOffsetAddress = tilesetOffsets[t];  // + startOffset
                 
-                VRAM.CopyIntoBuffer(tilesetOffsetAddress, 16, tilepix);
+                VRAM.CopyIntoBuffer(tilesetOffsetAddress, tileSize, tilepix);
                 do
                 {
                     byte pixVal = tilepix[startOffset];
@@ -736,7 +746,7 @@ namespace FoenixIDE.Display
                     x++;
                     startOffset++;
                     tilesetOffsetAddress++;
-                } while (startOffset != 16 && x < maxX);
+                } while (startOffset != tileSize && x < maxX);
                 startOffset = 0;
                 if (x == maxX)
                 {
