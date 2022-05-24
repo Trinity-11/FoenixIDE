@@ -9,4 +9,5 @@ CharSet Manager/.vs/CharSet Manager/v15/.suo
 Tests/*.hex
 Tests/*.lst
 bin/Debug
+bin/Release
 packages
