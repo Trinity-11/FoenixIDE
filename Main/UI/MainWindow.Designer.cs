@@ -350,7 +350,8 @@ namespace FoenixIDE.UI
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.autorunEmulatorToolStripMenuItem});
+            this.autorunEmulatorToolStripMenuItem,
+            this.transcriptModeDebuggerToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(76, 24);
             this.settingsToolStripMenuItem.Text = "&Settings";
