@@ -172,6 +172,7 @@ namespace FoenixIDE.UI
                 debugWindow.RunButton_Click(null, null);
             }
             autorunEmulatorToolStripMenuItem.Checked = autoRun;
+            transcriptModeDebuggerToolStripMenuItem.Checked = Simulator.Properties.Settings.Default.TranscriptModeDebugger;
         }
 
         private void CenterForm(Form form)
