@@ -38,7 +38,31 @@ namespace FoenixIDE.UI
             Default,
             Transcipt
         }
-        public DebugWindowMode CurrentDebugWindowMode = DebugWindowMode.Default;
+        private DebugWindowMode currentDebugWindowMode = DebugWindowMode.Default;
+
+        void UpdateHeaderTextBoxLabel()
+        {
+            if (currentDebugWindowMode == DebugWindowMode.Default)
+            {
+                HeaderTextbox.Text = "LABEL          PC      OPCODES      SOURCE";
+            }
+            else
+            {
+                System.Diagnostics.Debug.Assert(currentDebugWindowMode == DebugWindowMode.Transcipt);
+                HeaderTextbox.Text = "               PC      OPCODES      SOURCE         REGISTERS";
+            }
+        }
+
+        public void SetDebugWindowMode(DebugWindowMode mode)
+        {
+            bool changed = currentDebugWindowMode != mode;
+            currentDebugWindowMode = mode;
+
+            if (!changed)
+                return;
+
+            UpdateHeaderTextBoxLabel();
+        }
 
         public CPUWindow()
         {
@@ -114,8 +138,8 @@ namespace FoenixIDE.UI
 
         private void CPUWindow_Load(object sender, EventArgs e)
         {
-            
-            HeaderTextbox.Text = "LABEL          PC      OPCODES      SOURCE";
+            UpdateHeaderTextBoxLabel();
+
             ClearTrace();
             RefreshStatus();
             Tooltip.SetToolTip(AddBPOverlayButton, "Add Breakpoint");
@@ -282,13 +306,13 @@ namespace FoenixIDE.UI
         {
             if (kernel.CPU.DebugPause && codeList != null)
             {
-                if (CurrentDebugWindowMode == DebugWindowMode.Default)
+                if (currentDebugWindowMode == DebugWindowMode.Default)
                 {
                     DebugPanel_Paint_DefaultMode(e);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.Assert(CurrentDebugWindowMode == DebugWindowMode.Transcipt);
+                    System.Diagnostics.Debug.Assert(currentDebugWindowMode == DebugWindowMode.Transcipt);
                     DebugPanel_Paint_TranscriptMode(e);
                 }
             }
@@ -301,7 +325,7 @@ namespace FoenixIDE.UI
 
         private void DebugPanel_MouseMove(object sender, MouseEventArgs e)
         {
-            if (CurrentDebugWindowMode == DebugWindowMode.Transcipt)
+            if (currentDebugWindowMode == DebugWindowMode.Transcipt)
                 return; // Nothing to do if in transcript mode
 
             if (!kernel.CPU.DebugPause)
@@ -650,6 +674,14 @@ namespace FoenixIDE.UI
             registerDisplay1.RegistersReadOnly(false);
         }
         private delegate void nullParamMethod();
+        void PushLineToTranscript(DebugLine line)
+        {
+            if (transcript.Count == transcript.Capacity)
+            {
+                transcript.RemoveAt(0);
+            }
+            transcript.Add(line);
+        }
 
         /// <summary>
         /// Executes next step of 65C816 code, logs dubeugging data
@@ -735,15 +767,6 @@ namespace FoenixIDE.UI
                     PushLineToTranscript(line);
                 }
             }                    
-        }
-
-        void PushLineToTranscript(DebugLine line)
-        {
-            if (transcript.Count == transcript.Capacity)
-            {
-                transcript.RemoveAt(0);
-            }
-            transcript.Add(line);
         }
 
         private delegate void lastLineDelegate(string line);
