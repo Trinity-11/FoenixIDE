@@ -107,6 +107,8 @@ namespace FoenixIDE.UI
         {
             // Transcript size is based on whatever will fit in the window.
             transcript = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
+            DebugLine transcriptLine = GetDebugLineFromPC(kernel.CPU.PC, true);
+            PushLineToTranscript(transcriptLine);
 
             if (kernel.lstFile != null && kernel.lstFile.Lines.Count > 0)
             {
@@ -603,6 +605,12 @@ namespace FoenixIDE.UI
                     registerDisplay1.RegistersReadOnly(false);
                     MainWindow.Instance.setGpuPeriod(500);
                 }
+
+                if (kernel.CPU.DebugPause)
+                {
+                    DebugLine transcriptLine = GetDebugLineFromPC(kernel.CPU.PC, true);
+                    PushLineToTranscript(transcriptLine);
+                }
             }
             else
             {
@@ -762,11 +770,14 @@ namespace FoenixIDE.UI
                 {
                     GenerateNextInstruction(pc);
                 }
-                else
-                {
-                    PushLineToTranscript(line);
-                }
-            }                    
+            }
+
+            // Update transcript if unpaused only, don't want to incur the overhead unconditionally.
+            if (kernel.CPU.DebugPause)
+            {
+                DebugLine transcriptLine = GetDebugLineFromPC(kernel.CPU.PC, true);
+                PushLineToTranscript(transcriptLine);
+            }
         }
 
         private delegate void lastLineDelegate(string line);
@@ -788,7 +799,8 @@ namespace FoenixIDE.UI
             }
 
         }
-        private void GenerateNextInstruction(int pc)
+
+        DebugLine GetDebugLineFromPC(int pc, bool includeRegisterStatus)
         {
             OpCode oc = kernel.CPU.PreFetch();
             int ocLength = oc.Length;
@@ -798,10 +810,27 @@ namespace FoenixIDE.UI
                 command[i] = kernel.MemMgr.RAM.ReadByte(pc + i);
             }
             string opcodes = oc.ToString(kernel.CPU.ReadSignature(ocLength, pc));
-            //string status = "";
-            DebugLine line = new DebugLine(pc);
+
+            DebugLine line;
+
+            if (includeRegisterStatus)
+            {
+                line = new DebugLine(kernel.CPU.PC, kernel.CPU.A.Value, kernel.CPU.X.Value, kernel.CPU.Y.Value, kernel.CPU.P);
+            }
+            else
+            {
+                line = new DebugLine(pc);
+            }
+
             line.SetOpcodes(command);
             line.SetMnemonic(opcodes);
+            return line;
+        }
+
+        private void GenerateNextInstruction(int pc)
+        {
+            DebugLine line = GetDebugLineFromPC(pc, false);
+
             if (!lastLine.InvokeRequired)
             {
                 lastLine.Text = line.ToString();
@@ -815,8 +844,6 @@ namespace FoenixIDE.UI
                 finally
                 { }
             }
-
-            PushLineToTranscript(line);
 
             // find the proper place to insert the line, based on the PC
             int index = 0;
