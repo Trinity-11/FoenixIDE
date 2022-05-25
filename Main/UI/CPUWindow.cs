@@ -32,6 +32,13 @@ namespace FoenixIDE.UI
         Point position = new Point();
         private int MemoryLimit = 0;
 
+        public enum DebugWindowMode
+        {
+            Default,
+            Transcipt
+        }
+        public DebugWindowMode CurrentDebugWindowMode = DebugWindowMode.Default;
+
         public CPUWindow()
         {
             InitializeComponent();
@@ -61,6 +68,11 @@ namespace FoenixIDE.UI
                 BPLabel.Text = "Breakpoint";
             }
 
+            InitializeDebugPanelText();
+        }
+
+        public void InitializeDebugPanelText()
+        { 
             UpdateQueue();
             int pc = kernel.CPU.PC;
             DebugLine line = GetExecutionInstruction(pc);

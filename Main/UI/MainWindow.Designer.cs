@@ -75,6 +75,7 @@ namespace FoenixIDE.UI
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
+            this.transcriptModeDebuggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gpu = new FoenixIDE.Display.Gpu();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -476,6 +477,14 @@ namespace FoenixIDE.UI
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
+            // transcriptModeDebuggerToolStripMenuItem
+            // 
+            this.transcriptModeDebuggerToolStripMenuItem.CheckOnClick = true;
+            this.transcriptModeDebuggerToolStripMenuItem.Name = "transcriptModeDebuggerToolStripMenuItem";
+            this.transcriptModeDebuggerToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.transcriptModeDebuggerToolStripMenuItem.Text = "Transcript-Mode Debugger";
+            this.transcriptModeDebuggerToolStripMenuItem.Click += new System.EventHandler(this.transcriptModeDebuggerToolStripMenuItem_Click);
+            // 
             // gpu
             // 
             this.gpu.BackColor = System.Drawing.Color.Blue;
@@ -578,6 +587,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem assetListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mIDIToVGMConvertToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem DefaultKernelToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem transcriptModeDebuggerToolStripMenuItem;
     }
 }
 
