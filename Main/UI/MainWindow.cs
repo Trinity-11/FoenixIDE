@@ -1395,7 +1395,7 @@ namespace FoenixIDE.UI
             Simulator.Properties.Settings.Default.TranscriptModeDebugger = transcriptModeDebuggerToolStripMenuItem.Checked;
             Simulator.Properties.Settings.Default.Save();
             debugWindow.CurrentDebugWindowMode = transcriptModeDebuggerToolStripMenuItem.Checked ? CPUWindow.DebugWindowMode.Transcipt : CPUWindow.DebugWindowMode.Default;
-            debugWindow.InitializeDebugPanelText();
+            debugWindow.Refresh();
         }
     }
 }
