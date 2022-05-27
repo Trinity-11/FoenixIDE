@@ -651,18 +651,38 @@ namespace FoenixIDE.Display
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
             //int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
             int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1 ) & 0x3F_FFFF;
-            
+
+            // the tilemapWindowX is 10 bits and the scrollX is the lower 4 bits.  The IDE combines them.
+            // direction is bit 15.
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
-            bool dirUp = (tilemapWindowX & 0x4000) != 0;
-            byte scrollX = (byte)(tilemapWindowX & 0x3C00 >> 10);
-            tilemapWindowX &= 0x3FF;
+            bool dirLeft = (tilemapWindowX & 0x8000) != 0;
+            if (smallTiles)
+            {
+                tilemapWindowX = (((tilemapWindowX & 0x3FF0) >> 1) + tilemapWindowX & 7);
+                tilemapWindowX *= (dirLeft ? -1 : 1);
+            }
+            else
+            {
+                tilemapWindowX &= (0x3FFF);
+                tilemapWindowX *= (dirLeft ? -1 : 1);
+            }
             int tileXOffset = tilemapWindowX % tileSize;
 
+            // the tilemapWindowY is 10 bits and the scrollY is the lower 4 bits.  The IDE combines them.
+            // direction is bit 15.
             int tilemapWindowY = VICKY.ReadWord(addrTileCtrlReg + 10);
-            bool dirRight = (tilemapWindowY & 0x4000) != 0;
-            byte scrollY = (byte)(tilemapWindowY & 0x3C00 >> 10);
-            tilemapWindowY &= 0x3FF;
-
+            bool dirUp = (tilemapWindowY & 0x8000) != 0;
+            if (smallTiles)
+            {
+                tilemapWindowY = (((tilemapWindowY & 0x3FF0) >> 1) + tilemapWindowY & 7);
+                tilemapWindowY *= (dirUp ? -1 : 1);
+            }
+            else
+            {
+                tilemapWindowY &= 0x3FFF;
+                tilemapWindowY *= (dirUp ? -1 : 1);
+            }
+            
             int tileRow = ( line + tilemapWindowY ) / tileSize;
             int tileYOffset = (line + tilemapWindowY) % tileSize;
             int maxX = width - borderXSize;

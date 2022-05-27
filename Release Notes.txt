@@ -1,3 +1,7 @@
+Release 0.5.6.7
+---------------
+Attempt to fix the tile scrolling bug.
+
 Release 0.5.6.6
 ---------------
 When in debug mode, only redraw the display twice per second instead of 60 times in run mode.
