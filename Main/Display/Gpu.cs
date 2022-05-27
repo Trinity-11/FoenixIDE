@@ -647,6 +647,7 @@ namespace FoenixIDE.Display
             
             int tileSize = (smallTiles ? 8 : 16);
             int strideLine = tileSize * 16;
+            byte scrollMask = (byte)(smallTiles ? 7 : 15);
 
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
             //int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
@@ -656,15 +657,14 @@ namespace FoenixIDE.Display
             // direction is bit 15.
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
             bool dirLeft = (tilemapWindowX & 0x8000) != 0;
+            byte scrollX = (byte)(((tilemapWindowX & scrollMask) * (dirLeft ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
-                tilemapWindowX = (((tilemapWindowX & 0x3FF0) >> 1) + tilemapWindowX & 7);
-                tilemapWindowX *= (dirLeft ? -1 : 1);
+                tilemapWindowX = ((tilemapWindowX & 0x3FF0) >> 1) + scrollX;
             }
             else
             {
-                tilemapWindowX &= (0x3FFF);
-                tilemapWindowX *= (dirLeft ? -1 : 1);
+                tilemapWindowX = (tilemapWindowX & 0x3FF0) + scrollX;
             }
             int tileXOffset = tilemapWindowX % tileSize;
 
@@ -672,15 +672,14 @@ namespace FoenixIDE.Display
             // direction is bit 15.
             int tilemapWindowY = VICKY.ReadWord(addrTileCtrlReg + 10);
             bool dirUp = (tilemapWindowY & 0x8000) != 0;
+            byte scrollY = (byte)(((tilemapWindowY & scrollMask) * (dirUp ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
-                tilemapWindowY = (((tilemapWindowY & 0x3FF0) >> 1) + tilemapWindowY & 7);
-                tilemapWindowY *= (dirUp ? -1 : 1);
+                tilemapWindowY = ((tilemapWindowY & 0x3FF0) >> 1) + scrollY;
             }
             else
             {
-                tilemapWindowY &= 0x3FFF;
-                tilemapWindowY *= (dirUp ? -1 : 1);
+                tilemapWindowY = tilemapWindowY & 0x3FF0 + scrollY;
             }
             
             int tileRow = ( line + tilemapWindowY ) / tileSize;
