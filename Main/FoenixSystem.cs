@@ -9,6 +9,8 @@ using FoenixIDE.MemoryLocations;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.UI;
+using System.IO;
+using System.Windows.Forms;
 
 namespace FoenixIDE
 {
@@ -184,7 +186,7 @@ namespace FoenixIDE
             boardVersion = rev;
         }
         // return true if the CPU was reset and the program was loaded
-        public bool ResetCPU(string kernelFilename)
+        public bool ResetCPU(string filename)
         {
             if (CPU != null)
             {
@@ -192,9 +194,9 @@ namespace FoenixIDE
                 //CPU.Halt();
             }
 
-            if (kernelFilename != null)
+            if (filename != null)
             {
-                LoadedKernel = kernelFilename;
+                LoadedKernel = filename;
             }
 
             // If the reset vector is not set in Bank 0, but it is set in Bank 18, the copy bank 18 into bank 0.
@@ -203,51 +205,126 @@ namespace FoenixIDE
             {
                 BasePageAddress = 0x38_0000;
             }
+            FileInfo info = new FileInfo(LoadedKernel);
+            if (!info.Exists)
+            {
+                OpenFileDialog f = new OpenFileDialog
+                {
+                    Title = "Select a kernel file",
+                    Filter = "Hex Files|*.hex|PGX Files|*.pgx|PGZ Files|*.pgz"
+                };
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    LoadedKernel = f.FileName;
+                    info = new FileInfo(LoadedKernel);
+                }
+            }
+            string extension = info.Extension.ToUpper();
+            if (extension.Equals(".HEX"))
+            {
+                if (!HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _))
+                {
+                    return false;
+                }
+            }
+            else if (extension.Equals(".PGX"))
+            {
+                FileInfo f = new FileInfo(LoadedKernel);
+                int flen = (int)(f.Length - 8);
+                BinaryReader reader = new BinaryReader(f.OpenRead());
+                // The first four byte contain PGX,0x1
+                byte[] header = reader.ReadBytes(4);
+                // The next four bytes contain the start address
+                int FnxAddressPtr = reader.ReadInt32();
+                // The rest of the file is data
+                byte[] DataBuffer = reader.ReadBytes(flen);
+                reader.Close();
 
-            if (LoadedKernel.EndsWith(".fnxml", true, null))
+                // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
+                MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
+                MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
+                MemMgr.WriteByte(0xFF03, 0x5C);      // JML
+                MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+            }
+            else if (extension.Equals(".PGZ"))
+            {
+                FileInfo f = new FileInfo(LoadedKernel);
+                BinaryReader reader = new BinaryReader(f.OpenRead());
+                byte header = reader.ReadByte();  // this should be Z for 24-bits and z for 32-bits
+                int size = header == 'z' ? 4 : 3;
+                int FnxAddressPtr = -1;
+
+                do
+                {
+                    byte[] bufAddr = reader.ReadBytes(size);
+                    byte[] bufLength = reader.ReadBytes(size);
+                    int address = bufAddr[0] + bufAddr[1] * 0x100 + bufAddr[2] * 0x10000 + (size == 4 ? bufAddr[3] * 0x1000000 : 0);
+                    int blockLength = bufLength[0] + bufLength[1] * 0x100 + bufLength[2] * 0x10000 + (size == 4 ? bufLength[3] * 0x1000000 : 0);
+                    if (blockLength == 0)
+                    {
+                        FnxAddressPtr = address;
+                    }
+                    else
+                    {
+                        byte[] DataBuffer = reader.ReadBytes(blockLength);
+                        MemMgr.CopyBuffer(DataBuffer, 0, address, blockLength);
+
+                        // TODO - make this backward compatible
+                        if (address >= (BasePageAddress + 0xFF00) && (address < (BasePageAddress + 0xFFFF)))
+                        {
+                            int pageFFLen = blockLength - ((address + blockLength) - (BasePageAddress + 0x1_0000));
+                            if (pageFFLen > blockLength)
+                            {
+                                pageFFLen = blockLength;
+                            }
+                            MemMgr.CopyBuffer(DataBuffer, 0, address - BasePageAddress, pageFFLen);
+                        }
+                    }
+
+                } while (reader.BaseStream.Position < f.Length);
+                reader.Close();
+
+                // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
+                MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
+                MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
+                MemMgr.WriteByte(0xFF03, 0x5C);      // JML
+                MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+            }
+            else if (extension.Equals(".FNXML"))
             {
                 this.ResetMemory();
                 FoeniXmlFile fnxml = new FoeniXmlFile(this, ResCheckerRef);
                 fnxml.Load(LoadedKernel);
                 boardVersion = fnxml.Version;
             }
+
+            // Load the .LST file if it exists
+            if (lstFile == null)
+            {
+                lstFile = new ListFile(LoadedKernel);
+            }
             else
             {
-                LoadedKernel = HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _);
-                if (LoadedKernel != null)
+                // TODO: This results in lines of code to be shown in incorrect order - Fix
+                ListFile tempList = new ListFile(LoadedKernel);
+                foreach (DebugLine line in tempList.Lines.Values)
                 {
-                    if (lstFile == null)
+                    if (lstFile.Lines.ContainsKey(line.PC))
                     {
-                        lstFile = new ListFile(LoadedKernel);
+                        lstFile.Lines.Remove(line.PC);
                     }
-                    else
-                    { 
-                        // TODO: This results in lines of code to be shown in incorrect order - Fix
-                        ListFile tempList = new ListFile(LoadedKernel);
-                        foreach (DebugLine line in tempList.Lines.Values)
+                    lstFile.Lines.Add(line.PC, line);
+                    for (int i = 1; i < line.commandLength; i++)
+                    {
+                        if (lstFile.Lines.ContainsKey(line.PC + i))
                         {
-                            if (lstFile.Lines.ContainsKey(line.PC))
-                            {
-                                lstFile.Lines.Remove(line.PC);
-                            }
-                            lstFile.Lines.Add(line.PC, line);
-                            for (int i = 1; i < line.commandLength; i++)
-                            {
-                                if (lstFile.Lines.ContainsKey(line.PC + i))
-                                {
-                                    lstFile.Lines.Remove(line.PC + i);
-                                }
-                            }
+                            lstFile.Lines.Remove(line.PC + i);
                         }
                     }
                 }
-                else
-                {
-                    return false;
-                }
             }
 
-            // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block for RevB or 0x38_0000 to 0x38_FFFF block for Rev C
+            // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block for RevB/RevU or 0x38_0000 to 0x38_FFFF block for RevC/RevU+
             List<DebugLine> copiedLines = new List<DebugLine>();
             if (lstFile.Lines.Count > 0)
             {

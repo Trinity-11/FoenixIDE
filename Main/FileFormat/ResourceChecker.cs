@@ -46,6 +46,10 @@ namespace FoenixIDE.Simulator.FileFormat
                     {
                         return false;
                     }
+                    else
+                    {
+                        // TODO - do we need to delete overlapping resources?  Or maybe only if start and lenght match exactly?
+                    }
                 }
             }
             resources.Add(resource);

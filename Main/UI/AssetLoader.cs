@@ -23,12 +23,14 @@ namespace FoenixIDE.UI
 
         private void AssetLoader_Load(object sender, EventArgs e)
         {
-            // Add items to the combo box
-            FileTypesCombo.Items.Add("Bitmap");
-            FileTypesCombo.Items.Add("Tilemap");
-            FileTypesCombo.Items.Add("Tileset 16x16");
-            FileTypesCombo.Items.Add("Tileset   8x8");
-            FileTypesCombo.Items.Add("Sprite");
+            // Add items to the combo box                 //index
+            FileTypesCombo.Items.Add("Bitmap");           //0
+            FileTypesCombo.Items.Add("Tileset 16x16");    //1
+            FileTypesCombo.Items.Add("Tileset   8x8");    //2
+            FileTypesCombo.Items.Add("Sprite");           //3
+            FileTypesCombo.Items.Add("Tilemap");          //4
+            FileTypesCombo.Items.Add("Palette");          //5
+            FileTypesCombo.Items.Add("Binary");           //6
             LUTCombo.Items.Add("LUT");
             FileTypesCombo.SelectedIndex = 0;
             LUTCombo.SelectedIndex = 0;
@@ -39,15 +41,9 @@ namespace FoenixIDE.UI
          */
         private void FileTypesCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            bool LUTSelected = FileTypesCombo.SelectedItem.ToString().StartsWith("LUT");
+            bool LUTSelected = FileTypesCombo.SelectedIndex > 3;
             LUTCombo.Enabled = !LUTSelected;
-            LoadAddressTextBox.Enabled = !LUTSelected;
-            if (FileTypesCombo.SelectedItem.ToString().StartsWith("LUT"))
-            {
-                int lut = Convert.ToInt32(FileTypesCombo.SelectedItem.ToString().Substring(4));
-                LoadAddressTextBox.Enabled = false;
-                LoadAddressTextBox.Text = (MemoryLocations.MemoryMap.GRP_LUT_BASE_ADDR + lut * 1024).ToString("X6");
-            }
+            checkOverwriteLUT.Enabled = !LUTSelected;
         }
 
         private String FormatAddress(int address)
@@ -78,6 +74,18 @@ namespace FoenixIDE.UI
                     GetTopLeftPixelColor(FileNameTextBox.Text);
                 }
                 FileSizeResultLabel.Text = FormatAddress((int)info.Length);
+                if (".tlm".Equals(ExtLabel.Text.ToLower()))
+                {
+                    FileTypesCombo.SelectedIndex = 4;
+                }
+                else if (".pal".Equals(ExtLabel.Text.ToLower()))
+                {
+                    FileTypesCombo.SelectedIndex = 5;
+                } 
+                else if (".bin".Equals(ExtLabel.Text.ToLower()))
+                {
+                    FileTypesCombo.SelectedIndex = 6;
+                }
                 StoreButton.Enabled = true;
             }
         }
@@ -128,28 +136,31 @@ namespace FoenixIDE.UI
                     operationType = ResourceType.bitmap;
                     conversionStride = screenResX;
                     break;
-                case 1:  // tilemaps
-                    operationType = ResourceType.tilemap;
-                    ExtLabel.Text = ".bin";
-                    break;
-                case 2:  // tilesets 16 x 16
+                case 1:  // tilesets 16 x 16
                     operationType = ResourceType.tileset;
                     conversionStride = 256;
                     maxHeight = 256;
                     break;
-                case 3:  // tilesets 8 x 8
+                case 2:  // tilesets 8 x 8
                     operationType = ResourceType.tileset;
                     conversionStride = 128;
                     maxHeight = 128;
                     break;
-                case 4:  // sprites
+                case 3:  // sprites
                     operationType = ResourceType.sprite;
                     conversionStride = 32;
                     maxHeight = 256;
                     break;
-                case 5:  // luts
+                case 4:  // tilemaps
+                    operationType = ResourceType.tilemap;
+                    ExtLabel.Text = ".bin";
+                    break;
+                case 5:  // palettes
                     operationType = ResourceType.lut;
                     ExtLabel.Text = ".pal";
+                    break;
+                case 6: // others
+                    operationType = ResourceType.raw;
                     break;
             }
 
@@ -158,7 +169,7 @@ namespace FoenixIDE.UI
                 StartAddress = destAddress,
                 SourceFile = FileNameTextBox.Text,
                 Name = Path.GetFileNameWithoutExtension(FileNameTextBox.Text),
-                FileType = operationType,
+                FileType = operationType
             };
 
 
@@ -188,6 +199,11 @@ namespace FoenixIDE.UI
                     break;
             }
             StoreButton.Enabled = res.Length > 0;
+            if (AssetWindow.Instance.Visible)
+            {
+                AssetWindow.Instance.UpdateAssets();
+                Close();
+            }
         }
 
         /*
@@ -207,7 +223,7 @@ namespace FoenixIDE.UI
 
                 // Limit how much data is imported based on the type of image
                 int importedLines = maxHeight < bitmap.Height ? maxHeight : bitmap.Height;
-                int importedCols = (bitmap.Width / stride) * stride < bitmap.Width ? (bitmap.Width / stride) * stride : bitmap.Width;
+                int importedCols = ((bitmap.Width / stride) > 0) ? (bitmap.Width / stride) * stride : bitmap.Width;
                 
                 Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
                 BitmapData bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, bitmap.PixelFormat);

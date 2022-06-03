@@ -141,12 +141,13 @@ namespace FoenixIDE.UI
             // Display the file length in hex
             if (filename != null && filename.Length > 0)
             {
-                if (Path.GetExtension(filename).ToUpper().Equals(".BIN"))
+                string fileExtension = Path.GetExtension(filename).ToUpper();
+                if (fileExtension.Equals(".BIN"))
                 {
                     FileInfo f = new FileInfo(filename);
-                    flen = f.Length;   
+                    flen = f.Length;
                 }
-                else
+                else if (fileExtension.Equals(".HEX"))
                 {
                     // We're loading a HEX file, so only consider the lines that are record type 00
                     string[] lines = System.IO.File.ReadAllLines(filename);
@@ -166,6 +167,29 @@ namespace FoenixIDE.UI
                         }
                     }
                 }
+                else if (fileExtension.Equals(".PGX"))
+                {
+                    FileInfo f = new FileInfo(filename);
+                    flen = f.Length - 8;
+                }
+                else if (fileExtension.Equals(".PGZ"))
+                {
+                    // Read the file to find the number of blocks and the block lengths
+                    FileInfo f = new FileInfo(FileNameTextBox.Text);
+                    BinaryReader reader = new BinaryReader(f.OpenRead());
+                    byte header = reader.ReadByte();  // this should be Z for 24-bits and z for 32-bits
+                    int size = header == 'z'?4:3;
+                    flen = 0;
+                    do
+                    {
+                        byte[] bufAddr = reader.ReadBytes(size);
+                        byte[] bufLength = reader.ReadBytes(size);
+                        int blockLen = bufLength[0] + bufLength[1] * 0x100 + bufLength[2] * 0x10000 + (size == 4 ? bufLength[3] * 0x1000000 : 0);
+                        flen += blockLen;
+                        reader.BaseStream.Seek(blockLen, SeekOrigin.Current);
+                    } while (reader.BaseStream.Position < f.Length);
+                    reader.Close();
+                }
             }
             String hexSize = flen.ToString("X6");
             FileSizeResultLabel.Text = "$" + hexSize.Substring(0, 2) + ":" + hexSize.Substring(2);
@@ -180,7 +204,7 @@ namespace FoenixIDE.UI
             OpenFileDialog openFileDlg = new OpenFileDialog
             {
                 DefaultExt = ".hex",
-                Filter = "Hex documents|*.hex|Binary documents|*.bin",
+                Filter = "Hex documents|*.hex|Binary documents|*.bin|PGX Files|*.pgx|PGZ Files|*.pgz",
                 Title = "Upload to the C256 Foenix"
             };
 
@@ -239,7 +263,7 @@ namespace FoenixIDE.UI
             UploadProgressBar.Visible = true;
 
             int BaseBankAddress = 0x38_0000;
-            if (boardVersion == BoardVersion.RevB)
+            if (boardVersion == BoardVersion.RevB || boardVersion == BoardVersion.RevU)
             {
                 BaseBankAddress = 0x18_0000;
             }
@@ -253,8 +277,8 @@ namespace FoenixIDE.UI
                     {
                         GetFnxInDebugMode();
                     }
-
-                    if (Path.GetExtension(FileNameTextBox.Text).ToUpper().Equals(".BIN"))
+                    string fileExtension = Path.GetExtension(FileNameTextBox.Text).ToUpper();
+                    if (fileExtension.Equals(".BIN"))
                     {
                         // Read the bytes and put them in the buffer
                         byte[] DataBuffer = System.IO.File.ReadAllBytes(FileNameTextBox.Text);
@@ -269,7 +293,87 @@ namespace FoenixIDE.UI
                             PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
                         }
                     }
-                    else
+                    else if (fileExtension.Equals(".PGX"))
+                    {
+                        FileInfo f = new FileInfo(FileNameTextBox.Text);
+                        int flen = (int)(f.Length - 8);
+                        BinaryReader reader = new BinaryReader(f.OpenRead());
+                        // The first four byte contain PGX 0x1
+                        byte[] header = reader.ReadBytes(4);
+                        // The next four bytes contain the start address
+                        int FnxAddressPtr = reader.ReadInt32();
+                        // The rest of the file is data
+                        byte[] DataBuffer = reader.ReadBytes(flen);
+                        reader.Close();
+
+                        Console.WriteLine("Starting Address: " + FnxAddressPtr);
+                        Console.WriteLine("File Size: " + transmissionSize);
+                        SendData(DataBuffer, FnxAddressPtr, transmissionSize);
+
+                        // Generate a fresh page $FF
+                        byte[] pageFF = CreateResetPage(FnxAddressPtr);
+
+                        // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                        PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                    }
+                    else if (fileExtension.Equals(".PGZ"))
+                    {
+                        FileInfo f = new FileInfo(FileNameTextBox.Text);
+                        BinaryReader reader = new BinaryReader(f.OpenRead());
+                        byte header = reader.ReadByte();  // this should be Z for 24-bits and z for 32-bits
+                        int size = header == 'z' ? 4 : 3;
+                        int FnxAddressPtr = -1;
+                        bool resetVector = false;
+
+                        // Read page $FF so we don't clobber everything
+                        byte[] pageFF = new byte[256];
+
+                        do
+                        {
+                            byte[] bufAddr = reader.ReadBytes(size);
+                            byte[] bufLength = reader.ReadBytes(size);
+                            int address = bufAddr[0] + bufAddr[1] * 0x100 + bufAddr[2] * 0x10000 + (size == 4 ? bufAddr[3] * 0x1000000 : 0);
+                            int blockLength = bufLength[0] + bufLength[1] * 0x100 + bufLength[2] * 0x10000 + (size == 4 ? bufLength[3] * 0x1000000 : 0);
+                            if (blockLength == 0)
+                            {
+                                FnxAddressPtr = address;
+                            }
+                            else
+                            {
+                                byte[] DataBuffer = reader.ReadBytes(blockLength);
+                                SendData(DataBuffer, address, blockLength);
+
+                                // TODO - make this backward compatible
+                                if (address >= (BaseBankAddress + 0xFF00) && (address < (BaseBankAddress + 0xFFFF)) )
+                                {
+                                    int pageFFLen = blockLength - ((address + blockLength) - (BaseBankAddress + 0x1_0000));
+                                    if (pageFFLen > blockLength)
+                                    {
+                                        pageFFLen = blockLength;
+                                    }
+                                    Array.Copy(DataBuffer, 0, pageFF, address - (BaseBankAddress + 0xFF00), 0x100);
+                                    resetVector = true;
+                                }
+                            }
+
+                        } while (reader.BaseStream.Position < f.Length);
+                        reader.Close();
+
+                        // If page FF is not found in code, assume that a standard kernel page is required
+                        if (!resetVector)
+                        {
+                            // Generate a fresh page $FF
+                            pageFF = CreateResetPage(FnxAddressPtr);
+                            resetVector = true;
+                        }
+                        // Update pageFF with the start address
+                        if (resetVector)
+                        {
+                            // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                            PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                        }
+                    }
+                    else if (fileExtension.Equals(".HEX"))
                     {
                         bool resetVector = false;
                         // Page FF is used to store IRQ vectors - this is only used when the program modifies the
@@ -417,6 +521,36 @@ namespace FoenixIDE.UI
                 DisconnectButton.Enabled = true;
             }
             
+        }
+
+        private byte[] CreateResetPage(int startAddress)
+        {
+            byte[] pageFF = new byte[256];
+
+            /* The Hex code
+                : 06 FF00 18 FB 5C 001000  
+                : 0B FF10 C2308B0B48DA5A5C081000
+                : 0B FF20 C2308B0B48DA5A5C081000
+                : 0B FF30 C2308B0B48DA5A5C081000
+                : 11 FF40 C2308B0B48DA5A229619387AFA682BAB40
+                : 11 FF60 C2308B0B48DA5A22C017387AFA682BAB40
+                : 20 FFE0 5C04003A10FF20FF30FF40FF000060FF5C9B063910FF20FF30FF40FF00FF60FF
+                */
+            Array.Copy(new byte[] { 0x18, 0xFB, 0x5C }, pageFF, 3);
+
+            // Address
+            pageFF[3] = (byte)(startAddress & 0xFF);
+            pageFF[4] = (byte)((startAddress >> 8) & 0xFF);
+            pageFF[5] = (byte)((startAddress >> 16) & 0xFF);
+
+            Array.Copy(new byte[] { 0xC2, 0x30, 0x8B, 0x0B, 0x48, 0xDA, 0x5A, 0x5C, 0x08, 0x10, 0x00 }, 0, pageFF, 0x10, 11);
+            Array.Copy(new byte[] { 0xC2, 0x30, 0x8B, 0x0B, 0x48, 0xDA, 0x5A, 0x5C, 0x08, 0x10, 0x00 }, 0, pageFF, 0x20, 11);
+            Array.Copy(new byte[] { 0xC2, 0x30, 0x8B, 0x0B, 0x48, 0xDA, 0x5A, 0x5C, 0x08, 0x10, 0x00 }, 0, pageFF, 0x30, 11);
+            Array.Copy(new byte[] { 0xC2, 0x30, 0x8B, 0x0B, 0x48, 0xDA, 0x5A, 0x22, 0x96, 0x19, 0x38, 0x7A, 0xFA, 0x68, 0x2B, 0xAB, 0x40 }, 0, pageFF, 0x40, 17);
+            Array.Copy(new byte[] { 0xC2, 0x30, 0x8B, 0x0B, 0x48, 0xDA, 0x5A, 0x22, 0xC0, 0x17, 0x38, 0x7A, 0xFA, 0x68, 0x2B, 0xAB, 0x40 }, 0, pageFF, 0x60, 17);
+            Array.Copy(new byte[] {0x5C, 0x04, 0x00, 0x3A, 0x10, 0xFF, 0x20, 0xFF, 0x30, 0xFF, 0x40, 0xFF, 0x00, 0x00, 0x60, 0xFF, 0x5C,
+                                0x9B, 0x06, 0x39, 0x10, 0xFF, 0x20, 0xFF, 0x30, 0xFF, 0x40, 0xFF, 0x00, 0xFF, 0x60, 0xFF }, 0, pageFF, 0xE0, 32);
+            return pageFF;
         }
 
         private void HideProgressBarAfter5Seconds(string message)
@@ -634,7 +768,9 @@ namespace FoenixIDE.UI
         {
             // Maximum transmission size is 8192
             if (Size > 8192)
+            {
                 Size = 8192;
+            }
 
             byte[] commandBuffer = new byte[8 + Size];
             commandBuffer[0] = 0x55;   // Header

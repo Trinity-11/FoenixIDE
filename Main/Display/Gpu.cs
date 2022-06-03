@@ -643,7 +643,7 @@ namespace FoenixIDE.Display
             {
                 return;
             }
-            bool smallTiles = (reg & 8) > 0;
+            bool smallTiles = (reg & 0x10) > 0;
             
             int tileSize = (smallTiles ? 8 : 16);
             int strideLine = tileSize * 16;

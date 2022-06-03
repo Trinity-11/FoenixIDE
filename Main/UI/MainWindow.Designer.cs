@@ -57,6 +57,7 @@ namespace FoenixIDE.UI
             this.joystickSimulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ConvertHexToPGXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ConvertBinToPGXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.convertHexToPGZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gameEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mIDIToVGMConvertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,9 +69,9 @@ namespace FoenixIDE.UI
             this.watchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.assetListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DefaultKernelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RestartMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.DebugMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.DefaultKernelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -91,11 +92,10 @@ namespace FoenixIDE.UI
             this.cpsPerf,
             this.fpsPerf,
             this.SDCardPath});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 1026);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 543);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 26, 0);
             this.statusStrip1.ShowItemToolTips = true;
-            this.statusStrip1.Size = new System.Drawing.Size(1228, 28);
+            this.statusStrip1.Size = new System.Drawing.Size(670, 28);
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -109,7 +109,7 @@ namespace FoenixIDE.UI
             this.toolStripRevision.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
             this.toolStripRevision.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripRevision.Name = "toolStripRevision";
-            this.toolStripRevision.Size = new System.Drawing.Size(64, 22);
+            this.toolStripRevision.Size = new System.Drawing.Size(64, 23);
             this.toolStripRevision.Text = "Rev B";
             this.toolStripRevision.ToolTipText = "Board Version";
             this.toolStripRevision.Click += new System.EventHandler(this.ToolStripRevision_Click);
@@ -120,7 +120,7 @@ namespace FoenixIDE.UI
             this.dipSwitch.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.dipSwitch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.None;
             this.dipSwitch.Name = "dipSwitch";
-            this.dipSwitch.Size = new System.Drawing.Size(129, 22);
+            this.dipSwitch.Size = new System.Drawing.Size(129, 23);
             this.dipSwitch.Text = "toolStripStatusLabel1";
             this.dipSwitch.ToolTipText = "DIP Switches";
             this.dipSwitch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DipSwitch_MouseDown);
@@ -129,14 +129,14 @@ namespace FoenixIDE.UI
             // ModeText
             // 
             this.ModeText.Name = "ModeText";
-            this.ModeText.Size = new System.Drawing.Size(33, 22);
+            this.ModeText.Size = new System.Drawing.Size(26, 23);
             this.ModeText.Text = "Key";
             // 
             // lastKeyPressed
             // 
             this.lastKeyPressed.AutoSize = false;
             this.lastKeyPressed.Name = "lastKeyPressed";
-            this.lastKeyPressed.Size = new System.Drawing.Size(30, 22);
+            this.lastKeyPressed.Size = new System.Drawing.Size(30, 23);
             this.lastKeyPressed.Text = "$00";
             // 
             // cpsPerf
@@ -150,7 +150,7 @@ namespace FoenixIDE.UI
             this.cpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cpsPerf.Name = "cpsPerf";
             this.cpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.cpsPerf.Size = new System.Drawing.Size(110, 22);
+            this.cpsPerf.Size = new System.Drawing.Size(110, 23);
             this.cpsPerf.Text = "CPS: 0";
             this.cpsPerf.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.cpsPerf.ToolTipText = "Cycles Per Second";
@@ -165,7 +165,7 @@ namespace FoenixIDE.UI
             this.fpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fpsPerf.Name = "fpsPerf";
             this.fpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.fpsPerf.Size = new System.Drawing.Size(55, 22);
+            this.fpsPerf.Size = new System.Drawing.Size(55, 23);
             this.fpsPerf.Text = "FPS: 0";
             this.fpsPerf.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.fpsPerf.ToolTipText = "Frames Per Second";
@@ -180,7 +180,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(779, 22);
+            this.SDCardPath.Size = new System.Drawing.Size(241, 23);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -199,63 +199,62 @@ namespace FoenixIDE.UI
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(11, 4, 0, 4);
-            this.menuStrip1.Size = new System.Drawing.Size(1228, 32);
+            this.menuStrip1.Size = new System.Drawing.Size(670, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuOpenHexFile,
             this.loadFNXMLFileToolStripMenuItem,
             this.saveProjectToolStripMenuItem,
+            this.menuOpenHexFile,
             this.loadWatchListToolStripMenuItem,
             this.saveWatchListToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // menuOpenHexFile
             // 
             this.menuOpenHexFile.Name = "menuOpenHexFile";
-            this.menuOpenHexFile.Size = new System.Drawing.Size(205, 26);
-            this.menuOpenHexFile.Text = "&Open Hex File";
-            this.menuOpenHexFile.Click += new System.EventHandler(this.MenuOpenHexFile_Click);
+            this.menuOpenHexFile.Size = new System.Drawing.Size(184, 22);
+            this.menuOpenHexFile.Text = "&Open Executable File";
+            this.menuOpenHexFile.Click += new System.EventHandler(this.MenuOpenExecutableFile_Click);
             // 
             // loadFNXMLFileToolStripMenuItem
             // 
             this.loadFNXMLFileToolStripMenuItem.Name = "loadFNXMLFileToolStripMenuItem";
-            this.loadFNXMLFileToolStripMenuItem.Size = new System.Drawing.Size(205, 26);
+            this.loadFNXMLFileToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.loadFNXMLFileToolStripMenuItem.Text = "&Load Project...";
             this.loadFNXMLFileToolStripMenuItem.Click += new System.EventHandler(this.LoadFNXMLFileToolStripMenuItem_Click);
             // 
             // saveProjectToolStripMenuItem
             // 
             this.saveProjectToolStripMenuItem.Name = "saveProjectToolStripMenuItem";
-            this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(205, 26);
+            this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.saveProjectToolStripMenuItem.Text = "&Save Project...";
             this.saveProjectToolStripMenuItem.Click += new System.EventHandler(this.SaveProjectToolStripMenuItem_Click);
             // 
             // loadWatchListToolStripMenuItem
             // 
             this.loadWatchListToolStripMenuItem.Name = "loadWatchListToolStripMenuItem";
-            this.loadWatchListToolStripMenuItem.Size = new System.Drawing.Size(205, 26);
+            this.loadWatchListToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.loadWatchListToolStripMenuItem.Text = "Load Watch List...";
             this.loadWatchListToolStripMenuItem.Click += new System.EventHandler(this.LoadWatchListToolStripMenuItem_Click);
             // 
             // saveWatchListToolStripMenuItem
             // 
             this.saveWatchListToolStripMenuItem.Name = "saveWatchListToolStripMenuItem";
-            this.saveWatchListToolStripMenuItem.Size = new System.Drawing.Size(205, 26);
+            this.saveWatchListToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.saveWatchListToolStripMenuItem.Text = "Save Watch List...";
             this.saveWatchListToolStripMenuItem.Click += new System.EventHandler(this.SaveWatchListToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(205, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
@@ -270,79 +269,87 @@ namespace FoenixIDE.UI
             this.joystickSimulatorToolStripMenuItem,
             this.ConvertHexToPGXToolStripMenuItem,
             this.ConvertBinToPGXToolStripMenuItem,
+            this.convertHexToPGZToolStripMenuItem,
             this.gameEditorToolStripMenuItem,
             this.mIDIToVGMConvertToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(58, 24);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
             // 
             // uploaderToolStripMenuItem
             // 
             this.uploaderToolStripMenuItem.Name = "uploaderToolStripMenuItem";
-            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.uploaderToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.uploaderToolStripMenuItem.Text = "&Uploader";
             this.uploaderToolStripMenuItem.Click += new System.EventHandler(this.UploaderToolStripMenuItem_Click);
             // 
             // loadImageToolStripMenuItem
             // 
             this.loadImageToolStripMenuItem.Name = "loadImageToolStripMenuItem";
-            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.loadImageToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.loadImageToolStripMenuItem.Text = "&Load Assets";
             this.loadImageToolStripMenuItem.Click += new System.EventHandler(this.LoadImageToolStripMenuItem_Click);
             // 
             // sDCardToolStripMenuItem
             // 
             this.sDCardToolStripMenuItem.Name = "sDCardToolStripMenuItem";
-            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.sDCardToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.sDCardToolStripMenuItem.Text = "&SD Card";
             this.sDCardToolStripMenuItem.Click += new System.EventHandler(this.SDCardToolStripMenuItem_Click);
             // 
             // tileEditorToolStripMenuItem
             // 
             this.tileEditorToolStripMenuItem.Name = "tileEditorToolStripMenuItem";
-            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.tileEditorToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.tileEditorToolStripMenuItem.Text = "&Tile Editor";
             this.tileEditorToolStripMenuItem.Click += new System.EventHandler(this.TileEditorToolStripMenuItem_Click);
             // 
             // characterEditorToolStripMenuItem
             // 
             this.characterEditorToolStripMenuItem.Name = "characterEditorToolStripMenuItem";
-            this.characterEditorToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.characterEditorToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.characterEditorToolStripMenuItem.Text = "&Character Editor";
             this.characterEditorToolStripMenuItem.Click += new System.EventHandler(this.CharacterEditorToolStripMenuItem_Click);
             // 
             // joystickSimulatorToolStripMenuItem
             // 
             this.joystickSimulatorToolStripMenuItem.Name = "joystickSimulatorToolStripMenuItem";
-            this.joystickSimulatorToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.joystickSimulatorToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.joystickSimulatorToolStripMenuItem.Text = "Joystick Simulator";
             this.joystickSimulatorToolStripMenuItem.Click += new System.EventHandler(this.JoystickSimulatorToolStripMenuItem_Click);
             // 
             // ConvertHexToPGXToolStripMenuItem
             // 
             this.ConvertHexToPGXToolStripMenuItem.Name = "ConvertHexToPGXToolStripMenuItem";
-            this.ConvertHexToPGXToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.ConvertHexToPGXToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.ConvertHexToPGXToolStripMenuItem.Text = "Convert Hex to PGX";
             this.ConvertHexToPGXToolStripMenuItem.Click += new System.EventHandler(this.ConvertHexToPGXToolStripMenuItem_Click);
             // 
             // ConvertBinToPGXToolStripMenuItem
             // 
             this.ConvertBinToPGXToolStripMenuItem.Name = "ConvertBinToPGXToolStripMenuItem";
-            this.ConvertBinToPGXToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.ConvertBinToPGXToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.ConvertBinToPGXToolStripMenuItem.Text = "Convert Bin to PGX";
             this.ConvertBinToPGXToolStripMenuItem.Click += new System.EventHandler(this.ConvertBinToPGXToolStripMenuItem_Click);
+            // 
+            // convertHexToPGZToolStripMenuItem
+            // 
+            this.convertHexToPGZToolStripMenuItem.Name = "convertHexToPGZToolStripMenuItem";
+            this.convertHexToPGZToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.convertHexToPGZToolStripMenuItem.Text = "Convert Hex to PGZ";
+            this.convertHexToPGZToolStripMenuItem.Click += new System.EventHandler(this.ConvertHexToPGZToolStripMenuItem_Click);
             // 
             // gameEditorToolStripMenuItem
             // 
             this.gameEditorToolStripMenuItem.Name = "gameEditorToolStripMenuItem";
-            this.gameEditorToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.gameEditorToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.gameEditorToolStripMenuItem.Text = "Game Editor";
             this.gameEditorToolStripMenuItem.Click += new System.EventHandler(this.GameEditorToolStripMenuItem_Click);
             // 
             // mIDIToVGMConvertToolStripMenuItem
             // 
             this.mIDIToVGMConvertToolStripMenuItem.Name = "mIDIToVGMConvertToolStripMenuItem";
-            this.mIDIToVGMConvertToolStripMenuItem.Size = new System.Drawing.Size(233, 26);
+            this.mIDIToVGMConvertToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.mIDIToVGMConvertToolStripMenuItem.Text = "MIDI to VGM Convert";
             this.mIDIToVGMConvertToolStripMenuItem.Click += new System.EventHandler(this.mIDIToVGMConvertToolStripMenuItem_Click);
             // 
@@ -351,7 +358,7 @@ namespace FoenixIDE.UI
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.autorunEmulatorToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(76, 24);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "&Settings";
             // 
             // autorunEmulatorToolStripMenuItem
@@ -364,7 +371,7 @@ namespace FoenixIDE.UI
             this.autorunEmulatorToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
             this.autorunEmulatorToolStripMenuItem.Name = "autorunEmulatorToolStripMenuItem";
             this.autorunEmulatorToolStripMenuItem.Padding = new System.Windows.Forms.Padding(0, 2, 0, 1);
-            this.autorunEmulatorToolStripMenuItem.Size = new System.Drawing.Size(209, 27);
+            this.autorunEmulatorToolStripMenuItem.Size = new System.Drawing.Size(169, 23);
             this.autorunEmulatorToolStripMenuItem.Text = "Autorun Emulator";
             this.autorunEmulatorToolStripMenuItem.Click += new System.EventHandler(this.autorunEmulatorToolStripMenuItem_Click);
             // 
@@ -377,13 +384,13 @@ namespace FoenixIDE.UI
             this.watchListToolStripMenuItem,
             this.assetListToolStripMenuItem});
             this.windowsToolStripMenuItem.Name = "windowsToolStripMenuItem";
-            this.windowsToolStripMenuItem.Size = new System.Drawing.Size(84, 24);
+            this.windowsToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
             this.windowsToolStripMenuItem.Text = "&Windows";
             // 
             // terminalToolStripMenuItem
             // 
             this.terminalToolStripMenuItem.Name = "terminalToolStripMenuItem";
-            this.terminalToolStripMenuItem.Size = new System.Drawing.Size(159, 26);
+            this.terminalToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.terminalToolStripMenuItem.Text = "&Terminal";
             this.terminalToolStripMenuItem.Click += new System.EventHandler(this.TerminalToolStripMenuItem_Click);
             // 
@@ -391,7 +398,7 @@ namespace FoenixIDE.UI
             // 
             this.cPUToolStripMenuItem.Enabled = false;
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(159, 26);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.CPUToolStripMenuItem_Click);
             // 
@@ -399,21 +406,21 @@ namespace FoenixIDE.UI
             // 
             this.memoryToolStripMenuItem.Enabled = false;
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(159, 26);
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.MemoryToolStripMenuItem_Click);
             // 
             // watchListToolStripMenuItem
             // 
             this.watchListToolStripMenuItem.Name = "watchListToolStripMenuItem";
-            this.watchListToolStripMenuItem.Size = new System.Drawing.Size(159, 26);
+            this.watchListToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.watchListToolStripMenuItem.Text = "Watch List";
             this.watchListToolStripMenuItem.Click += new System.EventHandler(this.WatchListToolStripMenuItem_Click);
             // 
             // assetListToolStripMenuItem
             // 
             this.assetListToolStripMenuItem.Name = "assetListToolStripMenuItem";
-            this.assetListToolStripMenuItem.Size = new System.Drawing.Size(159, 26);
+            this.assetListToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.assetListToolStripMenuItem.Text = "Asset List";
             this.assetListToolStripMenuItem.Click += new System.EventHandler(this.assetListToolStripMenuItem_Click);
             // 
@@ -426,14 +433,22 @@ namespace FoenixIDE.UI
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
             this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.R)));
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(59, 24);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.resetToolStripMenuItem.Text = "&Reset";
+            // 
+            // DefaultKernelToolStripMenuItem
+            // 
+            this.DefaultKernelToolStripMenuItem.Enabled = false;
+            this.DefaultKernelToolStripMenuItem.Name = "DefaultKernelToolStripMenuItem";
+            this.DefaultKernelToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.DefaultKernelToolStripMenuItem.Text = "Restart Default &Kernel";
+            this.DefaultKernelToolStripMenuItem.Click += new System.EventHandler(this.DefaultKernelToolStripMenuItem_Click);
             // 
             // RestartMenuItem
             // 
             this.RestartMenuItem.Enabled = false;
             this.RestartMenuItem.Name = "RestartMenuItem";
-            this.RestartMenuItem.Size = new System.Drawing.Size(237, 26);
+            this.RestartMenuItem.Size = new System.Drawing.Size(187, 22);
             this.RestartMenuItem.Text = "&Restart";
             this.RestartMenuItem.Click += new System.EventHandler(this.RestartMenuItemClick);
             // 
@@ -441,17 +456,9 @@ namespace FoenixIDE.UI
             // 
             this.DebugMenuItem.Enabled = false;
             this.DebugMenuItem.Name = "DebugMenuItem";
-            this.DebugMenuItem.Size = new System.Drawing.Size(237, 26);
+            this.DebugMenuItem.Size = new System.Drawing.Size(187, 22);
             this.DebugMenuItem.Text = "&Debug";
             this.DebugMenuItem.Click += new System.EventHandler(this.DebugToolStripMenuItem_Click);
-            // 
-            // DefaultKernelToolStripMenuItem
-            // 
-            this.DefaultKernelToolStripMenuItem.Enabled = false;
-            this.DefaultKernelToolStripMenuItem.Name = "DefaultKernelToolStripMenuItem";
-            this.DefaultKernelToolStripMenuItem.Size = new System.Drawing.Size(237, 26);
-            this.DefaultKernelToolStripMenuItem.Text = "Restart Default &Kernel";
-            this.DefaultKernelToolStripMenuItem.Click += new System.EventHandler(this.DefaultKernelToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -459,20 +466,20 @@ namespace FoenixIDE.UI
             this.checkForUpdateToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "&Help";
             // 
             // checkForUpdateToolStripMenuItem
             // 
             this.checkForUpdateToolStripMenuItem.Name = "checkForUpdateToolStripMenuItem";
-            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(207, 26);
+            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.checkForUpdateToolStripMenuItem.Text = "Check for &Update";
             this.checkForUpdateToolStripMenuItem.Click += new System.EventHandler(this.CheckForUpdateToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(207, 26);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
@@ -484,11 +491,11 @@ namespace FoenixIDE.UI
             this.gpu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gpu.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.gpu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.gpu.Location = new System.Drawing.Point(0, 32);
-            this.gpu.Margin = new System.Windows.Forms.Padding(7);
-            this.gpu.MinimumSize = new System.Drawing.Size(1173, 886);
+            this.gpu.Location = new System.Drawing.Point(0, 24);
+            this.gpu.Margin = new System.Windows.Forms.Padding(4);
+            this.gpu.MinimumSize = new System.Drawing.Size(640, 480);
             this.gpu.Name = "gpu";
-            this.gpu.Size = new System.Drawing.Size(1228, 994);
+            this.gpu.Size = new System.Drawing.Size(670, 519);
             this.gpu.TabIndex = 0;
             this.gpu.TabStop = false;
             this.gpu.TileEditorMode = false;
@@ -501,9 +508,9 @@ namespace FoenixIDE.UI
             // MainWindow
             // 
             this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1228, 1054);
+            this.ClientSize = new System.Drawing.Size(670, 571);
             this.Controls.Add(this.gpu);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
@@ -512,8 +519,8 @@ namespace FoenixIDE.UI
             this.KeyPreview = true;
             this.Location = new System.Drawing.Point(300, 300);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(7);
-            this.MinimumSize = new System.Drawing.Size(1243, 1086);
+            this.Margin = new System.Windows.Forms.Padding(4);
+            this.MinimumSize = new System.Drawing.Size(685, 580);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Foenix IDE";
@@ -578,6 +585,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem assetListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mIDIToVGMConvertToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem DefaultKernelToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem convertHexToPGZToolStripMenuItem;
     }
 }
 

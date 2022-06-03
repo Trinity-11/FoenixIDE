@@ -1,3 +1,9 @@
+Release 0.5.6.8
+---------------
+Added tool to generate PGZ files.
+Updated the Uploader Dialog to allow for sending PGX and PGZ files.
+Updated IDE start-up to accept PGX and PGZ files - from "Load Executable menu" and drag-n-drop.
+
 Release 0.5.6.7
 ---------------
 Attempt to fix the tile scrolling bug.

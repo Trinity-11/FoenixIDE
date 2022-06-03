@@ -181,7 +181,7 @@ namespace FoenixIDE.UI
             form.Location = new Point(left, top);
         }
 
-        private void LoadHexFile(string Filename)
+        private void LoadExecutableFile(string Filename)
         {
             debugWindow.Pause();
             kernel.SetVersion(version);
@@ -633,17 +633,17 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void MenuOpenHexFile_Click(object sender, EventArgs e)
+        private void MenuOpenExecutableFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
-                Filter = "Hex Files|*.hex",
-                Title = "Select a Hex File",
+                Filter = "Hex Files|*.hex|PGX Files|*.pgx|PGZ Files|*.pgz",
+                Title = "Select an Executable File",
                 CheckFileExists = true
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                LoadHexFile(dialog.FileName);
+                LoadExecutableFile(dialog.FileName);
             }
         }
 
@@ -1155,7 +1155,8 @@ namespace FoenixIDE.UI
             if (obj != null && obj.Length > 0)
             {
                 FileInfo info = new FileInfo(obj[0]);
-                if (info.Extension.ToUpper().Equals(".HEX"))
+                string extension = info.Extension.ToUpper();
+                if (extension.Equals(".HEX") || extension.Equals(".PGX") || extension.Equals(".PGZ"))
                 {
                     e.Effect = DragDropEffects.Copy;
                     return;
@@ -1170,15 +1171,16 @@ namespace FoenixIDE.UI
             if (obj != null && obj.Length > 0)
             {
                 FileInfo info = new FileInfo(obj[0]);
-                if (info.Extension.ToUpper().Equals(".HEX"))
+                string extension = info.Extension.ToUpper();
+                if (extension.Equals(".HEX") || extension.Equals(".PGX") || extension.Equals(".PGZ"))
                 {
-                    LoadHexFile(obj[0]);
+                    LoadExecutableFile(obj[0]);
                 }
             }
         }
 
         // Convert a Hex file to PGX
-        // Header is PGX,1,4 byte jump address
+        // Header is 4 bytes: PGX,$1, 4 byte: jump address
         private void ConvertHexToPGXToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog
@@ -1190,25 +1192,96 @@ namespace FoenixIDE.UI
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 MemoryRAM temporaryRAM = new MemoryRAM(0, 4 * 1024 * 1024);
-                HexFile.Load(temporaryRAM, dialog.FileName, 0, out int DataStartAddress, out int DataLength);
-                // write the file
-                string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
+                HexFile.Load(temporaryRAM, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
 
-                byte[] buffer = new byte[DataLength];
-                temporaryRAM.CopyIntoBuffer(DataStartAddress, DataLength, buffer);
+                if (DataStartAddress.Count > 1)
+                {
+                    MessageBox.Show("The Hex file has multiple segments, use a PGZ instead.", "Convert to PGX", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    // write the file
+                    string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
+
+                    byte[] buffer = new byte[DataLength[0]];
+                    temporaryRAM.CopyIntoBuffer(DataStartAddress[0], DataLength[0], buffer);
+                    using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
+                    {
+                        // 8 byte header
+                        writer.Write((byte)'P');
+                        writer.Write((byte)'G');
+                        writer.Write((byte)'X');
+                        writer.Write((byte)1);
+                        writer.Write(DataStartAddress[0]);
+                        writer.Write(buffer);
+                    }
+                }
+            }
+        }
+
+        private void ConvertHexToPGZToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Hex Files|*.hex",
+                Title = "Select a Hex File",
+                CheckFileExists = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                MemoryRAM temporaryRAM = new MemoryRAM(0, 4 * 1024 * 1024);
+                HexFile.Load(temporaryRAM, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
+                // write the file
+                string outputFileName = Path.ChangeExtension(dialog.FileName, "PGZ");
+
+                int startAddress = temporaryRAM.ReadLong(0xFFE1);
+                // If the start address 0, then check at $38:FFE1, the FMX, U+ executable location.
+                if (startAddress == 0)
+                {
+                    startAddress = temporaryRAM.ReadLong(0x38FFE1);
+                }
+                // If the start address is 0, then check at $18:FFE1, for a U executable
+                if (startAddress == 0)
+                {
+                    startAddress = temporaryRAM.ReadLong(0x18FFE1);
+                }
+                // The last effort is to use the address of the first segment
+                if (startAddress == 0)
+                {
+                    startAddress = DataStartAddress[0];
+                }
                 using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
                 {
-                    // 8 byte header
-                    writer.Write((byte)'P');
-                    writer.Write((byte)'G');
-                    writer.Write((byte)'X');
-                    writer.Write((byte)1);
-                    writer.Write(DataStartAddress);
+                    // Header
+                    writer.Write((byte)'Z');
+                    byte[] buffer;
+                    for (int i = 0; i < DataStartAddress.Count; i++)
+                    {
+                        buffer = PrepareHeader(DataStartAddress[i], DataLength[i]);
+                        writer.Write(buffer);
+                        buffer = new byte[DataLength[i]];
+                        temporaryRAM.CopyIntoBuffer(DataStartAddress[i], DataLength[i], buffer);
+                        writer.Write(buffer);
+                    }
+
+                    // the last 6 bytes are the start address and 0 length
+                    buffer = PrepareHeader(startAddress, 0);
                     writer.Write(buffer);
                 }
             }
         }
 
+        private byte[] PrepareHeader(int start, int length)
+        {
+            byte[] buf = new byte[6];
+            buf[0] = (byte)(start & 0xFF);
+            buf[1] = (byte)((start >> 8) & 0xFF);
+            buf[2] = (byte)((start >> 16) & 0xFF);
+            buf[3] = (byte)(length & 0xFF);
+            buf[4] = (byte)((length >> 8) & 0xFF);
+            buf[5] = (byte)((length >> 16) & 0xFF);
+            return buf;
+        }
         private void ConvertBinToPGXToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog

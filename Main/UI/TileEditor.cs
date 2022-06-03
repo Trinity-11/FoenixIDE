@@ -279,6 +279,7 @@ namespace FoenixIDE.Simulator.UI
             // show if the tilemap is enabled - ignore the LUT, it's not used
             int ControlReg = MemMgr.ReadByte(addrOffset);
             TilemapEnabledCheckbox.Checked = (ControlReg & 1) != 0;
+            checkSmallTiles.Checked = (ControlReg & 0x10) != 0;
             // address in memory
             int tilemapAddr = MemMgr.ReadLong(addrOffset + 1) & 0x3F_FFFF;
             TilemapAddress.Text = (tilemapAddr + 0xB0_0000).ToString("X6");
@@ -433,11 +434,11 @@ namespace FoenixIDE.Simulator.UI
             byte value = MemMgr.ReadByte(tilemapBaseAddr);
             if (checkSmallTiles.Checked)
             {
-                value |= 8;
+                value |= 0x10;
             }
             else
             {
-                value &= 7;
+                value &= 0xF;
             }
             MemMgr.WriteByte(tilemapBaseAddr, value);
             TilesetViewer.Refresh();

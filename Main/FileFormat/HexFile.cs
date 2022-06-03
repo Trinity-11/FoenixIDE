@@ -1,5 +1,6 @@
 ﻿using FoenixIDE.MemoryLocations;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace FoenixIDE.Simulator.FileFormat
@@ -7,29 +8,19 @@ namespace FoenixIDE.Simulator.FileFormat
     public class HexFile
     {
 
-        static public String Load(MemoryRAM ram, string Filename, int gabeAddressBank, out int startAddress, out int length)
+        static public bool Load(MemoryRAM ram, string Filename, int gabeAddressBank, out List<int> blocks, out List<int> blockLengths)
         {
             int bank = 0;
-            int address = 0;
+            int addrCursor = 0;
+
             String processedFileName = Filename;
-            startAddress = -1;
-            length = -1;
+            blocks = new List<int>();
+            blockLengths = new List<int>();
+            int startAddress = -1;
 
             if (!System.IO.File.Exists(Filename))
             {
-                OpenFileDialog f = new OpenFileDialog
-                {
-                    Title = "Select a kernel file",
-                    Filter = "Hex Files|*.hex|All Files|*.*"
-                };
-                if (f.ShowDialog() == DialogResult.OK)
-                {
-                    processedFileName = f.FileName;
-                }
-                else
-                {
-                    return null;
-                }
+                return false;
             }
                 
 
@@ -50,23 +41,23 @@ namespace FoenixIDE.Simulator.FileFormat
                     {
                         // data row. The next n bytes are data to be loaded into memory
                         case "00":
-                            address = GetByte(offset, 0, 2);
-                            if (startAddress == -1 && ((address & 0xFF00) != 0xFF00))
+                            addrCursor = GetByte(offset, 0, 2);
+                            if (startAddress == -1)
                             {
-                                startAddress = bank + address;
+                                startAddress = bank + addrCursor;
                             }
                             if (bank <= ram.Length)
                             {
                                 for (int i = 0; i < data.Length; i += 2)
                                 {
                                     int b = GetByte(data, i, 1);
-                                    ram.WriteByte(bank + address, (byte)b);
+                                    ram.WriteByte(bank + addrCursor, (byte)b);
                                     // Copy bank $38 or $18 to page 0
                                     if (bank == gabeAddressBank)
                                     {
-                                        ram.WriteByte(address, (byte)b);
+                                        ram.WriteByte(addrCursor, (byte)b);
                                     }
-                                    address++;
+                                    addrCursor++;
                                 }
                             }
                             
@@ -74,16 +65,31 @@ namespace FoenixIDE.Simulator.FileFormat
 
                         // end of file - just ignore
                         case "01":
-                            length = address;
+                            if (startAddress != -1)
+                            {
+                                blocks.Add(startAddress);
+                                blockLengths.Add(bank + addrCursor - startAddress);
+                            }
                             break;
 
                         case "02":
                             bank = GetByte(data, 0, 2) * 16;
+                            if (startAddress != -1)
+                            {
+                                blocks.Add(startAddress);
+                                blockLengths.Add(addrCursor);
+                            }
                             break;
 
                         // extended linear address 
                         // lower byte will populate the bank number. 
                         case "04":
+                            if (startAddress != -1)
+                            {
+                                blocks.Add(startAddress);
+                                blockLengths.Add(bank + addrCursor - startAddress);
+                                startAddress = -1;
+                            }
                             bank = GetByte(data, 0, 2) << 16;
                             break;
 
@@ -102,7 +108,7 @@ namespace FoenixIDE.Simulator.FileFormat
                     break;
                 }
             }
-            return processedFileName;
+            return true;
         }
 
         // Read a two-character hex string into a byte

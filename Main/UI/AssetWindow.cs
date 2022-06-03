@@ -77,10 +77,20 @@ namespace FoenixIDE.UI
                         SaveFileDialog saveDlg = new SaveFileDialog
                         {
                             Title = "Save Asset to File",
-                            Filter = "Raw File (*.bin)|*.bin|Palette File (*.pal)|*.pal|Tilemap File (*.tlm)| *.tlm",
                             FileName = info.Name
                         };
-
+                        switch (res.FileType)
+                        {
+                            case ResourceType.lut:
+                                saveDlg.Filter = "Palette File (*.pal)|*.pal|Raw File (*.bin)|*.bin|Tilemap File (*.tlm)|*.tlm";
+                                break;
+                            case ResourceType.tilemap:
+                                saveDlg.Filter = "Tilemap File (*.tlm)|*.tlm|Palette File (*.pal)|*.pal|Raw File (*.bin)|*.bin";
+                                break;
+                            default:
+                                saveDlg.Filter = "Raw File (*.bin)|*.bin|Palette File (*.pal)|*.pal|Tilemap File (*.tlm)|*.tlm";
+                                break;
+                        }
                         if (saveDlg.ShowDialog() == DialogResult.OK)
                         {
 
