@@ -52,11 +52,13 @@ namespace FoenixIDE.Processor
         public void Dec()
         {
             _value -= 1;
+            _value &= Width == 1 ? 0xFF : 0xFFFF;
         }
 
         public void Inc()
         {
             _value += 1;
+            _value &= Width == 1 ? 0xFF : 0xFFFF;
         }
         public virtual int Low
         {

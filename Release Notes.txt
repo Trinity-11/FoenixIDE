@@ -1,3 +1,7 @@
+Release 0.5.6.9
+---------------
+Fixed a bug with incrementing registers wasn't overflowing correctly.
+
 Release 0.5.6.8
 ---------------
 Added tool to generate PGZ files.

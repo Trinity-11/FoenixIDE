@@ -365,5 +365,26 @@ namespace FoenixIDETester
             Assert.IsFalse(cpu.Flags.Zero);
         }
 
+        [TestMethod]
+        public void checkLargInx()
+        {
+            ClearCarry();
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.XCE_Implied);
+            cpu.ExecuteNext();
+
+            // REP #$30
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.REP_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x30);
+            cpu.ExecuteNext();
+
+            Assert.AreEqual(2, cpu.X.Width);
+            
+            cpu.X.Value = 0xFFFF;
+            Assert.AreEqual(0xFFFF, cpu.X.Value);
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.INX_Implied);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0, cpu.X.Value);
+        }
+
     }
 }
