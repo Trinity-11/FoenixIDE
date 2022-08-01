@@ -1,3 +1,7 @@
+Release 0.5.6.10
+----------------
+Added kernel files for all current C256 Foenix variants.  The kernel loader checks the machine type and loads the matching kernel from the roms folder.
+
 Release 0.5.6.9
 ---------------
 Fixed a bug with incrementing registers wasn't overflowing correctly.

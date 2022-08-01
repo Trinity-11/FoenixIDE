@@ -103,6 +103,9 @@ namespace FoenixIDE
                             case "u":
                                 context.Add("version", "RevU");
                                 break;
+                            case "u+":
+                                context.Add("version", "RevU+");
+                                break;
                         }
                         break;
                     case "--help":

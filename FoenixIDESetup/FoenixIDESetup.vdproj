@@ -45,6 +45,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2973C6F7D2FB4372A2A0B6B60D013CB3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2E69A73F30734920B0F600D6641B83F0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -75,13 +81,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4402305546C24234AC2F9611A0801F55"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_49985036DB914285843A571BF616F781"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_56328197DB4C47E1ACAA2A073A07D19F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_563F86D9D947492CB36C3AA515B42299"
+        "MsmKey" = "8:_576C5404C7674838B7613F26F5B25D18"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -117,8 +135,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7ADEF7EB358C87F0CD07E1208961D3AA"
-        "OwnerKey" = "8:_05BB69B027C149C699B0E2980589B4DF"
+        "MsmKey" = "8:_81547FC2AD874EF680C5282428D55CD4"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -177,13 +195,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B7646B74D1344494AA0483CB2EF5407B"
+        "MsmKey" = "8:_B491B053F7E849679E550DF3C67E89BF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BA33F90FF923446195A9FD68BDE2ED45"
+        "MsmKey" = "8:_B7646B74D1344494AA0483CB2EF5407B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -207,7 +225,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D1CC5E0C57A31A8787314D306BDFBA58"
+        "OwnerKey" = "8:_05BB69B027C149C699B0E2980589B4DF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E5B0021E526A45D28B87F5F0706277AA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EDF063FA0BC448258600F68E865EAF8D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F5E33CFE52604F89ADF26B5E264648BA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -232,7 +268,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7ADEF7EB358C87F0CD07E1208961D3AA"
+        "OwnerKey" = "8:_D1CC5E0C57A31A8787314D306BDFBA58"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -426,6 +462,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2973C6F7D2FB4372A2A0B6B60D013CB3"
+            {
+            "SourcePath" = "8:..\\Main\\roms\\kernel_U.lst"
+            "TargetName" = "8:kernel_U.lst"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2E69A73F30734920B0F600D6641B83F0"
             {
             "SourcePath" = "8:..\\Main\\Resources\\base_asm\\io_def.asm"
@@ -526,6 +582,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4402305546C24234AC2F9611A0801F55"
+            {
+            "SourcePath" = "8:..\\Main\\roms\\kernel_U.hex"
+            "TargetName" = "8:kernel_U.hex"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_49985036DB914285843A571BF616F781"
+            {
+            "SourcePath" = "8:..\\Main\\roms\\kernel_U_Plus.hex"
+            "TargetName" = "8:kernel_U_Plus.hex"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_56328197DB4C47E1ACAA2A073A07D19F"
             {
             "SourcePath" = "8:..\\Main\\Resources\\base_asm\\VKYII_CFP9553_TILEMAP_def.asm"
@@ -546,10 +642,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_563F86D9D947492CB36C3AA515B42299"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_576C5404C7674838B7613F26F5B25D18"
             {
-            "SourcePath" = "8:..\\bin\\Release\\roms\\kernel.hex"
-            "TargetName" = "8:kernel.hex"
+            "SourcePath" = "8:..\\Main\\roms\\kernel_B.hex"
+            "TargetName" = "8:kernel_B.hex"
             "Tag" = "8:"
             "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
             "Condition" = "8:"
@@ -666,23 +762,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7ADEF7EB358C87F0CD07E1208961D3AA"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_81547FC2AD874EF680C5282428D55CD4"
             {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-                "ScatterAssemblies"
-                {
-                    "_7ADEF7EB358C87F0CD07E1208961D3AA"
-                    {
-                    "Name" = "8:System.Net.Http.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:System.Net.Http.dll"
-            "TargetName" = "8:"
+            "SourcePath" = "8:..\\Main\\roms\\kernel_FMX.lst"
+            "TargetName" = "8:kernel_FMX.lst"
             "Tag" = "8:"
-            "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -694,7 +779,7 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_84B5614706384430824C81CC98510E62"
@@ -877,12 +962,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B7646B74D1344494AA0483CB2EF5407B"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B491B053F7E849679E550DF3C67E89BF"
             {
-            "SourcePath" = "8:..\\Main\\Resources\\GameGeneratorTemplates.txt"
-            "TargetName" = "8:GameGeneratorTemplates.txt"
+            "SourcePath" = "8:..\\Main\\roms\\kernel_B.lst"
+            "TargetName" = "8:kernel_B.lst"
             "Tag" = "8:"
-            "Folder" = "8:_16053BACFCB84245B80C7CF2A152195E"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -897,12 +982,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BA33F90FF923446195A9FD68BDE2ED45"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B7646B74D1344494AA0483CB2EF5407B"
             {
-            "SourcePath" = "8:..\\bin\\Release\\roms\\kernel.lst"
-            "TargetName" = "8:kernel.lst"
+            "SourcePath" = "8:..\\Main\\Resources\\GameGeneratorTemplates.txt"
+            "TargetName" = "8:GameGeneratorTemplates.txt"
             "Tag" = "8:"
-            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Folder" = "8:_16053BACFCB84245B80C7CF2A152195E"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -977,12 +1062,83 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D1CC5E0C57A31A8787314D306BDFBA58"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+                "ScatterAssemblies"
+                {
+                    "_D1CC5E0C57A31A8787314D306BDFBA58"
+                    {
+                    "Name" = "8:System.Net.Http.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.Net.Http.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E5B0021E526A45D28B87F5F0706277AA"
             {
             "SourcePath" = "8:..\\bin\\Release\\Resources\\CBM-ASCII_8x16.bin"
             "TargetName" = "8:CBM-ASCII_8x16.bin"
             "Tag" = "8:"
             "Folder" = "8:_16053BACFCB84245B80C7CF2A152195E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EDF063FA0BC448258600F68E865EAF8D"
+            {
+            "SourcePath" = "8:..\\Main\\roms\\kernel_U_Plus.lst"
+            "TargetName" = "8:kernel_U_Plus.lst"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F5E33CFE52604F89ADF26B5E264648BA"
+            {
+            "SourcePath" = "8:..\\Main\\roms\\kernel_FMX.hex"
+            "TargetName" = "8:kernel_FMX.hex"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1107,7 +1263,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FoenixIDE Setup"
         "ProductCode" = "8:{0F09CD7A-6292-4AD4-B99E-D088A15D65C9}"
-        "PackageCode" = "8:{0C342159-8165-474E-9E0E-A03DC08270C0}"
+        "PackageCode" = "8:{F4927D30-91A5-4E32-B1DC-4D213B55B18D}"
         "UpgradeCode" = "8:{A91983FA-7F1D-495E-8BFB-CB92EECA466F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1656,7 +1812,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_05BB69B027C149C699B0E2980589B4DF"
             {
-            "SourcePath" = "8:..\\Main\\obj\\Release\\FoenixIDE.exe"
+            "SourcePath" = "8:..\\Main\\obj\\Debug\\FoenixIDE.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"

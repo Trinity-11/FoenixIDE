@@ -264,6 +264,9 @@
     <Compile Include="UI\WatchForm.Designer.cs">
       <DependentUpon>WatchForm.cs</DependentUpon>
     </Compile>
+    <Content Include="roms\kernel_B.lst" />
+    <Content Include="roms\kernel_FMX.lst" />
+    <Content Include="roms\kernel_U.lst" />
     <EmbeddedResource Include="Display\Gpu.resx">
       <DependentUpon>Gpu.cs</DependentUpon>
     </EmbeddedResource>
@@ -381,8 +384,9 @@
     </None>
     <None Include="Resources\GENMIDI.op2" />
     <None Include="Resources\zero.bmp" />
-    <Content Include="roms\kernel.lst" />
-    <Content Include="roms\kernel.hex" />
+    <None Include="roms\kernel_B.hex" />
+    <None Include="roms\kernel_FMX.hex" />
+    <None Include="roms\kernel_U.hex" />
     <None Include="roms\kernel_U_Plus.hex" />
     <None Include="roms\kernel_U_Plus.lst" />
     <None Include="Resources\save_btn.bmp" />

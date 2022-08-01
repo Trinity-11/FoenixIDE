@@ -70,7 +70,7 @@ namespace FoenixIDE
                 VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),       // 60K
                 VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE),       // 4MB Video
                 FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE),       // 8MB RAM
-                GABE = new GabeRAM(MemoryMap.GABE_START, MemoryMap.GABE_SIZE),   // 4K 
+                GABE = new GabeRAM(MemoryMap.GABE_START, MemoryMap.GABE_SIZE),            // 4K 
 
                 // Special devices
                 MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes

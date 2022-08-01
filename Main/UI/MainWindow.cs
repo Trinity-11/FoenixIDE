@@ -40,7 +40,7 @@ namespace FoenixIDE.UI
         private ResourceChecker ResChecker = new ResourceChecker();
         private delegate void TransmitByteFunction(byte Value);
         private delegate void ShowFormFunction();
-        private String defaultKernel = @"roms\kernel.hex";
+        private String defaultKernel;
         private int jumpStartAddress;
         private bool disabledIRQs = false;
         private bool autoRun = true;
@@ -79,6 +79,10 @@ namespace FoenixIDE.UI
                     {
                         version = BoardVersion.RevB;
                     }
+                    else if (context["version"] == "RevC")
+                    {
+                        version = BoardVersion.RevC;
+                    }
                     else if (context["version"] == "RevU")
                     {
                         version = BoardVersion.RevU;
@@ -113,6 +117,24 @@ namespace FoenixIDE.UI
                         break;
                 }
             }
+            if (defaultKernel == null)
+            {
+                switch (version)
+                {
+                    case BoardVersion.RevB:
+                        defaultKernel = @"roms\\kernel_B.hex";
+                        break;
+                    case BoardVersion.RevC:
+                        defaultKernel = @"roms\\kernel_FMX.hex";
+                        break;
+                    case BoardVersion.RevU:
+                        defaultKernel = @"roms\\kernel_U.hex";
+                        break;
+                    case BoardVersion.RevUPlus:
+                        defaultKernel = @"roms\\kernel_U_Plus.hex";
+                        break;
+                }
+            }
             if (context == null || "true".Equals(context["Continue"]))
             {
                 InitializeComponent();
@@ -144,14 +166,19 @@ namespace FoenixIDE.UI
                 debugWindow.DisableIRQs(true);
             }
 
-            this.Top = 0;
-            this.Left = 0;
-            //this.Width = debugWindow.Left;
-            if (this.Width > 1200)
+            if (sender != null)
             {
-                this.Width = 1200;
+                this.Top = 0;
+                this.Left = 0;
+
+                //this.Width = debugWindow.Left;
+                if (this.Width > 1200)
+                {
+                    this.Width = 1200;
+                }
+                this.Height = Convert.ToInt32(this.Width * 0.75);
             }
-            this.Height = Convert.ToInt32(this.Width * 0.75);
+            
 
             SetDipSwitchMemory();
             // Code is tightly coupled with memory manager
@@ -1000,24 +1027,30 @@ namespace FoenixIDE.UI
             Simulator.Properties.Settings.Default.Save();
         }
 
+        // The user clicks on the tool strip for a different board version: B, FMX, U or U+
         private void ToolStripRevision_Click(object sender, EventArgs e)
         {
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
+                defaultKernel = @"roms\\kernel_FMX.hex";
             }
             else if (version == BoardVersion.RevC)
             {
                 version = BoardVersion.RevU;
+                defaultKernel = @"roms\\kernel_U.hex";
             }
             else if (version == BoardVersion.RevU)
             {
                 version = BoardVersion.RevUPlus;
+                defaultKernel = @"roms\\kernel_U_Plus.hex";
             }
             else
             {
-                version = BoardVersion.RevB;
+                version = BoardVersion.RevC;
+                defaultKernel = @"roms\\kernel_FMX.hex";
             }
+
             kernel.SetVersion(version);
             if (uploaderWindow != null)
             {
@@ -1026,6 +1059,7 @@ namespace FoenixIDE.UI
             DisplayBoardVersion();
             // Reset the memory, keyboard, GABE and reload the program?
             debugWindow.Pause();
+            kernel.lstFile.Lines.Clear();
             BasicWindow_Load(null, null);
         }
 
