@@ -72,6 +72,7 @@ namespace FoenixIDE.Display
         void Gpu_Load(object sender, EventArgs e)
         {
             this.Paint += new PaintEventHandler(Gpu_Paint);
+            
             this.DoubleBuffered = true;
             //gpuRefreshTimer.Tick += new EventHandler(GpuRefreshTimer_Tick);
             hiresTimer.Elapsed += new MultimediaElapsedEventHandler(GpuRefreshTimer_Tick);

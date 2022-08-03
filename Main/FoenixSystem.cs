@@ -104,9 +104,18 @@ namespace FoenixIDE
             // Write bytes $9F in the joystick registers to mean that they are not installed.
             MemMgr.WriteWord(0xAFE800, 0x9F9F);
             MemMgr.WriteWord(0xAFE802, 0x9F9F);
-            MemMgr.TIMER0.TimerInterruptDelegate += TimerEvent0;
-            MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
-            MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
+            if (MemMgr.TIMER0.TimerInterruptDelegate == null)
+            {
+                MemMgr.TIMER0.TimerInterruptDelegate += TimerEvent0;
+            }
+            if (MemMgr.TIMER1.TimerInterruptDelegate == null)
+            {
+                MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
+            }
+            if (MemMgr.TIMER2.TimerInterruptDelegate == null)
+            {
+                MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
+            }
 
             // Set the Vicky rev and subrev
             MemMgr.VICKY.WriteWord(0x1C, 0x7654);

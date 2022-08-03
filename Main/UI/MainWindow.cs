@@ -150,9 +150,18 @@ namespace FoenixIDE.UI
             ShowMemoryWindow();
 
             // Now that the kernel is initialized, allocate variables to the GPU
-            gpu.StartOfFrame += SOF;
-            gpu.StartOfLine += SOL;
-            gpu.GpuUpdated += Gpu_Update_Cps_Fps;
+            if (gpu.StartOfFrame == null)
+            { 
+                gpu.StartOfFrame += SOF;
+            }
+            if (gpu.StartOfLine == null)
+            {
+                gpu.StartOfLine += SOL;
+            }
+            if (gpu.GpuUpdated == null)
+            {
+                gpu.GpuUpdated += Gpu_Update_Cps_Fps;
+            }
             gpu.VRAM = kernel.MemMgr.VIDEO;
             gpu.RAM = kernel.MemMgr.RAM;
             gpu.VICKY = kernel.MemMgr.VICKY;
