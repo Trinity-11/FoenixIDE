@@ -288,7 +288,7 @@ namespace FoenixIDE.UI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.DebugPanel.Location = new System.Drawing.Point(0, 126);
-            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
             this.DebugPanel.Name = "DebugPanel";
             this.DebugPanel.Size = new System.Drawing.Size(605, 367);
             this.DebugPanel.TabIndex = 6;
@@ -302,7 +302,7 @@ namespace FoenixIDE.UI
             this.AddBPOverlayButton.FlatAppearance.BorderSize = 0;
             this.AddBPOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.AddBPOverlayButton.Location = new System.Drawing.Point(99, 200);
-            this.AddBPOverlayButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.AddBPOverlayButton.Margin = new System.Windows.Forms.Padding(2);
             this.AddBPOverlayButton.Name = "AddBPOverlayButton";
             this.AddBPOverlayButton.Size = new System.Drawing.Size(18, 18);
             this.AddBPOverlayButton.TabIndex = 7;
@@ -318,7 +318,7 @@ namespace FoenixIDE.UI
             this.DeleteBPOverlayButton.FlatAppearance.BorderSize = 0;
             this.DeleteBPOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.DeleteBPOverlayButton.Location = new System.Drawing.Point(118, 200);
-            this.DeleteBPOverlayButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.DeleteBPOverlayButton.Margin = new System.Windows.Forms.Padding(2);
             this.DeleteBPOverlayButton.Name = "DeleteBPOverlayButton";
             this.DeleteBPOverlayButton.Size = new System.Drawing.Size(18, 18);
             this.DeleteBPOverlayButton.TabIndex = 8;
@@ -334,7 +334,7 @@ namespace FoenixIDE.UI
             this.InspectOverlayButton.FlatAppearance.BorderSize = 0;
             this.InspectOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.InspectOverlayButton.Location = new System.Drawing.Point(137, 200);
-            this.InspectOverlayButton.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.InspectOverlayButton.Margin = new System.Windows.Forms.Padding(1);
             this.InspectOverlayButton.Name = "InspectOverlayButton";
             this.InspectOverlayButton.Size = new System.Drawing.Size(38, 18);
             this.InspectOverlayButton.TabIndex = 9;
@@ -351,7 +351,7 @@ namespace FoenixIDE.UI
             this.StepOverOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.StepOverOverlayButton.Font = new System.Drawing.Font("Arial Narrow", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StepOverOverlayButton.Location = new System.Drawing.Point(176, 200);
-            this.StepOverOverlayButton.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.StepOverOverlayButton.Margin = new System.Windows.Forms.Padding(1);
             this.StepOverOverlayButton.Name = "StepOverOverlayButton";
             this.StepOverOverlayButton.Size = new System.Drawing.Size(21, 18);
             this.StepOverOverlayButton.TabIndex = 10;
@@ -660,7 +660,7 @@ namespace FoenixIDE.UI
             this.LabelOverlayButton.FlatAppearance.BorderSize = 0;
             this.LabelOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.LabelOverlayButton.Location = new System.Drawing.Point(198, 200);
-            this.LabelOverlayButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.LabelOverlayButton.Margin = new System.Windows.Forms.Padding(2);
             this.LabelOverlayButton.Name = "LabelOverlayButton";
             this.LabelOverlayButton.Size = new System.Drawing.Size(18, 18);
             this.LabelOverlayButton.TabIndex = 13;

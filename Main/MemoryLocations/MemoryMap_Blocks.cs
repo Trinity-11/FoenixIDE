@@ -17,6 +17,7 @@ namespace FoenixIDE.MemoryLocations
 
         // Beginning of Vicky Address Space
         public const int VICKY_START = VICKY_BASE_ADDR;            // Beginning of I/O Space
+        public const int VICKY_START_JR = 0xD000;                  // IO Page 0
         public const int VICKY_END = 0xAF_DFFF;                    // End of I/O Space
         public const int VICKY_SIZE = VICKY_END - VICKY_START + 1; // 64KB
 

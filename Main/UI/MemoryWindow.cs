@@ -18,6 +18,12 @@ namespace FoenixIDE.UI
         public ButtonClicked SetGamma;
         public ButtonClicked SetHiRes;
 
+        // Delegate function to write MCR Bytes
+        public delegate void WriteMCRBytesDelegate(byte low, byte high);
+        public WriteMCRBytesDelegate WriteMCRBytes;
+        public delegate ushort ReadMCRBytesDelegate(); // little-endian
+        public ReadMCRBytesDelegate ReadMCRBytes;
+
         public MemoryWindow()
         {
             InitializeComponent();
@@ -311,21 +317,20 @@ namespace FoenixIDE.UI
                 btn.BackColor = Control.DefaultBackColor;
             }
             // Save the value of all buttons to the Master Control Memory Location
-            int value = ((int)MCRBit0Button.Tag);
-            value |= ((int)MCRBit1Button.Tag) << 1;
-            value |= ((int)MCRBit2Button.Tag) << 2;
-            value |= ((int)MCRBit3Button.Tag) << 3;
-            value |= ((int)MCRBit4Button.Tag) << 4;
-            value |= ((int)MCRBit5Button.Tag) << 5;
-            value |= ((int)MCRBit6Button.Tag) << 6;
-            value |= ((int)MCRBit7Button.Tag) << 7;
-            Memory.WriteByte(0xAF_0000, (byte)value);
+            int low = ((int)MCRBit0Button.Tag);
+            low |= ((int)MCRBit1Button.Tag) << 1;
+            low |= ((int)MCRBit2Button.Tag) << 2;
+            low |= ((int)MCRBit3Button.Tag) << 3;
+            low |= ((int)MCRBit4Button.Tag) << 4;
+            low |= ((int)MCRBit5Button.Tag) << 5;
+            low |= ((int)MCRBit6Button.Tag) << 6;
+            low |= ((int)MCRBit7Button.Tag) << 7;
 
-            value = ((int)MCRBit8Button.Tag);
-            value |= ((int)MCRBit9Button.Tag) << 1;
-            Memory.WriteByte(0xAF_0001, (byte)value);
+            int high = ((int)MCRBit8Button.Tag);
+            high |= ((int)MCRBit9Button.Tag) << 1;
+            WriteMCRBytes?.Invoke((byte)low, (byte)high);
 
-            if (StartAddressText.Text.StartsWith("AF", false, null))
+            if ("AF0000".Equals(StartAddressText.Text))
             {
                 RefreshMemoryView();
             }
@@ -341,36 +346,37 @@ namespace FoenixIDE.UI
 
         public void UpdateMCRButtons()
         {
-            byte value = Memory.ReadByte(0xAF_0000);
+            ushort word = ReadMCRBytes.Invoke();
+            // split the value
+            byte low = (byte)(word & 0xFF);
+            byte high = (byte)(word >> 8);
             // Determine if Gamma was changed, if so, toggle the dip switch
             int oldGamma = (int)MCRBit6Button.Tag;
-            int newGamma = (value & 0x40) != 0 ? 1 : 0;
+            int newGamma = (low & 0x40) != 0 ? 1 : 0;
 
-            SetMCRButton(MCRBit7Button, (value & 0x80) == 0x80);
+            SetMCRButton(MCRBit7Button, (low & 0x80) == 0x80);
             SetMCRButton(MCRBit6Button, newGamma != 0);
             if (oldGamma != newGamma)
             {
                 SetGamma?.Invoke(newGamma != 0);
             }
-            SetMCRButton(MCRBit5Button, (value & 0x20) == 0x20);
-            SetMCRButton(MCRBit4Button, (value & 0x10) == 0x10);
-            SetMCRButton(MCRBit3Button, (value & 0x08) == 0x08);
-            SetMCRButton(MCRBit2Button, (value & 0x04) == 0x04);
-            SetMCRButton(MCRBit1Button, (value & 0x02) == 0x02);
-            SetMCRButton(MCRBit0Button, (value & 0x01) == 0x01);
+            SetMCRButton(MCRBit5Button, (low & 0x20) == 0x20);
+            SetMCRButton(MCRBit4Button, (low & 0x10) == 0x10);
+            SetMCRButton(MCRBit3Button, (low & 0x08) == 0x08);
+            SetMCRButton(MCRBit2Button, (low & 0x04) == 0x04);
+            SetMCRButton(MCRBit1Button, (low & 0x02) == 0x02);
+            SetMCRButton(MCRBit0Button, (low & 0x01) == 0x01);
 
             // High-res and double-pixels
-            value = Memory.ReadByte(0xAF_0001);
             // Determine if the Hi-Res was changed, if so toggle the dip switch
             int oldHires = (int)MCRBit8Button.Tag;
-            int newHires = (value & 0x01) != 0 ? 1 : 0;
+            int newHires = (high & 0x01) != 0 ? 1 : 0;
             SetMCRButton(MCRBit8Button, (newHires) != 0);
             if (oldHires != newHires)
             {
                 SetHiRes?.Invoke(newHires != 0);
             }
-            SetMCRButton(MCRBit9Button, (value & 0x02) != 0);
-
+            SetMCRButton(MCRBit9Button, (high & 0x02) != 0);
         }
 
         private void SetMCRButton(Button btn, bool value)

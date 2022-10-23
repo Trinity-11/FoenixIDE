@@ -35,6 +35,8 @@ namespace FoenixIDE
             SDCardDevice sdcard = null;
             byte SystemStat = 0; // FMX
             int keyboardAddress = MemoryMap.KBD_DATA_BUF_FMX; // FMX
+            int clock = 14318000;
+            bool is6502 = false;
 
             switch (boardVersion)
             {
@@ -52,58 +54,132 @@ namespace FoenixIDE
                     SystemStat = 5;
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_U;
                     break;
+                case BoardVersion.RevJr:
+                    memSize = 1024*1024;
+                    keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
+                    clock = 6293000;
+                    is6502 = true;
+                    break;
             }
             if (boardVersion == BoardVersion.RevB)
             {
-                codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 2);  // This register is only a single byte but we allow writing a word
+                codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 4);
                 sdcard = new CH376SRegister(MemoryMap.SDCARD_DATA, MemoryMap.SDCARD_SIZE);
+            }
+            else if (boardVersion == BoardVersion.RevJr)
+            {
+                codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_JR, 3);  // unlike the FMX, this register is 16-bits in F256Jr
+                sdcard = new GabeSDController(MemoryMap.SDCARD_JR, MemoryMap.SDCARD_SIZE);   // TODO: write yet a new SD controller.
             }
             else
             {
-                codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_FMX, 2);  // This register is only a single byte but we allow writing a word
+                codec = new CodecRAM(MemoryMap.CODEC_START_FMX, 4);
                 sdcard = new GabeSDController(MemoryMap.GABE_SDC_CTRL_START, MemoryMap.GABE_SDC_CTRL_SIZE);
             }
 
-            MemMgr = new MemoryManager
+            if (boardVersion != BoardVersion.RevJr)
             {
-                RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),                        // RAM: 2MB Rev B & U, 4MB Rev C & U+
-                VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),       // 60K
-                VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE),       // 4MB Video
-                FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE),       // 8MB RAM
-                GABE = new GabeRAM(MemoryMap.GABE_START, MemoryMap.GABE_SIZE),            // 4K 
+                // These are the 65816-based machines
+                MemMgr = new MemoryManager
+                {
+                    RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),                        // RAM: 2MB Rev B & U, 4MB Rev C & U+
+                    VICKY = new MemoryRAM(MemoryMap.VICKY_START, MemoryMap.VICKY_SIZE),       // 60K
+                    VIDEO = new MemoryRAM(MemoryMap.VIDEO_START, MemoryMap.VIDEO_SIZE),       // 4MB Video
+                    FLASH = new MemoryRAM(MemoryMap.FLASH_START, MemoryMap.FLASH_SIZE),       // 8MB RAM
+                    GABE = new GabeRAM(MemoryMap.GABE_START, MemoryMap.GABE_SIZE),            // 4K 
 
-                // Special devices
-                MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
-                KEYBOARD = new KeyboardRegister(keyboardAddress, 5),
-                SDCARD = sdcard,
-                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
-                UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
-                UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),
-                OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
-                FLOAT = new MathFloatRegister(MemoryMap.FLOAT_START, MemoryMap.FLOAT_END - MemoryMap.FLOAT_START + 1),
-                MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2),
-                VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE),
-                TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
-                TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
-                TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8)
-            };
-            MemMgr.CODEC = codec;
-            MemMgr.KEYBOARD.SetKernel(this);
+                    // Special devices
+                    MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
+                    KEYBOARD = new KeyboardRegister(keyboardAddress, 5),
+                    SDCARD = sdcard,
+                    INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
+                    UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
+                    UART2 = new UART(MemoryMap.UART2_REGISTERS, 8),
+                    OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
+                    FLOAT = new MathFloatRegister(MemoryMap.FLOAT_START, MemoryMap.FLOAT_END - MemoryMap.FLOAT_START + 1),
+                    MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2),
+                    VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE),
+                    TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
+                    TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
+                    TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8),
+                    CODEC = codec,
+                    MMU = null
+                };
+                MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
+                MemMgr.VDMA.setSystemRam(MemMgr.RAM);
+                MemMgr.VDMA.setVickyRam(MemMgr.VICKY);
+                MemMgr.GABE.WriteByte(MemoryMap.GABE_SYS_STAT - MemoryMap.GABE_START, SystemStat);
+            }
+            else
+            {
+                // This is a 6502-based machine
+                MemMgr = new MemoryManager
+                {
+                    RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
+                    // vicky will store 4 pages of data
+                    VICKY = new MemoryRAM(0, 4 * 0x2000),
+                    KEYBOARD = new KeyboardRegister(keyboardAddress, 5),
+                    MATH = new MathCoproRegister(MemoryMap.MATH_START_JR, MemoryMap.MATH_END_JR - MemoryMap.MATH_START_JR + 1), // 32 bytes
+                    SDCARD = sdcard,
+                    INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_JR, 2),
+                    UART1 = new UART(MemoryMap.UART_REGISTERS_JR, 8),
+                    TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG_JR, 8),
+                    TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_JR, 8),
+                    CODEC = codec,
+                    MMU = new MMU_JR(0,16)
+                };
+            }
 
             // Assign memory variables used by other processes
-            CPU = new CPU(MemMgr);
-            
-            MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
-            MemMgr.VDMA.setSystemRam(MemMgr.RAM);
-            MemMgr.VDMA.setVickyRam(MemMgr.VICKY);
-            MemMgr.GABE.WriteByte(MemoryMap.GABE_SYS_STAT - MemoryMap.GABE_START, SystemStat);
+            CPU = new CPU(MemMgr, clock, is6502);
 
             // Load the kernel.hex if present
             ResetCPU(DefaultKernel);
 
-            // Write bytes $9F in the joystick registers to mean that they are not installed.
-            MemMgr.WriteWord(0xAFE800, 0x9F9F);
-            MemMgr.WriteWord(0xAFE802, 0x9F9F);
+            if (boardVersion != BoardVersion.RevJr)
+            {
+                // Write bytes $9F in the joystick registers to mean that they are not installed.
+                MemMgr.WriteWord(0xAFE800, 0x9F9F);
+                MemMgr.WriteWord(0xAFE802, 0x9F9F);
+
+                if (MemMgr.TIMER2.TimerInterruptDelegate == null)
+                {
+                    MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
+                }
+
+                // Set the Vicky rev and subrev
+                MemMgr.VICKY.WriteWord(0x1C, 0x7654);
+                MemMgr.VICKY.WriteWord(0x1E, 0x3456);
+                MemMgr.VICKY.WriteByte(MemoryMap.GAMMA_CTRL_REG - MemoryMap.VICKY_BASE_ADDR, 0x11); // Gamma and hi-res are off
+                // set the date
+                MemMgr.VICKY.WriteByte(MemoryMap.FPGA_DOR - MemoryMap.VICKY_BASE_ADDR, 0x1);
+                MemMgr.VICKY.WriteByte(MemoryMap.FPGA_MOR - MemoryMap.VICKY_BASE_ADDR, 0x2);
+                MemMgr.VICKY.WriteByte(MemoryMap.FPGA_YOR - MemoryMap.VICKY_BASE_ADDR, 0x21);
+
+                // Set board revision
+                MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_C - MemoryMap.GABE_START, (byte)'E');
+                MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_4 - MemoryMap.GABE_START, (byte)'M');
+                switch (boardVersion)
+                {
+                    case BoardVersion.RevB:
+                        MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'B');
+                        break;
+                    case BoardVersion.RevC:
+                        MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'C');
+                        break;
+                    case BoardVersion.RevU:
+                        MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'U');
+                        break;
+                    case BoardVersion.RevUPlus:
+                        MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'+');
+                        break;
+                }
+            }
+            else
+            {
+                MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
+            }
+
             if (MemMgr.TIMER0.TimerInterruptDelegate == null)
             {
                 MemMgr.TIMER0.TimerInterruptDelegate += TimerEvent0;
@@ -112,41 +188,6 @@ namespace FoenixIDE
             {
                 MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
             }
-            if (MemMgr.TIMER2.TimerInterruptDelegate == null)
-            {
-                MemMgr.TIMER2.TimerInterruptDelegate += TimerEvent2;
-            }
-
-            // Set the Vicky rev and subrev
-            MemMgr.VICKY.WriteWord(0x1C, 0x7654);
-            MemMgr.VICKY.WriteWord(0x1E, 0x3456);
-            MemMgr.VICKY.WriteByte(MemoryMap.GAMMA_CTRL_REG - MemoryMap.VICKY_BASE_ADDR, 0x11); // Gamma and hi-res are off
-            // set the date
-            MemMgr.VICKY.WriteByte(MemoryMap.FPGA_DOR - MemoryMap.VICKY_BASE_ADDR, 0x1);
-            MemMgr.VICKY.WriteByte(MemoryMap.FPGA_MOR - MemoryMap.VICKY_BASE_ADDR, 0x2);
-            MemMgr.VICKY.WriteByte(MemoryMap.FPGA_YOR - MemoryMap.VICKY_BASE_ADDR, 0x21);
-
-            // Set board revision
-            MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_C - MemoryMap.GABE_START, (byte)'E');
-            MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_4 - MemoryMap.GABE_START, (byte)'M');
-            switch (boardVersion)
-            {
-                case BoardVersion.RevB:
-                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'B');
-                    break;
-                case BoardVersion.RevC:
-                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'C');
-                    break;
-                case BoardVersion.RevU:
-                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'U');
-                    break;
-                case BoardVersion.RevUPlus:
-                    MemMgr.GABE.WriteByte(MemoryMap.REVOFPCB_A - MemoryMap.GABE_START, (byte)'+');
-                    break;
-            }
-            
-            // Set the rev date
-
         }
 
         private void TimerEvent0()
@@ -214,6 +255,7 @@ namespace FoenixIDE
             {
                 BasePageAddress = 0x38_0000;
             }
+
             FileInfo info = new FileInfo(LoadedKernel);
             if (!info.Exists)
             {
@@ -234,6 +276,13 @@ namespace FoenixIDE
                 if (!HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _))
                 {
                     return false;
+                }
+                if (boardVersion == BoardVersion.RevJr)
+                {
+                    byte[] tempBuffer = new byte[0xFFFF];
+                    MemMgr.RAM.CopyIntoBuffer(0, 0xFFFF, tempBuffer);
+                    //MemMgr.RAM.Zero();
+                    MemMgr.RAM.CopyBuffer(tempBuffer, 0, 0xF_0000, 0xFFFF);
                 }
             }
             else if (extension.Equals(".PGX"))

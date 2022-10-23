@@ -91,6 +91,10 @@ namespace FoenixIDE.UI
                     {
                         version = BoardVersion.RevUPlus;
                     }
+                    else if (context["version"] == "RevJr")
+                    {
+                        version = BoardVersion.RevJr;
+                    }
                     boardVersionCommandLineSpecified = true;
                 }
             }
@@ -115,6 +119,9 @@ namespace FoenixIDE.UI
                     case "U+":
                         version = BoardVersion.RevUPlus;
                         break;
+                    case "Jr":
+                        version = BoardVersion.RevJr;
+                        break;
                 }
             }
             if (defaultKernel == null)
@@ -132,6 +139,9 @@ namespace FoenixIDE.UI
                         break;
                     case BoardVersion.RevUPlus:
                         defaultKernel = @"roms\\kernel_U_Plus.hex";
+                        break;
+                    case BoardVersion.RevJr:
+                        defaultKernel = @"roms\\kernel_F256Jr.hex";
                         break;
                 }
             }
@@ -152,24 +162,65 @@ namespace FoenixIDE.UI
             // Now that the kernel is initialized, allocate variables to the GPU
             if (gpu.StartOfFrame == null)
             { 
-                gpu.StartOfFrame += SOF;
+                gpu.StartOfFrame += SOFRoutine;
             }
             if (gpu.StartOfLine == null)
             {
-                gpu.StartOfLine += SOL;
+                gpu.StartOfLine += SOLRoutine;
             }
             if (gpu.GpuUpdated == null)
             {
                 gpu.GpuUpdated += Gpu_Update_Cps_Fps;
             }
-            gpu.VRAM = kernel.MemMgr.VIDEO;
-            gpu.RAM = kernel.MemMgr.RAM;
             gpu.VICKY = kernel.MemMgr.VICKY;
-            // This fontset is loaded just in case the kernel doesn't provide one.
-            gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+            if (version != BoardVersion.RevJr)
+            {
+                gpu.SetMode(0);
+                gpu.VRAM = kernel.MemMgr.VIDEO;
+                
+                // This fontset is loaded just in case the kernel doesn't provide one.
+                gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
-            joystickWindow.gabe = kernel.MemMgr.GABE;
+                joystickWindow.gabe = kernel.MemMgr.GABE;
 
+                gpu.SetMCRAddress(0);
+                gpu.SetFGLUTAddress(MemoryMap.FG_CHAR_LUT_PTR - gpu.VICKY.StartAddress);
+                gpu.SetBGLUTAddress(MemoryMap.BG_CHAR_LUT_PTR - gpu.VICKY.StartAddress);
+                gpu.SetTextStartAddress(MemoryMap.SCREEN_PAGE0 - gpu.VICKY.StartAddress);
+                gpu.SetTextColorStartAddress(MemoryMap.SCREEN_PAGE1 - gpu.VICKY.StartAddress);
+                gpu.SetCursorCtrlRegister(MemoryMap.VKY_TXT_CURSOR_CTRL_REG - gpu.VICKY.StartAddress);
+                gpu.SetCursorCharacterAddress(MemoryMap.VKY_TXT_CURSOR_CHAR_REG - gpu.VICKY.StartAddress);
+                gpu.SetCursorXAddress(MemoryMap.VKY_TXT_CURSOR_X_REG - gpu.VICKY.StartAddress);
+
+                gpu.SetFontBaseAddress(MemoryMap.FONT0_MEMORY_BANK_START - gpu.VICKY.StartAddress);
+                gpu.SetLUTBaseAddress(MemoryMap.GRP_LUT_BASE_ADDR - gpu.VICKY.StartAddress);
+                gpu.SetGammaBaseAddress(MemoryMap.GAMMA_BASE_ADDR - gpu.VICKY.StartAddress);
+                gpu.SetLineIRQRegister(MemoryMap.VKY_LINE_IRQ_CTRL_REG);
+                gpu.SetSOL0Address(MemoryMap.VKY_LINE0_CMP_VALUE_LO);
+                gpu.SetSOL1Address(MemoryMap.VKY_LINE1_CMP_VALUE_LO);
+                gpu.SetMousePointerRegister(0x700);
+            }
+            else
+            {
+                gpu.SetMode(1);
+                // Addresses for VICKY in Junior are zero-based
+                gpu.SetMCRAddress(0x1000);
+                gpu.SetFGLUTAddress(MemoryMap.FG_CHAR_LUT_PTR_JR - 0xC000);  // IO Page 0
+                gpu.SetBGLUTAddress(MemoryMap.BG_CHAR_LUT_PTR_JR - 0xC000);  // IO Page 0
+                gpu.SetTextStartAddress(MemoryMap.SCREEN_PAGE_JR + 0x4000 - 0xC000);  // IO Page 2
+                gpu.SetTextColorStartAddress(MemoryMap.SCREEN_PAGE_JR + 0x6000 - 0xC000);  // IO Page 3
+                gpu.SetCursorCtrlRegister(MemoryMap.VKY_TXT_CURSOR_CTRL_REG_JR - 0xC000);  // IO Page 0
+                gpu.SetCursorCharacterAddress(MemoryMap.VKY_TXT_CURSOR_CHAR_REG_JR - 0xC000); // IO Page 0
+                gpu.SetCursorXAddress(MemoryMap.VKY_TXT_CURSOR_X_REG_JR - 0xC000); // IO Page 0
+
+                gpu.SetFontBaseAddress(MemoryMap.FONT_MEMORY_BANK_START_JR + 0x2000 - 0xC000);  // IO Page 1
+                gpu.SetLUTBaseAddress(MemoryMap.GRP_LUT_BASE_ADDR_JR + 0x2000 - 0xC000);  // IO Page 1
+                gpu.SetGammaBaseAddress(MemoryMap.GAMMA_BASE_ADDR_JR - 0xC000);  // IO Page 0
+                gpu.SetLineIRQRegister(MemoryMap.VKY_LINE_IRQ_CTRL_REG_JR - 0xC000);  // IO Page 0
+                gpu.SetSOL0Address(MemoryMap.VKY_LINE_CMP_VALUE_JR - 0xC000);  // IO Page 0
+                gpu.SetMousePointerRegister(0x1000);  // IO Page 0
+            }
+           
             if (disabledIRQs)
             {
                 debugWindow.DisableIRQs(true);
@@ -187,13 +238,18 @@ namespace FoenixIDE.UI
                 }
                 this.Height = Convert.ToInt32(this.Width * 0.75);
             }
-            
 
             SetDipSwitchMemory();
-            // Code is tightly coupled with memory manager
-            kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
-            kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
+            if (version != BoardVersion.RevJr)
+            {
+                // Code is tightly coupled with memory manager
+                kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
+                kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
+            }
             kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
+            kernel.MemMgr.KEYBOARD.TriggerMouseInterrupt += TriggerMouseInterrupt;
+            kernel.MemMgr.KEYBOARD.TriggerKeyboardInterrupt += TriggerKeyboardInterrupt;
+
             kernel.ResCheckerRef = ResChecker;
 
             watchWindow.SetKernel(kernel);
@@ -272,6 +328,8 @@ namespace FoenixIDE.UI
             {
                 memoryWindow.BringToFront();
             }
+            memoryWindow.WriteMCRBytes += WriteMCRBytesToVicky;
+            memoryWindow.ReadMCRBytes += ReadMCRBytesFromVicky;
             memoryWindow.UpdateMCRButtons();
             memoryWindow.SetGamma += UpdateGamma;
             memoryWindow.SetHiRes += UpdateHiRes;
@@ -344,7 +402,7 @@ namespace FoenixIDE.UI
         }
 
         DateTime pSof;
-        public void SOF()
+        public void SOFRoutine()
         {
             // Check if the interrupt is enabled
             DateTime currentDT = DateTime.Now;
@@ -352,10 +410,21 @@ namespace FoenixIDE.UI
             //System.Console.WriteLine(ts.TotalMilliseconds);
             pSof = currentDT;
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (version == BoardVersion.RevJr)
+            {
+                // we need to this to avoid using the MMU IO Paging function
+                mask = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
+            }
+            
             if (!kernel.CPU.DebugPause)
             {
                 // Set the SOF Interrupt
-                byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                byte IRQ0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
+                if (version == BoardVersion.RevJr)
+                {
+                    // we need to this to avoid using the MMU IO Paging function
+                    IRQ0 = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                }
                 IRQ0 |= (byte)Register0.FNX0_INT00_SOF;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 if ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF)
@@ -365,15 +434,23 @@ namespace FoenixIDE.UI
             }
         }
 
-        public void SOL()
+        public void SOLRoutine()
         {
             // Check if the interrupt is enabled
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+            if (version == BoardVersion.RevJr)
+            {
+                mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR);
+            }
             // if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
             if (!kernel.CPU.DebugPause && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
             {
                 // Set the SOL Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                if (version == BoardVersion.RevJr)
+                {
+                    IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR);
+                }
                 IRQ0 |= (byte)Register0.FNX0_INT01_SOL;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 kernel.CPU.Pins.IRQ = true;
@@ -382,17 +459,26 @@ namespace FoenixIDE.UI
 
         public void setGpuPeriod(uint time)
         {
-            gpu.setRefreshPeriod(time);
+
+            gpu.SetRefreshPeriod(time);
         }
 
         public void SDCardInterrupt(CH376SInterrupt irq)
         {
             // Check if the SD Card interrupt is allowed
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
+            if (version == BoardVersion.RevJr)
+            {
+                mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR + 1);
+            }
             if (!kernel.CPU.DebugPause && (~mask & (byte)Register1.FNX1_INT07_SDCARD) == (byte)Register1.FNX1_INT07_SDCARD)
             {
                 // Set the SD Card Interrupt
                 byte IRQ1 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
+                if (version == BoardVersion.RevJr)
+                {
+                    IRQ1 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR + 1);
+                }
                 IRQ1 |= (byte)Register1.FNX1_INT07_SDCARD;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IRQ1);
                 kernel.CPU.Pins.IRQ = true;
@@ -462,7 +548,7 @@ namespace FoenixIDE.UI
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
                 if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
-                    kernel.MemMgr.KEYBOARD.WriteKey(scanCode);
+                   WriteKeyboardCode(scanCode);
                 }
             }
             else if (e.KeyCode == Keys.Pause)
@@ -480,6 +566,73 @@ namespace FoenixIDE.UI
             }
         }
 
+        private void WriteKeyboardCode(ScanCode sc)
+        {
+            if (version != BoardVersion.RevJr)
+            {
+                // Check if the Keyboard interrupt is allowed
+                byte mask = kernel.MemMgr.ReadByte(MemoryMap.INT_MASK_REG1);
+                if ((~mask & (byte)Register1.FNX1_INT00_KBD) != 0)
+                {
+                    kernel.MemMgr.KEYBOARD.WriteByte(0, (byte)sc);
+                    kernel.MemMgr.KEYBOARD.WriteByte(4, 0);
+
+                    TriggerKeyboardInterrupt();
+                }
+            }
+            else
+            {
+                // Check if the Keyboard interrupt is allowed
+                byte mask = kernel.MemMgr.VICKY.ReadByte(MemoryMap.INT_MASK_REG0_JR - 0xC000);
+                if ((~mask & (byte)Register0_JR.JR0_INT02_KBD) != 0)
+                {
+                    kernel.MemMgr.KEYBOARD.WriteByte(0, (byte)sc);
+                    kernel.MemMgr.KEYBOARD.WriteByte(4, 0);
+
+                    TriggerKeyboardInterrupt();
+                }
+            }
+        }
+        private void TriggerKeyboardInterrupt()
+        {
+            if (version != BoardVersion.RevJr)
+            {
+                // Set the Keyboard Interrupt
+                byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(1);
+                IrqVal |= (byte)Register1.FNX1_INT00_KBD;
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IrqVal);
+                kernel.CPU.Pins.IRQ = true;
+            }
+            else
+            {
+                // Set the Keyboard Interrupt
+                byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(0);
+                IrqVal |= (byte)Register0_JR.JR0_INT02_KBD;
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IrqVal);
+                kernel.CPU.Pins.IRQ = true;
+            }
+        }
+
+        private void TriggerMouseInterrupt()
+        {
+            if (version != BoardVersion.RevJr)
+            {
+                // Set the Mouse Interrupt
+                byte IRQ0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
+                IRQ0 |= (byte)Register0.FNX0_INT07_MOUSE;
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                kernel.CPU.Pins.IRQ = true;
+            }
+            else
+            {
+                // Set the Mouse Interrupt
+                byte IRQ0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
+                IRQ0 |= (byte)Register0_JR.JR0_INT03_MOUSE;
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                kernel.CPU.Pins.IRQ = true;
+            }
+        }
+
         private void BasicWindow_KeyUp(object sender, KeyEventArgs e)
         {
             ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
@@ -489,7 +642,7 @@ namespace FoenixIDE.UI
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
                 if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
-                    kernel.MemMgr.KEYBOARD.WriteKey(scanCode);
+                    WriteKeyboardCode(scanCode);
                 }
             }
             else
@@ -555,6 +708,19 @@ namespace FoenixIDE.UI
                     previousFrame = currentFrame;
                     Write_CPS_FPS_Safe("CPS: " + cps.ToString("N0"), "FPS: " + fps.ToString("N0"));
                 }
+                WriteRTCTime(currentTime);
+            }
+            else
+            {
+                cpsPerf.Text = "CPS: 0";
+                fpsPerf.Text = "FPS: 0";
+            }
+        }
+
+        private void WriteRTCTime(DateTime currentTime)
+        {
+            if (version != BoardVersion.RevJr)
+            {
                 // write the time to memory - values are BCD
                 kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Second));
                 kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Minute));
@@ -567,8 +733,14 @@ namespace FoenixIDE.UI
             }
             else
             {
-                cpsPerf.Text = "CPS: 0";
-                fpsPerf.Text = "FPS: 0";
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR, BCD(currentTime.Second));
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 2, BCD(currentTime.Minute));
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 4, BCD(currentTime.Hour));
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 6, BCD(currentTime.Day));
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 8, BCD(currentTime.Month));
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 10, BCD(currentTime.Year % 100));
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 12, BCD(currentTime.Year / 100));
+                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 14, (byte)(currentTime.DayOfWeek + 1));
             }
         }
 
@@ -779,7 +951,14 @@ namespace FoenixIDE.UI
         {
             gpu.TileEditorMode = false;
             // Restore the previous graphics mode
-            kernel.MemMgr.VICKY.WriteByte(0, previousGraphicMode);
+            if (version != BoardVersion.RevJr)
+            {
+                kernel.MemMgr.VICKY.WriteByte(0, previousGraphicMode);
+            }
+            else
+            {
+                kernel.MemMgr.VICKY.WriteByte(0x1000, previousGraphicMode);
+            }
             tileEditor.Dispose();
             tileEditor = null;
             TileClicked = null;
@@ -794,10 +973,20 @@ namespace FoenixIDE.UI
                 tileEditor.SetResourceChecker(kernel.ResCheckerRef);
                 gpu.TileEditorMode = true;
                 // Set Vicky into Tile mode
-                previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0);
-                kernel.MemMgr.VICKY.WriteByte(0, 0x10);
-                // Enable borders
-                kernel.MemMgr.VICKY.WriteByte(4, 1);
+                if (version != BoardVersion.RevJr)
+                {
+                    previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0);
+                    kernel.MemMgr.VICKY.WriteByte(0, 0x10);
+                    // Enable borders
+                    kernel.MemMgr.VICKY.WriteByte(4, 1);
+                }
+                else
+                {
+                    previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0x1000);
+                    kernel.MemMgr.VICKY.WriteByte(0x1000, 0x10);
+                    // Enable borders
+                    kernel.MemMgr.VICKY.WriteByte(0x1004, 1);
+                }
                 CenterForm(tileEditor);
                 tileEditor.Show();
                 tileEditor.FormClosed += new FormClosedEventHandler(EditorWindowClosed);
@@ -824,33 +1013,44 @@ namespace FoenixIDE.UI
         private void Gpu_MouseMove(object sender, MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
+            if (version == BoardVersion.RevJr)
+            {
+                gpu.GetScreenSize_JR();
+            }
             double ratioW = gpu.Width / (double)size.X;
             double ratioH = gpu.Height / (double)size.Y;
-            bool borderEnabled = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_CTRL_REG) == 1;
-            double borderWidth = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_X_SIZE) : 0;
-            double borderHeight = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_Y_SIZE) : 0;
-            if (gpu.TileEditorMode && e.Button != MouseButtons.None)
+            if (version != BoardVersion.RevJr)
             {
-                if ((e.X / ratioW > borderWidth && e.X / ratioW < size.X - borderWidth) && (e.Y / ratioH > borderHeight && e.Y / ratioH < size.Y - borderHeight))
+                bool borderEnabled = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_CTRL_REG) == 1;
+                double borderWidth = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_X_SIZE) : 0;
+                double borderHeight = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_Y_SIZE) : 0;
+                if (gpu.TileEditorMode && e.Button != MouseButtons.None)
                 {
-                    this.Cursor = Cursors.Hand;
-                    bool leftButton = e.Button == MouseButtons.Left;
-                    TileClicked?.Invoke(new Point((int)(e.X / ratioW), (int)(e.Y / ratioH)), leftButton);
+                    if ((e.X / ratioW > borderWidth && e.X / ratioW < size.X - borderWidth) && (e.Y / ratioH > borderHeight && e.Y / ratioH < size.Y - borderHeight))
+                    {
+                        this.Cursor = Cursors.Hand;
+                        bool leftButton = e.Button == MouseButtons.Left;
+                        TileClicked?.Invoke(new Point((int)(e.X / ratioW), (int)(e.Y / ratioH)), leftButton);
+                    }
+                    else
+                    {
+                        this.Cursor = Cursors.No;
+                    }
                 }
-                else
+                else if (kernel.MemMgr != null)
                 {
-                    this.Cursor = Cursors.No;
+                    GenerateMouseInterrupt(e);
                 }
-            }
-            else if (kernel.MemMgr != null)
-            {
-                GenerateMouseInterrupt(e);
             }
         }
 
         private void Gpu_MouseDown(object sender, MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
+            if (version == BoardVersion.RevJr)
+            {
+                gpu.GetScreenSize_JR();
+            }
             double ratioW = gpu.Width / (double)size.X;
             double ratioH = gpu.Height / (double)size.Y;
             switch (e.Button)
@@ -905,6 +1105,10 @@ namespace FoenixIDE.UI
         private void GenerateMouseInterrupt(MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
+            if (version == BoardVersion.RevJr)
+            {
+                gpu.GetScreenSize_JR();
+            }
             double ratioW = gpu.Width / (double)size.X;
             double ratioH = gpu.Height / (double)size.Y;
             int X = (int)(e.X / ratioW);
@@ -1025,10 +1229,15 @@ namespace FoenixIDE.UI
                 toolStripRevision.Text = "Rev U";
                 shortVersion = "U";
             }
-            else
+            else if (version == BoardVersion.RevUPlus)
             {
                 toolStripRevision.Text = "Rev U+";
                 shortVersion = "U+";
+            }
+            else
+            {
+                toolStripRevision.Text = "Rev F256Jr";
+                shortVersion = "Jr";
             }
             // force repaint
             statusStrip1.Invalidate();
@@ -1053,6 +1262,11 @@ namespace FoenixIDE.UI
             {
                 version = BoardVersion.RevUPlus;
                 defaultKernel = @"roms\\kernel_U_Plus.hex";
+            }
+            else if (version == BoardVersion.RevUPlus)
+            {
+                version = BoardVersion.RevJr;
+                defaultKernel = @"roms\\kernel_F256Jr.hex";
             }
             else
             {
@@ -1140,44 +1354,86 @@ namespace FoenixIDE.UI
 
         private void SetDipSwitchMemory()
         {
-            // if kernel memory is available, set the memory
-            byte bootMode = (byte)((switches[0] ? 0 : 1) + (switches[1] ? 0 : 2));
-            byte userMode = (byte)((switches[2] ? 0 : 1) + (switches[3] ? 0 : 2) + (switches[4] ? 0 : 4));
-            if (kernel.MemMgr != null)
+            if (version != BoardVersion.RevJr)
             {
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.DIP_BOOT_MODE, bootMode);
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.DIP_USER_MODE, userMode);
+                // if kernel memory is available, set the memory
+                byte bootMode = (byte)((switches[0] ? 0 : 1) + (switches[1] ? 0 : 2));
+                byte userMode = (byte)((switches[2] ? 0 : 1) + (switches[3] ? 0 : 2) + (switches[4] ? 0 : 4));
+                if (kernel.MemMgr != null)
+                {
+                    kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.DIP_BOOT_MODE, bootMode);
+                    kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.DIP_USER_MODE, userMode);
 
-                // switch 5 - high-res mode
-                byte hiRes = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR + 1);
-                if (switches[4])
-                {
-                    hiRes |= 1;
-                }
-                else
-                {
-                    hiRes &= 0xFE;
-                }
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR + 1, hiRes);
+                    // switch 5 - high-res mode
+                    byte hiRes = kernel.MemMgr.ReadByte(kernel.MemMgr.VICKY.StartAddress + 1);
+                    if (switches[4])
+                    {
+                        hiRes |= 1;
+                    }
+                    else
+                    {
+                        hiRes &= 0xFE;
+                    }
+                    kernel.MemMgr.WriteByte(kernel.MemMgr.VICKY.StartAddress + 1, hiRes);
 
-                // switch 6 - Gamma
-                byte MCR = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
-                if (switches[6])
-                {
-                    MCR |= 0x40;
+                    // switch 6 - Gamma
+                    byte MCR = kernel.MemMgr.ReadByte(kernel.MemMgr.VICKY.StartAddress);
+                    if (switches[6])
+                    {
+                        MCR |= 0x40;
+                    }
+                    else
+                    {
+                        MCR &= 0b1011_1111;
+                    }
+                    kernel.MemMgr.WriteByte(kernel.MemMgr.VICKY.StartAddress, MCR);
                 }
-                else
-                {
-                    MCR &= 0b1011_1111;
-                }
-                kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.VICKY_BASE_ADDR, MCR);
             }
+            else
+            { 
+                byte bootMode = (byte)((switches[0] ? 0 : 1) + (switches[1] ? 0 : 2) + (switches[2] ? 0 : 4) + (switches[3] ? 0 : 8));
+                byte userMode = (byte)((switches[4] ? 0 : 1) + (switches[5] ? 0 : 2) + (switches[6] ? 0 : 4));
+                if (kernel.MemMgr != null && kernel.MemMgr.VICKY != null)
+                {
+
+                    // switch 6 - Gamma
+                    byte MCR = kernel.MemMgr.VICKY.ReadByte(MemoryMap.VICKY_START_JR - 0xC000);
+                    if (switches[7])
+                    {
+                        MCR |= 0x40;
+                    }
+                    else
+                    {
+                        MCR &= 0b1011_1111;
+                    }
+                    kernel.MemMgr.VICKY.WriteByte(kernel.MemMgr.VICKY.StartAddress, MCR);
+                }
+            }
+        }
+
+        public void WriteMCRBytesToVicky(byte low, byte high)
+        {
+            kernel.MemMgr.VICKY.WriteByte(0, low);
+            kernel.MemMgr.VICKY.WriteByte(1, high);
+        }
+
+        public ushort ReadMCRBytesFromVicky()
+        {
+            return (ushort)kernel.MemMgr.VICKY.ReadWord(0);
         }
 
         public void UpdateGamma(bool gamma)
         {
-            switches[6] = gamma;
-            dipSwitch.Invalidate();
+            if (version != BoardVersion.RevJr)
+            {
+                switches[6] = gamma;
+                dipSwitch.Invalidate();
+            }
+            else
+            {
+                switches[7] = gamma;
+                dipSwitch.Invalidate();
+            }
         }
 
         public void UpdateHiRes(bool hires)

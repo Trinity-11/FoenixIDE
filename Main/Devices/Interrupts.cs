@@ -66,4 +66,27 @@ namespace FoenixIDE.Simulator.Devices
         FNX3_INT07_TBD = 0x80       // SDCARD Insertion
     }
 
+    enum Register0_JR
+    {
+        JR0_INT00_SOF = 1,
+        JR0_INT01_SOL = 2,
+        JR0_INT02_KBD = 4,
+        JR0_INT03_MOUSE = 8,
+        JR0_INT04_TMR0 = 16,
+        JR0_INT05_TMR1 = 32,
+        JR0_INT06_DMA = 64,
+        JR0_INT07_RSVD = 128
+    }
+
+    enum Register1_JR
+    {
+        JR1_INT00_UART = 1,
+        JR1_INT01_VKY2 = 2,
+        JR1_INT02_VKY3 = 4,
+        JR1_INT03_VKY4 = 8,
+        JR1_INT04_RTC = 16,
+        JR1_INT05_VIA = 32,
+        JR1_INT06_IEC = 64,
+        JR1_INT07_SDCARD = 128
+    }
 }

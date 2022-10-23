@@ -32,36 +32,46 @@ namespace FoenixIDE.MemoryLocations
         public const int USER_TEMP = 0x0000E0; // 32 Bytes Temp space for user programs
         public const int PAGE0_END_ = 0x000100; //  Byte 
 
+        public const int CURSORX_JR = 0x00D014; // 2 Bytes This is where the blinking cursor sits. Do not edit this direectly. Call LOCATE to update the location and handle moving the cursor correctly. 
+        public const int CURSORY_JR = 0x00D016; // 2 Bytes This is where the blinking cursor sits. Do not edit this direectly. Call LOCATE to update the location and handle moving the cursor correctly. 
+
+
         #region GAVIN
         public const int GAVIN_BLOCK = 0x000100; // 256 Bytes Gavin reserved, overlaps debugging registers at $1F0
 
         // Math co-processor
-        public const int MATH_START = 0x00_0100;
-        public const int MULTIPLIER_0 = 0x000100; // 0 Byte Unsigned multiplier
-        public const int M0_OPERAND_A = 0x000100; // 2 Bytes Operand A (ie: A x B)
-        public const int M0_OPERAND_B = 0x000102; // 2 Bytes Operand B (ie: A x B)
-        public const int M0_RESULT = 0x000104; // 4 Bytes Result of A x B
-        public const int MULTIPLIER_1 = 0x000108; // 0 Byte Signed Multiplier
-        public const int M1_OPERAND_A = 0x000108; // 2 Bytes Operand A (ie: A x B)
-        public const int M1_OPERAND_B = 0x00010A; // 2 Bytes Operand B (ie: A x B)
-        public const int M1_RESULT = 0x00010C; // 4 Bytes Result of A x B
-        public const int DIVIDER_0 = 0x000108; // 0 Byte Unsigned divider
-        public const int D0_OPERAND_A = 0x000108; // 2 Bytes Divider 0 Dividend ex: A in  A/B 
-        public const int D0_OPERAND_B = 0x00010A; // 2 Bytes Divider 0 Divisor ex B in A/B
-        public const int D0_RESULT = 0x00010C; // 2 Bytes Quotient result of A/B ex: 7/2 = 3 r 1
-        public const int D0_REMAINDER = 0x00010E; // 2 Bytes Remainder of A/B ex: 1 in 7/2=3 r 1
-        public const int DIVIDER_1 = 0x000110; // 0 Byte Signed divider
-        public const int D1_OPERAND_A = 0x000110; // 2 Bytes Divider 1 Dividend ex: A in  A/B 
-        public const int D1_OPERAND_B = 0x000112; // 2 Bytes Divider 1 Divisor ex B in A/B
-        public const int D1_RESULT = 0x000114; // 2 Bytes Signed quotient result of A/B ex: 7/2 = 3 r 1
-        public const int D1_REMAINDER = 0x000116; // 2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
-        public const int MATH_END = 0x00_012F;
+        public const int MATH_START =    0x00_0100;
+        public const int MATH_START_JR = 0x00_DE00;
+
+        /** Just for reference
+        public const int MULTIPLIER_0 =  0x000100; // 0 Byte Unsigned multiplier
+        public const int M0_OPERAND_A =  0x000100; // 2 Bytes Operand A (ie: A x B)
+        public const int M0_OPERAND_B =  0x000102; // 2 Bytes Operand B (ie: A x B)
+        public const int M0_RESULT =     0x000104; // 4 Bytes Result of A x B
+        public const int MULTIPLIER_1 =  0x000108; // 0 Byte Signed Multiplier
+        public const int M1_OPERAND_A =  0x000108; // 2 Bytes Operand A (ie: A x B)
+        public const int M1_OPERAND_B =  0x00010A; // 2 Bytes Operand B (ie: A x B)
+        public const int M1_RESULT =     0x00010C; // 4 Bytes Result of A x B
+        public const int DIVIDER_0 =     0x000108; // 0 Byte Unsigned divider
+        public const int D0_OPERAND_A =  0x000108; // 2 Bytes Divider 0 Dividend ex: A in  A/B 
+        public const int D0_OPERAND_B =  0x00010A; // 2 Bytes Divider 0 Divisor ex B in A/B
+        public const int D0_RESULT =     0x00010C; // 2 Bytes Quotient result of A/B ex: 7/2 = 3 r 1
+        public const int D0_REMAINDER =  0x00010E; // 2 Bytes Remainder of A/B ex: 1 in 7/2=3 r 1
+        public const int DIVIDER_1 =     0x000110; // 0 Byte Signed divider
+        public const int D1_OPERAND_A =  0x000110; // 2 Bytes Divider 1 Dividend ex: A in  A/B 
+        public const int D1_OPERAND_B =  0x000112; // 2 Bytes Divider 1 Divisor ex B in A/B
+        public const int D1_RESULT =     0x000114; // 2 Bytes Signed quotient result of A/B ex: 7/2 = 3 r 1
+        public const int D1_REMAINDER =  0x000116; // 2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
+        */
+        public const int MATH_END =      0x00_012F;
+        public const int MATH_END_JR =   0x00_DE1F;
 
         // Pending Interrupt (Read and Write Back to Clear)
         public const int INT_PENDING_REG0 = 0x00_0140;
         public const int INT_PENDING_REG1 = 0x00_0141;
         public const int INT_PENDING_REG2 = 0x00_0142;
         public const int INT_PENDING_REG3 = 0x00_0143; // FMX Model
+        public const int INT_PENDING_REG0_JR = 0x00_D660;
 
         // Polarity Set
         public const int INT_POL_REG0 = 0x00_0144 ;
@@ -79,13 +89,16 @@ namespace FoenixIDE.MemoryLocations
         public const int INT_MASK_REG1 = 0x00_014D;
         public const int INT_MASK_REG2 = 0x00_014E;
         public const int INT_MASK_REG3 = 0x00_014F; // FMX Model
+        public const int INT_MASK_REG0_JR = 0x00_D666;
 
         public const int TIMER0_CTRL_REG = 0x00_0160;
+        public const int TIMER0_CTRL_REG_JR = 0xD650;
         public const int TIMER0_CHARGE   = 0x00_0161;
         public const int TIMER0_CMP_REG  = 0x00_0164;
         public const int TIMER0_CMP      = 0x00_0165;
 
         public const int TIMER1_CTRL_REG = 0x00_0168;
+        public const int TIMER1_CTRL_REG_JR = 0xD658;
         public const int TIMER1_CHARGE   = 0x00_0169;
         public const int TIMER1_CMP_REG  = 0x00_016C;
         public const int TIMER1_CMP      = 0x00_016D;

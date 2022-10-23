@@ -100,6 +100,9 @@
     <Compile Include="Devices\SDCard\CH376SRegister.cs" />
     <Compile Include="Devices\SDCard\CH376SResponse.cs" />
     <Compile Include="Devices\UART.cs" />
+    <Compile Include="Display\GPU_Common.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="FileFormat\DebugLine.cs" />
     <Compile Include="FileFormat\FoenixLexer.cs" />
     <Compile Include="FileFormat\FoenixmlFile.cs" />
@@ -265,6 +268,7 @@
       <DependentUpon>WatchForm.cs</DependentUpon>
     </Compile>
     <Content Include="roms\kernel_B.lst" />
+    <Content Include="roms\kernel_F256jr.lst" />
     <Content Include="roms\kernel_FMX.lst" />
     <Content Include="roms\kernel_U.lst" />
     <EmbeddedResource Include="Display\Gpu.resx">
@@ -342,6 +346,7 @@
     <EmbeddedResource Include="UI\WatchForm.resx">
       <DependentUpon>WatchForm.cs</DependentUpon>
     </EmbeddedResource>
+    <Compile Include="Devices\MMU_JR.cs" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -385,6 +390,7 @@
     <None Include="Resources\GENMIDI.op2" />
     <None Include="Resources\zero.bmp" />
     <None Include="roms\kernel_B.hex" />
+    <None Include="roms\kernel_F256jr.hex" />
     <None Include="roms\kernel_FMX.hex" />
     <None Include="roms\kernel_U.hex" />
     <None Include="roms\kernel_U_Plus.hex" />

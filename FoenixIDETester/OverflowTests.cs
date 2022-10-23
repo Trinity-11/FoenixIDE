@@ -22,7 +22,7 @@ namespace FoenixIDETester
             {
                 RAM = new MemoryRAM(0, 3 * 0x20_0000)
             };
-            cpu = new CPU(MemMgr);
+            cpu = new CPU(MemMgr, 14_000_000, false);
             cpu.SetEmulationMode();
             Assert.AreEqual(1, cpu.A.Width);
             Assert.AreEqual(1, cpu.X.Width);

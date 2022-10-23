@@ -61,6 +61,9 @@ namespace FoenixIDE.Processor
 
         public event Operations.SimulatorCommandEvent SimulatorCommand;
 
+        public const int DefaultStackValueNative = 0xd6ff;
+        public const int DefaultStackValueEmulation = 0x01ff;
+
         public int ClockSpeed
         {
             get
@@ -91,14 +94,14 @@ namespace FoenixIDE.Processor
             }
         }
 
-        public CPU(MemoryManager mm)
+        public CPU(MemoryManager mm, int clock, bool is6502)
         {
             MemMgr = mm;
-            clockSpeed = 14000000;
+            clockSpeed = clock;
             clockCyles = 0;
             Operations operations = new Operations(this);
             operations.SimulatorCommand += Operations_SimulatorCommand;
-            opcodes = new OpcodeList(operations, this);
+            opcodes = new OpcodeList(operations, this, is6502);
             Flags.Emulation = true;
         }
 
@@ -154,15 +157,22 @@ namespace FoenixIDE.Processor
 
             // TODO - if pc > RAM size, then throw an exception
             CurrentOpcode = opcodes[MemMgr.RAM.ReadByte(PC)];
-            OpcodeLength = CurrentOpcode.Length;
-            OpcodeCycles = 1;
-            SignatureBytes = ReadSignature(OpcodeLength, PC);
+            if (CurrentOpcode != null)
+            {
+                OpcodeLength = CurrentOpcode.Length;
+                OpcodeCycles = 1;
+                SignatureBytes = ReadSignature(OpcodeLength, PC);
 
-            PC += OpcodeLength;
-            
-            CurrentOpcode.Execute(SignatureBytes);
-            clockCyles += OpcodeCycles;
-            return false;
+                PC += OpcodeLength;
+
+                CurrentOpcode.Execute(SignatureBytes);
+                clockCyles += OpcodeCycles;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         // Simulator State management 
@@ -190,7 +200,9 @@ namespace FoenixIDE.Processor
             A.Value = 0;
             X.Value = 0;
             Y.Value = 0;
-            Stack.Reset();
+            Stack.Value = Flags.Emulation ? DefaultStackValueEmulation : DefaultStackValueNative;
+            Stack.TopOfStack = Stack.Value;
+
             DataBank.Value = 0;
             DirectPage.Value = 0;
             //ProgramBank.Value = 0;

@@ -34,10 +34,15 @@ namespace FoenixIDE.MemoryLocations
         public const int SDCARD_CMD = 0xAF_E809;
         public const int SDCARD_STAT = 0xAF_E810;
 
+        // F256JR addresses
+        public const int SDCARD_JR = 0x00_DD00;
+        public const int MATH_JR = 0x00_DE00;
+
         // Handling code in CODEC_RAM
         public const int CODEC_START = 0xAF_E820;     // Start of CODEC memory range
         public const int CODEC_SIZE = 0x04;           // Size of CODEC memory range
         public const int CODEC_WR_CTRL = 0xAF_E822;   // codec write address
+        public const int CODEC_WR_CTRL_JR = 0x00_D620;   // codec write address
 
         // GABE
         /* 

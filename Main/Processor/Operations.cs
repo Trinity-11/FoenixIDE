@@ -793,7 +793,7 @@ namespace FoenixIDE.Processor
                     break;
                 case OpcodeList.TCS_Implied:
                     cpu.Stack.Value = cpu.A.Value16;
-                    cpu.Stack.TopOfStack = cpu.A.Value16;
+                    cpu.Stack.TopOfStack = cpu.A.Value16;  // TCS is not available to in emulation mode
                     cpu.Flags.SetNZ(cpu.Stack.Value, 2);
                     break;
                 case OpcodeList.TSC_Implied:
@@ -831,8 +831,8 @@ namespace FoenixIDE.Processor
                     cpu.Flags.SetNZ(cpu.X.Value, transWidth);
                     break;
                 case OpcodeList.TXS_Implied:
-                    cpu.Stack.Value = cpu.X.Value;
-                    cpu.Stack.TopOfStack = cpu.X.Value;
+                    cpu.Stack.Value = cpu.Flags.Emulation ? 0x100 + cpu.X.Value : cpu.X.Value;
+                    cpu.Stack.TopOfStack = cpu.Stack.Value;
                     break;
 
                 // X - Y
@@ -1153,5 +1153,69 @@ namespace FoenixIDE.Processor
         {
             cpu.Waiting = true;
         }
+
+        // NEW instructions to support the 65C02!!
+        public void ResetMemoryBit(byte instruction, AddressModes addressMode, int signature)
+        {
+            // the first nibble in the instruction is the bit to modify
+            byte bit = (byte)((instruction >> 4) & 7);
+            byte nibble = (byte)((1 << bit) ^ 0xFF);
+
+            // direct page addressing
+            int address = cpu.DirectPage.Value + signature;
+            byte val = cpu.MemMgr.ReadByte(address);
+            
+            // Reset the bit
+            val = (byte)(val & nibble);
+            // Assign to the address
+            cpu.MemMgr.WriteByte(address, val);
+        }
+
+        public void SetMemoryBit(byte instruction, AddressModes addressMode, int signature)
+        {
+            // the first nibble in the instruction is the bit to modify
+            byte bit = (byte)((instruction >> 4) & 7);
+            byte nibble = (byte)(1 << bit);
+
+            // direct page addressing
+            int address = cpu.DirectPage.Value + signature;
+            byte val = cpu.MemMgr.ReadByte(address);
+
+            // Reset the bit
+            val = (byte)(val | nibble);
+            // Assign to the address
+            cpu.MemMgr.WriteByte(address, val);
+        }
+
+        public void BranchBITReset(byte instruction, AddressModes addressMode, int signature)
+        {
+            // the first nibble in the instruction is the bit to modify
+            byte bit = (byte)((instruction >> 4) & 7);
+            byte nibble = (byte)(1 << bit);
+
+            // direct page addressing
+            int address = cpu.DirectPage.Value + (signature >> 8);
+            byte val = cpu.MemMgr.ReadByte(address);
+            if ((val & nibble) == 0)
+            {
+                BranchNear((byte)(signature & 0xFF));
+            }
+        }
+
+        public void BranchBITSet(byte instruction, AddressModes addressMode, int signature)
+        {
+            // the first nibble in the instruction is the bit to modify
+            byte bit = (byte)((instruction >> 4) & 7);
+            byte nibble = (byte)(1 << bit);
+
+            // direct page addressing
+            int address = cpu.DirectPage.Value + (signature >> 8);
+            byte val = cpu.MemMgr.ReadByte(address);
+            if ((val & nibble) == 1)
+            {
+                BranchNear((byte)(signature & 0xFF));
+            }
+        }
+
     }
 }

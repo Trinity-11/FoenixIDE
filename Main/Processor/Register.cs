@@ -10,8 +10,6 @@ namespace FoenixIDE.Processor
     {
         protected int _value;
         private int byteLength = 2;
-        public const int DefaultStackValue = 0xd6ff;
-        public int TopOfStack = DefaultStackValue;
 
         /// <summary>
         /// Forces the upper 8 bits to 0 when the register changes to 8 bit mode, or when writing or reading 
@@ -27,6 +25,8 @@ namespace FoenixIDE.Processor
         //    Bits16 = 2,
         //    Bits24 = 3,
         //}
+
+        public virtual void Reset() { }
 
         public virtual int Value
         {
@@ -181,13 +181,6 @@ namespace FoenixIDE.Processor
             else
                 return this.Value;
         }
-
-        public virtual void Reset()
-        {
-            this.TopOfStack = DefaultStackValue;
-            this.Value = DefaultStackValue;
-            this.byteLength = 2;
-        }
     }
 
     /// <summary>
@@ -208,6 +201,7 @@ namespace FoenixIDE.Processor
             }
         }
 
+        public int TopOfStack = 0;
         /// <summary>
         /// Get a direct page address. Offsets the register's value by 8 bits, then adds 
         /// the supplied address.

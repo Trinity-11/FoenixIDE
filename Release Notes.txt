@@ -1,3 +1,11 @@
+Release 0.6.0.0
+---------------
+Fixed an issue where CPS/FPS display was showing zeroes after switching Board type.
+Started to add support for the F256 Junior.
+MMU is implemented.
+Text and cursor display is implemented; bitmaps, sprites and tilemaps are not.
+Interrupts for Timers 0 and 1, Keyboard and Mouse are implemented.
+
 Release 0.5.6.10
 ----------------
 Added kernel files for all current C256 Foenix variants.  The kernel loader checks the machine type and loads the matching kernel from the roms folder.

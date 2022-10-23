@@ -428,8 +428,12 @@ namespace FoenixIDE.UI
                 IRQPC = -1;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(0, 0);
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(1, 0);
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
+                if (kernel.GetVersion() != BoardVersion.RevJr)
+                {
+                    kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
+                    kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
+                }
+               
                 InterruptMatchesCheckboxes();
                 registerDisplay1.RegistersReadOnly(true);
                 MainWindow.Instance.setGpuPeriod(16);
@@ -703,46 +707,49 @@ namespace FoenixIDE.UI
         private void GenerateNextInstruction(int pc)
         {
             OpCode oc = kernel.CPU.PreFetch();
-            int ocLength = oc.Length;
-            byte[] command = new byte[ocLength];
-            for (int i = 0; i < ocLength; i++)
+            if (oc != null)
             {
-                command[i] = kernel.MemMgr.RAM.ReadByte(pc + i);
-            }
-            string opcodes = oc.ToString(kernel.CPU.ReadSignature(ocLength, pc));
-            //string status = "";
-            DebugLine line = new DebugLine(pc);
-            line.SetOpcodes(command);
-            line.SetMnemonic(opcodes);
-            if (!lastLine.InvokeRequired)
-            {
-                lastLine.Text = line.ToString();
-            }
-            else
-            {
-                try
+                int ocLength = oc.Length;
+                byte[] command = new byte[ocLength];
+                for (int i = 0; i < ocLength; i++)
                 {
-                    lastLine.Invoke(new lastLineDelegate(ShowLastLine), new object[] { line.ToString() });
+                    command[i] = kernel.MemMgr.RAM.ReadByte(pc + i);
                 }
-                finally
-                { }
-            }
-            // find the proper place to insert the line, based on the PC
-            int index = 0;
-            bool lineAdded = false;
-            for (index = 0; index < codeList.Count; index++)
-            {
-                DebugLine l = codeList[index];
-                if (l.PC > pc)
+                string opcodes = oc.ToString(kernel.CPU.ReadSignature(ocLength, pc));
+                //string status = "";
+                DebugLine line = new DebugLine(pc);
+                line.SetOpcodes(command);
+                line.SetMnemonic(opcodes);
+                if (!lastLine.InvokeRequired)
                 {
-                    codeList.Insert(index, line);
-                    lineAdded = true;
-                    break;
+                    lastLine.Text = line.ToString();
                 }
-            }
-            if (!lineAdded)
-            {
-                codeList.Add(line);
+                else
+                {
+                    try
+                    {
+                        lastLine.Invoke(new lastLineDelegate(ShowLastLine), new object[] { line.ToString() });
+                    }
+                    finally
+                    { }
+                }
+                // find the proper place to insert the line, based on the PC
+                int index = 0;
+                bool lineAdded = false;
+                for (index = 0; index < codeList.Count; index++)
+                {
+                    DebugLine l = codeList[index];
+                    if (l.PC > pc)
+                    {
+                        codeList.Insert(index, line);
+                        lineAdded = true;
+                        break;
+                    }
+                }
+                if (!lineAdded)
+                {
+                    codeList.Add(line);
+                }
             }
         }
 
@@ -780,7 +787,7 @@ namespace FoenixIDE.UI
         {
             StepCounter = 0;
             IRQPC = 0;
-            kernel.CPU.Stack.Reset();
+            kernel.CPU.Stack.TopOfStack = kernel.CPU.Flags.Emulation ? CPU.DefaultStackValueEmulation : CPU.DefaultStackValueNative;
             stackText.Clear();
             DebugPanel.Refresh();
             lastLine.Text = "";
@@ -946,10 +953,13 @@ namespace FoenixIDE.UI
                 if (KeyboardCheckBox.IsActive)
                     KeyboardCheckBox.IsActive = false;
             }
-            //Read Interrupt Register 2
-            byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
-            //Read Interrupt Register 3
-            byte reg3 = kernel.MemMgr.INTERRUPT.ReadByte(3);
+            if (kernel.GetVersion() != BoardVersion.RevJr)
+            {
+                //Read Interrupt Register 2
+                byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
+                //Read Interrupt Register 3
+                byte reg3 = kernel.MemMgr.INTERRUPT.ReadByte(3);
+            }
             return result;
         }
 

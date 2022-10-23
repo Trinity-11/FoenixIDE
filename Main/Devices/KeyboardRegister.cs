@@ -10,15 +10,12 @@ namespace FoenixIDE.Simulator.Devices
         private byte ps2PacketCntr = 0;
         private int packetLength = 0;
         private byte[] ps2packet = new byte[6];
-        private FoenixSystem kernel;
+        public delegate void TriggerInterruptDelegate();
+        public TriggerInterruptDelegate TriggerKeyboardInterrupt;
+        public TriggerInterruptDelegate TriggerMouseInterrupt;
 
         public KeyboardRegister(int StartAddress, int Length) : base(StartAddress, Length)
         {
-        }
-
-        public void SetKernel(FoenixSystem kernel)
-        {
-            this.kernel = kernel;
         }
 
         // This is used to simulate the Keyboard Register
@@ -153,19 +150,6 @@ namespace FoenixIDE.Simulator.Devices
             }
             return data[Address];
         }
-        public void WriteKey(ScanCode key)
-        {
-            // Check if the Keyboard interrupt is allowed
-            byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
-            if ((~mask & (byte)Register1.FNX1_INT00_KBD) == (byte)Register1.FNX1_INT00_KBD)
-            {
-                kernel.MemMgr.KEYBOARD.WriteByte(0, (byte)key);
-                kernel.MemMgr.KEYBOARD.WriteByte(4, 0);
-
-                TriggerKeyboardInterrupt();
-            }
-        }
-
         public void WriteScanCodeSequence(byte[] codes, int seqLength)
         {
             breakKey = true;
@@ -175,15 +159,7 @@ namespace FoenixIDE.Simulator.Devices
             packetLength = seqLength;
             Array.Copy(codes, ps2packet, seqLength);
 
-            TriggerKeyboardInterrupt();
-        }
-        private void TriggerKeyboardInterrupt()
-        {
-            // Set the Keyboard Interrupt
-            byte IRQ1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
-            IRQ1 |= (byte)Register1.FNX1_INT00_KBD;
-            kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IRQ1);
-            kernel.CPU.Pins.IRQ = true;
+            TriggerKeyboardInterrupt?.Invoke();
         }
         
         public void MousePackets(byte buttons, byte X, byte Y)
@@ -196,15 +172,8 @@ namespace FoenixIDE.Simulator.Devices
             ps2packet[1] = X;
             ps2packet[2] = Y;
 
-            TriggerMouseInterrupt();
+            TriggerMouseInterrupt?.Invoke();
         }
-        private void TriggerMouseInterrupt()
-        {
-            // Set the Mouse Interrupt
-            byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
-            IRQ0 |= (byte)Register0.FNX0_INT07_MOUSE;
-            kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
-            kernel.CPU.Pins.IRQ = true;
-        }
+        
     }
 }

@@ -15,8 +15,9 @@ namespace FoenixIDE.Simulator.Devices
         public override async void WriteByte(int Address, byte Value)
         {
             data[Address] = Value;
+            data[2] = 1;
             await Task.Delay(200);
-            data[0] = 0;
+            data[2] = 0;
         }
     }
 }
