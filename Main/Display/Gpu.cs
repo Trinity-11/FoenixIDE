@@ -148,7 +148,7 @@ namespace FoenixIDE.Display
 
             // Read the Master Control Register
             Point res;
-            if (VRAM != null)
+            if (mode == 0)
             {
                 res = GetScreenSize();
             }
@@ -322,7 +322,7 @@ namespace FoenixIDE.Display
                                 // Layer 11 - bitmap 1
                                 if ((MCRegister & 0x8) == 0x8)
                                 {
-                                    DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, false, false);
                                 }
                                 // Layer 10 - sprite layer 5
                                 if ((MCRegister & 0x20) != 0)
@@ -332,7 +332,7 @@ namespace FoenixIDE.Display
                                 // Layer 9 - tilemap layer 3
                                 if ((MCRegister & 0x10) == 0x10)
                                 {
-                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 3, displayBorder, borderXSize, line, res.X);
+                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 3, displayBorder, borderXSize, line, res.X, false, false);
                                 }
                                 // Layer 8 - sprite layer 4
                                 if ((MCRegister & 0x20) != 0)
@@ -342,7 +342,7 @@ namespace FoenixIDE.Display
                                 // Layer 7 - tilemap layer 2
                                 if ((MCRegister & 0x10) == 0x10)
                                 {
-                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 2, displayBorder, borderXSize, line, res.X);
+                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 2, displayBorder, borderXSize, line, res.X, false, false);
                                 }
                                 // Layer 6 - sprite layer 3
                                 if ((MCRegister & 0x20) != 0)
@@ -352,7 +352,7 @@ namespace FoenixIDE.Display
                                 // Layer 5 - tilemap layer 1
                                 if ((MCRegister & 0x10) == 0x10)
                                 {
-                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 1, displayBorder, borderXSize, line, res.X);
+                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 1, displayBorder, borderXSize, line, res.X, false, false);
                                 }
                                 // Layer 4 - sprite layer 2
                                 if ((MCRegister & 0x20) != 0)
@@ -362,7 +362,7 @@ namespace FoenixIDE.Display
                                 // Layer 3 - tilemap layer 0
                                 if ((MCRegister & 0x10) == 0x10)
                                 {
-                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X);
+                                    DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X, false, false);
                                 }
                                 // Layer 2 - sprite layer 1
                                 if ((MCRegister & 0x20) != 0)
@@ -372,7 +372,7 @@ namespace FoenixIDE.Display
                                 // Layer 1 - bitmap layer 0
                                 if ((MCRegister & 0x8) == 0x8)
                                 {
-                                    DrawBitmap(bitmapPointer, gammaCorrection, 0, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawBitmap(bitmapPointer, gammaCorrection, 0, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, false, false);
                                 }
                                 // Layer 0 - sprite layer 0
                                 if ((MCRegister & 0x20) != 0)
@@ -383,6 +383,104 @@ namespace FoenixIDE.Display
                             else
                             {
                                 // Tiny Vicky Layers for Bitmaps, Tilemaps and sprites
+                                byte LayerMgr0 = (byte)(VICKY.ReadByte(0xD002 - 0xC000) & 0x7);
+                                byte LayerMgr1 = (byte)(VICKY.ReadByte(0xD002 - 0xC000) >> 4);
+                                byte LayerMgr2 = (byte)(VICKY.ReadByte(0xD003 - 0xC000) & 0x7);
+                                bool doubleY = (MCRHigh & 4) == 0;
+                                bool doubleX = (MCRHigh & 2) == 0;
+                                int BitmapY = (MCRHigh & 4) != 0 ? res.Y : res.Y >> 1;
+                                
+                                if ((MCRegister & 0x20) != 0)
+                                {
+                                    DrawSprites(bitmapPointer, gammaCorrection, 0, displayBorder, borderXSize, borderYSize, line, 320, BitmapY);
+                                }
+                                if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
+                                {
+                                    switch (LayerMgr0)
+                                    {
+                                        case 0:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 0, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 1:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 2:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 4:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 5:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 1, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 6:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 2, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                    }
+                                    
+                                }
+                                if ((MCRegister & 0x20) != 0)
+                                {
+                                    DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY);
+                                }
+                                if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
+                                {
+                                    switch (LayerMgr1)
+                                    {
+                                        case 0:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 0, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 1:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 2:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 4:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 5:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 1, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 6:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 2, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                    }
+
+                                }
+                                if ((MCRegister & 0x20) != 0)
+                                {
+                                    DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY);
+                                }
+                                if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
+                                {
+                                    switch (LayerMgr2)
+                                    {
+                                        case 0:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 0, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 1:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 2:
+                                            DrawBitmap(bitmapPointer, gammaCorrection, 1, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 4:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 5:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 1, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                        case 6:
+                                            DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 2, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
+                                            break;
+                                    }
+
+                                }
+                                if ((MCRegister & 0x20) != 0)
+                                {
+                                    DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY);
+                                }
                             }
                         }
                         // Draw the text

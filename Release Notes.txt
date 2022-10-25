@@ -1,3 +1,9 @@
+Release 0.6.0.1
+---------------
+Implemented tiles for F256Jr.
+Fixed the issue when resetting the CPU, also reset the MMU and VICKY Layer Manager Registers.
+Fixed RTC issue in F256Jr where the time was written in RAM.
+
 Release 0.6.0.0
 ---------------
 Fixed an issue where CPS/FPS display was showing zeroes after switching Board type.

@@ -147,6 +147,16 @@ namespace FoenixIDE.Display
         {
             CursorXAddress = val;
         }
+        int TileMapBaseAddress;
+        public void SetTileMapBaseAddress(int val)
+        {
+            TileMapBaseAddress = val;
+        }
+        int TilesetBaseAddress;
+        public void SetTilesetBaseAddress(int val)
+        {
+            TilesetBaseAddress = val;
+        }
 
         private int[] GetTextLUT(byte fg, byte bg, bool gamma)
         {
@@ -296,11 +306,21 @@ namespace FoenixIDE.Display
             }
         }
 
-        private unsafe void DrawBitmap(int* p, bool gammaCorrection, int layer, bool bkgrnd, int bgndColor, int borderXSize, int borderYSize, int line, int width, int height)
+        int BitmapControlRegister;
+        public void SetBitmapControlRegister(int val)
+        {
+            BitmapControlRegister = val;
+        }
+        /**
+         *
+         * dX => double the horizontal pixels
+         * dY => double the vertical pixels
+         */
+        private unsafe void DrawBitmap(int* p, bool gammaCorrection, int layer, bool bkgrnd, int bgndColor, int borderXSize, int borderYSize, int line, int width, bool dX, bool dY)
         {
 
             // Bitmap Controller is located at $AF:0100 and $AF:0108
-            int regAddr = MemoryMap.BITMAP_CONTROL_REGISTER_ADDR - VICKY.StartAddress + layer * 8;
+            int regAddr = BitmapControlRegister + layer * 8;
             byte reg = VICKY.ReadByte(regAddr);
             if ((reg & 0x01) == 00)
             {
@@ -309,18 +329,41 @@ namespace FoenixIDE.Display
             byte lutIndex = (byte)((reg >> 1) & 7);  // 8 possible LUTs
 
             int bitmapAddress = VICKY.ReadLong(regAddr + 1) & 0x3F_FFFF;
-            int xOffset = VICKY.ReadWord(regAddr + 4);
-            int yOffset = VICKY.ReadWord(regAddr + 6);
+            int xOffset = 0;
+            int yOffset = 0;
+            if (mode == 0)
+            {
+                xOffset = VICKY.ReadWord(regAddr + 4);
+                yOffset = VICKY.ReadWord(regAddr + 6);
+            }
 
             int clrVal = 0;
-            int offsetAddress = bitmapAddress + line * width;
+            int offsetAddress;
+            if (!dY)
+            {
+                offsetAddress = bitmapAddress + line * width;
+            }
+            else
+            {
+                offsetAddress = bitmapAddress + (line/2) * (dX ? width/2 : width);
+            }
+            
             int pixelOffset = line * STRIDE;
             int* ptr = p + pixelOffset;
             //int col = borderXSize;
             byte pixVal = 0;
-            VRAM.CopyIntoBuffer(offsetAddress, width, pixVals);
-
-            int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - VICKY.StartAddress + lutIndex * 1024;
+            if (!dX)
+            {
+                VRAM.CopyIntoBuffer(offsetAddress, width, pixVals);
+            }
+            else
+            {
+                for (int i=0;i < width/2; i++)
+                {
+                    pixVals[i*2] = VRAM.ReadByte(offsetAddress + i);
+                    pixVals[i*2+1] = pixVals[i * 2];
+                }
+            }
 
             //while (col < width - borderXSize)
             for (int col = borderXSize; col < width - borderXSize; col++)
@@ -335,10 +378,10 @@ namespace FoenixIDE.Display
             }
         }
 
-        private unsafe void DrawTiles(int* p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, in int borderXSize, in int line, in int width)
+        private unsafe void DrawTiles(int* p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, in int borderXSize, in int line, in int width, bool dX, bool dY)
         {
             // There are four possible tilemaps to choose from
-            int addrTileCtrlReg = MemoryMap.TILE_CONTROL_REGISTER_ADDR - VICKY.StartAddress + layer * 12;
+            int addrTileCtrlReg = TileMapBaseAddress + layer * 12;
             int reg = VICKY.ReadByte(addrTileCtrlReg);
             // if the set is not enabled, we're done.
             if ((reg & 0x01) == 00)
@@ -381,15 +424,15 @@ namespace FoenixIDE.Display
             }
             else
             {
-                tilemapWindowY = tilemapWindowY & 0x3FF0 + scrollY;
+                tilemapWindowY = (tilemapWindowY & 0x3FF0) + scrollY;
             }
 
-            int tileRow = (line + tilemapWindowY) / tileSize;
-            int tileYOffset = (line + tilemapWindowY) % tileSize;
+            int tileRow = ((dY ? line / 2: line) + tilemapWindowY) / tileSize;
+            int tileYOffset = ((dY ? line / 2 : line) + tilemapWindowY) % tileSize;
             int maxX = width - borderXSize;
 
             // we always read tiles 0 to width/TILE_SIZE + 1 - this is to ensure we can display partial tiles, with X,Y offsets
-            int tilemapItemCount = width / tileSize + 1;
+            int tilemapItemCount = (dX ? width / 2 : width) / tileSize + 1;
             byte[] tiles = new byte[tilemapItemCount * 2];
             int[] tilesetOffsets = new int[tilemapItemCount];
             VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tilemapItemCount * 2, tiles);
@@ -399,9 +442,16 @@ namespace FoenixIDE.Display
             int[] strides = new int[8];
             for (int i = 0; i < 8; i++)
             {
-                tilesetPointers[i] = VICKY.ReadLong(MemoryMap.TILESET_BASE_ADDR - VICKY.StartAddress + i * 4) & 0x3F_FFFF;
-                byte tilesetConfig = VICKY.ReadByte(MemoryMap.TILESET_BASE_ADDR - VICKY.StartAddress + i * 4 + 3);
-                strides[i] = (tilesetConfig & 8) != 0 ? strideLine : tileSize;
+                tilesetPointers[i] = VICKY.ReadLong(TilesetBaseAddress + i * 4) & 0x3F_FFFF;
+                byte tilesetConfig = VICKY.ReadByte(TilesetBaseAddress + i * 4 + 3);
+                if (mode == 0)
+                {
+                    strides[i] = (tilesetConfig & 8) != 0 ? strideLine : tileSize;
+                }
+                else
+                {
+                    strides[i] = strideLine;
+                }
             }
             for (int i = 0; i < tilemapItemCount; i++)
             {
@@ -443,7 +493,7 @@ namespace FoenixIDE.Display
             //}
             // alternate display style - avoids repeating the loop so often
             int startTileX = (borderXSize + tileXOffset) / tileSize;
-            int endTileX = (width - borderXSize + tileXOffset) / tileSize + 1;
+            int endTileX = ((dX ? width/2 : width) - borderXSize + tileXOffset) / tileSize + 1;
             int startOffset = (borderXSize + tilemapWindowX) % tileSize;
             int x = borderXSize;
             byte[] tilepix = new byte[tileSize];
@@ -467,6 +517,14 @@ namespace FoenixIDE.Display
                     x++;
                     startOffset++;
                     tilesetOffsetAddress++;
+                    if (dX)
+                    {
+                        if (pixVal >0)
+                        {
+                            ptr[x] = clrVal;
+                        }
+                        x++;
+                    }
                 } while (startOffset != tileSize && x < maxX);
                 startOffset = 0;
                 if (x == maxX)

@@ -199,10 +199,16 @@ namespace FoenixIDE.UI
                 gpu.SetSOL0Address(MemoryMap.VKY_LINE0_CMP_VALUE_LO);
                 gpu.SetSOL1Address(MemoryMap.VKY_LINE1_CMP_VALUE_LO);
                 gpu.SetMousePointerRegister(0x700);
+
+                gpu.SetBitmapControlRegister(MemoryMap.BITMAP_CONTROL_REGISTER_ADDR - gpu.VICKY.StartAddress);
+                gpu.SetTileMapBaseAddress(MemoryMap.TILE_CONTROL_REGISTER_ADDR - gpu.VICKY.StartAddress);
+                gpu.SetTilesetBaseAddress(MemoryMap.TILESET_BASE_ADDR - gpu.VICKY.StartAddress);
             }
             else
             {
                 gpu.SetMode(1);
+                gpu.VRAM = kernel.MemMgr.RAM;
+
                 // Addresses for VICKY in Junior are zero-based
                 gpu.SetMCRAddress(0x1000);
                 gpu.SetFGLUTAddress(MemoryMap.FG_CHAR_LUT_PTR_JR - 0xC000);  // IO Page 0
@@ -219,6 +225,10 @@ namespace FoenixIDE.UI
                 gpu.SetLineIRQRegister(MemoryMap.VKY_LINE_IRQ_CTRL_REG_JR - 0xC000);  // IO Page 0
                 gpu.SetSOL0Address(MemoryMap.VKY_LINE_CMP_VALUE_JR - 0xC000);  // IO Page 0
                 gpu.SetMousePointerRegister(0x1000);  // IO Page 0
+
+                gpu.SetBitmapControlRegister(0xD100 - 0xC000);  // IO Page 0
+                gpu.SetTileMapBaseAddress(0xD200 - 0xC000);
+                gpu.SetTilesetBaseAddress(0xD280 - 0xC000);
             }
            
             if (disabledIRQs)
@@ -401,14 +411,9 @@ namespace FoenixIDE.UI
             }
         }
 
-        DateTime pSof;
         public void SOFRoutine()
         {
             // Check if the interrupt is enabled
-            DateTime currentDT = DateTime.Now;
-            TimeSpan ts = currentDT - pSof;
-            //System.Console.WriteLine(ts.TotalMilliseconds);
-            pSof = currentDT;
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
             if (version == BoardVersion.RevJr)
             {
@@ -459,7 +464,6 @@ namespace FoenixIDE.UI
 
         public void setGpuPeriod(uint time)
         {
-
             gpu.SetRefreshPeriod(time);
         }
 
@@ -685,6 +689,7 @@ namespace FoenixIDE.UI
                 statusStrip1.Update();
             }
         }
+
         int previousCounter = 0;
         int previousFrame = 0;
         DateTime previousTime = DateTime.Now;
@@ -733,14 +738,14 @@ namespace FoenixIDE.UI
             }
             else
             {
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR, BCD(currentTime.Second));
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 2, BCD(currentTime.Minute));
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 4, BCD(currentTime.Hour));
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 6, BCD(currentTime.Day));
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 8, BCD(currentTime.Month));
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 10, BCD(currentTime.Year % 100));
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 12, BCD(currentTime.Year / 100));
-                kernel.MemMgr.RAM.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 14, (byte)(currentTime.DayOfWeek + 1));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR - 0xC000, BCD(currentTime.Second));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 2 - 0xC000, BCD(currentTime.Minute));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 4 - 0xC000, BCD(currentTime.Hour));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 6 - 0xC000, BCD(currentTime.Day));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 8 - 0xC000, BCD(currentTime.Month));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 10 - 0xC000, BCD(currentTime.Year % 100));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 12 - 0xC000, BCD(currentTime.Year / 100));
+                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 14 - 0xC000, (byte)(currentTime.DayOfWeek + 1));
             }
         }
 
@@ -778,6 +783,13 @@ namespace FoenixIDE.UI
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
+                if (version == BoardVersion.RevJr)
+                {
+                    // Now update other registers
+                    kernel.MemMgr.MMU.Reset();
+                    kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
+                    kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+                }
                 memoryWindow.UpdateMCRButtons();
                 ResetSDCard();
 
@@ -799,6 +811,13 @@ namespace FoenixIDE.UI
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
+                if (version == BoardVersion.RevJr)
+                {
+                    // Now update other registers
+                    kernel.MemMgr.MMU.Reset();
+                    kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
+                    kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+                }
                 memoryWindow.UpdateMCRButtons();
                 ResetSDCard();
 
@@ -817,6 +836,13 @@ namespace FoenixIDE.UI
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
+                if (version == BoardVersion.RevJr)
+                {
+                    // Now update other registers
+                    kernel.MemMgr.MMU.Reset();
+                    kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
+                    kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+                }
                 memoryWindow.UpdateMCRButtons();
                 ResetSDCard();
 
@@ -876,6 +902,13 @@ namespace FoenixIDE.UI
                     debugWindow.Pause();
                     SetDipSwitchMemory();
                     ShowDebugWindow();
+                    if (version == BoardVersion.RevJr)
+                    {
+                        // Now update other registers
+                        kernel.MemMgr.MMU.Reset();
+                        kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
+                        kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+                    }
                     ShowMemoryWindow();
                     EnableMenuItems();
                     assetWindow.UpdateAssets();
@@ -1395,7 +1428,6 @@ namespace FoenixIDE.UI
                 byte userMode = (byte)((switches[4] ? 0 : 1) + (switches[5] ? 0 : 2) + (switches[6] ? 0 : 4));
                 if (kernel.MemMgr != null && kernel.MemMgr.VICKY != null)
                 {
-
                     // switch 6 - Gamma
                     byte MCR = kernel.MemMgr.VICKY.ReadByte(MemoryMap.VICKY_START_JR - 0xC000);
                     if (switches[7])
@@ -1406,20 +1438,22 @@ namespace FoenixIDE.UI
                     {
                         MCR &= 0b1011_1111;
                     }
-                    kernel.MemMgr.VICKY.WriteByte(kernel.MemMgr.VICKY.StartAddress, MCR);
+                    kernel.MemMgr.VICKY.WriteByte(MemoryMap.VICKY_START_JR - 0xC000, MCR);
                 }
             }
         }
 
         public void WriteMCRBytesToVicky(byte low, byte high)
         {
-            kernel.MemMgr.VICKY.WriteByte(0, low);
-            kernel.MemMgr.VICKY.WriteByte(1, high);
+            int baseAddr = version == BoardVersion.RevJr ? 0xD000 - 0xC000 : 0;
+
+            kernel.MemMgr.VICKY.WriteByte(baseAddr, low);
+            kernel.MemMgr.VICKY.WriteByte(baseAddr + 1, high);
         }
 
         public ushort ReadMCRBytesFromVicky()
         {
-            return (ushort)kernel.MemMgr.VICKY.ReadWord(0);
+            return (ushort)kernel.MemMgr.VICKY.ReadWord(version == BoardVersion.RevJr ? 0xD000 - 0xC000 : 0);
         }
 
         public void UpdateGamma(bool gamma)

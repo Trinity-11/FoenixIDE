@@ -17,11 +17,6 @@ namespace FoenixIDE.Simulator.Devices
 
         public MMU_JR(int StartAddress, int Length) : base(StartAddress, Length)
         {
-            // At boot time, the last page of FLASH
-            LUTs[7]  = 0x7F;
-            LUTs[15] = 0x7F;
-            LUTs[23] = 0x7F;
-            LUTs[31] = 0x7F;
         }
 
         public override byte ReadByte(int Address)
@@ -61,6 +56,16 @@ namespace FoenixIDE.Simulator.Devices
         public void SetActiveLUT(byte LUT)
         {
             activeLUT = LUT;
+        }
+
+        public void Reset()
+        {
+            data[0] = 0;
+            data[1] = 0;
+             LUTs = new byte[]{ 0, 1, 2, 3, 4, 5, 6, 0x7F,
+                        0, 1, 2, 3, 4, 5, 6, 0x7F,
+                        0, 1, 2, 3, 4, 5, 6, 0x7F,
+                        0, 1, 2, 3, 4, 5, 6, 0x7F };
         }
     }
 }

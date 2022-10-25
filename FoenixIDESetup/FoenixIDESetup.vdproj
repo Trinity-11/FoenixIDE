@@ -135,6 +135,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7BD2B3A7DD6E4E0E81969BEC234D508C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_81547FC2AD874EF680C5282428D55CD4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -238,6 +244,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EDF063FA0BC448258600F68E865EAF8D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F1A01B2DDF0E458FB4CC621697DB5ED5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -762,6 +774,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7BD2B3A7DD6E4E0E81969BEC234D508C"
+            {
+            "SourcePath" = "8:..\\Main\\roms\\kernel_F256jr.lst"
+            "TargetName" = "8:kernel_F256jr.lst"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_81547FC2AD874EF680C5282428D55CD4"
             {
             "SourcePath" = "8:..\\Main\\roms\\kernel_FMX.lst"
@@ -1133,6 +1165,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F1A01B2DDF0E458FB4CC621697DB5ED5"
+            {
+            "SourcePath" = "8:..\\Main\\roms\\kernel_F256jr.hex"
+            "TargetName" = "8:kernel_F256jr.hex"
+            "Tag" = "8:"
+            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F5E33CFE52604F89ADF26B5E264648BA"
             {
             "SourcePath" = "8:..\\Main\\roms\\kernel_FMX.hex"
@@ -1263,7 +1315,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FoenixIDE Setup"
         "ProductCode" = "8:{0F09CD7A-6292-4AD4-B99E-D088A15D65C9}"
-        "PackageCode" = "8:{F4927D30-91A5-4E32-B1DC-4D213B55B18D}"
+        "PackageCode" = "8:{1C77F710-270E-4289-9C4C-FFA9E9979B1C}"
         "UpgradeCode" = "8:{A91983FA-7F1D-495E-8BFB-CB92EECA466F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1812,7 +1864,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_05BB69B027C149C699B0E2980589B4DF"
             {
-            "SourcePath" = "8:..\\Main\\obj\\Debug\\FoenixIDE.exe"
+            "SourcePath" = "8:..\\Main\\obj\\Release\\FoenixIDE.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"

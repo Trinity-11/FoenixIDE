@@ -178,6 +178,8 @@ namespace FoenixIDE
             else
             {
                 MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
+                MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
+                MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
             }
 
             if (MemMgr.TIMER0.TimerInterruptDelegate == null)
@@ -279,10 +281,10 @@ namespace FoenixIDE
                 }
                 if (boardVersion == BoardVersion.RevJr)
                 {
-                    byte[] tempBuffer = new byte[0xFFFF];
-                    MemMgr.RAM.CopyIntoBuffer(0, 0xFFFF, tempBuffer);
+                    byte[] tempBuffer = new byte[0x1_0000];
+                    MemMgr.RAM.CopyIntoBuffer(0, 0x1_0000, tempBuffer);
                     //MemMgr.RAM.Zero();
-                    MemMgr.RAM.CopyBuffer(tempBuffer, 0, 0xF_0000, 0xFFFF);
+                    MemMgr.RAM.CopyBuffer(tempBuffer, 0, 0xF_0000, 0x1_0000);
                 }
             }
             else if (extension.Equals(".PGX"))

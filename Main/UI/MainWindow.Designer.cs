@@ -42,9 +42,9 @@ namespace FoenixIDE.UI
             this.SDCardPath = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuOpenHexFile = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFNXMLFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOpenHexFile = new System.Windows.Forms.ToolStripMenuItem();
             this.loadWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveWatchListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,10 +92,10 @@ namespace FoenixIDE.UI
             this.cpsPerf,
             this.fpsPerf,
             this.SDCardPath});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 543);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 519);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.ShowItemToolTips = true;
-            this.statusStrip1.Size = new System.Drawing.Size(670, 28);
+            this.statusStrip1.Size = new System.Drawing.Size(669, 22);
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -109,7 +109,7 @@ namespace FoenixIDE.UI
             this.toolStripRevision.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
             this.toolStripRevision.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripRevision.Name = "toolStripRevision";
-            this.toolStripRevision.Size = new System.Drawing.Size(64, 23);
+            this.toolStripRevision.Size = new System.Drawing.Size(64, 17);
             this.toolStripRevision.Text = "Rev B";
             this.toolStripRevision.ToolTipText = "Board Version";
             this.toolStripRevision.Click += new System.EventHandler(this.ToolStripRevision_Click);
@@ -120,7 +120,7 @@ namespace FoenixIDE.UI
             this.dipSwitch.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.dipSwitch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.None;
             this.dipSwitch.Name = "dipSwitch";
-            this.dipSwitch.Size = new System.Drawing.Size(129, 23);
+            this.dipSwitch.Size = new System.Drawing.Size(129, 17);
             this.dipSwitch.Text = "toolStripStatusLabel1";
             this.dipSwitch.ToolTipText = "DIP Switches";
             this.dipSwitch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DipSwitch_MouseDown);
@@ -129,14 +129,14 @@ namespace FoenixIDE.UI
             // ModeText
             // 
             this.ModeText.Name = "ModeText";
-            this.ModeText.Size = new System.Drawing.Size(26, 23);
+            this.ModeText.Size = new System.Drawing.Size(26, 17);
             this.ModeText.Text = "Key";
             // 
             // lastKeyPressed
             // 
             this.lastKeyPressed.AutoSize = false;
             this.lastKeyPressed.Name = "lastKeyPressed";
-            this.lastKeyPressed.Size = new System.Drawing.Size(30, 23);
+            this.lastKeyPressed.Size = new System.Drawing.Size(30, 17);
             this.lastKeyPressed.Text = "$00";
             // 
             // cpsPerf
@@ -150,7 +150,7 @@ namespace FoenixIDE.UI
             this.cpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cpsPerf.Name = "cpsPerf";
             this.cpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.cpsPerf.Size = new System.Drawing.Size(110, 23);
+            this.cpsPerf.Size = new System.Drawing.Size(110, 17);
             this.cpsPerf.Text = "CPS: 0";
             this.cpsPerf.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.cpsPerf.ToolTipText = "Cycles Per Second";
@@ -165,7 +165,7 @@ namespace FoenixIDE.UI
             this.fpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fpsPerf.Name = "fpsPerf";
             this.fpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.fpsPerf.Size = new System.Drawing.Size(55, 23);
+            this.fpsPerf.Size = new System.Drawing.Size(55, 17);
             this.fpsPerf.Text = "FPS: 0";
             this.fpsPerf.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.fpsPerf.ToolTipText = "Frames Per Second";
@@ -180,7 +180,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(241, 23);
+            this.SDCardPath.Size = new System.Drawing.Size(240, 17);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -199,7 +199,7 @@ namespace FoenixIDE.UI
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(670, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(669, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -216,13 +216,6 @@ namespace FoenixIDE.UI
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
-            // menuOpenHexFile
-            // 
-            this.menuOpenHexFile.Name = "menuOpenHexFile";
-            this.menuOpenHexFile.Size = new System.Drawing.Size(184, 22);
-            this.menuOpenHexFile.Text = "&Open Executable File";
-            this.menuOpenHexFile.Click += new System.EventHandler(this.MenuOpenExecutableFile_Click);
-            // 
             // loadFNXMLFileToolStripMenuItem
             // 
             this.loadFNXMLFileToolStripMenuItem.Name = "loadFNXMLFileToolStripMenuItem";
@@ -236,6 +229,13 @@ namespace FoenixIDE.UI
             this.saveProjectToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.saveProjectToolStripMenuItem.Text = "&Save Project...";
             this.saveProjectToolStripMenuItem.Click += new System.EventHandler(this.SaveProjectToolStripMenuItem_Click);
+            // 
+            // menuOpenHexFile
+            // 
+            this.menuOpenHexFile.Name = "menuOpenHexFile";
+            this.menuOpenHexFile.Size = new System.Drawing.Size(184, 22);
+            this.menuOpenHexFile.Text = "&Open Executable File";
+            this.menuOpenHexFile.Click += new System.EventHandler(this.MenuOpenExecutableFile_Click);
             // 
             // loadWatchListToolStripMenuItem
             // 
@@ -495,7 +495,7 @@ namespace FoenixIDE.UI
             this.gpu.Margin = new System.Windows.Forms.Padding(4);
             this.gpu.MinimumSize = new System.Drawing.Size(640, 480);
             this.gpu.Name = "gpu";
-            this.gpu.Size = new System.Drawing.Size(670, 519);
+            this.gpu.Size = new System.Drawing.Size(669, 495);
             this.gpu.TabIndex = 0;
             this.gpu.TabStop = false;
             this.gpu.TileEditorMode = false;
@@ -510,7 +510,7 @@ namespace FoenixIDE.UI
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(670, 571);
+            this.ClientSize = new System.Drawing.Size(669, 541);
             this.Controls.Add(this.gpu);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
