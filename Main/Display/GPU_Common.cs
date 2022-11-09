@@ -158,6 +158,11 @@ namespace FoenixIDE.Display
             TilesetBaseAddress = val;
         }
 
+        int SpriteBaseAddress;
+        public void SetSpriteBaseAddress(int val)
+        {
+            SpriteBaseAddress = val;
+        }
         private int[] GetTextLUT(byte fg, byte bg, bool gamma)
         {
             int[] values = new int[2];
@@ -444,18 +449,11 @@ namespace FoenixIDE.Display
             {
                 tilesetPointers[i] = VICKY.ReadLong(TilesetBaseAddress + i * 4) & 0x3F_FFFF;
                 byte tilesetConfig = VICKY.ReadByte(TilesetBaseAddress + i * 4 + 3);
-                if (mode == 0)
-                {
-                    strides[i] = (tilesetConfig & 8) != 0 ? strideLine : tileSize;
-                }
-                else
-                {
-                    strides[i] = strideLine;
-                }
+                strides[i] = (tilesetConfig & 8) != 0 ? strideLine : tileSize;
             }
             for (int i = 0; i < tilemapItemCount; i++)
             {
-                byte tile = tiles[i * 2];
+                byte tile = (byte)(tiles[i * 2]);
                 byte tilesetReg = tiles[i * 2 + 1];
                 byte tileset = (byte)(tilesetReg & 7);
                 //byte tileLUT = (byte)((tilesetReg & 0x38) >> 3);
@@ -465,7 +463,7 @@ namespace FoenixIDE.Display
                 int strideX = strides[tileset];
                 if (strideX == tileSize)
                 {
-                    tilesetOffsets[i] = tilesetPointer + (tile % 16) * strideLine + (tile / 16) * strideLine * 16 + tileYOffset * tileSize;
+                    tilesetOffsets[i] = tilesetPointer + (tile % 16) * tileSize * tileSize + (tile / 16) * tileSize * tileSize * 16 + tileYOffset * tileSize;
                 }
                 else
                 {
@@ -533,48 +531,72 @@ namespace FoenixIDE.Display
                 }
             }
         }
-        private unsafe void DrawSprites(int* p, bool gammaCorrection, byte layer, bool bkgrnd, int borderXSize, int borderYSize, int line, int width, int height)
+        const int screenOffset = 32;
+        private unsafe void DrawSprites(int* p, bool gammaCorrection, byte layer, bool bkgrnd, int borderXSize, int borderYSize, int line, int width, int height, bool dX, bool dY)
         {
             // There are 32 possible sprites to choose from.
             for (int s = 63; s > -1; s--)
             {
-                int addrSprite = MemoryMap.SPRITE_CONTROL_REGISTER_ADDR + s * 8 - VICKY.StartAddress;
+                int addrSprite = SpriteBaseAddress + s * 8;
                 byte reg = VICKY.ReadByte(addrSprite);
                 // if the set is not enabled, we're done.
-                byte spriteLayer = (byte)((reg & 0x70) >> 4);
+                byte spriteLayer = (mode == 0) ? ((byte)((reg & 0x70) >> 4)) : ((byte)((reg & 0x18) >> 3));
+                // if the sprite is enabled and the layer matches, then check the line
                 if ((reg & 1) != 0 && layer == spriteLayer)
                 {
-                    int posY = VICKY.ReadWord(addrSprite + 6) - 32;
-                    if ((line >= posY && line < posY + 32))
+                    byte spriteSize = 32;
+                    if (mode == 1)
+                    {
+                        switch ((reg & 0x60) >> 5)
+                        {
+                            case 1:
+                                spriteSize = 24;
+                                break;
+                            case 2:
+                                spriteSize = 16;
+                                break;
+                            case 3:
+                                spriteSize = 8;
+                                break;
+                        }
+                    }
+                    int posY = VICKY.ReadWord(addrSprite + 6) - screenOffset;
+                    int actualLine = dY ? line / 2 : line;
+                    if ((actualLine >= posY && actualLine < posY + spriteSize))
                     {
                         // TODO Fix this when Vicky II fixes the LUT issue
-                        byte lutIndex = (byte)(((reg & 14) >> 1));  // 8 possible LUTs
-                        int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - VICKY.StartAddress + lutIndex * 1024;
+                        byte lutIndex = (mode == 0) ? (byte)(((reg & 0xC) >> 1)) : (byte)(((reg & 6) >> 1));
+            
+                        int lutAddress = lutBaseAddress + lutIndex * 1024;
                         bool striding = (reg & 0x80) == 0x80;
 
                         int spriteAddress = VICKY.ReadLong(addrSprite + 1) & 0x3F_FFFF;
-                        int posX = VICKY.ReadWord(addrSprite + 4) - 32;
+                        int posX = VICKY.ReadWord(addrSprite + 4) - screenOffset;
+                        if (dX)
+                        {
+                            posX *= 2;
+                        }
 
 
-                        if (posX >= (width - borderXSize) || posY >= (height - borderYSize) || (posX + 32) < 0 || (posY + 32) < 0)
+                        if (posX >= (width - borderXSize) || posY >= (height - borderYSize) || (posX + screenOffset) < 0 || (posY + screenOffset) < 0)
                         {
                             continue;
                         }
-                        int spriteWidth = 32;
+                        int spriteWidth = spriteSize;
                         int xOffset = 0;
                         // Check for sprite bleeding on the left-hand-side
                         if (posX < borderXSize)
                         {
                             xOffset = borderXSize - posX;
                             posX = borderXSize;
-                            spriteWidth = 32 - xOffset;
+                            spriteWidth = spriteSize - xOffset;
                             if (spriteWidth == 0)
                             {
                                 continue;
                             }
                         }
                         // Check for sprite bleeding on the right-hand side
-                        if (posX + 32 > width - borderXSize)
+                        if (posX + spriteSize > width - borderXSize)
                         {
                             spriteWidth = width - borderXSize - posX;
                             if (spriteWidth == 0)
@@ -586,19 +608,21 @@ namespace FoenixIDE.Display
                         int clrVal = 0;
                         byte pixVal = 0;
 
-                        // Sprites are 32 x 32
-                        int sline = line - posY;
+                        int sline = actualLine - posY;
                         int lineOffset = line * STRIDE;
                         int* ptr = p + lineOffset;
                         for (int col = xOffset; col < xOffset + spriteWidth; col++)
                         {
                             // Lookup the pixel in the tileset - if the value is 0, it's transparent
-                            pixVal = VRAM.ReadByte(spriteAddress + col + sline * 32);
+                            pixVal = VRAM.ReadByte(spriteAddress + col + sline * spriteSize);
                             if (pixVal != 0)
                             {
                                 clrVal = GetLUTValue(lutIndex, pixVal, gammaCorrection);
-                                //System.Runtime.InteropServices.Marshal.WriteInt32(p, (lineOffset + (col-xOffset + posX)) * 4, value);
-                                ptr[col - xOffset + posX] = clrVal;
+                                ptr[(dX ? col * 2: col) - xOffset + posX] = clrVal;
+                                if (dX)
+                                {
+                                    ptr[col * 2 +1 - xOffset + posX] = clrVal;
+                                }
                             }
                         }
                     }

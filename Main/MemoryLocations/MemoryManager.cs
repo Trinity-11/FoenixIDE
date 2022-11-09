@@ -287,18 +287,11 @@ namespace FoenixIDE.MemoryLocations
                 byte segment = (byte)(Address >> 13);  // take the top 3 bits
                 offset = MMU.GetPage((byte)(MMURegister & 3), segment) * 8192;
                 // bits 4 and 5 of MMURegister determine which LUT is being edited
-                if (Address >= 8 && Address <= 0xF)
+                if ((MMURegister & 0x80) != 0 && Address >= 8 && Address <= 0xF)
                 {
                     Device = MMU;
                     MMU.SetActiveLUT((byte)((MMURegister & 0x30) >> 4));
                     DeviceAddress = Address;
-                    return;
-                }
-                if ((MMURegister & 0x80) != 0 && Address >= 0x10 && Address <= 0x2F)
-                {
-                    Device = MMU;
-                    MMU.SetActiveLUT((byte)((Address - 0x10)>>3));
-                    DeviceAddress = (Address & 7) + 8;
                     return;
                 }
                 

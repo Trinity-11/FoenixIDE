@@ -156,7 +156,7 @@ namespace FoenixIDE.Processor
             }
 
             // TODO - if pc > RAM size, then throw an exception
-            CurrentOpcode = opcodes[MemMgr.RAM.ReadByte(PC)];
+            CurrentOpcode = opcodes[MemMgr.ReadByte(PC)];
             if (CurrentOpcode != null)
             {
                 OpcodeLength = CurrentOpcode.Length;
@@ -258,11 +258,11 @@ namespace FoenixIDE.Processor
             switch (length)
             {
                 case 2:
-                    return MemMgr.RAM.ReadByte(pc + 1);
+                    return MemMgr.ReadByte(pc + 1);
                 case 3:
-                    return MemMgr.RAM.ReadWord(pc + 1);
+                    return MemMgr.ReadWord(pc + 1);
                 case 4:
-                    return MemMgr.RAM.ReadLong(pc + 1);
+                    return MemMgr.ReadLong(pc + 1);
             }
 
             return 0;

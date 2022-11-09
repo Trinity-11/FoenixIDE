@@ -177,10 +177,43 @@ namespace FoenixIDE.UI
             {
                 case ".png":
                     Bitmap png = new Bitmap(FileNameTextBox.Text, false);
+                    if (FileTypesCombo.SelectedIndex == 1)
+                    {
+                        if (png.Width == 16)
+                        {
+                            conversionStride = 16;
+                            maxHeight = 256 * 16;
+                        }
+                    }
+                    else if(FileTypesCombo.SelectedIndex == 2)
+                    {
+                        if (png.Width == 8)
+                        {
+                            conversionStride = 8;
+                            maxHeight = 256 * 8;
+                        }
+                    }
+
                     ConvertBitmapToRaw(png, res, (byte)LUTCombo.SelectedIndex, conversionStride, maxHeight);
                     break;
                 case ".bmp":
                     Bitmap bmp = new Bitmap(FileNameTextBox.Text, false);
+                    if (FileTypesCombo.SelectedIndex == 1)
+                    {
+                        if (bmp.Width == 16)
+                        {
+                            conversionStride = 16;
+                            maxHeight = 256 * 16;
+                        }
+                    }
+                    else if (FileTypesCombo.SelectedIndex == 2)
+                    {
+                        if (bmp.Width == 8)
+                        {
+                            conversionStride = 8;
+                            maxHeight = 256 * 8;
+                        }
+                    }
                     ConvertBitmapToRaw(bmp, res, (byte)LUTCombo.SelectedIndex, conversionStride, maxHeight);
                     break;
                 default:
@@ -250,6 +283,7 @@ namespace FoenixIDE.UI
                     { }
 
                     done = true;
+
                     // Reset the Lookup Table
                     lut = new List<int>(256)
                     {
@@ -397,6 +431,18 @@ namespace FoenixIDE.UI
                             MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i, LowByte(rbg));
                             MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 1, MidByte(rbg));
                             MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 2, HighByte(rbg));
+                            MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 3, 0);
+                        }
+                        // if the Overwrite checkbox is checked, then complete with zeros
+                        if (checkOverwriteLUT.Checked)
+                        {
+                            for (int i= lut.Count; i < 256; i++)
+                            {
+                                MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i, 0);
+                                MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 1, 0);
+                                MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 2, 0);
+                                MemMgrRef.VICKY.WriteByte(lutBaseAddress + 4 * i + 3, 0);
+                            }
                         }
                     }
 

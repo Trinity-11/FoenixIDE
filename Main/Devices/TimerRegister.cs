@@ -1,15 +1,11 @@
-﻿using FoenixIDE.Timers;
+﻿using KGySoft.CoreLibraries;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
     public class TimerRegister : MemoryLocations.MemoryRAM
     {
-        private MultimediaTimer hiresTimer = null;
+        private HiResTimer hiresTimer = null;
 
         public delegate void RaiseInterruptFunction();
         public RaiseInterruptFunction TimerInterruptDelegate;
@@ -17,8 +13,8 @@ namespace FoenixIDE.Simulator.Devices
 
         public TimerRegister(int StartAddress, int Length) : base(StartAddress, Length)
         {
-            hiresTimer = new MultimediaTimer(1000);
-            hiresTimer.Elapsed += new MultimediaElapsedEventHandler(Timer_Tick);
+            hiresTimer = new HiResTimer(1000);
+            hiresTimer.Elapsed += Timer_Tick;
         }
 
         public override void WriteByte(int Address, byte Value)
@@ -51,8 +47,6 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     hiresTimer.Interval = adjInterval;
                 }
-
-                
             }
         }
 

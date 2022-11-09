@@ -203,6 +203,8 @@ namespace FoenixIDE.UI
                 gpu.SetBitmapControlRegister(MemoryMap.BITMAP_CONTROL_REGISTER_ADDR - gpu.VICKY.StartAddress);
                 gpu.SetTileMapBaseAddress(MemoryMap.TILE_CONTROL_REGISTER_ADDR - gpu.VICKY.StartAddress);
                 gpu.SetTilesetBaseAddress(MemoryMap.TILESET_BASE_ADDR - gpu.VICKY.StartAddress);
+
+                gpu.SetSpriteBaseAddress(MemoryMap.SPRITE_CONTROL_REGISTER_ADDR - gpu.VICKY.StartAddress);
             }
             else
             {
@@ -229,6 +231,7 @@ namespace FoenixIDE.UI
                 gpu.SetBitmapControlRegister(0xD100 - 0xC000);  // IO Page 0
                 gpu.SetTileMapBaseAddress(0xD200 - 0xC000);
                 gpu.SetTilesetBaseAddress(0xD280 - 0xC000);
+                gpu.SetSpriteBaseAddress(0xD900 - 0xC000);
             }
            
             if (disabledIRQs)
@@ -336,13 +339,26 @@ namespace FoenixIDE.UI
             }
             else
             {
+                memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.BringToFront();
             }
-            memoryWindow.WriteMCRBytes += WriteMCRBytesToVicky;
-            memoryWindow.ReadMCRBytes += ReadMCRBytesFromVicky;
+            if (memoryWindow.WriteMCRBytes == null)
+            {
+                memoryWindow.WriteMCRBytes += WriteMCRBytesToVicky;
+            }
+            if (memoryWindow.ReadMCRBytes == null)
+            {
+                memoryWindow.ReadMCRBytes += ReadMCRBytesFromVicky;
+            }
             memoryWindow.UpdateMCRButtons();
-            memoryWindow.SetGamma += UpdateGamma;
-            memoryWindow.SetHiRes += UpdateHiRes;
+            if (memoryWindow.SetGamma == null)
+            {
+                memoryWindow.SetGamma += UpdateGamma;
+            }
+            if (memoryWindow.SetHiRes == null)
+            {
+                memoryWindow.SetHiRes += UpdateHiRes;
+            }
         }
 
         public void SerialTransmitByte(byte Value)
@@ -657,20 +673,6 @@ namespace FoenixIDE.UI
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            gpu.StartOfFrame = null;
-            gpu.StartOfLine = null;
-            if (debugWindow != null)
-            {
-                debugWindow.Close();
-            }
-            if (memoryWindow != null)
-            {
-                memoryWindow.Close();
-            }
-            if (GGF != null)
-            {
-                GGF.Close();
-            }
             this.Close();
         }
 
@@ -712,6 +714,10 @@ namespace FoenixIDE.UI
                     previousTime = currentTime;
                     previousFrame = currentFrame;
                     Write_CPS_FPS_Safe("CPS: " + cps.ToString("N0"), "FPS: " + fps.ToString("N0"));
+                }
+                else
+                {
+                    Write_CPS_FPS_Safe("CPS: Stopped", "FPS: N/A");
                 }
                 WriteRTCTime(currentTime);
             }
@@ -853,8 +859,10 @@ namespace FoenixIDE.UI
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            gpu.StopTimer();
             gpu.StartOfFrame = null;
             gpu.StartOfLine = null;
+            
             ModeText.Text = "Shutting down CPU thread";
             if (kernel.CPU != null)
             {
@@ -864,6 +872,19 @@ namespace FoenixIDE.UI
                     kernel.CPU.CPUThread.Abort();
                     kernel.CPU.CPUThread.Join(1000);
                 }
+            }
+
+            if (debugWindow != null)
+            {
+                debugWindow.Close();
+            }
+            if (memoryWindow != null)
+            {
+                memoryWindow.Close();
+            }
+            if (GGF != null)
+            {
+                GGF.Close();
             }
         }
 

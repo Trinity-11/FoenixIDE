@@ -1,3 +1,12 @@
+Release 0.6.0.2
+---------------
+Fixed CPU reading incorrect page when MMU is present in F256Jr.
+Fixed LUT editing issue.
+Fixed Tileset stride issue.
+Removed MultimediaTimer and replaced with a native C# HiResTimer.
+Added sprite functionality for the F256Jr.
+In the Uploader window, when in F256Jr mode, the buffer size is 2K.
+
 Release 0.6.0.1
 ---------------
 Implemented tiles for F256Jr.

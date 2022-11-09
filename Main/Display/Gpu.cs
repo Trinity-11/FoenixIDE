@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using System.Drawing.Text;
 using System.Drawing.Imaging;
-using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.MemoryLocations;
-using System.Diagnostics;
-using FoenixIDE.Timers;
-using System.Threading.Tasks;
+using KGySoft.CoreLibraries;
 
 namespace FoenixIDE.Display
 {
@@ -24,7 +17,6 @@ namespace FoenixIDE.Display
 
         const int CHAR_WIDTH = 8;
         const int CHAR_HEIGHT = 8;
-        const int SPRITE_SIZE = 32;
 
         public MemoryRAM VRAM = null;
         public MemoryRAM VICKY = null;
@@ -39,12 +31,8 @@ namespace FoenixIDE.Display
         public delegate void GpuUpdateFunction();
         public GpuUpdateFunction GpuUpdated;
 
-        //Timer gpuRefreshTimer = new Timer
-        //{
-        //    Interval = 15
-        //};
-        // In debug mode, draw the screen twice per second, instead of 60 times.
-        private MultimediaTimer hiresTimer = new MultimediaTimer(500);
+        private HiResTimer hiresTimer;
+        
         private static readonly int[] vs = new int[256 * 8];
         private int[] lutCache = vs;
 
@@ -52,6 +40,8 @@ namespace FoenixIDE.Display
         {
             InitializeComponent();
             this.Load += new EventHandler(Gpu_Load);
+            hiresTimer = new HiResTimer(500);
+            hiresTimer.Elapsed += GpuRefreshTimer_Tick;
         }
 
         void Gpu_Load(object sender, EventArgs e)
@@ -60,12 +50,9 @@ namespace FoenixIDE.Display
             BlinkingCounter = BLINK_RATE;
 
             this.DoubleBuffered = true;
-            //gpuRefreshTimer.Tick += new EventHandler(GpuRefreshTimer_Tick);
-            hiresTimer.Elapsed += new MultimediaElapsedEventHandler(GpuRefreshTimer_Tick);
 
             if (DesignMode)
             {
-                //gpuRefreshTimer.Enabled = false;
                 hiresTimer.Stop();
             }
             else
@@ -77,7 +64,6 @@ namespace FoenixIDE.Display
                 int sidemargin = ParentForm.Width - ClientRectangle.Width;
                 ParentForm.Height = htarget + topmargin;
                 ParentForm.Width = (int)Math.Ceiling(htarget * 1.6) + sidemargin;
-                //gpuRefreshTimer.Enabled = true;
                 hiresTimer.Start();
             }
         }
@@ -88,7 +74,6 @@ namespace FoenixIDE.Display
         /// </summary>
         private int BLINK_RATE = 30;
         private int BlinkingCounter;
-
         void GpuRefreshTimer_Tick(object sender, EventArgs e)
         {
             if (BlinkingCounter-- == 0)
@@ -101,6 +86,13 @@ namespace FoenixIDE.Display
             {
                 GpuUpdated?.Invoke();
             }
+        }
+
+        public void StopTimer()
+        {
+            hiresTimer.Interval = 1000;
+            hiresTimer.Elapsed -= GpuRefreshTimer_Tick;
+            hiresTimer.Stop();
         }
 
         public void SetRefreshPeriod(uint time)
@@ -317,7 +309,7 @@ namespace FoenixIDE.Display
                                 // Layer 12 - sprite layer 6
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 6, displayBorder, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 6, displayBorder, borderXSize, borderYSize, line, res.X, res.Y, false, false);
                                 }
                                 // Layer 11 - bitmap 1
                                 if ((MCRegister & 0x8) == 0x8)
@@ -327,7 +319,7 @@ namespace FoenixIDE.Display
                                 // Layer 10 - sprite layer 5
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 5, displayBorder, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 5, displayBorder, borderXSize, borderYSize, line, res.X, res.Y, false, false);
                                 }
                                 // Layer 9 - tilemap layer 3
                                 if ((MCRegister & 0x10) == 0x10)
@@ -337,7 +329,7 @@ namespace FoenixIDE.Display
                                 // Layer 8 - sprite layer 4
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 4, displayBorder, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 4, displayBorder, borderXSize, borderYSize, line, res.X, res.Y, false, false);
                                 }
                                 // Layer 7 - tilemap layer 2
                                 if ((MCRegister & 0x10) == 0x10)
@@ -347,7 +339,7 @@ namespace FoenixIDE.Display
                                 // Layer 6 - sprite layer 3
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, res.Y, false, false);
                                 }
                                 // Layer 5 - tilemap layer 1
                                 if ((MCRegister & 0x10) == 0x10)
@@ -357,7 +349,7 @@ namespace FoenixIDE.Display
                                 // Layer 4 - sprite layer 2
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, res.Y, false, false);
                                 }
                                 // Layer 3 - tilemap layer 0
                                 if ((MCRegister & 0x10) == 0x10)
@@ -367,7 +359,7 @@ namespace FoenixIDE.Display
                                 // Layer 2 - sprite layer 1
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, res.Y, false, false);
                                 }
                                 // Layer 1 - bitmap layer 0
                                 if ((MCRegister & 0x8) == 0x8)
@@ -377,7 +369,7 @@ namespace FoenixIDE.Display
                                 // Layer 0 - sprite layer 0
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 0, displayBorder, borderXSize, borderYSize, line, res.X, res.Y);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 0, displayBorder, borderXSize, borderYSize, line, res.X, res.Y, false, false);
                                 }
                             }
                             else
@@ -392,7 +384,7 @@ namespace FoenixIDE.Display
                                 
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 0, displayBorder, borderXSize, borderYSize, line, 320, BitmapY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 0, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                                 if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
                                 {
@@ -421,7 +413,7 @@ namespace FoenixIDE.Display
                                 }
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                                 if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
                                 {
@@ -450,7 +442,7 @@ namespace FoenixIDE.Display
                                 }
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                                 if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
                                 {
@@ -479,7 +471,7 @@ namespace FoenixIDE.Display
                                 }
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                             }
                         }
@@ -494,7 +486,10 @@ namespace FoenixIDE.Display
                     }
                     if (!TileEditorMode)
                     {
-                        DrawMouse(bitmapPointer, gammaCorrection, line, res.X, res.Y);
+                        if (mode == 0)
+                        {
+                            DrawMouse(bitmapPointer, gammaCorrection, line, res.X, res.Y);
+                        }
                     }
 
                 }

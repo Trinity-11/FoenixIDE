@@ -52,7 +52,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -80,6 +81,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basic\HiResTimer.cs" />
+    <Compile Include="Basic\HiResTimerElapsedEventArgs.cs" />
     <Compile Include="Basic\ScanCodes.cs" />
     <Compile Include="Controls\ColorCheckBox.cs">
       <SubType>Component</SubType>
@@ -339,7 +342,6 @@
     <EmbeddedResource Include="UI\UploaderWindow.resx">
       <DependentUpon>UploaderWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <Compile Include="Basic\MultimediaTimer.cs" />
     <EmbeddedResource Include="UI\CharEditor\ViewControl.resx">
       <DependentUpon>ViewControl.cs</DependentUpon>
     </EmbeddedResource>

@@ -436,7 +436,7 @@ namespace FoenixIDE.UI
                
                 InterruptMatchesCheckboxes();
                 registerDisplay1.RegistersReadOnly(true);
-                MainWindow.Instance.setGpuPeriod(16);
+                MainWindow.Instance.setGpuPeriod(17);
                 kernel.CPU.DebugPause = false;
                 lastLine.Text = "";
                 kernel.CPU.CPUThread = new Thread(new ThreadStart(ThreadProc));

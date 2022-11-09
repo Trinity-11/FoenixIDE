@@ -3,16 +3,11 @@ using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.IO.Ports;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Timer = System.Windows.Forms.Timer;
 
 namespace FoenixIDE.UI
 {
@@ -46,6 +41,9 @@ namespace FoenixIDE.UI
                     break;
                 case BoardVersion.RevUPlus:
                     RevModeLabel.Text = "Mode: RevU+";
+                    break;
+                case BoardVersion.RevJr:
+                    RevModeLabel.Text = "Mode: F256Jr";
                     break;
             }
         }
@@ -266,6 +264,10 @@ namespace FoenixIDE.UI
             if (boardVersion == BoardVersion.RevB || boardVersion == BoardVersion.RevU)
             {
                 BaseBankAddress = 0x18_0000;
+            }
+            else if (boardVersion == BoardVersion.RevJr)
+            {
+                BaseBankAddress = 0;
             }
 
             if (SendFileRadio.Checked)
@@ -625,7 +627,7 @@ namespace FoenixIDE.UI
                         // DataBuffer = The buffer where the loaded Binary File resides
                         // FnxAddressPtr = Pointer where to put the Data in the Fnx
                         // i = Pointer Inside the data buffer
-                        // Size_Of_File = Size of the Payload we want to transfer which ought to be smaller than 8192
+                        // Size_Of_File = Size of the Payload we want to transfer which ought to be smaller than 2048 bytes
                         PreparePacket2Write(buffer, startAddress, 0, size);
                         UploadProgressBar.Increment(size);
                     }
@@ -769,7 +771,16 @@ namespace FoenixIDE.UI
             // Maximum transmission size is 8192
             if (Size > 8192)
             {
-                Size = 8192;
+                if (boardVersion != BoardVersion.RevJr)
+                {
+                    Size = 8192;
+                    Console.WriteLine("PreparePacket2Write: output truncated to 8K bytes.");
+                }
+                else
+                {
+                    Size = 2048;
+                    Console.WriteLine("PreparePacket2Write: output truncated to 2K bytes.");
+                }
             }
 
             byte[] commandBuffer = new byte[8 + Size];
@@ -778,8 +789,8 @@ namespace FoenixIDE.UI
             commandBuffer[2] = (byte)((FNXMemPointer >> 16) & 0xFF); // (H)24Bit Addy - Where to Store the Data
             commandBuffer[3] = (byte)((FNXMemPointer >> 8) & 0xFF);  // (M)24Bit Addy - Where to Store the Data
             commandBuffer[4] = (byte)(FNXMemPointer & 0xFF);         // (L)24Bit Addy - Where to Store the Data
-            commandBuffer[5] = (byte)((Size >> 8) & 0xFF);           // (H)16Bit Size - How many bytes to Store (Max 8Kbytes for now)
-            commandBuffer[6] = (byte)(Size & 0xFF);                  // (L)16Bit Size - How many bytes to Store (Max 8Kbytes for now)
+            commandBuffer[5] = (byte)((Size >> 8) & 0xFF);           // (H)16Bit Size - How many bytes to Store (Max 8Kbytes for now - 2K for Junior)
+            commandBuffer[6] = (byte)(Size & 0xFF);                  // (L)16Bit Size - How many bytes to Store (Max 8Kbytes for now - 2K for Junior)
             Array.Copy(buffer, FilePointer, commandBuffer, 7, Size);
 
             TxProcessLRC(commandBuffer);
@@ -789,6 +800,10 @@ namespace FoenixIDE.UI
             SendMessage(commandBuffer, null);   // Tx the requested Payload Size (Plus Header and LRC), No Payload to be received aside of the Status.
         }
 
+        /**
+         * address: the address to read from, in the machine
+         * size: the number of bytes to read
+         */
         public byte[] PreparePacket2Read(int address, int size)
         {
             if (size > 0)
