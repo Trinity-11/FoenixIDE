@@ -41,6 +41,7 @@ namespace FoenixIDE.MemoryLocations
 
         public const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0100; // 2 layers - 8 bytes
         public const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0200; // 12 bytes for each tile layer
+        public const int TILE_CONTROL_REGISTER_ADDR_JR = 0xD200;
         public const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0C00; // 8 bytes for each sprite
 
         public const int VDMA_START = 0xAF_0400;
@@ -112,6 +113,7 @@ namespace FoenixIDE.MemoryLocations
         public const int GRP_LUT_BASE_ADDR_JR = 0xD000;
 
         public const int TILESET_BASE_ADDR = 0xAF_0280; // 8 tileset addresses, 4 bytes - 3 bytes address of tileset, 1 byte configuration
+        public const int TILESET_BASE_ADDR_JR = 0xD280;
 
         public const int FONT0_MEMORY_BANK_START = 0xAF_8000;
         public const int FONT1_MEMORY_BANK_START = 0xAF_8800;

@@ -540,7 +540,6 @@ namespace FoenixIDE.UI
 
         private void RefreshStatus()
         {
-            this.Text = "Debug: " + StepCounter.ToString();
             if (kernel.CPU.DebugPause)
             {
                 DebugPanel.Refresh();

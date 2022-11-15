@@ -485,6 +485,7 @@ namespace FoenixIDE.UI
             // 
             // gpu
             // 
+            this.gpu.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.gpu.BackColor = System.Drawing.Color.Blue;
             this.gpu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.gpu.CausesValidation = false;
@@ -540,8 +541,6 @@ namespace FoenixIDE.UI
         }
 
         #endregion
-
-        private Gpu gpu;
         private global::System.Windows.Forms.StatusStrip statusStrip1;
         private global::System.Windows.Forms.ToolStripStatusLabel ModeText;
         private global::System.Windows.Forms.ToolStripStatusLabel lastKeyPressed;
@@ -586,6 +585,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem mIDIToVGMConvertToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem DefaultKernelToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem convertHexToPGZToolStripMenuItem;
+        public Gpu gpu;
     }
 }
 

@@ -232,7 +232,7 @@ namespace FoenixIDE.UI
                     break;
             }
             StoreButton.Enabled = res.Length > 0;
-            if (AssetWindow.Instance.Visible)
+            if (AssetWindow.Instance != null)
             {
                 AssetWindow.Instance.UpdateAssets();
                 Close();

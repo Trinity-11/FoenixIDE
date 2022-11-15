@@ -214,7 +214,7 @@ namespace FoenixIDE.Display
         }
 
         // We only cache items that are requested, instead of precomputing all 1024 colors.
-        private int GetLUTValue(in byte lutIndex, in byte color, in bool gamma)
+        public int GetLUTValue(in byte lutIndex, in byte color, in bool gamma)
         {
             //int offset = lutIndex * 256 + color;
             var lc = lutCache;
@@ -397,7 +397,7 @@ namespace FoenixIDE.Display
 
             int tileSize = (smallTiles ? 8 : 16);
             int strideLine = tileSize * 16;
-            byte scrollMask = (byte)(smallTiles ? 7 : 15);
+            byte scrollMask = (byte)(smallTiles ? 0xE : 0xF);
 
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
             //int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
@@ -410,7 +410,7 @@ namespace FoenixIDE.Display
             byte scrollX = (byte)(((tilemapWindowX & scrollMask) * (dirLeft ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
-                tilemapWindowX = ((tilemapWindowX & 0x3FF0) >> 1) + scrollX;
+                tilemapWindowX = ((tilemapWindowX & 0x3FF0 + scrollX) >> 1) ;
             }
             else
             {
@@ -425,7 +425,7 @@ namespace FoenixIDE.Display
             byte scrollY = (byte)(((tilemapWindowY & scrollMask) * (dirUp ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
-                tilemapWindowY = ((tilemapWindowY & 0x3FF0) >> 1) + scrollY;
+                tilemapWindowY = ((tilemapWindowY & 0x3FF0 + scrollY) >> 1);
             }
             else
             {
@@ -578,7 +578,7 @@ namespace FoenixIDE.Display
                         }
 
 
-                        if (posX >= (width - borderXSize) || posY >= (height - borderYSize) || (posX + screenOffset) < 0 || (posY + screenOffset) < 0)
+                        if (posX >= (width - borderXSize) || posY >= (height - spriteSize) || (posX + spriteSize) < 0 || (posY + spriteSize) < 0)
                         {
                             continue;
                         }
@@ -611,7 +611,16 @@ namespace FoenixIDE.Display
                         int sline = actualLine - posY;
                         int lineOffset = line * STRIDE;
                         int* ptr = p + lineOffset;
-                        for (int col = xOffset; col < xOffset + spriteWidth; col++)
+                        int cols = spriteSize;
+                        if (posX + (dX ? spriteSize*2:spriteSize) >= width - borderXSize)
+                        {
+                            cols = width - borderXSize - posX;
+                            if (dX)
+                            {
+                                cols /= 2;
+                            }
+                        }
+                        for (int col = xOffset; col < xOffset + cols; col++)
                         {
                             // Lookup the pixel in the tileset - if the value is 0, it's transparent
                             pixVal = VRAM.ReadByte(spriteAddress + col + sline * spriteSize);

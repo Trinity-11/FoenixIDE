@@ -198,7 +198,7 @@
             // 
             this.checkSmallTiles.AutoSize = true;
             this.checkSmallTiles.Location = new System.Drawing.Point(14, 98);
-            this.checkSmallTiles.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkSmallTiles.Margin = new System.Windows.Forms.Padding(2);
             this.checkSmallTiles.Name = "checkSmallTiles";
             this.checkSmallTiles.Size = new System.Drawing.Size(76, 17);
             this.checkSmallTiles.TabIndex = 14;

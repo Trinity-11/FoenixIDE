@@ -90,9 +90,10 @@ namespace FoenixIDE.Display
 
         public void StopTimer()
         {
+            hiresTimer.Stop();
             hiresTimer.Interval = 1000;
             hiresTimer.Elapsed -= GpuRefreshTimer_Tick;
-            hiresTimer.Stop();
+            
         }
 
         public void SetRefreshPeriod(uint time)

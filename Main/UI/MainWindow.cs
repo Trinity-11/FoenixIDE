@@ -35,7 +35,7 @@ namespace FoenixIDE.UI
 
         // Local variables and events
         private byte previousGraphicMode;
-        private delegate void TileClickEvent(Point tile, bool leftButton);
+        private delegate void TileClickEvent(Point tile, PointF ratios, bool leftButton);
         private TileClickEvent TileClicked;
         private ResourceChecker ResChecker = new ResourceChecker();
         private delegate void TransmitByteFunction(byte Value);
@@ -229,8 +229,8 @@ namespace FoenixIDE.UI
                 gpu.SetMousePointerRegister(0x1000);  // IO Page 0
 
                 gpu.SetBitmapControlRegister(0xD100 - 0xC000);  // IO Page 0
-                gpu.SetTileMapBaseAddress(0xD200 - 0xC000);
-                gpu.SetTilesetBaseAddress(0xD280 - 0xC000);
+                gpu.SetTileMapBaseAddress(MemoryMap.TILE_CONTROL_REGISTER_ADDR_JR - 0xC000);
+                gpu.SetTilesetBaseAddress(MemoryMap.TILESET_BASE_ADDR_JR - 0xC000);
                 gpu.SetSpriteBaseAddress(0xD900 - 0xC000);
             }
            
@@ -703,7 +703,6 @@ namespace FoenixIDE.UI
 
                 if (!kernel.CPU.DebugPause)
                 {
-
                     TimeSpan s = currentTime - previousTime;
                     int currentCounter = kernel.CPU.CycleCounter;
                     int currentFrame = gpu.paintCycle;
@@ -860,13 +859,14 @@ namespace FoenixIDE.UI
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             gpu.StopTimer();
+            kernel.CPU.DebugPause = true;
+            gpu.GpuUpdated -= Gpu_Update_Cps_Fps;
             gpu.StartOfFrame = null;
             gpu.StartOfLine = null;
             
             ModeText.Text = "Shutting down CPU thread";
             if (kernel.CPU != null)
             {
-                kernel.CPU.DebugPause = true;
                 if (kernel.CPU.CPUThread != null)
                 {
                     kernel.CPU.CPUThread.Abort();
@@ -1036,7 +1036,7 @@ namespace FoenixIDE.UI
                 }
                 else
                 {
-                    previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0x1000);
+                    previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0xD000 - 0xC000);
                     kernel.MemMgr.VICKY.WriteByte(0x1000, 0x10);
                     // Enable borders
                     kernel.MemMgr.VICKY.WriteByte(0x1004, 1);
@@ -1069,10 +1069,10 @@ namespace FoenixIDE.UI
             Point size = gpu.GetScreenSize();
             if (version == BoardVersion.RevJr)
             {
-                gpu.GetScreenSize_JR();
+                size = gpu.GetScreenSize_JR();
             }
-            double ratioW = gpu.Width / (double)size.X;
-            double ratioH = gpu.Height / (double)size.Y;
+            float ratioW = gpu.Width / (float)size.X;
+            float ratioH = gpu.Height / (float)size.Y;
             if (version != BoardVersion.RevJr)
             {
                 bool borderEnabled = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_CTRL_REG) == 1;
@@ -1084,7 +1084,7 @@ namespace FoenixIDE.UI
                     {
                         this.Cursor = Cursors.Hand;
                         bool leftButton = e.Button == MouseButtons.Left;
-                        TileClicked?.Invoke(new Point((int)(e.X / ratioW), (int)(e.Y / ratioH)), leftButton);
+                        TileClicked?.Invoke(new Point((int)(e.X / ratioW), (int)(e.Y / ratioH)), new PointF(ratioW, ratioH), leftButton);
                     }
                     else
                     {
@@ -1103,10 +1103,10 @@ namespace FoenixIDE.UI
             Point size = gpu.GetScreenSize();
             if (version == BoardVersion.RevJr)
             {
-                gpu.GetScreenSize_JR();
+                size = gpu.GetScreenSize_JR();
             }
-            double ratioW = gpu.Width / (double)size.X;
-            double ratioH = gpu.Height / (double)size.Y;
+            float ratioW = gpu.Width / (float)size.X;
+            float ratioH = gpu.Height / (float)size.Y;
             switch (e.Button)
             {
                 case MouseButtons.Left:
@@ -1122,7 +1122,7 @@ namespace FoenixIDE.UI
             if (gpu.TileEditorMode && gpu.Cursor != Cursors.No)
             {
                 bool leftButton = e.Button == MouseButtons.Left;
-                TileClicked?.Invoke(new Point((int)(e.X / ratioW), (int)(e.Y / ratioH)), leftButton);
+                TileClicked?.Invoke(new Point((int)(e.X / ratioW), (int)(e.Y / ratioH)), new PointF(ratioW, ratioH), leftButton);
             }
             else
             {
@@ -1188,7 +1188,7 @@ namespace FoenixIDE.UI
             left = false;
             right = false;
             middle = false;
-            if (gpu.IsMousePointerVisible() || gpu.TileEditorMode)
+            if (version != BoardVersion.RevJr && gpu.IsMousePointerVisible() || gpu.TileEditorMode)
             {
                 Cursor.Show();
             }
@@ -1197,7 +1197,7 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseEnter(object sender, EventArgs e)
         {
-            if (gpu.IsMousePointerVisible() && !gpu.TileEditorMode)
+            if (version != BoardVersion.RevJr && gpu.IsMousePointerVisible() && !gpu.TileEditorMode)
             {
                 Cursor.Hide();
             }

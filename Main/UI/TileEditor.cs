@@ -26,6 +26,9 @@ namespace FoenixIDE.Simulator.UI
         private Pen yellowPen = new Pen(Color.Yellow);
         private Pen redPen = new Pen(Color.Red);
         private Brush whiteBrush = new SolidBrush(Color.White);
+        private bool isJunior = false;
+        private int tileRegistersBaseAddress;
+        private int tilesetRegistersBaseAddress;
 
         public TileEditor()
         {
@@ -59,6 +62,17 @@ namespace FoenixIDE.Simulator.UI
         public void SetMemory(MemoryManager mm)
         {
             MemMgr = mm;
+            if (mm.MMU != null)
+            {
+                isJunior = true;
+                tileRegistersBaseAddress = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR_JR - 0xC000;
+                tilesetRegistersBaseAddress = MemoryLocations.MemoryMap.TILESET_BASE_ADDR_JR - 0xC000;
+            }
+            else
+            {
+                tileRegistersBaseAddress = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR - MemMgr.VICKY.StartAddress;
+                tilesetRegistersBaseAddress = MemoryLocations.MemoryMap.TILESET_BASE_ADDR - MemMgr.VICKY.StartAddress;
+            }
         }
 
         public void SetResourceChecker(ResourceChecker rc)
@@ -66,21 +80,16 @@ namespace FoenixIDE.Simulator.UI
             resCheckerRef = rc;
         }
 
-        private int[] LoadLUT(MemoryRAM VKY)
+        private int[] LoadLUT()
         {
-            // Read the color lookup tables
-            int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - MemoryMap.VICKY_BASE_ADDR;
+            
             int lookupTables = 4;
             int[] result = new int[lookupTables * 256];
 
 
             for (int c = 0; c < lookupTables * 256; c++)
             {
-                byte blue = VKY.ReadByte(lutAddress++);
-                byte green = VKY.ReadByte(lutAddress++);
-                byte red = VKY.ReadByte(lutAddress++);
-                lutAddress++; // skip the alpha channel
-                result[c] = (int)(0xFF000000 + (red << 16) + (green << 8) + blue);
+                result[c] = MainWindow.Instance.gpu.GetLUTValue((byte)(c / 256), (byte)(c % 256), false);
             }
             return result;
         }
@@ -96,11 +105,17 @@ namespace FoenixIDE.Simulator.UI
             BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             IntPtr p = bitmapData.Scan0;
             int stride = bitmapData.Stride;
-            int[] graphicsLUT = LoadLUT(MemMgr.VICKY);
+            int[] graphicsLUT = LoadLUT();
             int lut = LutList.SelectedIndex;
             int tileSize = checkSmallTiles.Checked ? 8 : 16;
             int tileStride = tileSize * 16;
-            int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) - 0xB0_0000;
+            int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16);
+            MemoryRAM memRef = MemMgr.RAM;
+            if (!isJunior)
+            {
+                tilesetAddress = tilesetAddress - 0xB0_0000;
+                memRef = MemMgr.VIDEO;
+            }
             for (int y = 0; y < 256; y++)
             {
                 for (int x = 0; x < 256; x++)
@@ -110,11 +125,11 @@ namespace FoenixIDE.Simulator.UI
                     int posY = checkSmallTiles.Checked ? y / 2 : y;
                     if (Stride256Checkbox.Checked)
                     {
-                        pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + (posY / tileStride) * tileStride * tileStride + (posY % tileStride) * tileStride + (posX / tileStride) * tileStride + posX % tileStride);
+                        pixel = memRef.ReadByte(tilesetAddress + (posY / tileStride) * tileStride * tileStride + (posY % tileStride) * tileStride + (posX / tileStride) * tileStride + posX % tileStride);
                     }
                     else
                     {
-                        pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + (posY / tileSize) * 16 * tileStride + (posY % tileSize) * tileSize + (posX % tileSize) + posX / tileSize * tileStride);
+                        pixel = memRef.ReadByte(tilesetAddress + (posY / tileSize) * 16 * tileSize * tileSize + (posY % tileSize) * tileSize + (posX % tileSize) + posX / tileSize * tileSize * tileSize);
                     }
                     if (pixel != 0)
                     {
@@ -174,15 +189,23 @@ namespace FoenixIDE.Simulator.UI
                 BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                 IntPtr p = bitmapData.Scan0;
                 int stride = bitmapData.Stride;
-                int[] graphicsLUT = LoadLUT(MemMgr.VICKY);
+                int[] graphicsLUT = LoadLUT();
                 int lut = LutList.SelectedIndex;
                 int tileStride = Stride256Checkbox.Checked ? size * 16 : size;
-                int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) + (selectedLeft / 16) * (Stride256Checkbox.Checked ? size * size : 16 * size) * 16 + (selectedLeft % 16) * (Stride256Checkbox.Checked ? size : 16 * size) - 0xB0_0000;
+                int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) + 
+                    (selectedLeft / 16) * (Stride256Checkbox.Checked ? tileStride : 16 * size) * size + 
+                    (selectedLeft % 16) * (Stride256Checkbox.Checked ? size : size * size);
+                MemoryRAM memRef = MemMgr.RAM;
+                if (!isJunior)
+                {
+                    tilesetAddress = tilesetAddress - 0xB0_0000;
+                    memRef = MemMgr.VIDEO;
+                }
                 for (int y = 0; y < size; y++)
                 {
                     for (int x = 0; x < size; x++)
                     {
-                        byte pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + (y * tileStride + x));
+                        byte pixel = memRef.ReadByte(tilesetAddress + (y * tileStride + x));
                         if (pixel != 0)
                         {
                             int color = graphicsLUT[lut * 256  + pixel];
@@ -214,15 +237,23 @@ namespace FoenixIDE.Simulator.UI
                 BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                 IntPtr p = bitmapData.Scan0;
                 int stride = bitmapData.Stride;
-                int[] graphicsLUT = LoadLUT(MemMgr.VICKY);
+                int[] graphicsLUT = LoadLUT();
                 int lut = LutList.SelectedIndex;
                 int tileStride = Stride256Checkbox.Checked ? size * 16 : size;
-                int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) + (selectedRight / 16) * (Stride256Checkbox.Checked ? size * size : 16 * size) * 16 + (selectedRight % 16) * (Stride256Checkbox.Checked ? size : 16 * size) - 0xB0_0000;
+                int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16) + 
+                    (selectedRight / 16) * (Stride256Checkbox.Checked ? tileStride : 16 * size) * size +
+                    (selectedRight % 16) * (Stride256Checkbox.Checked ? size : size * size);
+                MemoryRAM memRef = MemMgr.RAM;
+                if (!isJunior)
+                {
+                    tilesetAddress = tilesetAddress - 0xB0_0000;
+                    memRef = MemMgr.VIDEO;
+                }
                 for (int y = 0; y < size; y++)
                 {
                     for (int x = 0; x < size; x++)
                     {
-                        byte pixel = MemMgr.VIDEO.ReadByte(tilesetAddress + (y * tileStride + x));
+                        byte pixel = memRef.ReadByte(tilesetAddress + (y * tileStride + x));
                         if (pixel != 0)
                         {
                             int color = graphicsLUT[lut * 256 + pixel];
@@ -275,22 +306,22 @@ namespace FoenixIDE.Simulator.UI
             selectedTilemap = Convert.ToInt32(selected.Tag);
             selected.BackColor = SystemColors.ActiveCaption;
 
-            int addrOffset = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
+            int addrOffset = tileRegistersBaseAddress + selectedTilemap * 12;
             // show if the tilemap is enabled - ignore the LUT, it's not used
-            int ControlReg = MemMgr.ReadByte(addrOffset);
+            int ControlReg = MemMgr.VICKY.ReadByte(addrOffset);
             TilemapEnabledCheckbox.Checked = (ControlReg & 1) != 0;
             checkSmallTiles.Checked = (ControlReg & 0x10) != 0;
             // address in memory
-            int tilemapAddr = MemMgr.ReadLong(addrOffset + 1) & 0x3F_FFFF;
-            TilemapAddress.Text = (tilemapAddr + 0xB0_0000).ToString("X6");
+            int tilemapAddr = MemMgr.VICKY.ReadLong(addrOffset + 1) & 0x3F_FFFF;
+            TilemapAddress.Text = (tilemapAddr + (isJunior?0:0xB0_0000)).ToString("X6");
 
-            int width = MemMgr.ReadWord(addrOffset + 4) & 0x3FF;  // max 1024
-            int height = MemMgr.ReadWord(addrOffset + 6) & 0x3FF; // max 1024
+            int width = MemMgr.VICKY.ReadWord(addrOffset + 4) & 0x3FF;  // max 1024
+            int height = MemMgr.VICKY.ReadWord(addrOffset + 6) & 0x3FF; // max 1024
             TilemapWidth.Text = width.ToString();
             TilemapHeight.Text = height.ToString();
 
-            int windowX = MemMgr.ReadWord(addrOffset + 8);
-            int windowY = MemMgr.ReadWord(addrOffset + 10);
+            int windowX = MemMgr.VICKY.ReadWord(addrOffset + 8);
+            int windowY = MemMgr.VICKY.ReadWord(addrOffset + 10);
             WindowX.Text = windowX.ToString();
             WindowY.Text = windowY.ToString();
         }
@@ -298,12 +329,26 @@ namespace FoenixIDE.Simulator.UI
         /**
          * When a tile is clicked in the GPU window, write the selected tile in memory.
          */
-        public void TileClicked_Click(Point tile, bool leftButton)
+        public void TileClicked_Click(Point tile, PointF ratios, bool leftButton)
         {
 
             int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
             int tileSize = (checkSmallTiles.Checked ? 8 : 16);
-            int offset = (tile.Y / tileSize * Convert.ToInt32(TilemapWidth.Text) + tile.X / tileSize + 1) * 2;
+            if (isJunior)
+            { 
+                tileSize *= 2;
+            }
+            int winX = 0;
+            int winY = 0;
+            if (WindowX.Text.Length > 0)
+            {
+                winX = Convert.ToInt32(WindowX.Text);
+            }
+            if (WindowY.Text.Length > 0)
+            {
+                winY = Convert.ToInt32(WindowY.Text);
+            }
+            int offset = ((tile.Y + (int)(winY/ratios.Y)) / tileSize * Convert.ToInt32(TilemapWidth.Text) + (tile.X + (int)(winX/ratios.X)) / tileSize + 1) * 2;
 
             if ((leftButton ? selectedLeft : selectedRight) != -1)
             {
@@ -313,14 +358,6 @@ namespace FoenixIDE.Simulator.UI
                 // Write the tileset and LUT - this way we can mix tiles from multiple tilesets in a single map
                 MemMgr.WriteByte(tilemapAddress + offset + 1, (byte)((LutList.SelectedIndex << 3) + TilesetList.SelectedIndex));
             }
-        }
-
-        private void TilemapEnabledCheckbox_Click(object sender, EventArgs e)
-        {
-            int addrOffset = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            byte ControlReg = MemMgr.ReadByte(addrOffset);
-            ControlReg = (byte)((ControlReg & 0xF0) + (TilemapEnabledCheckbox.Checked ? 1 : 0));
-            MemMgr.WriteByte(addrOffset, ControlReg);
         }
 
         private void TileEditor_KeyDown(object sender, KeyEventArgs e)
@@ -368,9 +405,13 @@ namespace FoenixIDE.Simulator.UI
 
         private void TilesetAddress_TextChanged(object sender, EventArgs e)
         {
-            int tilesetBaseAddr = MemoryLocations.MemoryMap.TILESET_BASE_ADDR + TilesetList.SelectedIndex * 4;
+            int tilesetBaseAddr = tilesetRegistersBaseAddress + TilesetList.SelectedIndex * 4;
             int newAddress = Convert.ToInt32(TilesetAddress.Text.Replace(":", ""), 16);
-            int offsetAddress = newAddress - 0xB0_0000;
+            int offsetAddress = newAddress;
+            if (!isJunior)
+            {
+                offsetAddress = newAddress - 0xB0_0000;
+            }
             if (offsetAddress > -1)
             {
                 MemMgr.WriteLong(tilesetBaseAddr, offsetAddress);
@@ -379,59 +420,61 @@ namespace FoenixIDE.Simulator.UI
 
         private void TilemapAddress_TextChanged(object sender, EventArgs e)
         {
-            int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
+            int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             int newAddress = Convert.ToInt32(TilemapAddress.Text.Replace(":", ""), 16);
             int offsetAddress = newAddress - 0xB0_0000;
             if (offsetAddress > -1)
             {
-                MemMgr.WriteLong(tilemapBaseAddr + 1, offsetAddress);
+                MemMgr.VICKY.WriteByte(tilemapBaseAddr + 1, (byte)(offsetAddress & 0xff));
+                MemMgr.VICKY.WriteByte(tilemapBaseAddr + 2, (byte)(offsetAddress >> 8 & 0xff));
+                MemMgr.VICKY.WriteByte(tilemapBaseAddr + 3, (byte)(offsetAddress >> 16 & 0xff));
             }
         }
 
         private void Width_TextChanged(object sender, EventArgs e)
         {
-            int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
+            int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             if (TilemapWidth.Text.Length > 0)
             {
                 int newValue = Convert.ToInt32(TilemapWidth.Text) & 0x3FF;
-                MemMgr.WriteWord(tilemapBaseAddr + 4, newValue);
+                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 4, newValue);
             }
         }
 
         private void Height_TextChanged(object sender, EventArgs e)
         {
-            int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
+            int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             if (TilemapHeight.Text.Length > 0)
             {
                 int newValue = Convert.ToInt32(TilemapHeight.Text) & 0x3FF;
-                MemMgr.WriteWord(tilemapBaseAddr + 6, newValue);
+                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 6, newValue);
             }
         }
 
         private void WindowX_TextChanged(object sender, EventArgs e)
         {
-            int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
+            int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             if (WindowX.Text.Length > 0)
             {
                 int newValue = Convert.ToInt32(WindowX.Text) & 0x3FF;
-                MemMgr.WriteWord(tilemapBaseAddr + 8, newValue);
+                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 8, newValue);
             }
         }
 
         private void WindowY_TextChanged(object sender, EventArgs e)
         {
-            int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
+            int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             if (WindowY.Text.Length > 0)
             {
                 int newValue = Convert.ToInt32(WindowY.Text) & 0x3FF;
-                MemMgr.WriteWord(tilemapBaseAddr + 10, newValue);
+                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 10, newValue);
             }
         }
 
         private void checkSmallTiles_CheckedChanged(object sender, EventArgs e)
         {
-            int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            byte value = MemMgr.ReadByte(tilemapBaseAddr);
+            int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
+            byte value = MemMgr.VICKY.ReadByte(tilemapBaseAddr);
             if (checkSmallTiles.Checked)
             {
                 value |= 0x10;
@@ -440,7 +483,7 @@ namespace FoenixIDE.Simulator.UI
             {
                 value &= 0xF;
             }
-            MemMgr.WriteByte(tilemapBaseAddr, value);
+            MemMgr.VICKY.WriteByte(tilemapBaseAddr, value);
             TilesetViewer.Refresh();
             leftTile.Refresh();
             RightTile.Refresh();
@@ -448,16 +491,18 @@ namespace FoenixIDE.Simulator.UI
 
         private void TilemapEnabledCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            int tilemapBaseAddr = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR + selectedTilemap * 12;
-            MemMgr.WriteByte(tilemapBaseAddr, (byte)(TilemapEnabledCheckbox.Checked ? 1 : 0));
+            int addrOffset = tileRegistersBaseAddress + selectedTilemap * 12;
+            byte ControlReg = MemMgr.VICKY.ReadByte(addrOffset);
+            ControlReg = (byte)((ControlReg & 0xF0) + (TilemapEnabledCheckbox.Checked ? 1 : 0));
+            MemMgr.VICKY.WriteByte(addrOffset, ControlReg);
         }
 
         private void TilesetList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int tilesetBaseAddr = MemoryLocations.MemoryMap.TILESET_BASE_ADDR + TilesetList.SelectedIndex * 4;
-            int tilesetAddr = MemMgr.ReadLong(tilesetBaseAddr) & 0x3F_FFFF;
-            TilesetAddress.Text = (tilesetAddr + 0xB0_0000).ToString("X6");
-            int cfgReg = MemMgr.ReadByte(tilesetBaseAddr + 3);
+            int tilesetBaseAddr = tilesetRegistersBaseAddress + TilesetList.SelectedIndex * 4;
+            int tilesetAddr = MemMgr.VICKY.ReadLong(tilesetBaseAddr) & 0x3F_FFFF;
+            TilesetAddress.Text = (tilesetAddr + (isJunior?0:0xB0_0000)).ToString("X6");
+            int cfgReg = MemMgr.VICKY.ReadByte(tilesetBaseAddr + 3);
             Stride256Checkbox.Checked = (cfgReg & 8) != 0;
             LutList.SelectedIndex = cfgReg & 7;
             TilesetViewer.Refresh();
@@ -465,9 +510,9 @@ namespace FoenixIDE.Simulator.UI
 
         private void LutList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int tilesetBaseAddr = MemoryLocations.MemoryMap.TILESET_BASE_ADDR + TilesetList.SelectedIndex * 4;
+            int tilesetBaseAddr = tilesetRegistersBaseAddress + TilesetList.SelectedIndex * 4;
             byte ConfigRegister = (byte)((Stride256Checkbox.Checked ? 8 : 0) + LutList.SelectedIndex);
-            MemMgr.WriteByte(tilesetBaseAddr + 3, ConfigRegister);
+            MemMgr.VICKY.WriteByte(tilesetBaseAddr + 3, ConfigRegister);
             TilesetViewer.Refresh();
         }
 
