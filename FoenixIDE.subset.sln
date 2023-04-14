@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6F8BC56C-269E-4E6D-BC71-9A5A646BC9EE}"
+	ProjectSection(SolutionItems) = preProject
+		foenix-96x96.png = foenix-96x96.png
+		README.md = README.md
+		Release Notes.txt = Release Notes.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Manuals", "Manuals", "{7474CB74-A9F1-47F4-926F-286A7E678AC0}"
+	ProjectSection(SolutionItems) = preProject
+		Manuals\6502.org_ Tutorial_ 65C816 Opcodes.html = Manuals\6502.org_ Tutorial_ 65C816 Opcodes.html
+		Manuals\65816 Opcodes.html = Manuals\65816 Opcodes.html
+		Manuals\65816 Programmanual.pdf = Manuals\65816 Programmanual.pdf
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoenixIDE", "Main\FoenixIDE.csproj", "{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBC67780-0386-4B97-A8DC-82ED73CBF0A0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7474CB74-A9F1-47F4-926F-286A7E678AC0} = {6F8BC56C-269E-4E6D-BC71-9A5A646BC9EE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D744402-F800-4C82-9020-2BB6B283C3A3}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+EndGlobal
