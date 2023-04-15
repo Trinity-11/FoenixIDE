@@ -1336,7 +1336,10 @@ namespace FoenixIDE.UI
             DisplayBoardVersion();
             // Reset the memory, keyboard, GABE and reload the program?
             debugWindow.Pause();
-            kernel.lstFile.Lines.Clear();
+            if (kernel.lstFile != null)
+            {
+                kernel.lstFile.Lines.Clear();
+            }
             BasicWindow_Load(null, null);
         }
 
@@ -1397,7 +1400,7 @@ namespace FoenixIDE.UI
             int switchWidth = (label.Width - textOffset) / 8;
             int switchID = (e.X - 24) / switchWidth;
 
-            if (switchID < 8)
+            if (switchID >= 0 && switchID < 8)
             {
                 // get current status and toggle it
                 switches[switchID] = !switches[switchID];
