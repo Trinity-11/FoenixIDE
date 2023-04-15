@@ -104,6 +104,9 @@ namespace FoenixIDE.MemoryLocations
 
         public virtual void WriteByte(int Address, byte Value)
         {
+            if (Address >= data.Length)
+                return;
+
             var d = data;
             d[Address] = Value;
         }
