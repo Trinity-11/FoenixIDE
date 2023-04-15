@@ -24,6 +24,8 @@
                 CursorBrush.Dispose();
                 InvertedBrush.Dispose();
             }
+            TextBrush.Dispose();
+            frameBuffer.Dispose();
             base.Dispose(disposing);
         }
 
