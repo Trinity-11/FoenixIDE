@@ -277,6 +277,7 @@ namespace FoenixIDE.UI
                 debugWindow.RunButton_Click(null, null);
             }
             autorunEmulatorToolStripMenuItem.Checked = autoRun;
+            transcriptModeDebuggerToolStripMenuItem.Checked = Simulator.Properties.Settings.Default.TranscriptModeDebugger;
         }
 
         private void CenterForm(Form form)
@@ -314,6 +315,7 @@ namespace FoenixIDE.UI
                     Top = Screen.PrimaryScreen.WorkingArea.Top,
                 };
                 debugWindow.Left = Screen.PrimaryScreen.WorkingArea.Width - debugWindow.Width;
+                debugWindow.SetDebugWindowMode(Simulator.Properties.Settings.Default.TranscriptModeDebugger ? CPUWindow.DebugWindowMode.Transcipt : CPUWindow.DebugWindowMode.Default);
                 debugWindow.SetKernel(kernel);
                 debugWindow.Show();
             }
@@ -1816,6 +1818,14 @@ namespace FoenixIDE.UI
         {
             MIDI_VGM_From midiForm = new MIDI_VGM_From();
             midiForm.Show();
+        }
+
+        private void transcriptModeDebuggerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Simulator.Properties.Settings.Default.TranscriptModeDebugger = transcriptModeDebuggerToolStripMenuItem.Checked;
+            Simulator.Properties.Settings.Default.Save();
+            debugWindow.SetDebugWindowMode(transcriptModeDebuggerToolStripMenuItem.Checked ? CPUWindow.DebugWindowMode.Transcipt : CPUWindow.DebugWindowMode.Default);
+            debugWindow.Refresh();
         }
     }
 }

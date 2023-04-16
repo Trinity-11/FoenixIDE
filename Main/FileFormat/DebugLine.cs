@@ -19,6 +19,9 @@ namespace FoenixIDE.Simulator.FileFormat
         public bool StepOver = false;
         public string label;
         private string evaled = null;
+        private int A, X, Y;
+        private FoenixIDE.Processor.Flags P;
+        private bool showRegisterStatus = false;
 
         private static readonly byte[] BranchJmpOpcodes = {
             OpcodeList.BCC_ProgramCounterRelative,
@@ -72,7 +75,34 @@ namespace FoenixIDE.Simulator.FileFormat
                     else
                         c.Append("   ");
                 }
-                evaled = string.Format("{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), source, null);
+                if (showRegisterStatus)
+                {
+                    // Pad out source
+                    const int sourceColumnWidth = 12;
+                    StringBuilder sourceString = new StringBuilder();
+                    sourceString.Append(source);
+                    for (int i = 0; i < sourceColumnWidth - source.Length; ++i)
+                    {
+                        sourceString.Append(' ');
+                    }
+
+                    StringBuilder flagsString = new StringBuilder();
+                    flagsString.Append(P.Emulation ? 'E' : 'e');
+                    flagsString.Append(P.Negative ? 'N' : 'n');
+                    flagsString.Append(P.oVerflow ? 'V' : 'v');
+                    flagsString.Append(P.accumulatorShort ? 'M' : 'm');
+                    flagsString.Append(P.xRegisterShort ? 'X' : 'x');
+                    flagsString.Append(P.Decimal ? 'D' : 'd');
+                    flagsString.Append(P.IrqDisable ? 'I' : 'i');
+                    flagsString.Append(P.Zero ? 'Z' : 'z');
+                    flagsString.Append(P.Carry ? 'C' : 'c');
+
+                    evaled = string.Format("{0}  {1} {2}  {3} A:{4:X4} X:{5:X4} Y:{6:X4} P:{7}", PC.ToString("X6"), c.ToString(), sourceString.ToString(), null, A, X, Y, flagsString);
+                }
+                else
+                {
+                    evaled = string.Format("{0}  {1} {2}  {3}", PC.ToString("X6"), c.ToString(), source, null);
+                }
             }
             return evaled;
         }
@@ -80,7 +110,19 @@ namespace FoenixIDE.Simulator.FileFormat
         public DebugLine(int pc)
         {
             PC = pc;
+            showRegisterStatus = false;
         }
+
+        public DebugLine(int pc, int a, int x, int y, FoenixIDE.Processor.Flags p)
+        {
+            PC = pc;
+            A = a;
+            X = x;
+            Y = y;
+            P = p;
+            showRegisterStatus = true;
+        }
+
         public void SetOpcodes(byte[] cmd)
         {
             commandLength = cmd.Length;
