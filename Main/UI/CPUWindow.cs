@@ -1000,5 +1000,10 @@ namespace FoenixIDE.UI
                 ccb.IsActive = false;
             }
         }
+
+        private void cpuLogCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            // if (cpuLogCheckBox.Checked)
+        }
     }
 }
