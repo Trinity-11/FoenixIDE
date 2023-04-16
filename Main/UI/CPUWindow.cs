@@ -805,6 +805,8 @@ namespace FoenixIDE.UI
 
         DebugLine GetDebugLineFromPC(int pc, bool includeRegisterStatus)
         {
+            DebugLine line = null;
+
             OpCode oc = kernel.CPU.PreFetch();
             if (oc != null)
             {
@@ -816,19 +818,18 @@ namespace FoenixIDE.UI
                 }
                 string opcodes = oc.ToString(kernel.CPU.ReadSignature(ocLength, pc));
 
-            DebugLine line;
-
-            if (includeRegisterStatus)
-            {
-                line = new DebugLine(kernel.CPU.PC, kernel.CPU.A.Value, kernel.CPU.X.Value, kernel.CPU.Y.Value, kernel.CPU.P);
-            }
-            else
-            {
-                line = new DebugLine(pc);
-            }
+                if (includeRegisterStatus)
+                {
+                    line = new DebugLine(kernel.CPU.PC, kernel.CPU.A.Value, kernel.CPU.X.Value, kernel.CPU.Y.Value, kernel.CPU.P);
+                }
+                else
+                {
+                    line = new DebugLine(pc);
+                }
 
                 line.SetOpcodes(command);
                 line.SetMnemonic(opcodes);
+            }
             return line;
         }
 
@@ -836,37 +837,36 @@ namespace FoenixIDE.UI
         {
             DebugLine line = GetDebugLineFromPC(pc, false);
 
-                if (!lastLine.InvokeRequired)
+            if (!lastLine.InvokeRequired)
+            {
+                lastLine.Text = line.ToString();
+            }
+            else
+            {
+                try
                 {
-                    lastLine.Text = line.ToString();
+                    lastLine.Invoke(new lastLineDelegate(ShowLastLine), new object[] { line.ToString() });
                 }
-                else
-                {
-                    try
-                    {
-                        lastLine.Invoke(new lastLineDelegate(ShowLastLine), new object[] { line.ToString() });
-                    }
-                    finally
-                    { }
-                }
+                finally
+                { }
+            }
 
-                // find the proper place to insert the line, based on the PC
-                int index = 0;
-                bool lineAdded = false;
-                for (index = 0; index < codeList.Count; index++)
+            // find the proper place to insert the line, based on the PC
+            int index = 0;
+            bool lineAdded = false;
+            for (index = 0; index < codeList.Count; index++)
+            {
+                DebugLine l = codeList[index];
+                if (l.PC > pc)
                 {
-                    DebugLine l = codeList[index];
-                    if (l.PC > pc)
-                    {
-                        codeList.Insert(index, line);
-                        lineAdded = true;
-                        break;
-                    }
+                    codeList.Insert(index, line);
+                    lineAdded = true;
+                    break;
                 }
-                if (!lineAdded)
-                {
-                    codeList.Add(line);
-                }
+            }
+            if (!lineAdded)
+            {
+                codeList.Add(line);
             }
         }
 
