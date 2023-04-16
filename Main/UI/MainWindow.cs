@@ -1217,18 +1217,12 @@ namespace FoenixIDE.UI
                 sdCardWindow.SetClusterSize(kernel.MemMgr.SDCARD.GetClusterSize());
                 sdCardWindow.SetFSType(kernel.MemMgr.SDCARD.GetFSType().ToString());
                 sdCardWindow.ShowDialog(this);
-                ResetSDCard();
+                ResetSDCardFromDialogWindow();
             }
         }
 
-        private void ResetSDCard()
+        private void ResetSDCardImpl(string path, int capacity, int clusterSize, string fsType, bool ISOMode)
         {
-            string path = sdCardWindow.GetPath();
-            int capacity = sdCardWindow.GetCapacity();
-            int clusterSize = sdCardWindow.GetClusterSize();
-            string fsType = sdCardWindow.GetFSType();
-            bool ISOMode = sdCardWindow.GetISOMode();
-
             kernel.MemMgr.SDCARD.SetSDCardPath(path);
             byte sdCardStat = 0;
             if (path == null || path.Length == 0)
@@ -1264,6 +1258,47 @@ namespace FoenixIDE.UI
             {
                 kernel.MemMgr.WriteByte(MemoryLocations.MemoryMap.SDCARD_STAT, sdCardStat);
             }
+        }
+
+        private void ResetSDCard()
+        {
+            // If user's settings file specified an SD card, load it now.
+            if (Simulator.Properties.Settings.Default.SDCardFolder != null)
+            {
+                ResetSDCardFromSettings();
+            }
+            else
+            {
+                ResetSDCardFromDialogWindow();
+            }
+        }
+
+        private void ResetSDCardFromSettings()
+        {
+            int sdCardCapacity = Simulator.Properties.Settings.Default.SDCardCapacity;
+            int sdCardClusterSize = Simulator.Properties.Settings.Default.SDCardClusterSize;
+            string sdCardFileSystemType = Simulator.Properties.Settings.Default.SDCardFileSystemType;
+            bool sdCardISOMode = Simulator.Properties.Settings.Default.SDCardISOMode;
+
+            ResetSDCardImpl(Simulator.Properties.Settings.Default.SDCardFolder, sdCardCapacity, sdCardClusterSize, sdCardFileSystemType, sdCardISOMode);
+        }
+
+        private void ResetSDCardFromDialogWindow()
+        {
+            string path = sdCardWindow.GetPath();
+            int capacity = sdCardWindow.GetCapacity();
+            int clusterSize = sdCardWindow.GetClusterSize();
+            string fsType = sdCardWindow.GetFSType();
+            bool ISOMode = sdCardWindow.GetISOMode();
+
+            ResetSDCardImpl(path, capacity, clusterSize, fsType, ISOMode);
+
+            Simulator.Properties.Settings.Default.SDCardFolder = path;
+            Simulator.Properties.Settings.Default.SDCardCapacity = capacity;
+            Simulator.Properties.Settings.Default.SDCardClusterSize = clusterSize;
+            Simulator.Properties.Settings.Default.SDCardFileSystemType = fsType;
+            Simulator.Properties.Settings.Default.SDCardISOMode = ISOMode;
+            Simulator.Properties.Settings.Default.Save();
         }
 
         private void DisplayBoardVersion()
