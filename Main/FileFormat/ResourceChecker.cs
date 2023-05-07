@@ -15,7 +15,8 @@ namespace FoenixIDE.Simulator.FileFormat
             tileset,
             tilemap,
             sprite,
-            lut
+            lut,
+            cursor
         }
         public class Resource
         {

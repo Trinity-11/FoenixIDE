@@ -175,11 +175,21 @@
             // 
             this.LUTCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.LUTCombo.FormattingEnabled = true;
+            this.LUTCombo.Items.AddRange(new object[] {
+            "LUT0",
+            "LUT1",
+            "LUT2",
+            "LUT3",
+            "LUT4",
+            "LUT5",
+            "LUT6",
+            "LUT7"});
             this.LUTCombo.Location = new System.Drawing.Point(345, 102);
             this.LUTCombo.Margin = new System.Windows.Forms.Padding(2);
             this.LUTCombo.Name = "LUTCombo";
             this.LUTCombo.Size = new System.Drawing.Size(117, 21);
             this.LUTCombo.TabIndex = 17;
+            this.LUTCombo.SelectedIndexChanged += new System.EventHandler(this.LUTCombo_SelectedIndexChanged);
             // 
             // ExtensionLabel
             // 

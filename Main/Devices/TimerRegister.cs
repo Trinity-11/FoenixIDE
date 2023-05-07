@@ -54,5 +54,10 @@ namespace FoenixIDE.Simulator.Devices
         {
             TimerInterruptDelegate?.Invoke();
         }
+
+        public void KillTimer()
+        {
+            hiresTimer.Stop();
+        }
     }
 }

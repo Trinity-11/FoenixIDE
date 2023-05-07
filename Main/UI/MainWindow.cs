@@ -678,17 +678,26 @@ namespace FoenixIDE.UI
 
         private void Write_CPS_FPS_Safe(string CPS, string FPS)
         {
-            if (statusStrip1.InvokeRequired)
+            if (!statusStrip1.IsDisposed && statusStrip1.InvokeRequired)
             {
                 var d = new WriteCPSFPSFunction(Write_CPS_FPS_Safe);
-                statusStrip1.Invoke(d, new object[] { CPS, FPS });
+                try
+                {
+                    statusStrip1.Invoke(d, new object[] { CPS, FPS });
+                }
+                catch
+                {
 
+                }
             }
             else
             {
                 cpsPerf.Text = CPS;
                 fpsPerf.Text = FPS;
-                statusStrip1.Update();
+                if (!statusStrip1.IsDisposed)
+                {
+                    statusStrip1.Update();
+                }
             }
         }
 
@@ -858,12 +867,25 @@ namespace FoenixIDE.UI
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            gpu.GpuUpdated -= Gpu_Update_Cps_Fps;
             gpu.StopTimer();
             kernel.CPU.DebugPause = true;
-            gpu.GpuUpdated -= Gpu_Update_Cps_Fps;
+            if (kernel.MemMgr.TIMER0 != null)
+            {
+                kernel.MemMgr.TIMER0.KillTimer();
+            }
+            if (kernel.MemMgr.TIMER1 != null)
+            {
+                kernel.MemMgr.TIMER1.KillTimer();
+            }
+            if (kernel.MemMgr.TIMER2 != null)
+            {
+                kernel.MemMgr.TIMER2.KillTimer();
+            }
             gpu.StartOfFrame = null;
             gpu.StartOfLine = null;
-            
+            gpu.KillTimer();
+
             ModeText.Text = "Shutting down CPU thread";
             if (kernel.CPU != null)
             {

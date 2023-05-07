@@ -40,8 +40,14 @@ namespace FoenixIDE.Display
         {
             InitializeComponent();
             this.Load += new EventHandler(Gpu_Load);
-            hiresTimer = new HiResTimer(500);
+            hiresTimer = new HiResTimer(200);
             hiresTimer.Elapsed += GpuRefreshTimer_Tick;
+        }
+
+        public void KillTimer()
+        {
+            hiresTimer.Stop();
+            hiresTimer = null;
         }
 
         void Gpu_Load(object sender, EventArgs e)
@@ -91,7 +97,7 @@ namespace FoenixIDE.Display
         public void StopTimer()
         {
             hiresTimer.Stop();
-            hiresTimer.Interval = 1000;
+            hiresTimer.Interval = 200;
             hiresTimer.Elapsed -= GpuRefreshTimer_Tick;
             
         }
@@ -481,7 +487,7 @@ namespace FoenixIDE.Display
                         {
                             if (top == 0)
                             {
-                                DrawBitmapText(bitmapPointer, MCRegister, gammaCorrection, ColumnsVisible, LinesVisible, borderXSize, borderYSize, line, res.X, res.Y);
+                                DrawText(bitmapPointer, MCRegister, gammaCorrection, ColumnsVisible, LinesVisible, borderXSize, borderYSize, line, res.X, res.Y);
                             }
                         }
                     }
@@ -507,7 +513,7 @@ namespace FoenixIDE.Display
             {
                 // Read the mouse pointer register
                 byte mouseReg = VICKY.ReadByte(MousePointerRegister);
-                return (mouseReg & 1) != 0;
+                return (mouseReg & 3) != 0;
             }
             else
             {

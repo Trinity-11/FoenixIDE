@@ -237,7 +237,7 @@ namespace FoenixIDE.Display
             }
             return value;
         }
-        private unsafe void DrawBitmapText(int* p, int MCR, bool gammaCorrection, byte TextColumns, byte TextRows, int colOffset, int rowOffset, int line, int width, int height)
+        private unsafe void DrawText(int* p, int MCR, bool gammaCorrection, byte TextColumns, byte TextRows, int colOffset, int rowOffset, int line, int width, int height)
         {
             bool overlayBitSet = (MCR & 0x02) == 0x02;
 
@@ -642,7 +642,7 @@ namespace FoenixIDE.Display
         private unsafe void DrawMouse(int* p, bool gammaCorrection, int line, int width, int height)
         {
             byte mouseReg = VICKY.ReadByte(MemoryMap.MOUSE_PTR_REG - VICKY.StartAddress);
-            bool MousePointerEnabled = (mouseReg & 1) == 1;
+            bool MousePointerEnabled = (mouseReg & 3) != 0;
 
             if (MousePointerEnabled)
             {

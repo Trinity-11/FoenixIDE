@@ -28,10 +28,10 @@ namespace FoenixIDE.UI
             FileTypesCombo.Items.Add("Tileset 16x16");    //1
             FileTypesCombo.Items.Add("Tileset   8x8");    //2
             FileTypesCombo.Items.Add("Sprite");           //3
-            FileTypesCombo.Items.Add("Tilemap");          //4
-            FileTypesCombo.Items.Add("Palette");          //5
-            FileTypesCombo.Items.Add("Binary");           //6
-            LUTCombo.Items.Add("LUT");
+            FileTypesCombo.Items.Add("Palette");          //4
+            FileTypesCombo.Items.Add("Cursor");           //5 - cursors are grayscale
+            FileTypesCombo.Items.Add("Tilemap");          //6
+            FileTypesCombo.Items.Add("Binary");           //7
             FileTypesCombo.SelectedIndex = 0;
             LUTCombo.SelectedIndex = 0;
         }
@@ -41,9 +41,21 @@ namespace FoenixIDE.UI
          */
         private void FileTypesCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            bool LUTSelected = FileTypesCombo.SelectedIndex > 3;
+            bool LUTSelected = FileTypesCombo.SelectedIndex > 4;
             LUTCombo.Enabled = !LUTSelected;
             checkOverwriteLUT.Enabled = !LUTSelected;
+            if (FileTypesCombo.SelectedIndex == 4)
+            {
+                LUTCombo.SelectedIndex = 0;
+            }
+        }
+        private void LUTCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (FileTypesCombo.SelectedIndex == 4)
+            {
+                int lutAddress = 0xAF_2000 + 0x400 * LUTCombo.SelectedIndex;
+                LoadAddressTextBox.Text = lutAddress.ToString("X6");
+            }
         }
 
         private String FormatAddress(int address)
@@ -58,7 +70,7 @@ namespace FoenixIDE.UI
         {
             OpenFileDialog openFileDlg = new OpenFileDialog
             {
-                Title = "Load Bitmap",
+                Title = "Load Asset",
                 DefaultExt = ".bin",
                 Filter = "Asset Files (*.bmp *.png *.bin *.data *.pal *.tlm *.aseprite)|*.bmp;*.png;*.bin;*.data;*.pal;*.tlm;*.aseprite|Binary Files (*.bin)|*.bin|Palette Files (*.pal)|*.pal|Bitmap Files (*.bmp *.png)|*.bmp;*.png|Data Files|*.data|Tilemap Files (*.tlm)|*.tlm|Any File|*.*"
             };
@@ -74,17 +86,20 @@ namespace FoenixIDE.UI
                     GetTopLeftPixelColor(FileNameTextBox.Text);
                 }
                 FileSizeResultLabel.Text = FormatAddress((int)info.Length);
-                if (".tlm".Equals(ExtLabel.Text.ToLower()))
-                {
-                    FileTypesCombo.SelectedIndex = 4;
-                }
-                else if (".pal".Equals(ExtLabel.Text.ToLower()))
+                if (".pal".Equals(ExtLabel.Text.ToLower()))
                 {
                     FileTypesCombo.SelectedIndex = 5;
+                    LUTCombo.SelectedIndex = 0;
+                    LUTCombo.Enabled = true;
+                    LoadAddressTextBox.Text = "AF:2000";
+                }
+                else if (".tlm".Equals(ExtLabel.Text.ToLower()))
+                {
+                    FileTypesCombo.SelectedIndex = 6;
                 } 
                 else if (".bin".Equals(ExtLabel.Text.ToLower()))
                 {
-                    FileTypesCombo.SelectedIndex = 6;
+                    FileTypesCombo.SelectedIndex = 7;
                 }
                 StoreButton.Enabled = true;
             }
@@ -130,36 +145,47 @@ namespace FoenixIDE.UI
             ResourceType operationType = ResourceType.raw;
             int conversionStride = 0;
             int maxHeight = screenResY;
+            byte lutIndex = 0;
             switch (FileTypesCombo.SelectedIndex)
             {
                 case 0:  // bitmaps
                     operationType = ResourceType.bitmap;
                     conversionStride = screenResX;
+                    lutIndex = (byte)LUTCombo.SelectedIndex;
                     break;
                 case 1:  // tilesets 16 x 16
                     operationType = ResourceType.tileset;
                     conversionStride = 256;
                     maxHeight = 256;
+                    lutIndex = (byte)LUTCombo.SelectedIndex;
                     break;
                 case 2:  // tilesets 8 x 8
                     operationType = ResourceType.tileset;
                     conversionStride = 128;
                     maxHeight = 128;
+                    lutIndex = (byte)LUTCombo.SelectedIndex;
                     break;
                 case 3:  // sprites
                     operationType = ResourceType.sprite;
                     conversionStride = 32;
                     maxHeight = 256;
+                    lutIndex = (byte)LUTCombo.SelectedIndex;
                     break;
-                case 4:  // tilemaps
-                    operationType = ResourceType.tilemap;
-                    ExtLabel.Text = ".bin";
-                    break;
-                case 5:  // palettes
+                case 4:  // palettes
                     operationType = ResourceType.lut;
                     ExtLabel.Text = ".pal";
                     break;
-                case 6: // others
+                case 5:  // cursors
+                    operationType = ResourceType.cursor;
+                    conversionStride = 16;
+                    maxHeight = 16;
+                    lutIndex = 0xFF;
+                    break;
+                case 6:  // tilemaps
+                    operationType = ResourceType.tilemap;
+                    ExtLabel.Text = ".bin";
+                    break;
+                case 7: // others
                     operationType = ResourceType.raw;
                     break;
             }
@@ -194,7 +220,7 @@ namespace FoenixIDE.UI
                         }
                     }
 
-                    ConvertBitmapToRaw(png, res, (byte)LUTCombo.SelectedIndex, conversionStride, maxHeight);
+                    ConvertBitmapToRaw(png, res, lutIndex, conversionStride, maxHeight);
                     break;
                 case ".bmp":
                     Bitmap bmp = new Bitmap(FileNameTextBox.Text, false);
@@ -214,7 +240,7 @@ namespace FoenixIDE.UI
                             maxHeight = 256 * 8;
                         }
                     }
-                    ConvertBitmapToRaw(bmp, res, (byte)LUTCombo.SelectedIndex, conversionStride, maxHeight);
+                    ConvertBitmapToRaw(bmp, res, lutIndex, conversionStride, maxHeight);
                     break;
                 default:
                     // Read the file as raw
@@ -246,14 +272,13 @@ namespace FoenixIDE.UI
          * Sprites are 32x32: the image may contain an array of sprites that need to be "de-interlaced".
          */
         private unsafe void ConvertBitmapToRaw(Bitmap bitmap, ResourceChecker.Resource resource, byte lutIndex, int stride, int maxHeight)
-        {             
+        {
+            bool gray = lutIndex == 0xFF;
             if (ResChecker.Add(resource))
             {
-                
-
                 // Load LUT from memory - ignore indexes 0 and 1
                 int lutBaseAddress = MemoryLocations.MemoryMap.GRP_LUT_BASE_ADDR + lutIndex * 0x400 - MemoryLocations.MemoryMap.VICKY_BASE_ADDR;
-
+                
                 // Limit how much data is imported based on the type of image
                 int importedLines = maxHeight < bitmap.Height ? maxHeight : bitmap.Height;
                 int importedCols = ((bitmap.Width / stride) > 0) ? (bitmap.Width / stride) * stride : bitmap.Width;
@@ -285,26 +310,29 @@ namespace FoenixIDE.UI
                     done = true;
 
                     // Reset the Lookup Table
-                    lut = new List<int>(256)
+                    if (!gray)
                     {
-                        // Always add black (transparent) and white
-                        0,
-                        0xFFFFFF
-                    };
-
-                    // The user may decide to overwrite the palette from this bitmap
-                    if (!checkOverwriteLUT.Checked)
-                    {
-                        for (int i = 2; i < 256; i++)
+                        lut = new List<int>(256)
                         {
-                            int value = MemMgrRef.VICKY.ReadLong(lutBaseAddress + 4 * i);
-                            if (value != 0)
+                            // Always add black (transparent) and white
+                            0,
+                            0xFFFFFF
+                        };
+
+                        // The user may decide to overwrite the palette from this bitmap
+                        if (!checkOverwriteLUT.Checked)
+                        {
+                            for (int i = 2; i < 256; i++)
                             {
-                                lut.Add(value);
-                            }
-                            else
-                            {
-                                break;
+                                int value = MemMgrRef.VICKY.ReadLong(lutBaseAddress + 4 * i);
+                                if (value != 0)
+                                {
+                                    lut.Add(value);
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -358,7 +386,14 @@ namespace FoenixIDE.UI
                             if (rgb != transparentColor )
                             {
                                 // if not, look in the LUT
-                                index = lut.IndexOf(rgb);
+                                if (!gray)
+                                {
+                                    index = lut.IndexOf(rgb);
+                                } 
+                                else
+                                {
+                                    index = r;
+                                }
                             }
                             // If the index is undefined, add a new entry
                             if (index == -1)
@@ -446,18 +481,21 @@ namespace FoenixIDE.UI
                         }
                     }
 
-                    // Check if a LUT matching our index is present in the Resources, if so don't do anything.
-                    Resource resLut = ResChecker.Find(ResourceType.lut, lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
-                    if (resLut == null)
+                    if (!gray)
                     {
-                        Resource lutPlaceholder = new Resource
+                        // Check if a LUT matching our index is present in the Resources, if so don't do anything.
+                        Resource resLut = ResChecker.Find(ResourceType.lut, lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
+                        if (resLut == null)
                         {
-                            Length = 0x400,
-                            FileType = ResourceType.lut,
-                            Name = "Generated LUT",
-                            StartAddress = lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
-                        };
-                        ResChecker.Add(lutPlaceholder);
+                            Resource lutPlaceholder = new Resource
+                            {
+                                Length = 0x400,
+                                FileType = ResourceType.lut,
+                                Name = "Generated LUT",
+                                StartAddress = lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
+                            };
+                            ResChecker.Add(lutPlaceholder);
+                        }
                     }
                 }
                 else
