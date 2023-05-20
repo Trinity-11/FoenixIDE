@@ -88,7 +88,7 @@ namespace FoenixIDE.UI
                 FileSizeResultLabel.Text = FormatAddress((int)info.Length);
                 if (".pal".Equals(ExtLabel.Text.ToLower()))
                 {
-                    FileTypesCombo.SelectedIndex = 5;
+                    FileTypesCombo.SelectedIndex = 4;
                     LUTCombo.SelectedIndex = 0;
                     LUTCombo.Enabled = true;
                     LoadAddressTextBox.Text = "AF:2000";
@@ -211,7 +211,7 @@ namespace FoenixIDE.UI
                             maxHeight = 256 * 16;
                         }
                     }
-                    else if(FileTypesCombo.SelectedIndex == 2)
+                    else if (FileTypesCombo.SelectedIndex == 2)
                     {
                         if (png.Width == 8)
                         {

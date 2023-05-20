@@ -1,12 +1,18 @@
+Release 0.6.0.4
+---------------
+Fix the Uploader to disable the "Flash" checkbox when a non-bin file is selected.
+Fixed the Foenix F256Jr kernel loading for @Gadget.
+
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+
 Release 0.6.0.3
 ---------------
 Fixed tile editor when small tiles are used without stride.
 Fixed blank asset list when adding assets from the Tools | Load Assets menu.
 Fixed the problem with sprites leaking into the border when in F256Jr mode.
 Fixed the Tile Editor for the F256Jr.
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Add breaklines in debugger listing, when memory is not contiguous.
 
 Release 0.6.0.2
 ---------------

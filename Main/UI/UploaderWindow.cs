@@ -214,6 +214,10 @@ namespace FoenixIDE.UI
                 FileNameTextBox.Text = openFileDlg.FileName;
                 C256DestAddress.Enabled = extension.ToUpper().Equals(".BIN");
                 ReflashCheckbox.Enabled = extension.ToUpper().Equals(".BIN");
+                if (!ReflashCheckbox.Enabled)
+                {
+                    ReflashCheckbox.Checked = false;
+                }
                 // Display the file length
                 long flen = GetFileLength(openFileDlg.FileName);
                     

@@ -281,10 +281,10 @@ namespace FoenixIDE
                 }
                 if (boardVersion == BoardVersion.RevJr)
                 {
-                    byte[] tempBuffer = new byte[0x1_0000];
-                    MemMgr.RAM.CopyIntoBuffer(0, 0x1_0000, tempBuffer);
+                    //byte[] tempBuffer = new byte[0x1_0000];
+                    //MemMgr.RAM.CopyIntoBuffer(0, 0x1_0000, tempBuffer);
                     //MemMgr.RAM.Zero();
-                    MemMgr.RAM.CopyBuffer(tempBuffer, 0, 0xF_0000, 0x1_0000);
+                    //MemMgr.RAM.CopyBuffer(tempBuffer, 0, 0xF_0000, 0x1_0000);
                 }
             }
             else if (extension.Equals(".PGX"))
