@@ -39,6 +39,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_15C89601B4584E75A5A171443BEA22BC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_22E516AE2CBC45F88076B6D578501922"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -130,12 +136,6 @@
         "Entry"
         {
         "MsmKey" = "8:_6FDDB1F1722B4E5094B4B6E7CF1F55F3"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7BD2B3A7DD6E4E0E81969BEC234D508C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -438,6 +438,26 @@
             {
             "SourcePath" = "8:..\\icon.ico"
             "TargetName" = "8:icon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_15C89601B4584E75A5A171443BEA22BC"
+            {
+            "SourcePath" = "8:..\\Main\\Resources\\f256jr_font_micah_jan25th.bin"
+            "TargetName" = "8:f256jr_font_micah_jan25th.bin"
             "Tag" = "8:"
             "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"
             "Condition" = "8:"
@@ -760,26 +780,6 @@
             "TargetName" = "8:timer_def.asm"
             "Tag" = "8:"
             "Folder" = "8:_2CED8A43FBFA44579E2CA91207C3D167"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7BD2B3A7DD6E4E0E81969BEC234D508C"
-            {
-            "SourcePath" = "8:..\\Main\\roms\\kernel_F256jr.lst"
-            "TargetName" = "8:kernel_F256jr.lst"
-            "Tag" = "8:"
-            "Folder" = "8:_046CAC32C99040D4B711E42EEBA2C9FA"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1314,15 +1314,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FoenixIDE Setup"
-        "ProductCode" = "8:{0F09CD7A-6292-4AD4-B99E-D088A15D65C9}"
-        "PackageCode" = "8:{1C77F710-270E-4289-9C4C-FFA9E9979B1C}"
+        "ProductCode" = "8:{15C518C8-9C5C-4445-8A1B-E86C3B79FA2F}"
+        "PackageCode" = "8:{8564CF9B-4AD2-4B24-A09C-ACA45F01D7FE}"
         "UpgradeCode" = "8:{A91983FA-7F1D-495E-8BFB-CB92EECA466F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.5.5"
+        "ProductVersion" = "8:0.6"
         "Manufacturer" = "8:C256 Foenix Project"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/Trinity-11/FoenixIDE"

@@ -72,7 +72,7 @@ namespace FoenixIDE.UI
             {
                 Title = "Load Asset",
                 DefaultExt = ".bin",
-                Filter = "Asset Files (*.bmp *.png *.bin *.data *.pal *.tlm *.aseprite)|*.bmp;*.png;*.bin;*.data;*.pal;*.tlm;*.aseprite|Binary Files (*.bin)|*.bin|Palette Files (*.pal)|*.pal|Bitmap Files (*.bmp *.png)|*.bmp;*.png|Data Files|*.data|Tilemap Files (*.tlm)|*.tlm|Any File|*.*"
+                Filter = "Asset Files (*.bmp *.png *.bin *.data *.pal *.tlm *.hex)|*.bmp;*.png;*.bin;*.data;*.pal;*.tlm;*.hex|Binary Files (*.bin)|*.bin|Hex Files (*.hex)|*.hex|Palette Files (*.pal)|*.pal|Bitmap Files (*.bmp *.png)|*.bmp;*.png|Data Files|*.data|Tilemap Files (*.tlm)|*.tlm|Any File|*.*"
             };
 
             // Load content of file in a TextBlock
@@ -98,6 +98,10 @@ namespace FoenixIDE.UI
                     FileTypesCombo.SelectedIndex = 6;
                 } 
                 else if (".bin".Equals(ExtLabel.Text.ToLower()))
+                {
+                    FileTypesCombo.SelectedIndex = 7;
+                }
+                else if (".hex".Equals(ExtLabel.Text.ToLower()))
                 {
                     FileTypesCombo.SelectedIndex = 7;
                 }
@@ -183,7 +187,7 @@ namespace FoenixIDE.UI
                     break;
                 case 6:  // tilemaps
                     operationType = ResourceType.tilemap;
-                    ExtLabel.Text = ".bin";
+                    ExtLabel.Text = ".tlm";
                     break;
                 case 7: // others
                     operationType = ResourceType.raw;
@@ -241,6 +245,26 @@ namespace FoenixIDE.UI
                         }
                     }
                     ConvertBitmapToRaw(bmp, res, lutIndex, conversionStride, maxHeight);
+                    break;
+                case ".hex":
+                    MemoryRAM memory = new MemoryRAM(0, Convert.ToInt32(FileSizeResultLabel.Text.Replace("$", "").Replace(":", ""), 16) );
+                    List<int> blockStarts = new List<int>();
+                    List<int> blockSizes = new List<int>();
+                    if (HexFile.Load(memory, FileNameTextBox.Text, 0, out blockStarts, out blockSizes))
+                    {
+
+                        res.Length = blockSizes[0];
+                        if (ResChecker.Add(res))
+                        {
+                            byte[] buffer = new byte[blockSizes[0]];
+                            memory.CopyIntoBuffer(0, buffer.Length, buffer);
+                            MemMgrRef.CopyBuffer(buffer, 0, destAddress, buffer.Length);
+                        }
+                        else
+                        {
+                            res.Length = -1;
+                        }
+                    }
                     break;
                 default:
                     // Read the file as raw

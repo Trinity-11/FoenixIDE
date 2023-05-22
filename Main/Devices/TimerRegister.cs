@@ -30,7 +30,7 @@ namespace FoenixIDE.Simulator.Devices
                 }
                 else
                 {
-                    hiresTimer.Stop();
+                    hiresTimer.Enabled = false;
                 }
             }
             else if (Address > 4 && Address < 8)
@@ -57,7 +57,7 @@ namespace FoenixIDE.Simulator.Devices
 
         public void KillTimer()
         {
-            hiresTimer.Stop();
+            hiresTimer.Kill();
         }
     }
 }

@@ -40,6 +40,7 @@ namespace FoenixIDE.MemoryLocations
         public TimerRegister TIMER0 = null;
         public TimerRegister TIMER1 = null;
         public TimerRegister TIMER2 = null;
+        public RTC RTC = null;
 
         public bool VectorPull = false;
 

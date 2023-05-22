@@ -1,11 +1,20 @@
+Release 0.6.0.5
+---------------
+Interrupt handler for the Real-time clock (RTC)
+Added .hex loading in asset loader.
+Added a default font for F256Jr.
+Fix the painting of layers in F256Jr.
+
+** TODO: Update the Keyboard device for F256Jr.
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Add breakpoints on read/write of memory addresses.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+
 Release 0.6.0.4
 ---------------
 Fix the Uploader to disable the "Flash" checkbox when a non-bin file is selected.
 Fixed the Foenix F256Jr kernel loading for @Gadget.
-
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Add breaklines in debugger listing, when memory is not contiguous.
 
 Release 0.6.0.3
 ---------------

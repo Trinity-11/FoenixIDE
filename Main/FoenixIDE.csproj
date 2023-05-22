@@ -93,6 +93,7 @@
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\KeyboardRegister.cs" />
     <Compile Include="Devices\MathFloatRegister.cs" />
+    <Compile Include="Devices\RTC.cs" />
     <Compile Include="Devices\TimerRegister.cs" />
     <Compile Include="Devices\SDCard\GabeSDController.cs" />
     <Compile Include="Devices\VDMA.cs" />
@@ -371,6 +372,9 @@
     <None Include="Resources\CBM-ASCII_8x8.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\f256jr_font_micah_jan25th.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\FOENIX-CHARACTER-ASCII.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -396,7 +400,7 @@
     <None Include="roms\kernel_FMX.hex" />
     <None Include="roms\kernel_U.hex" />
     <None Include="roms\kernel_U_Plus.hex" />
-    <None Include="roms\kernel_U_Plus.lst" />
+    <Content Include="roms\kernel_U_Plus.lst" />
     <None Include="Resources\save_btn.bmp" />
     <Content Include="Resources\base_asm\EXP_C200_EVID_def.asm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

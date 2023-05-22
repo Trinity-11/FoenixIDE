@@ -102,6 +102,7 @@ namespace FoenixIDE
                     TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
                     TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
                     TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8),
+                    RTC = new RTC(MemoryMap.RTC_SEC, 16),
                     CODEC = codec,
                     MMU = null
                 };
@@ -125,6 +126,7 @@ namespace FoenixIDE
                     UART1 = new UART(MemoryMap.UART_REGISTERS_JR, 8),
                     TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG_JR, 8),
                     TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_JR, 8),
+                    RTC = new RTC(MemoryMap.RTC_SEC_JR, 16),
                     CODEC = codec,
                     MMU = new MMU_JR(0,16)
                 };
@@ -180,6 +182,13 @@ namespace FoenixIDE
                 MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
                 MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                 MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+
+                String micahFontPath = @"Resources\f256jr_font_micah_jan25th.bin";
+                if (System.IO.File.Exists(micahFontPath))
+                {
+                    byte[] fontBuffer = global::System.IO.File.ReadAllBytes(micahFontPath);
+                    MemMgr.VICKY.CopyBuffer(fontBuffer, 0, 0x2000, 2048);
+                }
             }
 
             if (MemMgr.TIMER0.TimerInterruptDelegate == null)
@@ -190,32 +199,68 @@ namespace FoenixIDE
             {
                 MemMgr.TIMER1.TimerInterruptDelegate += TimerEvent1;
             }
+            if (MemMgr.RTC.AlarmPeriodicInterruptDelegate == null)
+            {
+                MemMgr.RTC.AlarmPeriodicInterruptDelegate  += RTCAlarmEvents;
+            }
         }
 
         private void TimerEvent0()
         {
-            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT02_TMR0) == (byte)Register0.FNX0_INT02_TMR0))
+            if (boardVersion != BoardVersion.RevJr)
             {
-                // Set the Timer0 Interrupt
-                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
-                IRQ0 |= (byte)Register0.FNX0_INT02_TMR0;
-                MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
-                CPU.Pins.IRQ = true;
+                byte mask =  MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+                if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT02_TMR0) == (byte)Register0.FNX0_INT02_TMR0))
+                {
+                    // Set the Timer0 Interrupt
+                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                    IRQ0 |= (byte)Register0.FNX0_INT02_TMR0;
+                    MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                    CPU.Pins.IRQ = true;
+                }
+            }
+            else
+            {
+                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
+                if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0_JR.JR0_INT04_TMR0) == (byte)Register0_JR.JR0_INT04_TMR0))
+                {
+                    // Set the Timer0 Interrupt
+                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    IRQ0 |= (byte)Register0_JR.JR0_INT04_TMR0;
+                    MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                    CPU.Pins.IRQ = true;
+                }
             }
         }
         private void TimerEvent1()
         {
-            byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT03_TMR1) == (byte)Register0.FNX0_INT03_TMR1))
+            if (boardVersion != BoardVersion.RevJr)
             {
-                // Set the Timer1 Interrupt
-                byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
-                IRQ0 |= (byte)Register0.FNX0_INT03_TMR1;
-                MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
-                CPU.Pins.IRQ = true;
+                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+                if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT03_TMR1) == (byte)Register0.FNX0_INT03_TMR1))
+                {
+                    // Set the Timer1 Interrupt
+                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                    IRQ0 |= (byte)Register0.FNX0_INT03_TMR1;
+                    MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                    CPU.Pins.IRQ = true;
+                }
+            }
+            else
+            {
+                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
+                if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0_JR.JR0_INT05_TMR1) == (byte)Register0_JR.JR0_INT05_TMR1))
+                {
+                    // Set the Timer0 Interrupt
+                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    IRQ0 |= (byte)Register0_JR.JR0_INT05_TMR1;
+                    MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                    CPU.Pins.IRQ = true;
+                }
             }
         }
+
+        // This event does not exist in the F256Jr
         private void TimerEvent2()
         {
             byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
@@ -226,6 +271,34 @@ namespace FoenixIDE
                 IRQ0 |= (byte)Register0.FNX0_INT04_TMR2;
                 MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                 CPU.Pins.IRQ = true;
+            }
+        }
+
+        private void RTCAlarmEvents()
+        {
+            if (boardVersion != BoardVersion.RevJr)
+            {
+                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+                if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT05_RTC) == (byte)Register0.FNX0_INT05_RTC))
+                {
+                    // Set the Timer1 Interrupt
+                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                    IRQ0 |= (byte)Register0.FNX0_INT05_RTC;
+                    MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                    CPU.Pins.IRQ = true;
+                }
+            }
+            else
+            {
+                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR + 1 - 0xC000);
+                if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register1_JR.JR1_INT04_RTC) == (byte)Register1_JR.JR1_INT04_RTC))
+                {
+                    // Set the Timer0 Interrupt
+                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR + 1 - 0xC000);
+                    IRQ0 |= (byte)Register1_JR.JR1_INT04_RTC;
+                    MemMgr.INTERRUPT.WriteFromGabe(1, IRQ0);
+                    CPU.Pins.IRQ = true;
+                }
             }
         }
 

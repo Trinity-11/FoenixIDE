@@ -470,7 +470,7 @@ namespace FoenixIDE.UI
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
                 if (version == BoardVersion.RevJr)
                 {
-                    IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR);
+                    IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
                 }
                 IRQ0 |= (byte)Register0.FNX0_INT01_SOL;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
@@ -727,45 +727,12 @@ namespace FoenixIDE.UI
                 {
                     Write_CPS_FPS_Safe("CPS: Stopped", "FPS: N/A");
                 }
-                WriteRTCTime(currentTime);
             }
             else
             {
                 cpsPerf.Text = "CPS: 0";
                 fpsPerf.Text = "FPS: 0";
             }
-        }
-
-        private void WriteRTCTime(DateTime currentTime)
-        {
-            if (version != BoardVersion.RevJr)
-            {
-                // write the time to memory - values are BCD
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Second));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MIN - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Minute));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_HRS - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Hour));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DAY - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Day));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_MONTH - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Month));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_YEAR - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Year % 100));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_CENTURY - kernel.MemMgr.VICKY.StartAddress, BCD(currentTime.Year / 100));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_DOW - kernel.MemMgr.VICKY.StartAddress, (byte)(currentTime.DayOfWeek + 1));
-            }
-            else
-            {
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR - 0xC000, BCD(currentTime.Second));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 2 - 0xC000, BCD(currentTime.Minute));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 4 - 0xC000, BCD(currentTime.Hour));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 6 - 0xC000, BCD(currentTime.Day));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 8 - 0xC000, BCD(currentTime.Month));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 10 - 0xC000, BCD(currentTime.Year % 100));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 12 - 0xC000, BCD(currentTime.Year / 100));
-                kernel.MemMgr.VICKY.WriteByte(MemoryLocations.MemoryMap.RTC_SEC_JR + 14 - 0xC000, (byte)(currentTime.DayOfWeek + 1));
-            }
-        }
-
-        private byte BCD(int val)
-        {
-            return (byte)(val / 10 * 0x10 + val % 10);
         }
 
         private void CPUToolStripMenuItem_Click(object sender, EventArgs e)
@@ -865,11 +832,8 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        private void DisableTimers()
         {
-            gpu.GpuUpdated -= Gpu_Update_Cps_Fps;
-            gpu.StopTimer();
-            kernel.CPU.DebugPause = true;
             if (kernel.MemMgr.TIMER0 != null)
             {
                 kernel.MemMgr.TIMER0.KillTimer();
@@ -882,6 +846,18 @@ namespace FoenixIDE.UI
             {
                 kernel.MemMgr.TIMER2.KillTimer();
             }
+            if (kernel.MemMgr.RTC != null)
+            {
+                kernel.MemMgr.RTC.KillTimer();
+            }
+        }
+
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            gpu.GpuUpdated -= Gpu_Update_Cps_Fps;
+            gpu.StopTimer();
+            kernel.CPU.DebugPause = true;
+            DisableTimers();
             gpu.StartOfFrame = null;
             gpu.StartOfLine = null;
             gpu.KillTimer();
@@ -1358,6 +1334,7 @@ namespace FoenixIDE.UI
             DisplayBoardVersion();
             // Reset the memory, keyboard, GABE and reload the program?
             debugWindow.Pause();
+            DisableTimers();
             kernel.lstFile.Lines.Clear();
             BasicWindow_Load(null, null);
         }
