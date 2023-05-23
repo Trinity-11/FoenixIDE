@@ -767,7 +767,7 @@ namespace FoenixIDE.UI
                 if (version == BoardVersion.RevJr)
                 {
                     // Now update other registers
-                    kernel.MemMgr.MMU.Reset();
+                    //kernel.MemMgr.MMU.Reset();
                     kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                     kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
                 }

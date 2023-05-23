@@ -188,7 +188,7 @@ namespace FoenixIDE.UI
                                             e.Graphics.FillEllipse(Brushes.DarkRed, LABEL_WIDTH - ROW_HEIGHT, painted * ROW_HEIGHT + 1, ROW_HEIGHT, ROW_HEIGHT);
                                         }
                                         // Check if the memory still matches the opcodes
-                                        if (!q0.CheckOpcodes(kernel.MemMgr.RAM))
+                                        if (!q0.CheckOpcodes(kernel.MemMgr))
                                         {
                                             e.Graphics.FillRectangle(Brushes.Red, LABEL_WIDTH + 3, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
@@ -227,7 +227,7 @@ namespace FoenixIDE.UI
                                 e.Graphics.FillRectangle(Brushes.Orange, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
                             // Check if the memory still matches the opcodes
-                            if (!line.CheckOpcodes(kernel.MemMgr.RAM))
+                            if (!line.CheckOpcodes(kernel.MemMgr))
                             {
                                 e.Graphics.FillRectangle(Brushes.Red, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                             }
@@ -567,7 +567,7 @@ namespace FoenixIDE.UI
                 while (i > 0)
                 {
                     int address = kernel.CPU.Stack.Value + i;
-                    stackText.AppendText(address.ToString("X4") + " " + kernel.CPU.MemMgr[address].ToString("X2") + "\r\n");
+                    stackText.AppendText(address.ToString("X4") + " " + kernel.CPU.MemMgr.ReadByte(address).ToString("X2") + "\r\n");
                     i--;
                 }
             }
@@ -712,7 +712,7 @@ namespace FoenixIDE.UI
                 byte[] command = new byte[ocLength];
                 for (int i = 0; i < ocLength; i++)
                 {
-                    command[i] = kernel.MemMgr.RAM.ReadByte(pc + i);
+                    command[i] = kernel.MemMgr.ReadByte(pc + i);
                 }
                 string opcodes = oc.ToString(kernel.CPU.ReadSignature(ocLength, pc));
                 //string status = "";

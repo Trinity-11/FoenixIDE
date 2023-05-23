@@ -250,7 +250,7 @@ namespace FoenixIDE.Processor
         /// </summary>
         public OpCode PreFetch()
         {
-            return opcodes[MemMgr[PC]];
+            return opcodes[MemMgr.ReadByte(PC)];
         }
 
         public int ReadSignature(int length, int pc)

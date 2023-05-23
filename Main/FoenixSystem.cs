@@ -346,18 +346,35 @@ namespace FoenixIDE
                 }
             }
             string extension = info.Extension.ToUpper();
+            if (info.Name.StartsWith("kernel"))
+            {
+                if (boardVersion == BoardVersion.RevJr)
+                {
+                    MemMgr.MMU.Reset();
+                }
+            }
+            else
+            { 
+                    // Ensure the first LUTs are set correctly - but don't overwrite the kernel.
+                if (boardVersion == BoardVersion.RevJr)
+                {
+                    MemMgr.MMU.SetActiveLUT(0);
+                    MemMgr.MMU.WriteByte(0x8, 0);
+                    MemMgr.MMU.WriteByte(0x9, 1);
+                    MemMgr.MMU.WriteByte(0xA, 2);
+                    MemMgr.MMU.WriteByte(0xB, 3);
+                    MemMgr.MMU.WriteByte(0xC, 4);
+                    MemMgr.MMU.WriteByte(0xD, 5);
+                    MemMgr.MMU.WriteByte(0xE, 6);
+                    MemMgr.MMU.WriteByte(0xF, 7);
+                    MemMgr.MMU.WriteByte(0, 0);
+                }
+            }
             if (extension.Equals(".HEX"))
             {
                 if (!HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _))
                 {
                     return false;
-                }
-                if (boardVersion == BoardVersion.RevJr)
-                {
-                    //byte[] tempBuffer = new byte[0x1_0000];
-                    //MemMgr.RAM.CopyIntoBuffer(0, 0x1_0000, tempBuffer);
-                    //MemMgr.RAM.Zero();
-                    //MemMgr.RAM.CopyBuffer(tempBuffer, 0, 0xF_0000, 0x1_0000);
                 }
             }
             else if (extension.Equals(".PGX"))
@@ -412,16 +429,21 @@ namespace FoenixIDE
                             }
                             MemMgr.CopyBuffer(DataBuffer, 0, address - BasePageAddress, pageFFLen);
                         }
+
+                        
                     }
 
                 } while (reader.BaseStream.Position < f.Length);
                 reader.Close();
 
-                // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
-                MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
-                MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
-                MemMgr.WriteByte(0xFF03, 0x5C);      // JML
-                MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+                if (boardVersion != BoardVersion.RevJr)
+                {
+                    // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
+                    MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
+                    MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
+                    MemMgr.WriteByte(0xFF03, 0x5C);      // JML
+                    MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+                }
             }
             else if (extension.Equals(".FNXML"))
             {

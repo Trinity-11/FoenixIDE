@@ -128,7 +128,7 @@ namespace FoenixIDE.MemoryLocations
         }
 
         // Copy data from a buffer to RAM
-        public void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length)
+        public virtual void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length)
         {
             var d = data;
             System.Array.Copy(src, srcAddress, d, destAddress, length);

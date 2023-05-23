@@ -142,11 +142,11 @@ namespace FoenixIDE.Simulator.FileFormat
             }
         }
 
-        public bool CheckOpcodes(MemoryLocations.MemoryRAM ram)
+        public bool CheckOpcodes(MemoryLocations.MemoryManager mgr)
         {
             for (int i=0;i<commandLength;i++)
             {
-                if (ram.ReadByte(PC + i) != command[i])
+                if (mgr.ReadByte(PC + i) != command[i])
                 {
                     return false;
                 }
