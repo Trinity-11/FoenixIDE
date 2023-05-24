@@ -158,7 +158,6 @@ namespace FoenixIDE.Display
             if (VICKY != null)
             {
                 byte MCRegister = VICKY.ReadByte(MCRAddress); // Reading address $AF:0000
-                byte MCRHigh = (byte)(VICKY.ReadByte(MCRAddress + 1) & 3); // Reading address $AF:0001
 
                 pixVals = new byte[res.X];
                 int top = 0; // top gets modified if error messages are displayed
@@ -381,6 +380,8 @@ namespace FoenixIDE.Display
                             }
                             else
                             {
+                                byte MCRHigh = (byte)(VICKY.ReadByte(MCRAddress + 1) & 7);
+
                                 // Tiny Vicky Layers for Bitmaps, Tilemaps and sprites
                                 byte LayerMgr0 = (byte)(VICKY.ReadByte(0xD002 - 0xC000) & 0x7);
                                 byte LayerMgr1 = (byte)(VICKY.ReadByte(0xD002 - 0xC000) >> 4);
@@ -391,7 +392,7 @@ namespace FoenixIDE.Display
                                 
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 0, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                                 if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
                                 {
@@ -420,7 +421,7 @@ namespace FoenixIDE.Display
                                 }
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                                 if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
                                 {
@@ -449,7 +450,7 @@ namespace FoenixIDE.Display
                                 }
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                                 if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
                                 {
@@ -478,7 +479,7 @@ namespace FoenixIDE.Display
                                 }
                                 if ((MCRegister & 0x20) != 0)
                                 {
-                                    DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
+                                    DrawSprites(bitmapPointer, gammaCorrection, 0, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
                             }
                         }

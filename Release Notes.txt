@@ -1,15 +1,21 @@
-Release 0.6.0.5
+Release 0.6.0.6
 ---------------
-Interrupt handler for the Real-time clock (RTC)
-Added .hex loading in asset loader.
-Added a default font for F256Jr.
-Fix the painting of layers in F256Jr.
+Fixed sprite layer ordering for the F256Jr.
+Fixed incorrect text mode in F256Jr.
+The GPU now imitates the F256Jr FPGA bug - the tile attributes are offset by 16-bit.
 
 ** TODO: Update the Keyboard device for F256Jr.
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Add breakpoints on read/write of memory addresses.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+
+Release 0.6.0.5
+---------------
+Interrupt handler for the Real-time clock (RTC)
+Added .hex loading in asset loader.
+Added a default font for F256Jr.
+Fix the painting of layers in F256Jr.
 
 Release 0.6.0.4
 ---------------

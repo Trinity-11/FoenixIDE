@@ -438,9 +438,12 @@ namespace FoenixIDE.Display
 
             // we always read tiles 0 to width/TILE_SIZE + 1 - this is to ensure we can display partial tiles, with X,Y offsets
             int tilemapItemCount = (dX ? width / 2 : width) / tileSize + 1;
-            byte[] tiles = new byte[tilemapItemCount * 2];
+            // The + 2 below is to take an FPGA but in the F256Jr into account
+            byte[] tiles = new byte[tilemapItemCount * 2 + 2];
             int[] tilesetOffsets = new int[tilemapItemCount];
-            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tilemapItemCount * 2, tiles);
+
+            // The + 2 below is to take an FPGA but in the F256Jr into account
+            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tilemapItemCount * 2 + 2, tiles);
 
             // cache of tilesetPointers
             int[] tilesetPointers = new int[8];
@@ -498,7 +501,8 @@ namespace FoenixIDE.Display
             int clrVal = 0;
             for (int t = startTileX; t < endTileX; t++)
             {
-                byte tilesetReg = tiles[t * 2 + 1];
+                // The (mode==0 ? 1 : 3) below is to take an FPGA but in the F256Jr into account
+                byte tilesetReg = tiles[t * 2 + (mode == 0 ? 1 : 3)];
                 byte lutIndex = (byte)((tilesetReg & 0x38) >> 3);
                 //int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - VICKY.StartAddress + lutIndex * 1024;
                 int tilesetOffsetAddress = tilesetOffsets[t];  // + startOffset
