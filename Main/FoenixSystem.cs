@@ -20,7 +20,6 @@ namespace FoenixIDE
         public Processor.CPU CPU = null;
 
         public ResourceChecker ResCheckerRef;
-        public Processor.Breakpoints Breakpoints = new Processor.Breakpoints();
         public ListFile lstFile;
         private BoardVersion boardVersion;
         public SortedList<string, WatchedMemory> WatchList = new SortedList<string, WatchedMemory>();
@@ -384,17 +383,21 @@ namespace FoenixIDE
                 BinaryReader reader = new BinaryReader(f.OpenRead());
                 // The first four byte contain PGX,0x1
                 byte[] header = reader.ReadBytes(4);
-                // The next four bytes contain the start address
-                int FnxAddressPtr = reader.ReadInt32();
-                // The rest of the file is data
-                byte[] DataBuffer = reader.ReadBytes(flen);
-                reader.Close();
+                if (header[0] == 'P' && header[1] == 'G' && header[2] == 'X')
+                {
+                    // The next four bytes contain the start address
+                    int FnxAddressPtr = reader.ReadInt32();
+                    // The rest of the file is data
+                    byte[] DataBuffer = reader.ReadBytes(flen);
+                    MemMgr.CopyBuffer(DataBuffer, 0, FnxAddressPtr, flen);
+                    reader.Close();
 
-                // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
-                MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
-                MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
-                MemMgr.WriteByte(0xFF03, 0x5C);      // JML
-                MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+                    // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
+                    MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
+                    MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
+                    MemMgr.WriteByte(0xFF03, 0x5C);      // JML
+                    MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+                }
             }
             else if (extension.Equals(".PGZ"))
             {
@@ -518,6 +521,11 @@ namespace FoenixIDE
             MemMgr.RAM.Zero();
             MemMgr.VICKY.Zero();
             MemMgr.VDMA.Zero();
+        }
+
+        public static int TextAddressToInt(string value)
+        {
+            return Convert.ToInt32(value.Replace("$", "").Replace(":", ""), 16);
         }
     }
 }

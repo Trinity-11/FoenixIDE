@@ -12,7 +12,7 @@ namespace FoenixIDE.Processor
         public byte Value;
         public string Mnemonic;
         public AddressModes AddressMode;
-        public delegate void ExecuteDelegate(byte Instruction, AddressModes AddressMode, int Signature);
+        public delegate void ExecuteDelegate(byte Instruction, AddressModes AddressMode, int Signature, out int effectiveAddress);
         public event ExecuteDelegate ExecuteOp;
         public int Length8Bit;
         public Register ActionRegister = null;
@@ -40,12 +40,16 @@ namespace FoenixIDE.Processor
             global::System.Diagnostics.Debug.WriteLine("public const int " + Mnemonic + "_" + Mode.ToString() + "=0x" + Value.ToString("X2") + ";");
         }
 
-        public void Execute(int SignatureBytes)
+        /**
+         * Execute the opcode, given the signature
+         * return the effective address if applicable
+         */
+        public void Execute(int SignatureBytes, out int effectiveAddress)
         {
             if (ExecuteOp == null)
                 throw new NotImplementedException("Tried to execute " + this.Mnemonic + " but it is not implemented.");
-
-            ExecuteOp(Value, AddressMode, SignatureBytes);
+            
+            ExecuteOp(Value, AddressMode, SignatureBytes, out effectiveAddress);
         }
 
         public int Length

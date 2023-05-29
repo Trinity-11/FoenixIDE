@@ -22,6 +22,7 @@ namespace FoenixIDE.MemoryLocations
 
         // Dip switch Ports
         public const int DIPSWITCH = 0xAF_E804; // (R) $AFE804...$AFE807
+        public const int DIPSWITCH_JR = 0XD670;
 
         public const int SDCARD_START = 0xAF_E808;  // Start of SDCARD memory range
 

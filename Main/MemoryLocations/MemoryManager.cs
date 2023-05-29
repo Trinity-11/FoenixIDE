@@ -214,7 +214,7 @@ namespace FoenixIDE.MemoryLocations
 
                 byte MMURegister = MMU.ReadByte(0);
                 byte IOPageRegister = MMU.ReadByte(1);
-                int offset = 0;
+                int offset;
                 if (IOPageRegister == 0)
                 {
                     if (Address >= CODEC.StartAddress && Address <= CODEC.EndAddress)

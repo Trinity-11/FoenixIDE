@@ -56,7 +56,7 @@
             // BrowseFileButton
             // 
             this.BrowseFileButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BrowseFileButton.Location = new System.Drawing.Point(13, 5);
+            this.BrowseFileButton.Location = new System.Drawing.Point(13, 7);
             this.BrowseFileButton.Margin = new System.Windows.Forms.Padding(2);
             this.BrowseFileButton.Name = "BrowseFileButton";
             this.BrowseFileButton.Size = new System.Drawing.Size(112, 24);
@@ -129,7 +129,7 @@
             // 
             this.StoreButton.Enabled = false;
             this.StoreButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StoreButton.Location = new System.Drawing.Point(186, 145);
+            this.StoreButton.Location = new System.Drawing.Point(186, 147);
             this.StoreButton.Margin = new System.Windows.Forms.Padding(2);
             this.StoreButton.Name = "StoreButton";
             this.StoreButton.Size = new System.Drawing.Size(112, 24);
@@ -258,7 +258,7 @@
             this.radioCustomColor.TabIndex = 26;
             this.radioCustomColor.Text = "Custom";
             this.radioCustomColor.UseVisualStyleBackColor = true;
-            this.radioCustomColor.CheckedChanged += new System.EventHandler(this.radioCustomColor_CheckedChanged);
+            this.radioCustomColor.CheckedChanged += new System.EventHandler(this.RadioCustomColor_CheckedChanged);
             // 
             // radioTopLeftColor
             // 
@@ -270,7 +270,7 @@
             this.radioTopLeftColor.TabIndex = 25;
             this.radioTopLeftColor.Text = "Pixel at (0,0)";
             this.radioTopLeftColor.UseVisualStyleBackColor = true;
-            this.radioTopLeftColor.CheckedChanged += new System.EventHandler(this.radioTopLeftColor_CheckedChanged);
+            this.radioTopLeftColor.CheckedChanged += new System.EventHandler(this.RadioTopLeftColor_CheckedChanged);
             // 
             // radioBlack
             // 
@@ -284,7 +284,7 @@
             this.radioBlack.TabStop = true;
             this.radioBlack.Text = "Black";
             this.radioBlack.UseVisualStyleBackColor = true;
-            this.radioBlack.CheckedChanged += new System.EventHandler(this.radioBlack_CheckedChanged);
+            this.radioBlack.CheckedChanged += new System.EventHandler(this.RadioBlack_CheckedChanged);
             // 
             // checkOverwriteLUT
             // 

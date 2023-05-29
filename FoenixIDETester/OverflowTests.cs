@@ -511,7 +511,7 @@ namespace FoenixIDETester
               SBC #$FF
          */
         [TestMethod]
-        public void overflow_testTutorial1_8bits()
+        public void Overflow_testTutorial1_8bits()
         {
             // #1:  1 + 1 = 2, returns V = 0
             ClearCarry();
@@ -599,7 +599,7 @@ namespace FoenixIDETester
         }
 
         [TestMethod]
-        public void overflow_testTutorial1_16bits()
+        public void Overflow_testTutorial1_16bits()
         {
             // Switch to 16 bit mode
             ClearCarry();

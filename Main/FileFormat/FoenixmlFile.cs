@@ -14,11 +14,11 @@ namespace FoenixIDE.Simulator.FileFormat
     class FoeniXmlFile
     {
         private const int PHRASE_LENGTH = 16;
-        private Processor.Breakpoints BreakPoints;
         private SortedList<int, DebugLine> codeList;
         private FoenixSystem kernel;
         private SortedList<string, WatchedMemory> watchList;
         public BoardVersion Version;
+        public List<int> breakpoints;
 
         private FoeniXmlFile() { }
 
@@ -26,8 +26,8 @@ namespace FoenixIDE.Simulator.FileFormat
         {
             this.kernel = kernel;
             this.codeList = kernel.lstFile.Lines;
-            this.BreakPoints = kernel.Breakpoints;
             watchList = kernel.WatchList;
+            breakpoints = new List<int>();
         }
         private static string tabs = "\t\t\t\t\t\t\t\t";
         public void Write(String filename, bool compact)
@@ -65,7 +65,7 @@ namespace FoenixIDE.Simulator.FileFormat
             xmlWriter.WriteRaw("\r");
 
 
-            if (BreakPoints != null)
+            if (breakpoints != null)
             {
                 // Write breakpoints
                 xmlWriter.WriteRaw(tabs.Substring(0, 1));
@@ -73,11 +73,11 @@ namespace FoenixIDE.Simulator.FileFormat
                 xmlWriter.WriteRaw("\r");
 
 
-                foreach (string bp in BreakPoints.Values)
+                foreach (int bp in breakpoints)
                 {
                     xmlWriter.WriteRaw(tabs.Substring(0, 2));
                     xmlWriter.WriteStartElement("breakpoint");
-                    xmlWriter.WriteAttributeString("address", bp);
+                    xmlWriter.WriteAttributeString("address", bp.ToString("X6"));
                     xmlWriter.WriteEndElement();  // end resource
                     xmlWriter.WriteRaw("\r");
                 }
@@ -373,7 +373,7 @@ namespace FoenixIDE.Simulator.FileFormat
                     if (reader.Name.Equals("breakpoint"))
                     {
                         string address = reader.GetAttribute("address");
-                        BreakPoints.Add(address);
+                        breakpoints.Add(FoenixSystem.TextAddressToInt(address));
                         continue;
                     }
                     if (reader.Name.Equals("project"))

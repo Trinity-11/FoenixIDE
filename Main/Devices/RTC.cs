@@ -73,7 +73,7 @@ namespace FoenixIDE.Simulator.Devices
             else
             {
                 data[0] = 0;
-                increment_minutes();
+                Increment_Minutes();
             }
             if (isAlarmEnabled)
             {
@@ -99,7 +99,7 @@ namespace FoenixIDE.Simulator.Devices
             }
         }
 
-        void increment_minutes()
+        void Increment_Minutes()
         {
             byte minutes = data[2];
             if (minutes < 59)
@@ -110,11 +110,11 @@ namespace FoenixIDE.Simulator.Devices
             else
             {
                 data[2] = 0;
-                increment_hours();
+                Increment_Hours();
             }
         }
 
-        void increment_hours()
+        void Increment_Hours()
         {
             byte hours = data[4];
             if (hours < 24)
@@ -125,14 +125,14 @@ namespace FoenixIDE.Simulator.Devices
             else
             {
                 data[4] = 0;
-                increment_days();
+                Increment_Days();
             }            
         }
 
         /**
          * This function is not accurate - it expects every month to have 31 days
          */
-        void increment_days()
+        void Increment_Days()
         {
             byte days = data[6];
             if (days < 31)
@@ -143,11 +143,11 @@ namespace FoenixIDE.Simulator.Devices
             else
             {
                 data[6] = 0;
-                increment_months();
+                Increment_Months();
             }
         }
 
-        void increment_months()
+        void Increment_Months()
         {
             byte months = data[9];
             if (months < 12)
@@ -158,11 +158,11 @@ namespace FoenixIDE.Simulator.Devices
             else
             {
                 data[9] = 0;
-                increment_years();
+                Increment_Years();
             }
         }
 
-        void increment_years()
+        void Increment_Years()
         {
             // NOT IMPLEMENTED
         }

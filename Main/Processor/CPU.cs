@@ -15,12 +15,11 @@ namespace FoenixIDE.Processor
     /// </summary>
     public partial class CPU
     {
-        const int BANKSIZE = 0x10000;
-        const int PAGESIZE = 0x100;
-        private OpcodeList opcodes = null;
+        private readonly OpcodeList opcodes = null;
 
         public OpCode CurrentOpcode = null;
         public int SignatureBytes = 0;
+        public int effectiveAddress;
 
         public CPUPins Pins = new CPUPins();
 
@@ -165,7 +164,8 @@ namespace FoenixIDE.Processor
 
                 PC += OpcodeLength;
 
-                CurrentOpcode.Execute(SignatureBytes);
+                effectiveAddress = -1;
+                CurrentOpcode.Execute(SignatureBytes, out effectiveAddress);
                 clockCyles += OpcodeCycles;
                 return false;
             }
@@ -276,53 +276,6 @@ namespace FoenixIDE.Processor
         {
             get { return this.clockCyles; }
         }
-
-        #region support routines
-        /// <summary>
-        /// Gets the address pointed to by a pointer in the data bank.
-        /// </summary>
-        /// <param name="baseAddress"></param>
-        /// <param name="Index"></param>
-        /// <returns></returns>
-        private int GetPointerLocal(int baseAddress, Register Index = null)
-        {
-            int addr = DataBank.GetLongAddress(baseAddress);
-            if (Index != null)
-                addr += Index.Value;
-            return addr;
-        }
-
-        /// <summary>
-        /// Gets the address pointed to by a pointer in Direct page.
-        /// be in the Direct Page. The address returned will be DBR+Pointer.
-        /// </summary>
-        /// <param name="baseAddress"></param>
-        /// <param name="Index"></param>
-        /// <returns></returns>
-        private int GetPointerDirect(int baseAddress, Register Index = null)
-        {
-            int addr = DirectPage.Value + baseAddress;
-            if (Index != null)
-                addr += Index.Value;
-            int pointer = MemMgr.ReadWord(addr);
-            return DataBank.GetLongAddress(pointer);
-        }
-
-        /// <summary>
-        /// Gets the address pointed to by a pointer referenced by a long address.
-        /// </summary>
-        /// <param name="baseAddress">24-bit address</param>
-        /// <param name="Index"></param>
-        /// <returns></returns>
-        private int GetPointerLong(int baseAddress, Register Index = null)
-        {
-            int addr = baseAddress;
-            if (Index != null)
-                addr += Index.Value;
-            return DataBank.GetLongAddress(MemMgr.ReadWord(addr));
-        }
-
-        #endregion
 
         /// <summary>
         /// Change execution to anohter address in the same bank

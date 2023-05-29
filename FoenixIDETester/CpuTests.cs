@@ -366,7 +366,7 @@ namespace FoenixIDETester
         }
 
         [TestMethod]
-        public void checkLargInx()
+        public void CheckLargInx()
         {
             ClearCarry();
             MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.XCE_Implied);

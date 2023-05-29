@@ -15,14 +15,13 @@
         {
             if (disposing && (components != null))
             {
-                components.Dispose();
-            }
-            if (disposing && (components != null))
-            {
                 BackgroundTextBrush.Dispose();
                 BorderBrush.Dispose();
                 CursorBrush.Dispose();
                 InvertedBrush.Dispose();
+                TextBrush.Dispose();
+                frameBuffer.Dispose();
+                components.Dispose();
             }
             base.Dispose(disposing);
         }

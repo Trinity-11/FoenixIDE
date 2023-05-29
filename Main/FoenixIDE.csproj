@@ -123,7 +123,6 @@
     <Compile Include="FileFormat\ResourceChecker.cs" />
     <Compile Include="MIDI\TimeSignature.cs" />
     <Compile Include="MIDI\Track.cs" />
-    <Compile Include="Processor\Breakpoints.cs" />
     <Compile Include="Processor\CPUPins.cs" />
     <Compile Include="Processor\InteruptTypes.cs" />
     <Compile Include="Processor\RegisterAccumulator.cs" />
@@ -153,6 +152,12 @@
     </Compile>
     <Compile Include="UI\AssetWindow.Designer.cs">
       <DependentUpon>AssetWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\BreakpointWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\BreakpointWindow.Designer.cs">
+      <DependentUpon>BreakpointWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\CharEditor\CharEditorWindow.cs">
       <SubType>Form</SubType>
@@ -283,6 +288,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\AssetWindow.resx">
       <DependentUpon>AssetWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\BreakpointWindow.resx">
+      <DependentUpon>BreakpointWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\CharEditor\CharEditorWindow.resx">
       <DependentUpon>CharEditorWindow.cs</DependentUpon>

@@ -23,7 +23,6 @@ namespace FoenixIDE.UI
         private BoardVersion boardVersion = BoardVersion.RevC;
 
         SerialPort serial = new SerialPort();
-        private Queue<byte> recievedData = new Queue<byte>();
 
         public void SetBoardVersion(BoardVersion ver)
         {
@@ -80,19 +79,19 @@ namespace FoenixIDE.UI
 
         private int GetTransmissionSize()
         {
-            int transmissionSize = -1;
+            int transmissionSize;
             if (SendFileRadio.Checked)
             {
                 GetFileLength(FileNameTextBox.Text);
-                transmissionSize = Convert.ToInt32(FileSizeResultLabel.Text.Replace("$", "").Replace(":", ""), 16);
+                transmissionSize = FoenixSystem.TextAddressToInt(FileSizeResultLabel.Text);
             }
             else if (BlockSendRadio.Checked)
             {
-                transmissionSize = Convert.ToInt32(EmuSrcSize.Text.Replace("$", "").Replace(":", ""), 16);
+                transmissionSize = FoenixSystem.TextAddressToInt(EmuSrcSize.Text);
             }
             else
             {
-                transmissionSize = Convert.ToInt32(C256SrcSize.Text.Replace("$", "").Replace(":", ""), 16);
+                transmissionSize = FoenixSystem.TextAddressToInt(C256SrcSize.Text);
             }
             return transmissionSize;
         }
@@ -180,7 +179,7 @@ namespace FoenixIDE.UI
                     flen = 0;
                     do
                     {
-                        byte[] bufAddr = reader.ReadBytes(size);
+                        _ = reader.ReadBytes(size); // we don't care about the address, as we're only trying to find the file size
                         byte[] bufLength = reader.ReadBytes(size);
                         int blockLen = bufLength[0] + bufLength[1] * 0x100 + bufLength[2] * 0x10000 + (size == 4 ? bufLength[3] * 0x1000000 : 0);
                         flen += blockLen;
@@ -258,7 +257,7 @@ namespace FoenixIDE.UI
         {
             SendBinaryButton.Enabled = false;
             DisconnectButton.Enabled = false;
-            hideLabelTimer_Tick(null, null);
+            HideLabelTimer_Tick(null, null);
             int transmissionSize = GetTransmissionSize();
             UploadProgressBar.Maximum = transmissionSize;
             UploadProgressBar.Value = 0;
@@ -306,21 +305,29 @@ namespace FoenixIDE.UI
                         BinaryReader reader = new BinaryReader(f.OpenRead());
                         // The first four byte contain PGX 0x1
                         byte[] header = reader.ReadBytes(4);
-                        // The next four bytes contain the start address
-                        int FnxAddressPtr = reader.ReadInt32();
-                        // The rest of the file is data
-                        byte[] DataBuffer = reader.ReadBytes(flen);
-                        reader.Close();
+                        if (header[0] == 'P' && header[1] == 'G' && header[2] == 'X')
+                        {
 
-                        Console.WriteLine("Starting Address: " + FnxAddressPtr);
-                        Console.WriteLine("File Size: " + transmissionSize);
-                        SendData(DataBuffer, FnxAddressPtr, transmissionSize);
+                            // The next four bytes contain the start address
+                            int FnxAddressPtr = reader.ReadInt32();
+                            // The rest of the file is data
+                            byte[] DataBuffer = reader.ReadBytes(flen);
+                            reader.Close();
 
-                        // Generate a fresh page $FF
-                        byte[] pageFF = CreateResetPage(FnxAddressPtr);
+                            Console.WriteLine("Starting Address: " + FnxAddressPtr);
+                            Console.WriteLine("File Size: " + transmissionSize);
+                            SendData(DataBuffer, FnxAddressPtr, transmissionSize);
 
-                        // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                        PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            // Generate a fresh page $FF
+                            byte[] pageFF = CreateResetPage(FnxAddressPtr);
+
+                            // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                            PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid PGX file - check header", "Transmission Error");
+                        }
                     }
                     else if (fileExtension.Equals(".PGZ"))
                     {
@@ -569,7 +576,7 @@ namespace FoenixIDE.UI
             DisconnectButton.Enabled = true;
         }
 
-        private void hideLabelTimer_Tick(object sender, EventArgs e)
+        private void HideLabelTimer_Tick(object sender, EventArgs e)
         {
             hideLabelTimer.Enabled = false;
             CountdownLabel.Visible = false;

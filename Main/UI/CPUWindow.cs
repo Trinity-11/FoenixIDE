@@ -7,17 +7,20 @@ using FoenixIDE.Processor;
 using FoenixIDE.Simulator.Controls;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
+using FoenixIDE.Simulator.UI;
 using Microsoft.VisualBasic;
 
 namespace FoenixIDE.UI
 {
     public partial class CPUWindow : Form
     {
-        private int StepCounter = 0;
         private bool isStepOver = false;
         private const int LABEL_WIDTH = 100;
 
-        private Breakpoints knl_breakpoints;
+        private List<int> knl_breakpointsExec = new List<int>();
+        private List<int> knl_breakpointsRead = new List<int>();
+        private List<int> knl_breakpointsWrite = new List<int>();
+        private BreakpointWindow breakpointWindow = new BreakpointWindow();
         private List<DebugLine> codeList = null;
 
         public static CPUWindow Instance = null;
@@ -38,6 +41,7 @@ namespace FoenixIDE.UI
             Instance = this;
             DisableIRQs(true);
             registerDisplay1.RegistersReadOnly(false);
+            breakpointWindow.DeleteEvent += DeleteEventHandler;
         }
 
         public void SetKernel(FoenixSystem kernel)
@@ -45,21 +49,6 @@ namespace FoenixIDE.UI
             this.kernel = kernel;
             MemoryLimit = kernel.MemMgr.RAM.Length;
             registerDisplay1.CPU = kernel.CPU;
-            knl_breakpoints = kernel.Breakpoints;
-            if (knl_breakpoints.Count > 0)
-            {
-                BPLabel.Text = knl_breakpoints.Count.ToString() + " BP";
-                // Update the combo
-                foreach (KeyValuePair<int, string> kvp in knl_breakpoints)
-                {
-                    BPCombo.Items.Add(kvp.Value);
-                    UpdateDebugLines(kvp.Key, true);
-                }
-            }
-            else
-            {
-                BPLabel.Text = "Breakpoint";
-            }
 
             UpdateQueue();
             int pc = kernel.CPU.PC;
@@ -71,6 +60,10 @@ namespace FoenixIDE.UI
             DebugPanel.Refresh();
         }
 
+        private void DeleteEventHandler()
+        {
+            DebugPanel.Invalidate();
+        }
         private void UpdateQueue()
         {
             if (kernel.lstFile != null && kernel.lstFile.Lines.Count > 0)
@@ -145,6 +138,7 @@ namespace FoenixIDE.UI
                 int queueLength = codeList.Count;
                 int painted = 0;
                 int index = 0;
+                List<int> bkpts = breakpointWindow.GetExecuteBreakpoints();
 
                 // Draw the position box
                 if (position.X > 0 && position.Y > 0)
@@ -182,7 +176,7 @@ namespace FoenixIDE.UI
                                         {
                                             e.Graphics.FillRectangle(Brushes.Orange, 0, painted * ROW_HEIGHT, this.Width, ROW_HEIGHT);
                                         }
-                                        if (knl_breakpoints.ContainsKey(q0.PC))
+                                        if (bkpts != null && bkpts.Contains(q0.PC))
                                         {
                                             e.Graphics.DrawEllipse(Pens.White, LABEL_WIDTH - ROW_HEIGHT - 1, painted * ROW_HEIGHT, ROW_HEIGHT+1, ROW_HEIGHT+1);
                                             e.Graphics.FillEllipse(Brushes.DarkRed, LABEL_WIDTH - ROW_HEIGHT, painted * ROW_HEIGHT + 1, ROW_HEIGHT, ROW_HEIGHT);
@@ -217,7 +211,7 @@ namespace FoenixIDE.UI
                                 e.Graphics.FillRectangle(Brushes.Blue, 1, painted * ROW_HEIGHT, LABEL_WIDTH + 2, ROW_HEIGHT + 2);
                                 e.Graphics.DrawString(line.label, HeaderTextbox.Font, Brushes.Yellow, 2, painted * ROW_HEIGHT);
                             }
-                            if (knl_breakpoints.ContainsKey(line.PC))
+                            if (bkpts != null && bkpts.Contains(line.PC))
                             {
                                 e.Graphics.DrawEllipse(Pens.White, LABEL_WIDTH - ROW_HEIGHT - 1, painted * ROW_HEIGHT, ROW_HEIGHT + 1, ROW_HEIGHT + 1);
                                 e.Graphics.FillEllipse(Brushes.DarkRed, LABEL_WIDTH - ROW_HEIGHT, painted * ROW_HEIGHT + 1, ROW_HEIGHT, ROW_HEIGHT);
@@ -341,9 +335,8 @@ namespace FoenixIDE.UI
                 if (codeList.Count > TopLineIndex + row)
                 {
                     DebugLine line = codeList[TopLineIndex + row];
-                    string value = line.PC.ToString("X6");
-                    BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
-                    AddBPButton_Click(null, null);
+                    breakpointWindow.AddBreakpoint(line.PC);
+                    DebugPanel.Invalidate();
                 }
             }
         }
@@ -356,9 +349,8 @@ namespace FoenixIDE.UI
                 if (codeList.Count > TopLineIndex + row)
                 {
                     DebugLine line = codeList[TopLineIndex + row];
-                    string value = line.PC.ToString("X6");
-                    BPCombo.Text = "$" + value.Substring(0, 2) + ":" + value.Substring(2);
-                    DeleteBPButton_Click(null, null);
+                    breakpointWindow.DeleteBreakpoint(line.PC);
+                    DebugPanel.Invalidate();
                 }
             }
         }
@@ -377,35 +369,6 @@ namespace FoenixIDE.UI
                     DebugPanel.Invalidate();
                 }
             }
-        }
-
-        private void AddBPButton_Click(object sender, EventArgs e)
-        {
-            if (BPCombo.Text.Trim() != "")
-            {
-                int newValue = knl_breakpoints.Add(BPCombo.Text.Trim().Replace(">",""));
-                if (newValue > -1)
-                {
-                    BPCombo.Text = knl_breakpoints.Format(newValue.ToString("X"));
-                    UpdateDebugLines(newValue, true);
-                    BPLabel.Text = knl_breakpoints.Count.ToString() + " BP";
-                }
-            }
-        }
-
-        private void DeleteBPButton_Click(object sender, EventArgs e)
-        {
-            if (BPCombo.Text != "")
-            {
-                knl_breakpoints.Remove(BPCombo.Text);
-                UpdateDebugLines(knl_breakpoints.GetIntFromHex(BPCombo.Text), false);
-                BPCombo.Items.Remove(BPCombo.Text);
-            }
-            if (knl_breakpoints.Count == 0)
-                BPCombo.Text = "";
-            else
-                BPCombo.Text = knl_breakpoints.Values[0];
-            BPLabel.Text = knl_breakpoints.Count.ToString() + " BP";
         }
 
         private void InspectButton_Click(object sender, EventArgs e)
@@ -436,7 +399,7 @@ namespace FoenixIDE.UI
                
                 InterruptMatchesCheckboxes();
                 registerDisplay1.RegistersReadOnly(true);
-                MainWindow.Instance.setGpuPeriod(17);
+                MainWindow.Instance.SetGpuPeriod(17);
                 kernel.CPU.DebugPause = false;
                 lastLine.Text = "";
                 kernel.CPU.CPUThread = new Thread(new ThreadStart(ThreadProc));
@@ -445,6 +408,12 @@ namespace FoenixIDE.UI
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
                 DebugPanel.Refresh();
+                knl_breakpointsExec.Clear();
+                knl_breakpointsExec.AddRange(breakpointWindow.GetExecuteBreakpoints());
+                knl_breakpointsRead.Clear();
+                knl_breakpointsRead.AddRange(breakpointWindow.GetReadBreakpoints());
+                knl_breakpointsWrite.Clear();
+                knl_breakpointsWrite.AddRange(breakpointWindow.GetWriteBreakpoints());
             }
             else
             {
@@ -462,7 +431,7 @@ namespace FoenixIDE.UI
             RunButton.Tag = "0";
             RefreshStatus();
             registerDisplay1.RegistersReadOnly(false);
-            MainWindow.Instance.setGpuPeriod(500);
+            MainWindow.Instance.SetGpuPeriod(500);
         }
 
         private void StepButton_Click(object sender, EventArgs e)
@@ -476,7 +445,7 @@ namespace FoenixIDE.UI
             ExecuteStep();
             RefreshStatus();
             registerDisplay1.RegistersReadOnly(false);
-            MainWindow.Instance.setGpuPeriod(500);
+            MainWindow.Instance.SetGpuPeriod(500);
             kernel.CPU.DebugPause = true;
         }
 
@@ -487,17 +456,13 @@ namespace FoenixIDE.UI
                 int row = position.Y / ROW_HEIGHT;
                 DebugLine line = codeList[TopLineIndex + row];
                 // Set a breakpoint to the next address
-                int nextAddress = line.PC + line.commandLength;
-                int newValue = knl_breakpoints.Add(nextAddress.ToString("X"));
+                knl_breakpointsExec.Add(line.PC);
 
-                if (newValue != -1)
-                {
-                    // Run the CPU until the breakpoint is reached
-                    RunButton_Click(null, null);
+                // Run the CPU until the breakpoint is reached
+                RunButton_Click(null, null);
 
-                    // Ensure the breakpoint is removed
-                    isStepOver = true;
-                }
+                // Ensure the breakpoint is removed
+                isStepOver = true;
             }
         }
 
@@ -515,21 +480,17 @@ namespace FoenixIDE.UI
             if (line != null && line.StepOver)
             {
                 // Set a breakpoint to the next address
-                int nextAddress = pc + line.commandLength;
-                int newValue = knl_breakpoints.Add(nextAddress.ToString("X"));
+                knl_breakpointsExec.Add(pc);
 
-                if (newValue != -1)
-                {
-                    // Run the CPU until the breakpoint is reached
-                    RunButton_Click(null, null);
+                // Run the CPU until the breakpoint is reached
+                RunButton_Click(null, null);
 
-                    // Ensure the breakpoint is removed
-                    isStepOver = true;
-                    RunButton.Text = "Run (F5)";
-                    RunButton.Tag = "0";
-                    registerDisplay1.RegistersReadOnly(false);
-                    MainWindow.Instance.setGpuPeriod(500);
-                }
+                // Ensure the breakpoint is removed
+                isStepOver = true;
+                RunButton.Text = "Run (F5)";
+                RunButton.Tag = "0";
+                registerDisplay1.RegistersReadOnly(false);
+                MainWindow.Instance.SetGpuPeriod(500);
             }
             else
             {
@@ -542,7 +503,7 @@ namespace FoenixIDE.UI
         {
             if (kernel.CPU.DebugPause)
             {
-                DebugPanel.Refresh();
+                DebugPanel.Invalidate();
                 UpdateStackDisplay();
             }
             registerDisplay1.UpdateRegisters();
@@ -589,11 +550,11 @@ namespace FoenixIDE.UI
             if (isStepOver)
             {
                 isStepOver = false;
-                knl_breakpoints.Remove(pc.ToString("X"));
+                knl_breakpointsExec.Remove(pc);
             }
             else
             {
-                BPCombo.Text = knl_breakpoints.GetHex(pc);
+                lastLine.Text = "Breakpoint reached $" + pc.ToString("X6");
             }
             
             RefreshStatus();
@@ -607,7 +568,6 @@ namespace FoenixIDE.UI
         /// </summary>
         public void ExecuteStep()
         {
-            StepCounter++;
             DebugLine line = null;
             int previousPC = kernel.CPU.PC;
 
@@ -615,6 +575,7 @@ namespace FoenixIDE.UI
             {
 
                 int nextPC = kernel.CPU.PC;
+                int effAddr = kernel.CPU.effectiveAddress;
                 if (nextPC > MemoryLimit)
                 {
                     UpdateTraceTimer.Enabled = false;
@@ -630,10 +591,21 @@ namespace FoenixIDE.UI
                     }
                     return;
                 }
-                if (knl_breakpoints.ContainsKey(nextPC) ||
-                        kernel.CPU.CurrentOpcode.Value == 0 ||
-                        (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()))
-                    )
+                if (
+                     knl_breakpointsRead.Contains(effAddr) ||
+                     knl_breakpointsWrite.Contains(effAddr))
+                {
+                    if (UpdateTraceTimer.Enabled)
+                    {
+                        UpdateTraceTimer.Enabled = false;
+                        kernel.CPU.DebugPause = true;
+                    }
+                    Invoke(new breakpointSetter(BreakpointReached), new object[] { effAddr });
+                }
+                if ( knl_breakpointsExec.Contains(nextPC) || 
+                     kernel.CPU.CurrentOpcode.Value == 0 ||
+                     ( BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()))
+                   )
                 {
                     if (kernel.CPU.CurrentOpcode.Value == 0)
                     {
@@ -752,21 +724,9 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void UpdateDebugLines(int newDebugLine, bool state)
+        public void JumpButton_Click(object sender, EventArgs e)
         {
-            BPCombo.BeginUpdate();
-            BPCombo.Items.Clear();
-            foreach (KeyValuePair<int,string> bp in knl_breakpoints)
-            {
-                BPCombo.Items.Add(bp.Value);
-            }
-            BPCombo.EndUpdate();
-            DebugPanel.Refresh();
-        }
-
-        private void JumpButton_Click(object sender, EventArgs e)
-        {
-            int pc = knl_breakpoints.GetIntFromHex(locationInput.Text);
+            int pc = FoenixSystem.TextAddressToInt(locationInput.Text);
             kernel.CPU.PC = pc;
             ClearTrace();
             DebugLine line = GetExecutionInstruction(pc);
@@ -784,7 +744,6 @@ namespace FoenixIDE.UI
 
         public void ClearTrace()
         {
-            StepCounter = 0;
             IRQPC = 0;
             kernel.CPU.Stack.TopOfStack = kernel.CPU.Flags.Emulation ? CPU.DefaultStackValueEmulation : CPU.DefaultStackValueNative;
             stackText.Clear();
@@ -954,9 +913,9 @@ namespace FoenixIDE.UI
             }
             if (kernel.GetVersion() != BoardVersion.RevJr)
             {
-                //Read Interrupt Register 2
+                //Read Interrupt Register 2 - we don't handle these yet
                 byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
-                //Read Interrupt Register 3
+                //Read Interrupt Register 3 - we don't handle these yet
                 byte reg3 = kernel.MemMgr.INTERRUPT.ReadByte(3);
             }
             return result;
@@ -994,10 +953,29 @@ namespace FoenixIDE.UI
 
         private void IRQCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            if (sender is ColorCheckBox)
+            if (sender is ColorCheckBox ccb)
             {
-                ColorCheckBox ccb = (ColorCheckBox)sender;
                 ccb.IsActive = false;
+            }
+        }
+
+        private void CenterForm(Form form)
+        {
+            int left = this.Left + (this.Width - form.Width) / 2;
+            int top = this.Top + (this.Height - form.Height) / 2;
+            form.Location = new Point(left, top);
+        }
+
+        private void BreakpointButton_Click(object sender, EventArgs e)
+        {
+            if (!breakpointWindow.Visible)
+            {
+                CenterForm(breakpointWindow);
+                breakpointWindow.Show();
+            }
+            else
+            {
+                breakpointWindow.BringToFront();
             }
         }
     }

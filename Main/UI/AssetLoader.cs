@@ -126,7 +126,6 @@ namespace FoenixIDE.UI
 
             // Store the address in the pointer address - little endian - 24 bits
             int destAddress = Convert.ToInt32(LoadAddressTextBox.Text.Replace(":", ""), 16);
-            FileInfo info = new FileInfo(FileNameTextBox.Text);
             byte MCRHigh = (byte)(MemMgrRef.VICKY.ReadByte(1) & 3);
             int screenResX = 640;
             int screenResY = 480;
@@ -247,10 +246,9 @@ namespace FoenixIDE.UI
                     ConvertBitmapToRaw(bmp, res, lutIndex, conversionStride, maxHeight);
                     break;
                 case ".hex":
-                    MemoryRAM memory = new MemoryRAM(0, Convert.ToInt32(FileSizeResultLabel.Text.Replace("$", "").Replace(":", ""), 16) );
-                    List<int> blockStarts = new List<int>();
-                    List<int> blockSizes = new List<int>();
-                    if (HexFile.Load(memory, FileNameTextBox.Text, 0, out blockStarts, out blockSizes))
+                    MemoryRAM memory = new MemoryRAM(0, FoenixSystem.TextAddressToInt(FileSizeResultLabel.Text) );
+                    List<int> blockSizes;
+                    if (HexFile.Load(memory, FileNameTextBox.Text, 0, out _, out blockSizes))
                     {
 
                         res.Length = blockSizes[0];
@@ -621,18 +619,18 @@ namespace FoenixIDE.UI
             return ((byte)(value & 0xFF));
         }
 
-        private void radioCustomColor_CheckedChanged(object sender, EventArgs e)
+        private void RadioCustomColor_CheckedChanged(object sender, EventArgs e)
         {
             textTransparentColor.ReadOnly = false;
         }
 
-        private void radioBlack_CheckedChanged(object sender, EventArgs e)
+        private void RadioBlack_CheckedChanged(object sender, EventArgs e)
         {
             textTransparentColor.ReadOnly = true;
             textTransparentColor.Text = "000000";
         }
 
-        private void radioTopLeftColor_CheckedChanged(object sender, EventArgs e)
+        private void RadioTopLeftColor_CheckedChanged(object sender, EventArgs e)
         {
             textTransparentColor.ReadOnly = true;
             textTransparentColor.Text = topLeftPixelColor.ToString("X6");

@@ -271,7 +271,11 @@ namespace FoenixIDE.UI
             DisplayBoardVersion();
             EnableMenuItems();
             ResetSDCard();
-
+            if (jumpStartAddress != 0)
+            {
+                debugWindow.locationInput.Text = jumpStartAddress.ToString("X6");
+                debugWindow.JumpButton_Click(null, null);
+            }
             if (autoRun)
             {
                 debugWindow.RunButton_Click(null, null);
@@ -478,7 +482,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        public void setGpuPeriod(uint time)
+        public void SetGpuPeriod(uint time)
         {
             gpu.SetRefreshPeriod(time);
         }
@@ -1443,9 +1447,12 @@ namespace FoenixIDE.UI
                 }
             }
             else
-            { 
+            {
+                // I don't know where to write these bytes in the F256Jr - D670
                 byte bootMode = (byte)((switches[0] ? 0 : 1) + (switches[1] ? 0 : 2) + (switches[2] ? 0 : 4) + (switches[3] ? 0 : 8));
                 byte userMode = (byte)((switches[4] ? 0 : 1) + (switches[5] ? 0 : 2) + (switches[6] ? 0 : 4));
+                byte dipValue = (byte)(bootMode + (userMode << 4));
+
                 if (kernel.MemMgr != null && kernel.MemMgr.VICKY != null)
                 {
                     // switch 6 - Gamma
@@ -1459,6 +1466,9 @@ namespace FoenixIDE.UI
                         MCR &= 0b1011_1111;
                     }
                     kernel.MemMgr.VICKY.WriteByte(MemoryMap.VICKY_START_JR - 0xC000, MCR);
+
+                    // DIP Switch register
+                    kernel.MemMgr.VICKY.WriteByte(MemoryMap.DIPSWITCH_JR - 0xC000, dipValue);
                 }
             }
         }
@@ -1754,13 +1764,13 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void autorunEmulatorToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AutorunEmulatorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Simulator.Properties.Settings.Default.Autorun = autorunEmulatorToolStripMenuItem.Checked;
             Simulator.Properties.Settings.Default.Save();
         }
 
-        private void assetListToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AssetListToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!assetWindow.Visible)
             {
@@ -1773,7 +1783,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void mIDIToVGMConvertToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MIDIToVGMConvertToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MIDI_VGM_From midiForm = new MIDI_VGM_From();
             midiForm.Show();

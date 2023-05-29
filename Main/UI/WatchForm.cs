@@ -110,7 +110,7 @@ namespace FoenixIDE.UI
         {
             if (AddressText.Text.Length > 0)
             {
-                int addressVal = Convert.ToInt32(AddressText.Text.Replace("$", "").Replace(":", ""), 16);
+                int addressVal = FoenixSystem.TextAddressToInt(AddressText.Text);
                 if (NameText.Text.Length > 0 && addressVal > 0)
                 {
                     if (kernel_ref.WatchList.ContainsKey(NameText.Text))
