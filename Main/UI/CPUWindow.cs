@@ -428,7 +428,7 @@ namespace FoenixIDE.UI
                 IRQPC = -1;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(0, 0);
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(1, 0);
-                if (kernel.GetVersion() != BoardVersion.RevJr)
+                if (!BoardVersionHelpers.IsJr(kernel.GetVersion()))
                 {
                     kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
                     kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
@@ -952,7 +952,7 @@ namespace FoenixIDE.UI
                 if (KeyboardCheckBox.IsActive)
                     KeyboardCheckBox.IsActive = false;
             }
-            if (kernel.GetVersion() != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(kernel.GetVersion()))
             {
                 //Read Interrupt Register 2
                 byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
