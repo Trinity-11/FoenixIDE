@@ -109,7 +109,7 @@ namespace FoenixIDE.UI
             this.toolStripRevision.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
             this.toolStripRevision.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripRevision.Name = "toolStripRevision";
-            this.toolStripRevision.Size = new System.Drawing.Size(64, 30);
+            this.toolStripRevision.Size = new System.Drawing.Size(100, 30);
             this.toolStripRevision.Text = "Rev B";
             this.toolStripRevision.ToolTipText = "Board Version";
             this.toolStripRevision.Click += new System.EventHandler(this.ToolStripRevision_Click);

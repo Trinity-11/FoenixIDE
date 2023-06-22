@@ -42,8 +42,11 @@ namespace FoenixIDE.UI
                 case BoardVersion.RevUPlus:
                     RevModeLabel.Text = "Mode: RevU+";
                     break;
-                case BoardVersion.RevJr:
+                case BoardVersion.RevJr_6502:
                     RevModeLabel.Text = "Mode: F256Jr";
+                    break;
+                case BoardVersion.RevJr_65816:
+                    RevModeLabel.Text = "Mode: F256Jr(816)";
                     break;
             }
         }
@@ -269,7 +272,7 @@ namespace FoenixIDE.UI
             {
                 BaseBankAddress = 0x18_0000;
             }
-            else if (boardVersion == BoardVersion.RevJr)
+            else if (BoardVersionHelpers.IsJr(boardVersion))
             {
                 BaseBankAddress = 0;
             }
@@ -775,7 +778,7 @@ namespace FoenixIDE.UI
             // Maximum transmission size is 8192
             if (Size > 8192)
             {
-                if (boardVersion != BoardVersion.RevJr)
+                if (!BoardVersionHelpers.IsJr(boardVersion))
                 {
                     Size = 8192;
                     Console.WriteLine("PreparePacket2Write: output truncated to 8K bytes.");
