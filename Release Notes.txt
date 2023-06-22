@@ -2,8 +2,13 @@ Release 0.6.0.7
 ---------------
 Added new breakpoint window that will break upon detection of Program Counter and memory addresses read and writes.
 Clean up of old dead code.
+Closes issue #25: https://github.com/Trinity-11/FoenixIDE/issues/25 - support for .bin files as executable.
+Added support for F256JR with the 65816 processor (thank you https://github.com/clandrew).
+Closes issue #26: https://github.com/Trinity-11/FoenixIDE/issues/26 - crash when converting out of order lines in hex file.
+When detecting the out of order lines, the LoadHex file will create a new block and change the cursor to the new address.
+Added drag-n-drop for .bin files.
 
-** TODO: Update the Keyboard device for F256Jr.
+** TODO: Update the Keyboard device for F256Jr (ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Add breaklines in debugger listing, when memory is not contiguous.

@@ -41,20 +41,24 @@ namespace FoenixIDE.Simulator.FileFormat
                     {
                         // data row. The next n bytes are data to be loaded into memory
                         case "00":
-                            int newAddrCursor = GetByte(offset, 0, 2);
+                            addrCursor = GetByte(offset, 0, 2);
                             
-                            // This is to address defect report #26 - https://github.com/Trinity-11/FoenixIDE/issues/26
-                            // Check if the new address is consecutive with the previous one - if not, create a new block
-                            /*if (bank + newAddrCursor != startAddress)
-                            {
-                                blocks.Add(startAddress);
-                                blockLengths.Add(bank + addrCursor - startAddress);
-                            }*/
-                            
-                            addrCursor = newAddrCursor;
-                            if (startAddress == -1)
+                            if (startAddress == -1 )
                             {
                                 startAddress = bank + addrCursor;
+                            }
+                            // This is to address defect report #26 - https://github.com/Trinity-11/FoenixIDE/issues/26
+                            // Check if the new address is consecutive with the previous one - if not, create a new block
+                            if (!blocks.Contains(startAddress) || (bank + addrCursor) < startAddress)
+                            {
+                                startAddress = bank + addrCursor;
+                                blocks.Add(startAddress);
+                                blockLengths.Add(data.Length / 2);
+                            }
+                            else
+                            {
+                                int bl = blocks.IndexOf(startAddress);
+                                blockLengths[bl] = (bank + addrCursor + data.Length / 2 - startAddress);
                             }
                             if (bank <= ram.Length)
                             {
@@ -75,20 +79,14 @@ namespace FoenixIDE.Simulator.FileFormat
 
                         // end of file - just ignore
                         case "01":
-                            if (startAddress != -1)
-                            {
-                                blocks.Add(startAddress);                                
-                                blockLengths.Add(bank + addrCursor - startAddress);
-                            }
                             break;
 
                         case "02":
-                            bank = GetByte(data, 0, 2) * 16;
                             if (startAddress != -1)
                             {
-                                blocks.Add(startAddress);
-                                blockLengths.Add(addrCursor);
+                                startAddress = -1;
                             }
+                            bank = GetByte(data, 0, 2) * 16;
                             break;
 
                         // extended linear address 
@@ -96,8 +94,6 @@ namespace FoenixIDE.Simulator.FileFormat
                         case "04":
                             if (startAddress != -1)
                             {
-                                blocks.Add(startAddress);
-                                blockLengths.Add(bank + addrCursor - startAddress);
                                 startAddress = -1;
                             }
                             bank = GetByte(data, 0, 2) << 16;

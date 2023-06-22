@@ -1555,7 +1555,7 @@ namespace FoenixIDE.UI
             {
                 FileInfo info = new FileInfo(obj[0]);
                 string extension = info.Extension.ToUpper();
-                if (extension.Equals(".HEX") || extension.Equals(".PGX") || extension.Equals(".PGZ"))
+                if (extension.Equals(".HEX") || extension.Equals(".PGX") || extension.Equals(".PGZ") || extension.Equals(".BIN"))
                 {
                     LoadExecutableFile(obj[0]);
                 }
