@@ -41,7 +41,17 @@ namespace FoenixIDE.Simulator.FileFormat
                     {
                         // data row. The next n bytes are data to be loaded into memory
                         case "00":
-                            addrCursor = GetByte(offset, 0, 2);
+                            int newAddrCursor = GetByte(offset, 0, 2);
+                            
+                            // This is to address defect report #26 - https://github.com/Trinity-11/FoenixIDE/issues/26
+                            // Check if the new address is consecutive with the previous one - if not, create a new block
+                            /*if (bank + newAddrCursor != startAddress)
+                            {
+                                blocks.Add(startAddress);
+                                blockLengths.Add(bank + addrCursor - startAddress);
+                            }*/
+                            
+                            addrCursor = newAddrCursor;
                             if (startAddress == -1)
                             {
                                 startAddress = bank + addrCursor;
@@ -67,7 +77,7 @@ namespace FoenixIDE.Simulator.FileFormat
                         case "01":
                             if (startAddress != -1)
                             {
-                                blocks.Add(startAddress);
+                                blocks.Add(startAddress);                                
                                 blockLengths.Add(bank + addrCursor - startAddress);
                             }
                             break;

@@ -43,7 +43,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
@@ -83,7 +83,8 @@
   <ItemGroup>
     <Compile Include="Basic\HiResTimer.cs" />
     <Compile Include="Basic\HiResTimerElapsedEventArgs.cs" />
-    <Compile Include="Basic\ScanCodes.cs" />
+    <Compile Include="Basic\ScanCodesSet1.cs" />
+    <Compile Include="Basic\ScanCodesSet2.cs" />
     <Compile Include="Controls\ColorCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>

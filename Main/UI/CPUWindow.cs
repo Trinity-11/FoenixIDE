@@ -408,12 +408,7 @@ namespace FoenixIDE.UI
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
                 DebugPanel.Refresh();
-                knl_breakpointsExec.Clear();
-                knl_breakpointsExec.AddRange(breakpointWindow.GetExecuteBreakpoints());
-                knl_breakpointsRead.Clear();
-                knl_breakpointsRead.AddRange(breakpointWindow.GetReadBreakpoints());
-                knl_breakpointsWrite.Clear();
-                knl_breakpointsWrite.AddRange(breakpointWindow.GetWriteBreakpoints());
+                addBreakpoints();
             }
             else
             {
@@ -432,6 +427,34 @@ namespace FoenixIDE.UI
             RefreshStatus();
             registerDisplay1.RegistersReadOnly(false);
             MainWindow.Instance.SetGpuPeriod(500);
+        }
+
+        private void addBreakpoints()
+        {
+            List<int> execs = breakpointWindow.GetExecuteBreakpoints();
+            foreach (int exec in execs)
+            {
+                if (!knl_breakpointsExec.Contains(exec))
+                {
+                    knl_breakpointsExec.Add(exec);
+                }
+            }
+            List<int> reads = breakpointWindow.GetReadBreakpoints();
+            foreach (int read in reads)
+            {
+                if (!knl_breakpointsRead.Contains(read))
+                {
+                    knl_breakpointsRead.Add(read);
+                }
+            }
+            List<int> writes = breakpointWindow.GetWriteBreakpoints();
+            foreach (int write in writes)
+            {
+                if (!knl_breakpointsWrite.Contains(write))
+                {
+                    knl_breakpointsWrite.Add(write);
+                }
+            }
         }
 
         private void StepButton_Click(object sender, EventArgs e)
@@ -480,7 +503,7 @@ namespace FoenixIDE.UI
             if (line != null && line.StepOver)
             {
                 // Set a breakpoint to the next address
-                knl_breakpointsExec.Add(pc);
+                knl_breakpointsExec.Add(pc + line.commandLength);
 
                 // Run the CPU until the breakpoint is reached
                 RunButton_Click(null, null);

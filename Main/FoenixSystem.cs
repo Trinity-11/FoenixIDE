@@ -315,6 +315,7 @@ namespace FoenixIDE
         {
             boardVersion = rev;
         }
+
         // return true if the CPU was reset and the program was loaded
         public bool ResetCPU(string filename)
         {
@@ -350,10 +351,10 @@ namespace FoenixIDE
                 }
                 else
                 {
+                    // Exit the loop and exit the function
                     return false;
                 }
-            } 
-            
+            }
             string extension = info.Extension.ToUpper();
             if (info.Name.StartsWith("kernel"))
             {
@@ -364,7 +365,7 @@ namespace FoenixIDE
             }
             else
             { 
-                    // Ensure the first LUTs are set correctly - but don't overwrite the kernel.
+                // Ensure the first LUTs are set correctly - but don't overwrite the kernel.
                 if (BoardVersionHelpers.IsJr(boardVersion))
                 {
                     MemMgr.MMU.SetActiveLUT(0);
@@ -388,9 +389,8 @@ namespace FoenixIDE
             }
             else if (extension.Equals(".PGX"))
             {
-                FileInfo f = new FileInfo(LoadedKernel);
-                int flen = (int)(f.Length - 8);
-                BinaryReader reader = new BinaryReader(f.OpenRead());
+                int flen = (int)(info.Length - 8);
+                BinaryReader reader = new BinaryReader(info.OpenRead());
                 // The first four byte contain PGX,0x1
                 byte[] header = reader.ReadBytes(4);
                 if (header[0] == 'P' && header[1] == 'G' && header[2] == 'X')
@@ -411,8 +411,7 @@ namespace FoenixIDE
             }
             else if (extension.Equals(".PGZ"))
             {
-                FileInfo f = new FileInfo(LoadedKernel);
-                BinaryReader reader = new BinaryReader(f.OpenRead());
+                BinaryReader reader = new BinaryReader(info.OpenRead());
                 byte header = reader.ReadByte();  // this should be Z for 24-bits and z for 32-bits
                 int size = header == 'z' ? 4 : 3;
                 int FnxAddressPtr = -1;
@@ -446,7 +445,7 @@ namespace FoenixIDE
                         
                     }
 
-                } while (reader.BaseStream.Position < f.Length);
+                } while (reader.BaseStream.Position < info.Length);
                 reader.Close();
 
                 if (!BoardVersionHelpers.IsJr(boardVersion))
@@ -464,6 +463,37 @@ namespace FoenixIDE
                 FoeniXmlFile fnxml = new FoeniXmlFile(this, ResCheckerRef);
                 fnxml.Load(LoadedKernel);
                 boardVersion = fnxml.Version;
+            }
+            else if (extension.Equals(".BIN"))
+            {
+                int flen = (int)(info.Length);
+                BinaryReader reader = new BinaryReader(info.OpenRead());
+                byte[] DataBuffer;
+                DataBuffer = reader.ReadBytes(flen);
+                int DataStartAddress = 0;
+                // Ask the user what address to write in the header
+                bool isAddressValid = false;
+                do
+                {
+                    string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the Start Address (Hexadecimal)", "Bin Start Address", "0");
+
+                    // Check if the user cancelled
+                    if (StrAddress == "")
+                    {
+                        return false;
+                    }
+                    try
+                    {
+                        DataStartAddress = Convert.ToInt32(StrAddress, 16);
+                        isAddressValid = true;
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Invalid Start Address", "Bin File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                } while (!isAddressValid);
+                // Copy the data into memory
+                MemMgr.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
             }
 
             // Load the .LST file if it exists

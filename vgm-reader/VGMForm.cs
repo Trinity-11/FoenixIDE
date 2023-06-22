@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
+/// <summary>
+/// Read https://www.smspower.org/uploads/Music/vgmspec170.txt for implementation details.
+/// </summary>
 namespace vgm_reader
 {
     public partial class VGMForm : Form
@@ -84,19 +82,54 @@ namespace vgm_reader
             // confirm that the first 4 bytes contain "Vgm "
             if (buffer[0] == 'V' && buffer[1] == 'g' && buffer[2] == 'm' && buffer[3] == ' ' && buffer[9] == 1)
             {
+                // The field values below are not necessary to read the file - without audio chips
+                uint end_of_file = ReadUint(4);
                 byte ver_maj = buffer[9];
                 byte ver_min = buffer[8];
-                int startSongOffset = (ver_min < 50) ? 0x40 : buffer[0x34] + buffer[0x35] * 256 + 0x34;
+                uint gdm_offset = ReadUint(0x14);
+                uint total_samples = ReadUint(0x18);
+                uint loop_pt_offset = ReadUint(0x1C);
+                uint samples_per_loop = ReadUint(0x20);
+                uint rate = ReadUint(0x24); // should be 50 for PAL and 60 for NTSC
+                ushort sn_fdbk = ReadUshort(0x28); // 9 sega master, 3 sega computer, 6 SN76494/SN76496
+                byte sn_reg_width = buffer[0x2A]; // 16 sega master, 15 sega computer
+                byte sn_flags = buffer[0x2B];
+
+                uint ym2612_clk = ReadUint(0x2C);
+                uint ym2151_clk = ReadUint(0x30);
+
+                // Start reading the file here
+                uint startSongOffset = (ver_min < 0x50) ? 0x40 : ReadUint(0x34) + 0x34;
+                uint pcm_clock;
+                uint pcm_intf_reg;
+                byte loop_mod;
+                if (ver_min > 0x50)
+                {
+                    pcm_clock = ReadUint(0x38);
+                    pcm_intf_reg = ReadUint(0x3C);
+                    loop_mod = buffer[0x7F];
+                }
+                if (ver_min >= 0x60)
+                {
+
+                }
+                ushort loop_base;
+                uint extra_hdr_offset;
+                if (ver_min >= 0x70)
+                {
+                    loop_base = ReadUshort(0x7E);
+                    extra_hdr_offset = ReadUint(0xBC);
+                }
                 data_stream_count = 0;
                 data_streams = new List<int>();
                 bool endOfSong = false; // end of song is represented by byte $66
                 // read the commands
-                int ptr = startSongOffset;
+                int ptr = (int)startSongOffset;
                 StringBuilder sb = new StringBuilder();
                 byte reg = 0;
                 byte val = 0;
                 int wait = 0;
-                while (!endOfSong&& ptr < buffer.Length)
+                while (!endOfSong && ptr < buffer.Length)
                 {
                     byte command = buffer[ptr++];
                     switch ((command & 0xF0) >> 4)
@@ -145,7 +178,6 @@ namespace vgm_reader
                                     val = buffer[ptr++];
                                     sb.AppendFormat("OPL3[{0}.{1:X2}]:{2:X2} ", command & 1, reg, val);
                                     break;
-
                             }
                             break;
                         case 6:
@@ -157,12 +189,12 @@ namespace vgm_reader
                                     break;
                                 case (byte)VGM_Commands.DATABANK:
                                     //remember the databank positions
-                                    ptr++; // this byte is always 66
-                                    byte stream_type = buffer[ptr++];
-                                    int stream_size = buffer[ptr] + buffer[ptr + 1] * 256 + buffer[ptr + 2] * 256 * 256 + buffer[ptr + 3] * 256 * 256 * 256;
+                                    int compat_cmd = buffer[ptr++]; // this byte is always 66
+                                    byte data_type = buffer[ptr++];
+                                    int stream_size = (int)ReadUint(ptr);
                                     data_streams.Add(ptr + 4);
                                     ptr += stream_size + 4;
-                                    DisplayError(sb, "DS[" + data_stream_count + "] size:" + stream_size + ", next addr: $" + ptr.ToString("X6"));
+                                    DisplayError(sb, "DS[" + data_stream_count + "] dt:" + data_type + " size:$" + stream_size.ToString("X4") + ", next addr: $" + ptr.ToString("X8"));
                                     data_stream_count++;
                                     break;
                                 case (byte)VGM_Commands.WAIT_N:
@@ -185,6 +217,53 @@ namespace vgm_reader
                             // YM2612 - DAC Write from Databank
                             wait = command & 0xF;
                             sb.Append("YMDAC:" + wait.ToString("X1") + " ");
+                            break;
+                        case 9:
+                            // DAC Stream Control
+                            byte streamId;
+                            switch (command)
+                            {
+                                case 0x90: // setup stream control
+                                    streamId = buffer[ptr++];
+                                    byte chipType = buffer[ptr++];
+                                    byte chipCmd = buffer[ptr++];
+                                    byte chipReg = buffer[ptr++];
+                                    sb.Append("\r\n").Append("StCtrl Setup:" + streamId + " CT:" + chipType + " Cmd:" + chipCmd + " Reg:" + chipReg).Append("\r\n");
+                                    break;
+                                case 0x91: // Set stream data
+                                    streamId = buffer[ptr++];
+                                    byte databankID = buffer[ptr++];
+                                    byte stepSize = buffer[ptr++];
+                                    byte stepBase = buffer[ptr++];
+                                    sb.Append("\r\n").Append("\r\n").Append("StCtrl Set Data:" + streamId + " DB: " + databankID + " SS:" + stepSize + " SB:" + stepBase).Append("\r\n");
+                                    break;
+                                case 0x92: // Stream Frequency
+                                    streamId = buffer[ptr++];
+                                    uint sampleRate = ReadUint(ptr);
+                                    ptr += 4;
+                                    sb.Append("\r\n").Append("StCtrl Freq:" + streamId + "," + sampleRate).Append("\r\n");
+                                    break;
+                                case 0x93: // Start stream
+                                    streamId = buffer[ptr++];
+                                    uint dataStart = ReadUint(ptr);
+                                    ptr += 4;
+                                    byte lengthMode = buffer[ptr++];
+                                    uint dataLength = ReadUint(ptr);
+                                    ptr += 4;
+                                    sb.Append("\r\n").Append("StCtrl Start:" + streamId + ", S:" + dataStart.ToString("X4") + ", Mode:" + lengthMode +", L:" + dataLength.ToString("X4")).Append("\r\n");
+                                    break;
+                                case 0x94: // Stop stream
+                                    streamId = buffer[ptr++];
+                                    sb.Append("\r\n").Append("StCtrl Stop: " + streamId).Append("\r\n");
+                                    break;
+                                case 0x95: // start stream (fast call)
+                                    streamId = buffer[ptr++];
+                                    ushort blockId = ReadUshort(ptr);
+                                    ptr += 2;
+                                    byte flags = buffer[ptr++];
+                                    sb.Append("\r\n").Append("StCtrl Start Fast: " + streamId + " B:" + blockId + " F:" + flags).Append("\r\n");
+                                    break;
+                            }
                             break;
                         case 0xa:
                             if (command == (byte)VGM_Commands.AY8910)
@@ -209,17 +288,17 @@ namespace vgm_reader
                             {
                                 case 0xb2:
                                     // ad dd
-                                    
+
                                     int sample = (reg & 0xF) * 256 + val;
                                     reg = (byte)((reg & 0xF0) >> 4);
                                     sb.Append("PWM[" + reg.ToString("X1") + "]:" + sample.ToString("X3") + " ");
                                     break;
                                 default:
-                                    
+
                                     sb.Append("2BC{" + command.ToString("X2") + "}[" + reg.ToString("X2") + "]:" + val.ToString("X2") + " ");
                                     break;
                             }
-                            
+
                             break;
                         case 0xc:
                             int addr = buffer[ptr] + buffer[ptr + 1] * 256;
@@ -237,12 +316,12 @@ namespace vgm_reader
                             break;
                         case 0xe:
                             // 4 bytes
-                            int offset = buffer[ptr] + buffer[ptr + 1] * 256 + buffer[ptr+2] * 256 * 256 + buffer[ptr + 3] * 256 * 256 * 256;
+                            int offset = buffer[ptr] + buffer[ptr + 1] * 256 + buffer[ptr + 2] * 256 * 256 + buffer[ptr + 3] * 256 * 256 * 256;
                             ptr += 4;
                             if (command == 0xE0)
                             {
                                 sb.Append("PCM DBO:" + offset.ToString("X8") + " ");
-                            } 
+                            }
                             else
                             {
                                 sb.Append("4BC{" + command.ToString("X2") + "}:" + offset.ToString("X8") + " ");
@@ -255,18 +334,19 @@ namespace vgm_reader
                     }
                 }
                 AY38910Text.Text = sb.ToString();
-            } else
+            }
+            else
             {
                 AY38910Text.Text = "Not a valid VGM file";
             }
-            
+
         }
 
         byte[] AYRegisters = new byte[15];
         private void DisplayAY38910Value(StringBuilder s, byte register, byte value)
         {
             AYRegisters[register] = value;
-            
+
             string channel = ((char)(((register & 7) >> 1) + 65)).ToString();
             switch (register)
             {
@@ -281,7 +361,7 @@ namespace vgm_reader
                         period = 1;
                     }
                     float f = 2000000 / (16 * period);
-                    s.Append("AY.T[" + channel + "]:" + AYRegisters[register+1].ToString("X1") + value.ToString("X2") + " f:" + f + " ");
+                    s.Append("AY.T[" + channel + "]:" + AYRegisters[register + 1].ToString("X1") + value.ToString("X2") + " f:" + f + " ");
                     break;
                 case 1:
                 case 3:
@@ -307,7 +387,7 @@ namespace vgm_reader
                     s.Append("AY.#C" + register + ":" + value + " ");
                     break;
             }
-            
+
         }
 
         /**
@@ -334,7 +414,7 @@ namespace vgm_reader
                 }
                 bool freq = (value & 0x10) == 0x10;
                 int val = value & 0xF;
-                s.Append("PSG." + (freq?"T":"A") + "[" + channel + "]:" + val.ToString("X1") + " ");
+                s.Append("PSG." + (freq ? "T" : "A") + "[" + channel + "]:" + val.ToString("X1") + " ");
             }
             else
             {
@@ -344,12 +424,22 @@ namespace vgm_reader
 
         private void DisplayWait(StringBuilder s, int value)
         {
-            s.Append("W:" + value).Append("\r\n");   
+            s.Append("W:" + value).Append("\r\n");
         }
 
         private void DisplayError(StringBuilder s, string error)
         {
             s.Append(error + "\r\n");
+        }
+
+        private uint ReadUint(int addr)
+        {
+            return (uint)(buffer[addr] + 256 * (buffer[addr + 1] + 256 * (buffer[addr + 2] + 256 * buffer[addr + 3])));
+        }
+
+        private ushort ReadUshort(int addr)
+        {
+            return (ushort)(buffer[addr] + 256 * buffer[addr + 1]);
         }
     }
 }

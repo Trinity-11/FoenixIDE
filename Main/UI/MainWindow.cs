@@ -1598,6 +1598,7 @@ namespace FoenixIDE.UI
                         writer.Write(DataStartAddress[0]);
                         writer.Write(buffer);
                     }
+                    MessageBox.Show("File " + outputFileName + " was created!", "PGX File Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -1651,6 +1652,7 @@ namespace FoenixIDE.UI
                     buffer = PrepareHeader(startAddress, 0);
                     writer.Write(buffer);
                 }
+                MessageBox.Show("File " + outputFileName + " was created!", "PGZ File Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -1676,28 +1678,42 @@ namespace FoenixIDE.UI
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 // Ask the user what address to write in the header
-                string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the PGX Start Address (Hexadecimal)", "PGX Start Address", "0");
-                if (!StrAddress.Equals("0"))
+                bool isAddressValid = false;
+                int DataStartAddress = 0;
+                do
                 {
-                    byte[] buffer = File.ReadAllBytes(dialog.FileName);
-                    // write the file
-                    int DataStartAddress = Convert.ToInt32(StrAddress, 16);
-                    string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
-                    using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
+                    string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the PGX Start Address (Hexadecimal)", "PGX Start Address", "0");
+
+                    // Check if the user cancelled
+                    if (StrAddress == "")
                     {
-                        // 8 byte header
-                        writer.Write((byte)'P');
-                        writer.Write((byte)'G');
-                        writer.Write((byte)'X');
-                        writer.Write((byte)1);
-                        writer.Write(DataStartAddress);
-                        writer.Write(buffer);
+                        return;
                     }
-                }
-                else
+                    try
+                    {
+                        DataStartAddress = Convert.ToInt32(StrAddress, 16);
+                        isAddressValid = true;
+                    } catch
+                    {
+                        MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                } while (!isAddressValid);
+                
+                
+                byte[] buffer = File.ReadAllBytes(dialog.FileName);
+                // write the file
+                string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
+                using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
                 {
-                    MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // 8 byte header
+                    writer.Write((byte)'P');
+                    writer.Write((byte)'G');
+                    writer.Write((byte)'X');
+                    writer.Write((byte)1);
+                    writer.Write(DataStartAddress);
+                    writer.Write(buffer);
                 }
+                MessageBox.Show("File " + outputFileName + " was created!\r\nStart address: $" + DataStartAddress.ToString("X6"), "PGX File Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
