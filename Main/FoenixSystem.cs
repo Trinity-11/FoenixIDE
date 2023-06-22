@@ -53,11 +53,17 @@ namespace FoenixIDE
                     SystemStat = 5;
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_U;
                     break;
-                case BoardVersion.RevJr:
+                case BoardVersion.RevJr_6502:
                     memSize = 1024*1024;
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
                     clock = 6293000;
                     is6502 = true;
+                    break;
+                case BoardVersion.RevJr_65816:
+                    memSize = 1024 * 1024;
+                    keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
+                    clock = 6293000;
+                    is6502 = false;
                     break;
             }
             if (boardVersion == BoardVersion.RevB)
@@ -65,7 +71,7 @@ namespace FoenixIDE
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL, 4);
                 sdcard = new CH376SRegister(MemoryMap.SDCARD_DATA, MemoryMap.SDCARD_SIZE);
             }
-            else if (boardVersion == BoardVersion.RevJr)
+            else if (BoardVersionHelpers.IsJr(boardVersion))
             {
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_JR, 3);  // unlike the FMX, this register is 16-bits in F256Jr
                 sdcard = new GabeSDController(MemoryMap.SDCARD_JR, MemoryMap.SDCARD_SIZE);   // TODO: write yet a new SD controller.
@@ -76,9 +82,9 @@ namespace FoenixIDE
                 sdcard = new GabeSDController(MemoryMap.GABE_SDC_CTRL_START, MemoryMap.GABE_SDC_CTRL_SIZE);
             }
 
-            if (boardVersion != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(boardVersion))
             {
-                // These are the 65816-based machines
+                // These are the strictly 65816-based machines
                 MemMgr = new MemoryManager
                 {
                     RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),                        // RAM: 2MB Rev B & U, 4MB Rev C & U+
@@ -112,7 +118,7 @@ namespace FoenixIDE
             }
             else
             {
-                // This is a 6502-based machine
+                // This is either a 6502-based machine, or a 65816-based Jr with the same memory map
                 MemMgr = new MemoryManager
                 {
                     RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
@@ -137,7 +143,7 @@ namespace FoenixIDE
             // Load the kernel.hex if present
             ResetCPU(DefaultKernel);
 
-            if (boardVersion != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(boardVersion))
             {
                 // Write bytes $9F in the joystick registers to mean that they are not installed.
                 MemMgr.WriteWord(0xAFE800, 0x9F9F);
@@ -206,7 +212,7 @@ namespace FoenixIDE
 
         private void TimerEvent0()
         {
-            if (boardVersion != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(boardVersion))
             {
                 byte mask =  MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
                 if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT02_TMR0) == (byte)Register0.FNX0_INT02_TMR0))
@@ -233,7 +239,7 @@ namespace FoenixIDE
         }
         private void TimerEvent1()
         {
-            if (boardVersion != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(boardVersion))
             {
                 byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
                 if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT03_TMR1) == (byte)Register0.FNX0_INT03_TMR1))
@@ -275,7 +281,7 @@ namespace FoenixIDE
 
         private void RTCAlarmEvents()
         {
-            if (boardVersion != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(boardVersion))
             {
                 byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
                 if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT05_RTC) == (byte)Register0.FNX0_INT05_RTC))
@@ -329,25 +335,29 @@ namespace FoenixIDE
             {
                 BasePageAddress = 0x38_0000;
             }
-
             FileInfo info = new FileInfo(LoadedKernel);
-            if (!info.Exists)
+            while (!info.Exists)
             {
                 OpenFileDialog f = new OpenFileDialog
                 {
                     Title = "Select a kernel file",
-                    Filter = "Hex Files|*.hex|PGX Files|*.pgx|PGZ Files|*.pgz"
+                    Filter = "Hex Files|*.hex|PGX Files|*.pgx|PGZ Files|*.pgz|Binary Files|*.bin"
                 };
                 if (f.ShowDialog() == DialogResult.OK)
                 {
                     LoadedKernel = f.FileName;
                     info = new FileInfo(LoadedKernel);
                 }
-            }
+                else
+                {
+                    return false;
+                }
+            } 
+            
             string extension = info.Extension.ToUpper();
             if (info.Name.StartsWith("kernel"))
             {
-                if (boardVersion == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(boardVersion))
                 {
                     MemMgr.MMU.Reset();
                 }
@@ -355,7 +365,7 @@ namespace FoenixIDE
             else
             { 
                     // Ensure the first LUTs are set correctly - but don't overwrite the kernel.
-                if (boardVersion == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(boardVersion))
                 {
                     MemMgr.MMU.SetActiveLUT(0);
                     MemMgr.MMU.WriteByte(0x8, 0);
@@ -439,7 +449,7 @@ namespace FoenixIDE
                 } while (reader.BaseStream.Position < f.Length);
                 reader.Close();
 
-                if (boardVersion != BoardVersion.RevJr)
+                if (!BoardVersionHelpers.IsJr(boardVersion))
                 {
                     // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
                     MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);

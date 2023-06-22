@@ -93,7 +93,12 @@ namespace FoenixIDE.UI
                     }
                     else if (context["version"] == "RevJr")
                     {
-                        version = BoardVersion.RevJr;
+                        // Keep back-compatibility with existing command line options.
+                        version = BoardVersion.RevJr_6502;
+                    }
+                    else if (context["version"] == "RevJr816")
+                    {
+                        version = BoardVersion.RevJr_65816;
                     }
                     boardVersionCommandLineSpecified = true;
                 }
@@ -120,7 +125,10 @@ namespace FoenixIDE.UI
                         version = BoardVersion.RevUPlus;
                         break;
                     case "Jr":
-                        version = BoardVersion.RevJr;
+                        version = BoardVersion.RevJr_6502;
+                        break;
+                    case "Jr816":
+                        version = BoardVersion.RevJr_65816;
                         break;
                 }
             }
@@ -140,7 +148,8 @@ namespace FoenixIDE.UI
                     case BoardVersion.RevUPlus:
                         defaultKernel = @"roms\\kernel_U_Plus.hex";
                         break;
-                    case BoardVersion.RevJr:
+                    case BoardVersion.RevJr_6502:
+                    case BoardVersion.RevJr_65816: // Both SKUs share the same kernelfile
                         defaultKernel = @"roms\\kernel_F256Jr.hex";
                         break;
                 }
@@ -173,7 +182,7 @@ namespace FoenixIDE.UI
                 gpu.GpuUpdated += Gpu_Update_Cps_Fps;
             }
             gpu.VICKY = kernel.MemMgr.VICKY;
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 gpu.SetMode(0);
                 gpu.VRAM = kernel.MemMgr.VIDEO;
@@ -253,7 +262,7 @@ namespace FoenixIDE.UI
             }
 
             SetDipSwitchMemory();
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 // Code is tightly coupled with memory manager
                 kernel.MemMgr.UART1.TransmitByte += SerialTransmitByte;
@@ -435,7 +444,7 @@ namespace FoenixIDE.UI
         {
             // Check if the interrupt is enabled
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (version == BoardVersion.RevJr)
+            if (BoardVersionHelpers.IsJr(version))
             {
                 // we need to this to avoid using the MMU IO Paging function
                 mask = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
@@ -445,7 +454,7 @@ namespace FoenixIDE.UI
             {
                 // Set the SOF Interrupt
                 byte IRQ0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
-                if (version == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(version))
                 {
                     // we need to this to avoid using the MMU IO Paging function
                     IRQ0 = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
@@ -463,7 +472,7 @@ namespace FoenixIDE.UI
         {
             // Check if the interrupt is enabled
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (version == BoardVersion.RevJr)
+            if (BoardVersionHelpers.IsJr(version))
             {
                 mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR);
             }
@@ -472,7 +481,7 @@ namespace FoenixIDE.UI
             {
                 // Set the SOL Interrupt
                 byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
-                if (version == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(version))
                 {
                     IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
                 }
@@ -491,7 +500,7 @@ namespace FoenixIDE.UI
         {
             // Check if the SD Card interrupt is allowed
             byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG1);
-            if (version == BoardVersion.RevJr)
+            if (BoardVersionHelpers.IsJr(version))
             {
                 mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR + 1);
             }
@@ -499,7 +508,7 @@ namespace FoenixIDE.UI
             {
                 // Set the SD Card Interrupt
                 byte IRQ1 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG1);
-                if (version == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(version))
                 {
                     IRQ1 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR + 1);
                 }
@@ -592,7 +601,7 @@ namespace FoenixIDE.UI
 
         private void WriteKeyboardCode(ScanCode sc)
         {
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 // Check if the Keyboard interrupt is allowed
                 byte mask = kernel.MemMgr.ReadByte(MemoryMap.INT_MASK_REG1);
@@ -619,7 +628,7 @@ namespace FoenixIDE.UI
         }
         private void TriggerKeyboardInterrupt()
         {
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 // Set the Keyboard Interrupt
                 byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(1);
@@ -639,7 +648,7 @@ namespace FoenixIDE.UI
 
         private void TriggerMouseInterrupt()
         {
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 // Set the Mouse Interrupt
                 byte IRQ0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
@@ -768,7 +777,7 @@ namespace FoenixIDE.UI
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
-                if (version == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(version))
                 {
                     // Now update other registers
                     //kernel.MemMgr.MMU.Reset();
@@ -796,7 +805,7 @@ namespace FoenixIDE.UI
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
-                if (version == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(version))
                 {
                     // Now update other registers
                     kernel.MemMgr.MMU.Reset();
@@ -821,7 +830,7 @@ namespace FoenixIDE.UI
                 debugWindow.ClearTrace();
                 SetDipSwitchMemory();
                 memoryWindow.Memory = kernel.CPU.MemMgr;
-                if (version == BoardVersion.RevJr)
+                if (BoardVersionHelpers.IsJr(version))
                 {
                     // Now update other registers
                     kernel.MemMgr.MMU.Reset();
@@ -894,7 +903,7 @@ namespace FoenixIDE.UI
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
-                Filter = "Hex Files|*.hex|PGX Files|*.pgx|PGZ Files|*.pgz",
+                Filter = "Hex Files|*.hex|PGX Files|*.pgx|PGZ Files|*.pgz|Binary Files|*.bin",
                 Title = "Select an Executable File",
                 CheckFileExists = true
             };
@@ -925,7 +934,7 @@ namespace FoenixIDE.UI
                     debugWindow.Pause();
                     SetDipSwitchMemory();
                     ShowDebugWindow();
-                    if (version == BoardVersion.RevJr)
+                    if (BoardVersionHelpers.IsJr(version))
                     {
                         // Now update other registers
                         kernel.MemMgr.MMU.Reset();
@@ -1007,7 +1016,7 @@ namespace FoenixIDE.UI
         {
             gpu.TileEditorMode = false;
             // Restore the previous graphics mode
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 kernel.MemMgr.VICKY.WriteByte(0, previousGraphicMode);
             }
@@ -1029,7 +1038,7 @@ namespace FoenixIDE.UI
                 tileEditor.SetResourceChecker(kernel.ResCheckerRef);
                 gpu.TileEditorMode = true;
                 // Set Vicky into Tile mode
-                if (version != BoardVersion.RevJr)
+                if (!BoardVersionHelpers.IsJr(version))
                 {
                     previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0);
                     kernel.MemMgr.VICKY.WriteByte(0, 0x10);
@@ -1069,13 +1078,13 @@ namespace FoenixIDE.UI
         private void Gpu_MouseMove(object sender, MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
-            if (version == BoardVersion.RevJr)
+            if (BoardVersionHelpers.IsJr(version))
             {
                 size = gpu.GetScreenSize_JR();
             }
             float ratioW = gpu.Width / (float)size.X;
             float ratioH = gpu.Height / (float)size.Y;
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 bool borderEnabled = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_CTRL_REG) == 1;
                 double borderWidth = borderEnabled ? kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.BORDER_X_SIZE) : 0;
@@ -1103,7 +1112,7 @@ namespace FoenixIDE.UI
         private void Gpu_MouseDown(object sender, MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
-            if (version == BoardVersion.RevJr)
+            if (BoardVersionHelpers.IsJr(version))
             {
                 size = gpu.GetScreenSize_JR();
             }
@@ -1161,7 +1170,7 @@ namespace FoenixIDE.UI
         private void GenerateMouseInterrupt(MouseEventArgs e)
         {
             Point size = gpu.GetScreenSize();
-            if (version == BoardVersion.RevJr)
+            if (BoardVersionHelpers.IsJr(version))
             {
                 gpu.GetScreenSize_JR();
             }
@@ -1190,7 +1199,7 @@ namespace FoenixIDE.UI
             left = false;
             right = false;
             middle = false;
-            if (version != BoardVersion.RevJr && gpu.IsMousePointerVisible() || gpu.TileEditorMode)
+            if (!BoardVersionHelpers.IsJr(version) && gpu.IsMousePointerVisible() || gpu.TileEditorMode)
             {
                 Cursor.Show();
             }
@@ -1199,7 +1208,7 @@ namespace FoenixIDE.UI
 
         private void Gpu_MouseEnter(object sender, EventArgs e)
         {
-            if (version != BoardVersion.RevJr && gpu.IsMousePointerVisible() && !gpu.TileEditorMode)
+            if (!BoardVersionHelpers.IsJr(version) && gpu.IsMousePointerVisible() && !gpu.TileEditorMode)
             {
                 Cursor.Hide();
             }
@@ -1290,11 +1299,17 @@ namespace FoenixIDE.UI
                 toolStripRevision.Text = "Rev U+";
                 shortVersion = "U+";
             }
-            else
+            else if (version == BoardVersion.RevJr_6502)
             {
                 toolStripRevision.Text = "Rev F256Jr";
                 shortVersion = "Jr";
             }
+            else if (version == BoardVersion.RevJr_65816)
+            {
+                toolStripRevision.Text = "Rev F256Jr(816)";
+                shortVersion = "Jr(816)";
+            }
+
             // force repaint
             statusStrip1.Invalidate();
             Simulator.Properties.Settings.Default.BoardRevision = shortVersion;
@@ -1321,7 +1336,12 @@ namespace FoenixIDE.UI
             }
             else if (version == BoardVersion.RevUPlus)
             {
-                version = BoardVersion.RevJr;
+                version = BoardVersion.RevJr_6502;
+                defaultKernel = @"roms\\kernel_F256Jr.hex";
+            }
+            else if (version == BoardVersion.RevJr_6502)
+            {
+                version = BoardVersion.RevJr_65816;
                 defaultKernel = @"roms\\kernel_F256Jr.hex";
             }
             else
@@ -1411,7 +1431,7 @@ namespace FoenixIDE.UI
 
         private void SetDipSwitchMemory()
         {
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 // if kernel memory is available, set the memory
                 byte bootMode = (byte)((switches[0] ? 0 : 1) + (switches[1] ? 0 : 2));
@@ -1475,7 +1495,7 @@ namespace FoenixIDE.UI
 
         public void WriteMCRBytesToVicky(byte low, byte high)
         {
-            int baseAddr = version == BoardVersion.RevJr ? 0xD000 - 0xC000 : 0;
+            int baseAddr = BoardVersionHelpers.IsJr(version) ? 0xD000 - 0xC000 : 0;
 
             kernel.MemMgr.VICKY.WriteByte(baseAddr, low);
             kernel.MemMgr.VICKY.WriteByte(baseAddr + 1, high);
@@ -1483,12 +1503,12 @@ namespace FoenixIDE.UI
 
         public ushort ReadMCRBytesFromVicky()
         {
-            return (ushort)kernel.MemMgr.VICKY.ReadWord(version == BoardVersion.RevJr ? 0xD000 - 0xC000 : 0);
+            return (ushort)kernel.MemMgr.VICKY.ReadWord(BoardVersionHelpers.IsJr(version) ? 0xD000 - 0xC000 : 0);
         }
 
         public void UpdateGamma(bool gamma)
         {
-            if (version != BoardVersion.RevJr)
+            if (!BoardVersionHelpers.IsJr(version))
             {
                 switches[6] = gamma;
                 dipSwitch.Invalidate();

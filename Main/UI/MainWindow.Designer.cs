@@ -92,10 +92,10 @@ namespace FoenixIDE.UI
             this.cpsPerf,
             this.fpsPerf,
             this.SDCardPath});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 502);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 511);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.ShowItemToolTips = true;
-            this.statusStrip1.Size = new System.Drawing.Size(669, 39);
+            this.statusStrip1.Size = new System.Drawing.Size(669, 30);
             this.statusStrip1.Stretch = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -109,7 +109,7 @@ namespace FoenixIDE.UI
             this.toolStripRevision.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
             this.toolStripRevision.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripRevision.Name = "toolStripRevision";
-            this.toolStripRevision.Size = new System.Drawing.Size(64, 34);
+            this.toolStripRevision.Size = new System.Drawing.Size(100, 25);
             this.toolStripRevision.Text = "Rev B";
             this.toolStripRevision.ToolTipText = "Board Version";
             this.toolStripRevision.Click += new System.EventHandler(this.ToolStripRevision_Click);
@@ -120,7 +120,7 @@ namespace FoenixIDE.UI
             this.dipSwitch.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.dipSwitch.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.None;
             this.dipSwitch.Name = "dipSwitch";
-            this.dipSwitch.Size = new System.Drawing.Size(129, 34);
+            this.dipSwitch.Size = new System.Drawing.Size(129, 25);
             this.dipSwitch.Text = "toolStripStatusLabel1";
             this.dipSwitch.ToolTipText = "DIP Switches";
             this.dipSwitch.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DipSwitch_MouseDown);
@@ -129,14 +129,14 @@ namespace FoenixIDE.UI
             // ModeText
             // 
             this.ModeText.Name = "ModeText";
-            this.ModeText.Size = new System.Drawing.Size(26, 34);
+            this.ModeText.Size = new System.Drawing.Size(26, 25);
             this.ModeText.Text = "Key";
             // 
             // lastKeyPressed
             // 
             this.lastKeyPressed.AutoSize = false;
             this.lastKeyPressed.Name = "lastKeyPressed";
-            this.lastKeyPressed.Size = new System.Drawing.Size(30, 34);
+            this.lastKeyPressed.Size = new System.Drawing.Size(30, 25);
             this.lastKeyPressed.Text = "$00";
             // 
             // cpsPerf
@@ -150,7 +150,7 @@ namespace FoenixIDE.UI
             this.cpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cpsPerf.Name = "cpsPerf";
             this.cpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.cpsPerf.Size = new System.Drawing.Size(110, 34);
+            this.cpsPerf.Size = new System.Drawing.Size(110, 25);
             this.cpsPerf.Text = "CPS: 0";
             this.cpsPerf.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.cpsPerf.ToolTipText = "Cycles Per Second";
@@ -165,7 +165,7 @@ namespace FoenixIDE.UI
             this.fpsPerf.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fpsPerf.Name = "fpsPerf";
             this.fpsPerf.Padding = new System.Windows.Forms.Padding(2);
-            this.fpsPerf.Size = new System.Drawing.Size(55, 34);
+            this.fpsPerf.Size = new System.Drawing.Size(55, 25);
             this.fpsPerf.Text = "FPS: 0";
             this.fpsPerf.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.fpsPerf.ToolTipText = "Frames Per Second";
@@ -180,7 +180,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(240, 34);
+            this.SDCardPath.Size = new System.Drawing.Size(173, 25);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -496,7 +496,7 @@ namespace FoenixIDE.UI
             this.gpu.Margin = new System.Windows.Forms.Padding(4);
             this.gpu.MinimumSize = new System.Drawing.Size(640, 480);
             this.gpu.Name = "gpu";
-            this.gpu.Size = new System.Drawing.Size(669, 480);
+            this.gpu.Size = new System.Drawing.Size(669, 487);
             this.gpu.TabIndex = 0;
             this.gpu.TabStop = false;
             this.gpu.TileEditorMode = false;
