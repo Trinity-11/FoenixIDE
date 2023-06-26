@@ -493,7 +493,8 @@ namespace FoenixIDE
                     }
                 } while (!isAddressValid);
                 // Copy the data into memory
-                MemMgr.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
+                MemMgr.RAM.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
+                //MemMgr.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
             }
 
             // Load the .LST file if it exists

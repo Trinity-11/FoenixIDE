@@ -127,7 +127,7 @@ namespace FoenixIDE.UI
                     case "Jr":
                         version = BoardVersion.RevJr_6502;
                         break;
-                    case "Jr816":
+                    case "Jr(816)":
                         version = BoardVersion.RevJr_65816;
                         break;
                 }
@@ -165,7 +165,7 @@ namespace FoenixIDE.UI
         {
             kernel = new FoenixSystem(version, defaultKernel);
             terminal = new SerialTerminal();
-            ShowDebugWindow();
+            ShowDebugWindow(version);
             ShowMemoryWindow();
 
             // Now that the kernel is initialized, allocate variables to the GPU
@@ -308,7 +308,7 @@ namespace FoenixIDE.UI
                 gpu.Refresh();
                 if (kernel.lstFile != null)
                 {
-                    ShowDebugWindow();
+                    ShowDebugWindow(version);
                     ShowMemoryWindow();
                 }
                 ResetSDCard();
@@ -316,7 +316,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void ShowDebugWindow()
+        private void ShowDebugWindow(BoardVersion ver)
         {
             cPUToolStripMenuItem.Enabled = true;
             if (debugWindow == null || debugWindow.IsDisposed)
@@ -327,11 +327,13 @@ namespace FoenixIDE.UI
                     Top = Screen.PrimaryScreen.WorkingArea.Top,
                 };
                 debugWindow.Left = Screen.PrimaryScreen.WorkingArea.Width - debugWindow.Width;
+                debugWindow.SetBoardVersion(ver);
                 debugWindow.SetKernel(kernel);
                 debugWindow.Show();
             }
             else
             {
+                debugWindow.SetBoardVersion(ver);
                 debugWindow.SetKernel(kernel);
                 debugWindow.BringToFront();
             }
@@ -750,7 +752,7 @@ namespace FoenixIDE.UI
 
         private void CPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowDebugWindow();
+            ShowDebugWindow(version);
         }
 
         private void MemoryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -933,7 +935,7 @@ namespace FoenixIDE.UI
                     gpu.Refresh();
                     debugWindow.Pause();
                     SetDipSwitchMemory();
-                    ShowDebugWindow();
+                    ShowDebugWindow(version);
                     if (BoardVersionHelpers.IsJr(version))
                     {
                         // Now update other registers
@@ -1539,7 +1541,7 @@ namespace FoenixIDE.UI
             {
                 FileInfo info = new FileInfo(obj[0]);
                 string extension = info.Extension.ToUpper();
-                if (extension.Equals(".HEX") || extension.Equals(".PGX") || extension.Equals(".PGZ"))
+                if (extension.Equals(".HEX") || extension.Equals(".PGX") || extension.Equals(".PGZ") || extension.Equals(".BIN"))
                 {
                     e.Effect = DragDropEffects.Copy;
                     return;

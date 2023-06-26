@@ -51,7 +51,7 @@
             this.CloseButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.CloseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CloseButton.Location = new System.Drawing.Point(122, 258);
-            this.CloseButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.CloseButton.Margin = new System.Windows.Forms.Padding(2);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new System.Drawing.Size(70, 28);
             this.CloseButton.TabIndex = 1;
@@ -63,14 +63,14 @@
             // 
             this.FoenixLogo.Image = ((System.Drawing.Image)(resources.GetObject("FoenixLogo.Image")));
             this.FoenixLogo.Location = new System.Drawing.Point(2, -46);
-            this.FoenixLogo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FoenixLogo.Margin = new System.Windows.Forms.Padding(2);
             this.FoenixLogo.Name = "FoenixLogo";
             this.FoenixLogo.Size = new System.Drawing.Size(296, 319);
             this.FoenixLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.FoenixLogo.TabIndex = 2;
             this.FoenixLogo.TabStop = false;
             // 
-            // AboutFrom
+            // AboutForm
             // 
             this.AcceptButton = this.CloseButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -84,10 +84,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.FoenixLogo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "AboutFrom";
+            this.Name = "AboutForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;

@@ -1,3 +1,15 @@
+Release 0.6.0.8
+---------------
+Fixed the interrupt checkboxes and the tooltips in the CPU Window to match the F256 or C256 registers.
+Fixed an issue when loading .bin files - this now goes only to RAM, not devices.
+Re-adjusted controls position in the Main and CPU windows and locked the forms.
+Fixed issue when the machine was left in Jr(816) it would restart in C mode.
+Changing the board version in the Main Window now is properly reflected in the CPU Window.
+** TODO: Update the Keyboard device for F256Jr (ScanCode Set 2).
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+
 Release 0.6.0.7
 ---------------
 Added new breakpoint window that will break upon detection of Program Counter and memory addresses read and writes.
@@ -7,11 +19,6 @@ Added support for F256JR with the 65816 processor (thank you https://github.com/
 Closes issue #26: https://github.com/Trinity-11/FoenixIDE/issues/26 - crash when converting out of order lines in hex file.
 When detecting the out of order lines, the LoadHex file will create a new block and change the cursor to the new address.
 Added drag-n-drop for .bin files.
-
-** TODO: Update the Keyboard device for F256Jr (ScanCode Set 2).
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Add breaklines in debugger listing, when memory is not contiguous.
 
 Release 0.6.0.6
 ---------------

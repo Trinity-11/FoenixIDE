@@ -34,6 +34,8 @@ namespace FoenixIDE.UI
 
         Point position = new Point();
         private int MemoryLimit = 0;
+        // Depending on the board
+        private BoardVersion boardVersion;
 
         public CPUWindow()
         {
@@ -42,6 +44,17 @@ namespace FoenixIDE.UI
             DisableIRQs(true);
             registerDisplay1.RegistersReadOnly(false);
             breakpointWindow.DeleteEvent += DeleteEventHandler;
+        }
+
+        /**
+         * Change the board version.
+         * The interrupts for F256s are different than C256s.
+         */
+        public void SetBoardVersion(BoardVersion version)
+        {
+            boardVersion = version;
+            DisplayInterruptTooltips();
+            BreakOnIRQCheckBox_CheckedChanged(null, null);
         }
 
         public void SetKernel(FoenixSystem kernel)
@@ -104,27 +117,9 @@ namespace FoenixIDE.UI
             Tooltip.SetToolTip(DeleteBPOverlayButton, "Remove Breakpoint");
             Tooltip.SetToolTip(InspectOverlayButton, "Browse Memory");
             Tooltip.SetToolTip(StepOverOverlayButton, "Step Over");
-            // Register 0
-            Tooltip.SetToolTip(SOFCheckbox, "Break on SOF Interrupts");
-            Tooltip.SetToolTip(SOLCheckbox, "Break on SOL Interrupts");
-            Tooltip.SetToolTip(TMR0Checkbox, "Break on TMR0 Interrupts");
-            Tooltip.SetToolTip(TMR1Checkbox, "Break on TMR1 Interrupts");
-            Tooltip.SetToolTip(TMR2Checkbox, "Break on TMR2 Interrupts");
-            Tooltip.SetToolTip(RTCCheckbox, "Break on RTC Interrupts");
-            Tooltip.SetToolTip(FDCCheckbox, "Break on FDC Interrupts");
-            Tooltip.SetToolTip(MouseCheckbox, "Break on Mouse Interrupts");
 
-            // Register 1
-            Tooltip.SetToolTip(KeyboardCheckBox, "Break on Keyboard Interrupts");
-            Tooltip.SetToolTip(COM2Checkbox, "Break on COM2 Interrupts");
-            Tooltip.SetToolTip(COM1Checkbox, "Break on COM1 Interrupts");
-            Tooltip.SetToolTip(MPU401Checkbox, "Break on MPU401 Interrupts");
-            Tooltip.SetToolTip(SDCardCheckBox, "Break on SD Card Interrupts");
-
-            // Register 2
-            Tooltip.SetToolTip(OPL2RCheckbox, "Break on OPL2 Right Interrupts");
-            Tooltip.SetToolTip(OPL2LCheckbox, "Break on OPL2 Left Interrupts");
             DebugPanel.Paint += new System.Windows.Forms.PaintEventHandler(DebugPanel_Paint);
+            DisplayInterruptTooltips();
         }
 
 
@@ -243,6 +238,65 @@ namespace FoenixIDE.UI
             }
         }
 
+        private void DisplayInterruptTooltips()
+        {
+            bool isJunior = BoardVersionHelpers.IsJr(boardVersion);
+            if (isJunior)
+            {
+                // this is going to be confusing - the F256 Interrupts are different
+                // Register 0
+                Tooltip.SetToolTip(SOFCheckbox, "Break on SOF Interrupts");
+                Tooltip.SetToolTip(SOLCheckbox, "Break on SOL Interrupts");
+                Tooltip.SetToolTip(TMR0Checkbox, "Break on Keyboard Interrupts");
+                Tooltip.SetToolTip(TMR1Checkbox, "Break on Mouse Interrupts");
+                Tooltip.SetToolTip(TMR2Checkbox, "Break on Timer0 Interrupts");
+                Tooltip.SetToolTip(RTCCheckbox, "Break on Timer1 Interrupts");
+                Tooltip.SetToolTip(FDCCheckbox, "Break on DMA Interrupts");
+                Tooltip.SetToolTip(MouseCheckbox, "Break on Reserved Interrupts");
+
+                // Register 1
+                Tooltip.SetToolTip(KeyboardCheckBox, "Break on UART Interrupts");
+                Tooltip.SetToolTip(V2SprColCheck, "Break on Vicky Int2 Interrupts");
+                Tooltip.SetToolTip(V2BitColCheck, "Break on Vicky Int3 Interrupts");
+                Tooltip.SetToolTip(COM2Checkbox, "Break on Vicky Int4 Interrupts");
+                Tooltip.SetToolTip(COM1Checkbox, "Break on RTC Interrupts");
+                Tooltip.SetToolTip(MPU401Checkbox, "Break on VIA Interrupts");
+                Tooltip.SetToolTip(ParallelPortCheck, "Break on IEC Interrupts");
+                Tooltip.SetToolTip(SDCardCheckBox, "Break on SD Card Interrupts");
+            }
+            else
+            {
+                // Register 0
+                Tooltip.SetToolTip(SOFCheckbox, "Break on SOF Interrupts");
+                Tooltip.SetToolTip(SOLCheckbox, "Break on SOL Interrupts");
+                Tooltip.SetToolTip(TMR0Checkbox, "Break on TMR0 Interrupts");
+                Tooltip.SetToolTip(TMR1Checkbox, "Break on TMR1 Interrupts");
+                Tooltip.SetToolTip(TMR2Checkbox, "Break on TMR2 Interrupts");
+                Tooltip.SetToolTip(RTCCheckbox, "Break on RTC Interrupts");
+                Tooltip.SetToolTip(FDCCheckbox, "Break on FDC Interrupts");
+                Tooltip.SetToolTip(MouseCheckbox, "Break on Mouse Interrupts");
+
+                // Register 1
+                Tooltip.SetToolTip(KeyboardCheckBox, "Break on Keyboard Interrupts");
+                Tooltip.SetToolTip(V2SprColCheck, "Break on Sprite Collision Interrupts");
+                Tooltip.SetToolTip(V2BitColCheck, "Break on Bitmap Collision Interrupts");
+                Tooltip.SetToolTip(COM2Checkbox, "Break on COM2 Interrupts");
+                Tooltip.SetToolTip(COM1Checkbox, "Break on COM1 Interrupts");
+                Tooltip.SetToolTip(MPU401Checkbox, "Break on MIDI Ctrlr Interrupts");
+                Tooltip.SetToolTip(ParallelPortCheck, "Break on Parallel Interrupts");
+                Tooltip.SetToolTip(SDCardCheckBox, "Break on SD Card Interrupts");
+
+                // Register 2
+                Tooltip.SetToolTip(OPL3Checkbox, "Break on OPL3 Interrupts");
+                Tooltip.SetToolTip(GabeInt0Check, "Break on Gabe INT0 Interrupts");
+                Tooltip.SetToolTip(GabeInt1Check, "Break on Gabe INT1 Interrupts");
+                Tooltip.SetToolTip(VDMACheck, "Break on VDMA Interrupts");
+                Tooltip.SetToolTip(V2TileColCheck, "Break on Tile Collision Interrupts");
+                Tooltip.SetToolTip(GabeInt2Check, "Break on Gabe INT2 Interrupts");
+                Tooltip.SetToolTip(ExtExpCheck, "Break on External Expansion Interrupts");
+                Tooltip.SetToolTip(SDCardInsertCheck, "Break on SDCard Insertion Interrupts");
+            }
+        }
         private void DebugPanel_MouseMove(object sender, MouseEventArgs e)
         {
             if (kernel.CPU.DebugPause)
@@ -825,23 +879,70 @@ namespace FoenixIDE.UI
         private void BreakOnIRQCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             bool visible = BreakOnIRQCheckBox.Checked;
-            SOFCheckbox.Visible = visible;
-            SOLCheckbox.Visible = visible;
-            TMR0Checkbox.Visible = visible;
-            TMR1Checkbox.Visible = visible;
-            TMR2Checkbox.Visible = visible;
-            RTCCheckbox.Visible = visible;
-            FDCCheckbox.Visible = visible;
-            MouseCheckbox.Visible = visible;
+            if (BoardVersionHelpers.IsJr(boardVersion))
+            {
+                // Row 1
+                SOFCheckbox.Visible = visible;
+                SOLCheckbox.Visible = visible;
+                TMR0Checkbox.Visible = visible;
+                TMR1Checkbox.Visible = visible;
+                TMR2Checkbox.Visible = visible;
+                RTCCheckbox.Visible = visible;
+                FDCCheckbox.Visible = visible;
+                MouseCheckbox.Visible = visible;
 
-            KeyboardCheckBox.Visible = visible;
-            COM2Checkbox.Visible = visible;
-            COM1Checkbox.Visible = visible;
-            MPU401Checkbox.Visible = visible;
-            SDCardCheckBox.Visible = visible;
+                // Row 2
+                KeyboardCheckBox.Visible = visible;
+                V2SprColCheck.Visible = visible;
+                V2BitColCheck.Visible = visible;
+                COM2Checkbox.Visible = visible;
+                COM1Checkbox.Visible = visible;
+                MPU401Checkbox.Visible = visible;
+                ParallelPortCheck.Visible = visible;
+                SDCardCheckBox.Visible = visible;
 
-            OPL2LCheckbox.Visible = visible;
-            OPL2RCheckbox.Visible = visible;
+                // Row 3
+                OPL3Checkbox.Visible = false;
+                GabeInt0Check.Visible = false;
+                GabeInt1Check.Visible = false;
+                VDMACheck.Visible = false;
+                V2TileColCheck.Visible = false;
+                GabeInt2Check.Visible = false;
+                ExtExpCheck.Visible = false;
+                SDCardInsertCheck.Visible = false;
+            }
+            else
+            {
+                // Row 1
+                SOFCheckbox.Visible = visible;
+                SOLCheckbox.Visible = visible;
+                TMR0Checkbox.Visible = visible;
+                TMR1Checkbox.Visible = visible;
+                TMR2Checkbox.Visible = visible;
+                RTCCheckbox.Visible = visible;
+                FDCCheckbox.Visible = visible;
+                MouseCheckbox.Visible = visible;
+
+                // Row 2
+                KeyboardCheckBox.Visible = visible;
+                V2SprColCheck.Visible = visible;
+                V2BitColCheck.Visible = visible;
+                COM2Checkbox.Visible = visible;
+                COM1Checkbox.Visible = visible;
+                MPU401Checkbox.Visible = visible;
+                ParallelPortCheck.Visible = visible;
+                SDCardCheckBox.Visible = visible;
+
+                // Row 3
+                OPL3Checkbox.Visible = visible;
+                GabeInt0Check.Visible = visible;
+                GabeInt1Check.Visible = visible;
+                VDMACheck.Visible = visible;
+                V2TileColCheck.Visible = visible;
+                GabeInt2Check.Visible = visible;
+                ExtExpCheck.Visible = visible;
+                SDCardInsertCheck.Visible = visible;
+            }
         }
 
         /// <summary>
@@ -853,93 +954,58 @@ namespace FoenixIDE.UI
             // Read Interrupt Register 0
             byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
             bool result = false;
-            if (SOFCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT00_SOF) != 0)
+            ColorCheckBox[] row1 = { SOFCheckbox, SOLCheckbox, TMR0Checkbox, TMR1Checkbox, TMR2Checkbox, RTCCheckbox, FDCCheckbox, MouseCheckbox };
+            for (int i =0; i<8;i++)
             {
-                SOFCheckbox.IsActive = true;
-                result = true;
-            } 
-            else
-            {
-                if (SOFCheckbox.IsActive) SOFCheckbox.IsActive = false;
-            }
-            if (SOLCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT01_SOL) != 0)
-            {
-                SOLCheckbox.IsActive = true;
-                result = true;
-            }
-            else
-            {
-                if (SOLCheckbox.IsActive) SOLCheckbox.IsActive = false;
-            }
-            if (TMR0Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT02_TMR0) != 0)
-            {
-                TMR0Checkbox.IsActive = true;
-                result = true;
-            }
-            else
-            {
-                if (TMR0Checkbox.IsActive) TMR0Checkbox.IsActive = false;
-            }
-
-            if (TMR1Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT03_TMR1) != 0)
-            {
-                TMR1Checkbox.IsActive = true;
-                result = true;
-            }
-            else
-            {
-                if (TMR1Checkbox.IsActive)
-                    TMR1Checkbox.IsActive = false;
-            }
-            if (TMR2Checkbox.Checked && (reg0 & (byte)Register0.FNX0_INT04_TMR2) != 0)
-            {
-                TMR2Checkbox.IsActive = true;
-                result = true;
-            }
-            else
-            {
-                if (TMR2Checkbox.IsActive)
-                    TMR2Checkbox.IsActive = false;
-            }
-            if (MouseCheckbox.Checked && (reg0 & (byte)Register0.FNX0_INT07_MOUSE) != 0)
-            {
-                MouseCheckbox.IsActive = true;
-                result = true;
-            }
-            else
-            {
-                if (MouseCheckbox.IsActive)
-                    MouseCheckbox.IsActive = false;
+                if (row1[i].Checked && (reg0 & 1 << i) != 0)
+                {
+                    row1[i].IsActive = true;
+                    result = true;
+                }
+                else
+                {
+                    row1[i].IsActive = false;
+                }
             }
 
             // Read Interrupt Register 1
             byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
-            if (SDCardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT07_SDCARD ) != 0)
+            ColorCheckBox[] row2 = { KeyboardCheckBox, V2SprColCheck, V2BitColCheck, COM2Checkbox, COM1Checkbox, MPU401Checkbox, ParallelPortCheck, SDCardCheckBox };
+            for (int i = 0; i < 8; i++)
             {
-                SDCardCheckBox.IsActive = true;
-                result = true;
+                if (row2[i].Checked && (reg1 & 1 << i) != 0)
+                {
+                    row2[i].IsActive = true;
+                    result = true;
+                }
+                else
+                {
+                    row2[i].IsActive = false;
+                }
             }
-            else
-            {
-                if (SDCardCheckBox.IsActive)
-                    SDCardCheckBox.IsActive = false;
-            }
-            if (KeyboardCheckBox.Checked && (reg1 & (byte)Register1.FNX1_INT00_KBD) != 0)
-            {
-                KeyboardCheckBox.IsActive = true;
-                result = true;
-            }
-            else
-            {
-                if (KeyboardCheckBox.IsActive)
-                    KeyboardCheckBox.IsActive = false;
-            }
+
+            // The F256s do not have the following registers
             if (!BoardVersionHelpers.IsJr(kernel.GetVersion()))
             {
                 //Read Interrupt Register 2 - we don't handle these yet
                 byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
+                ColorCheckBox[] row3 = { OPL3Checkbox, GabeInt0Check, GabeInt1Check, VDMACheck, V2TileColCheck, GabeInt2Check, ExtExpCheck, SDCardInsertCheck };
+                for (int i = 0; i < 8; i++)
+                {
+                    if (row3[i].Checked && (reg1 & 1 << i) != 0)
+                    {
+                        row3[i].IsActive = true;
+                        result = true;
+                    }
+                    else
+                    {
+                        row3[i].IsActive = false;
+                    }
+                }
+
                 //Read Interrupt Register 3 - we don't handle these yet
                 byte reg3 = kernel.MemMgr.INTERRUPT.ReadByte(3);
+                // As you can see, row4 is not implemented
             }
             return result;
         }
