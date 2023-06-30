@@ -48,11 +48,13 @@ namespace FoenixIDE.UI
         public static MainWindow Instance = null;
         private delegate void WriteCPSFPSFunction(string CPS, string FPS);
         private bool fullScreen = false;
+        private string applicationDirectory;
 
         public MainWindow(Dictionary<string, string> context)
         {
             bool autoRunCommandLineSpecified = false;
             bool boardVersionCommandLineSpecified = false;
+            applicationDirectory = System.AppContext.BaseDirectory;
 
             if (context != null)
             {
@@ -137,20 +139,20 @@ namespace FoenixIDE.UI
                 switch (version)
                 {
                     case BoardVersion.RevB:
-                        defaultKernel = @"roms\\kernel_B.hex";
+                        defaultKernel = applicationDirectory + "\\roms\\kernel_B.hex";
                         break;
                     case BoardVersion.RevC:
-                        defaultKernel = @"roms\\kernel_FMX.hex";
+                        defaultKernel = applicationDirectory + "\\roms\\kernel_FMX.hex";
                         break;
                     case BoardVersion.RevU:
-                        defaultKernel = @"roms\\kernel_U.hex";
+                        defaultKernel = applicationDirectory + "\\roms\\kernel_U.hex";
                         break;
                     case BoardVersion.RevUPlus:
-                        defaultKernel = @"roms\\kernel_U_Plus.hex";
+                        defaultKernel = applicationDirectory + "\\roms\\kernel_U_Plus.hex";
                         break;
                     case BoardVersion.RevJr_6502:
                     case BoardVersion.RevJr_65816: // Both SKUs share the same kernelfile
-                        defaultKernel = @"roms\\kernel_F256Jr.hex";
+                        defaultKernel = applicationDirectory + "\\roms\\kernel_F256Jr.hex";
                         break;
                 }
             }
@@ -188,7 +190,7 @@ namespace FoenixIDE.UI
                 gpu.VRAM = kernel.MemMgr.VIDEO;
                 
                 // This fontset is loaded just in case the kernel doesn't provide one.
-                gpu.LoadFontSet("Foenix", @"Resources\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+                gpu.LoadFontSet("Foenix", applicationDirectory + "\\Resources\\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
                 joystickWindow.gabe = kernel.MemMgr.GABE;
 

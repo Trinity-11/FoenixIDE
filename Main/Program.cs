@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using FoenixIDE.Simulator.UI;
 
 namespace FoenixIDE
 {
@@ -141,6 +142,12 @@ namespace FoenixIDE
                         DisplayUsage();
                         context["Continue"] = "false";
                         break;
+                    case "-v":
+                    case "--version":
+                        string version = AboutForm.AppVersion();
+                        Console.Out.WriteLine("FoenixIDE version: " + version);
+                        context["Continue"] = "false";
+                        break;
                     default:
                         Console.Out.WriteLine("Unknown switch used:" + args[i].Trim());
                         DisplayUsage();
@@ -165,6 +172,7 @@ namespace FoenixIDE
             Console.Out.WriteLine("   -i, --irq: disable IRQs true/false");
             Console.Out.WriteLine("   -b, --board: board revision b, c, u, u+, jr, jr816");
             Console.Out.WriteLine("   -h, --help, /?: show this usage");
+            Console.Out.WriteLine("   -v, --version: show the version");
         }
         static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {

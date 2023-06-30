@@ -37,11 +37,16 @@ namespace FoenixIDE.UI
                "public ^{ get; set; }", "private ^{ get; set; }", "internal ^{ get; set; }", "protected ^{ get; set; }"
                };*/
 
+        private string applicationDirectory;
+
         public GameGeneratorForm()
         {
             InitializeComponent();
 
-            //create autocomplete popup menu
+            // get the application directory
+            applicationDirectory = System.AppContext.BaseDirectory;
+
+            // create autocomplete popup menu
             popupMenu = new AutocompleteMenu(CodeTextBox);
             //popupMenu.Items.ImageList = imageList1;
             popupMenu.SearchPattern = @"[\w\.:=!]";
@@ -257,7 +262,7 @@ namespace FoenixIDE.UI
                 // copy the standard asm files - includes and definitions
                 string folder = saveDlg.SelectedPath;
                 Directory.CreateDirectory(folder + Path.DirectorySeparatorChar + "includes");
-                DirectoryInfo dir = new DirectoryInfo(@"Resources\\base_asm");
+                DirectoryInfo dir = new DirectoryInfo(applicationDirectory + "\\Resources\\base_asm");
                 foreach (FileInfo fi in dir.GetFiles("*.asm"))
                 {
                     fi.CopyTo(folder + Path.DirectorySeparatorChar + "includes" + Path.DirectorySeparatorChar + fi.Name, true);
@@ -515,7 +520,7 @@ namespace FoenixIDE.UI
         private void ReloadTemplates()
         {
             templates = new Dictionary<string, List<string>>();
-            string[] AllTemplates = File.ReadAllLines(@"Resources\\GameGeneratorTemplates.txt");
+            string[] AllTemplates = File.ReadAllLines(applicationDirectory + "\\Resources\\GameGeneratorTemplates.txt");
             string templateName = null; ;
             List<string> lines = new List<string>();
             foreach (string line in AllTemplates)

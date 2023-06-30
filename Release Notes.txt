@@ -1,13 +1,19 @@
+Release 0.6.0.10
+----------------
+Emergency fix to address incorrect loading of resources when running the application from command-line.
+Added the -v, --version command-line switches.
+
+** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+
 Release 0.6.0.9
 ---------------
 Allow console output to be visible for command line users.
 Replaced the --kernel options to accept valid .pgz, .pgx, .hex and .bin files instead of only .hex.  
 The --board option now accepts b, c, u, u+, jr and jr816.
 The -h, /? and --help flags now display the usage.
-** TODO: Update the Keyboard device for F256Jr (ScanCode Set 2).
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Add breaklines in debugger listing, when memory is not contiguous.
 
 Release 0.6.0.8
 ---------------

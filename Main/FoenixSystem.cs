@@ -187,8 +187,8 @@ namespace FoenixIDE
                 MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
                 MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                 MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
-
-                String micahFontPath = @"Resources\f256jr_font_micah_jan25th.bin";
+                string applicationDirectory = System.AppContext.BaseDirectory;
+                String micahFontPath = applicationDirectory + "\\Resources\\f256jr_font_micah_jan25th.bin";
                 if (System.IO.File.Exists(micahFontPath))
                 {
                     byte[] fontBuffer = global::System.IO.File.ReadAllBytes(micahFontPath);
