@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace FoenixIDE
 {
@@ -33,6 +34,8 @@ namespace FoenixIDE
 
         private static Dictionary<String,String> DecodeProgramArguments(string[] args)
         {
+            AttachConsole(ATTACH_PARENT_PROCESS);
+            
             Dictionary<string, string> context = new Dictionary<string, string>
             {
                 { "Continue", "true" }
@@ -119,6 +122,12 @@ namespace FoenixIDE
                         break;
                 }
             }
+
+            IntPtr cw = GetConsoleWindow();
+            SendMessage(cw, WM_CHAR, (IntPtr)VK_ENTER, IntPtr.Zero);
+
+            FreeConsole();
+            
             return context;
         }
 
@@ -136,5 +145,20 @@ namespace FoenixIDE
         {
             Application.Exit();
         }
+        
+        [DllImport("kernel32.dll")]
+        static extern bool AttachConsole(int dwProcessId);
+        private const int ATTACH_PARENT_PROCESS = -1;
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern int SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        const uint WM_CHAR = 0x0102;
+        const int VK_ENTER = 0x0D;
+
+        [DllImport("kernel32.dll")]
+        static extern bool FreeConsole();
     }
 }
