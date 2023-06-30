@@ -54,12 +54,6 @@ namespace FoenixIDE.UI
             this.StepOverOverlayButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
             this.irqPanel = new System.Windows.Forms.Panel();
-            this.Reg2Label = new System.Windows.Forms.Label();
-            this.Reg1Label = new System.Windows.Forms.Label();
-            this.Reg0Label = new System.Windows.Forms.Label();
-            this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
-            this.LabelOverlayButton = new System.Windows.Forms.Button();
-            this.DebugPanel = new System.Windows.Forms.PictureBox();
             this.GabeInt1Check = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.VDMACheck = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.V2TileColCheck = new FoenixIDE.Simulator.Controls.ColorCheckBox();
@@ -82,8 +76,14 @@ namespace FoenixIDE.UI
             this.TMR1Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.TMR0Checkbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.SOLCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.Reg2Label = new System.Windows.Forms.Label();
+            this.Reg1Label = new System.Windows.Forms.Label();
+            this.Reg0Label = new System.Windows.Forms.Label();
             this.KeyboardCheckBox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.SOFCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
+            this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
+            this.LabelOverlayButton = new System.Windows.Forms.Button();
+            this.DebugPanel = new System.Windows.Forms.PictureBox();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
@@ -389,82 +389,6 @@ namespace FoenixIDE.UI
             this.irqPanel.Name = "irqPanel";
             this.irqPanel.Size = new System.Drawing.Size(226, 74);
             this.irqPanel.TabIndex = 12;
-            // 
-            // Reg2Label
-            // 
-            this.Reg2Label.AutoSize = true;
-            this.Reg2Label.Location = new System.Drawing.Point(4, 57);
-            this.Reg2Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Reg2Label.Name = "Reg2Label";
-            this.Reg2Label.Size = new System.Drawing.Size(58, 13);
-            this.Reg2Label.TabIndex = 21;
-            this.Reg2Label.Text = "IRQ Reg 2";
-            // 
-            // Reg1Label
-            // 
-            this.Reg1Label.AutoSize = true;
-            this.Reg1Label.Location = new System.Drawing.Point(4, 39);
-            this.Reg1Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Reg1Label.Name = "Reg1Label";
-            this.Reg1Label.Size = new System.Drawing.Size(58, 13);
-            this.Reg1Label.TabIndex = 20;
-            this.Reg1Label.Text = "IRQ Reg 1";
-            // 
-            // Reg0Label
-            // 
-            this.Reg0Label.AutoSize = true;
-            this.Reg0Label.Location = new System.Drawing.Point(4, 22);
-            this.Reg0Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Reg0Label.Name = "Reg0Label";
-            this.Reg0Label.Size = new System.Drawing.Size(58, 13);
-            this.Reg0Label.TabIndex = 19;
-            this.Reg0Label.Text = "IRQ Reg 0";
-            // 
-            // BreakOnIRQCheckBox
-            // 
-            this.BreakOnIRQCheckBox.AutoSize = true;
-            this.BreakOnIRQCheckBox.BackColor = System.Drawing.SystemColors.Control;
-            this.BreakOnIRQCheckBox.Checked = true;
-            this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(4, 3);
-            this.BreakOnIRQCheckBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.BreakOnIRQCheckBox.Name = "BreakOnIRQCheckBox";
-            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
-            this.BreakOnIRQCheckBox.TabIndex = 16;
-            this.BreakOnIRQCheckBox.Text = "Break on IRQ";
-            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = false;
-            this.BreakOnIRQCheckBox.CheckedChanged += new System.EventHandler(this.BreakOnIRQCheckBox_CheckedChanged);
-            // 
-            // LabelOverlayButton
-            // 
-            this.LabelOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.LabelOverlayButton.FlatAppearance.BorderSize = 0;
-            this.LabelOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.LabelOverlayButton.Location = new System.Drawing.Point(198, 200);
-            this.LabelOverlayButton.Margin = new System.Windows.Forms.Padding(2);
-            this.LabelOverlayButton.Name = "LabelOverlayButton";
-            this.LabelOverlayButton.Size = new System.Drawing.Size(18, 18);
-            this.LabelOverlayButton.TabIndex = 13;
-            this.LabelOverlayButton.TabStop = false;
-            this.LabelOverlayButton.Text = "L";
-            this.LabelOverlayButton.UseVisualStyleBackColor = false;
-            this.LabelOverlayButton.Visible = false;
-            this.LabelOverlayButton.Click += new System.EventHandler(this.LabelOverlayButton_Click);
-            // 
-            // DebugPanel
-            // 
-            this.DebugPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.DebugPanel.Location = new System.Drawing.Point(0, 126);
-            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
-            this.DebugPanel.Name = "DebugPanel";
-            this.DebugPanel.Size = new System.Drawing.Size(606, 334);
-            this.DebugPanel.TabIndex = 6;
-            this.DebugPanel.TabStop = false;
-            this.DebugPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseClick);
-            this.DebugPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseMove);
             // 
             // GabeInt1Check
             // 
@@ -799,6 +723,36 @@ namespace FoenixIDE.UI
             this.SOLCheckbox.UseVisualStyleBackColor = true;
             this.SOLCheckbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
             // 
+            // Reg2Label
+            // 
+            this.Reg2Label.AutoSize = true;
+            this.Reg2Label.Location = new System.Drawing.Point(4, 57);
+            this.Reg2Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.Reg2Label.Name = "Reg2Label";
+            this.Reg2Label.Size = new System.Drawing.Size(58, 13);
+            this.Reg2Label.TabIndex = 21;
+            this.Reg2Label.Text = "IRQ Reg 2";
+            // 
+            // Reg1Label
+            // 
+            this.Reg1Label.AutoSize = true;
+            this.Reg1Label.Location = new System.Drawing.Point(4, 39);
+            this.Reg1Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.Reg1Label.Name = "Reg1Label";
+            this.Reg1Label.Size = new System.Drawing.Size(58, 13);
+            this.Reg1Label.TabIndex = 20;
+            this.Reg1Label.Text = "IRQ Reg 1";
+            // 
+            // Reg0Label
+            // 
+            this.Reg0Label.AutoSize = true;
+            this.Reg0Label.Location = new System.Drawing.Point(4, 22);
+            this.Reg0Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.Reg0Label.Name = "Reg0Label";
+            this.Reg0Label.Size = new System.Drawing.Size(58, 13);
+            this.Reg0Label.TabIndex = 19;
+            this.Reg0Label.Text = "IRQ Reg 0";
+            // 
             // KeyboardCheckBox
             // 
             this.KeyboardCheckBox.Checked = true;
@@ -828,6 +782,52 @@ namespace FoenixIDE.UI
             this.SOFCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.SOFCheckbox.UseVisualStyleBackColor = true;
             this.SOFCheckbox.CheckedChanged += new System.EventHandler(this.IRQCheckbox_CheckedChanged);
+            // 
+            // BreakOnIRQCheckBox
+            // 
+            this.BreakOnIRQCheckBox.AutoSize = true;
+            this.BreakOnIRQCheckBox.BackColor = System.Drawing.SystemColors.Control;
+            this.BreakOnIRQCheckBox.Checked = true;
+            this.BreakOnIRQCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.BreakOnIRQCheckBox.Location = new System.Drawing.Point(4, 3);
+            this.BreakOnIRQCheckBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.BreakOnIRQCheckBox.Name = "BreakOnIRQCheckBox";
+            this.BreakOnIRQCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.BreakOnIRQCheckBox.TabIndex = 16;
+            this.BreakOnIRQCheckBox.Text = "Break on IRQ";
+            this.BreakOnIRQCheckBox.UseVisualStyleBackColor = false;
+            this.BreakOnIRQCheckBox.CheckedChanged += new System.EventHandler(this.BreakOnIRQCheckBox_CheckedChanged);
+            // 
+            // LabelOverlayButton
+            // 
+            this.LabelOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.LabelOverlayButton.FlatAppearance.BorderSize = 0;
+            this.LabelOverlayButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.LabelOverlayButton.Location = new System.Drawing.Point(198, 200);
+            this.LabelOverlayButton.Margin = new System.Windows.Forms.Padding(2);
+            this.LabelOverlayButton.Name = "LabelOverlayButton";
+            this.LabelOverlayButton.Size = new System.Drawing.Size(18, 18);
+            this.LabelOverlayButton.TabIndex = 13;
+            this.LabelOverlayButton.TabStop = false;
+            this.LabelOverlayButton.Text = "L";
+            this.LabelOverlayButton.UseVisualStyleBackColor = false;
+            this.LabelOverlayButton.Visible = false;
+            this.LabelOverlayButton.Click += new System.EventHandler(this.LabelOverlayButton_Click);
+            // 
+            // DebugPanel
+            // 
+            this.DebugPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.DebugPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.DebugPanel.Location = new System.Drawing.Point(0, 126);
+            this.DebugPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.DebugPanel.Name = "DebugPanel";
+            this.DebugPanel.Size = new System.Drawing.Size(606, 334);
+            this.DebugPanel.TabIndex = 6;
+            this.DebugPanel.TabStop = false;
+            this.DebugPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseClick);
+            this.DebugPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DebugPanel_MouseMove);
             // 
             // registerDisplay1
             // 
