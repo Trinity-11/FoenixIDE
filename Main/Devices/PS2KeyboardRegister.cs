@@ -3,7 +3,7 @@ using System;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class KeyboardRegister: MemoryLocations.MemoryRAM
+    public class PS2KeyboardRegister: MemoryLocations.MemoryRAM
     {
         private bool mouseDevice = false;
         private bool breakKey = false;
@@ -14,7 +14,7 @@ namespace FoenixIDE.Simulator.Devices
         public TriggerInterruptDelegate TriggerKeyboardInterrupt;
         public TriggerInterruptDelegate TriggerMouseInterrupt;
 
-        public KeyboardRegister(int StartAddress, int Length) : base(StartAddress, Length)
+        public PS2KeyboardRegister(int StartAddress, int Length) : base(StartAddress, Length)
         {
         }
 
