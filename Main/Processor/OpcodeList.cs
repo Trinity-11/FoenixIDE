@@ -713,6 +713,57 @@ namespace FoenixIDE.Processor
             }
             else
             {
+                
+                // According to WDC02S spec, these invalid OPs are treated as NOPs, in some cases multi-byte NOPs.
+
+                list[0x02] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc)); 
+                list[0x22] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x42] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc)); 
+                list[0x62] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x82] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xC2] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xE2] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+
+                list[0x03] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x13] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x23] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x33] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x43] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x53] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x63] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x73] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x83] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x93] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xA3] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xB3] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xC3] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xD3] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xE3] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xF3] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+
+                list[0x0B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x1B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x2B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x3B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x4B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x5B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x6B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x7B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x8B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x9B] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xAB] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xBB] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xEB] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xFB] = new OpCode(0xEA, "NOP", 1, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+
+                list[0x44] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x54] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xD4] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xF4] = new OpCode(0xEA, "NOP", 2, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+
+                list[0x5C] = new OpCode(0xEA, "NOP", 3, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xDC] = new OpCode(0xEA, "NOP", 3, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xFC] = new OpCode(0xEA, "NOP", 3, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
 
                 // Variants - Rockwell
                 list[0x07] = new OpCode(0x07, "RMB0", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
