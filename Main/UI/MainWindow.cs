@@ -271,8 +271,8 @@ namespace FoenixIDE.UI
                 kernel.MemMgr.UART2.TransmitByte += SerialTransmitByte;
             }
             kernel.MemMgr.SDCARD.sdCardIRQMethod += SDCardInterrupt;
-            kernel.MemMgr.KEYBOARD.TriggerMouseInterrupt += TriggerMouseInterrupt;
-            kernel.MemMgr.KEYBOARD.TriggerKeyboardInterrupt += TriggerKeyboardInterrupt;
+            kernel.MemMgr.PS2KEYBOARD.TriggerMouseInterrupt += TriggerMouseInterrupt;
+            kernel.MemMgr.PS2KEYBOARD.TriggerKeyboardInterrupt += TriggerKeyboardInterrupt;
 
             kernel.ResCheckerRef = ResChecker;
 
@@ -593,7 +593,7 @@ namespace FoenixIDE.UI
                 e.Handled = true;
                 if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
-                    kernel.MemMgr.KEYBOARD.WriteScanCodeSequence(new byte[] { 0xe1, 0x1d, 0x45, 0xe1, 0x9d, 0xc5 }, 6);
+                    kernel.MemMgr.PS2KEYBOARD.WriteScanCodeSequence(new byte[] { 0xe1, 0x1d, 0x45, 0xe1, 0x9d, 0xc5 }, 6);
                 }
                 lastKeyPressed.Text = "Break";
             }
@@ -611,8 +611,8 @@ namespace FoenixIDE.UI
                 byte mask = kernel.MemMgr.ReadByte(MemoryMap.INT_MASK_REG1);
                 if ((~mask & (byte)Register1.FNX1_INT00_KBD) != 0)
                 {
-                    kernel.MemMgr.KEYBOARD.WriteByte(0, (byte)sc);
-                    kernel.MemMgr.KEYBOARD.WriteByte(4, 0);
+                    kernel.MemMgr.PS2KEYBOARD.WriteByte(0, (byte)sc);
+                    kernel.MemMgr.PS2KEYBOARD.WriteByte(4, 0);
 
                     TriggerKeyboardInterrupt();
                 }
@@ -623,8 +623,8 @@ namespace FoenixIDE.UI
                 byte mask = kernel.MemMgr.VICKY.ReadByte(MemoryMap.INT_MASK_REG0_JR - 0xC000);
                 if ((~mask & (byte)Register0_JR.JR0_INT02_KBD) != 0)
                 {
-                    kernel.MemMgr.KEYBOARD.WriteByte(0, (byte)sc);
-                    kernel.MemMgr.KEYBOARD.WriteByte(4, 0);
+                    kernel.MemMgr.PS2KEYBOARD.WriteByte(0, (byte)sc);
+                    kernel.MemMgr.PS2KEYBOARD.WriteByte(4, 0);
 
                     TriggerKeyboardInterrupt();
                 }
@@ -1194,7 +1194,7 @@ namespace FoenixIDE.UI
             // The PS/2 packet is byte0, xm, ym
             if ((~mask & (byte)Register0.FNX0_INT07_MOUSE) == (byte)Register0.FNX0_INT07_MOUSE)
             {
-                kernel.MemMgr.KEYBOARD.MousePackets((byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)), (byte)(X & 0xFF), (byte)(Y & 0xFF));
+                kernel.MemMgr.PS2KEYBOARD.MousePackets((byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)), (byte)(X & 0xFF), (byte)(Y & 0xFF));
             }
         }
 

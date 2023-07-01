@@ -29,7 +29,7 @@ namespace FoenixIDE.MemoryLocations
         public MathCoproRegister MATH = null;
         public MathFloatRegister FLOAT = null;
         public CodecRAM CODEC = null;
-        public KeyboardRegister KEYBOARD = null;
+        public PS2KeyboardRegister PS2KEYBOARD = null;
         public SDCardDevice SDCARD = null;
         public InterruptController INTERRUPT = null;
         public UART UART1 = null;
@@ -122,10 +122,10 @@ namespace FoenixIDE.MemoryLocations
                     return;
                 }
 
-                if (Address >= KEYBOARD.StartAddress && Address <= KEYBOARD.EndAddress)
+                if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
                 {
-                    Device = KEYBOARD;
-                    DeviceAddress = Address - KEYBOARD.StartAddress;
+                    Device = PS2KEYBOARD;
+                    DeviceAddress = Address - PS2KEYBOARD.StartAddress;
                     return;
                 }
                 if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
@@ -247,10 +247,10 @@ namespace FoenixIDE.MemoryLocations
                         DeviceAddress = Address - TIMER1.StartAddress;
                         return;
                     }
-                    if (Address >= KEYBOARD.StartAddress && Address <= KEYBOARD.EndAddress)
+                    if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
                     {
-                        Device = KEYBOARD;
-                        DeviceAddress = Address - KEYBOARD.StartAddress;
+                        Device = PS2KEYBOARD;
+                        DeviceAddress = Address - PS2KEYBOARD.StartAddress;
                         return;
                     }
                     if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
