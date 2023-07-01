@@ -619,6 +619,12 @@ namespace FoenixIDE.UI
             }
             else
             {
+                // Notify the F256K matrix keyboard
+                if (kernel.MemMgr.MATRIXKEYBOARD != null)
+                {
+                    kernel.MemMgr.MATRIXKEYBOARD.WriteScanCode(sc);
+                }
+
                 // Check if the Keyboard interrupt is allowed
                 byte mask = kernel.MemMgr.VICKY.ReadByte(MemoryMap.INT_MASK_REG0_JR - 0xC000);
                 if ((~mask & (byte)Register0_JR.JR0_INT02_KBD) != 0)
