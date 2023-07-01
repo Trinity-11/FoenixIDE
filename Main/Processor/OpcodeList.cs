@@ -750,6 +750,15 @@ namespace FoenixIDE.Processor
                 list[0xDF] = new OpCode(0xDF, "BBS5", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
                 list[0xEF] = new OpCode(0xEF, "BBS6", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
                 list[0xFF] = new OpCode(0xFF, "BBS7", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+
+                // NOPs
+                list[0x02] = new OpCode(NOP_Implied, "NOP", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x22] = new OpCode(NOP_Implied, "NOP", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x42] = new OpCode(NOP_Implied, "NOP", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x62] = new OpCode(NOP_Implied, "NOP", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0x82] = new OpCode(NOP_Implied, "NOP", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xC2] = new OpCode(NOP_Implied, "NOP", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
+                list[0xE2] = new OpCode(NOP_Implied, "NOP", 2, AddressModes.Immediate, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
             }
         }
     }
