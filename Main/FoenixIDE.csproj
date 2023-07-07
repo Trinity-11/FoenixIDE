@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup Condition=" '$(OS)' == 'Unix' ">
+	  <DefineConstants>$(DefineConstants);UNIX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+	  <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -66,10 +72,6 @@
     <StartupObject>FoenixIDE.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FastColoredTextBox, Version=2.16.28.1, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\FastColoredTextBox\FastColoredTextBox\bin\Release\FastColoredTextBox.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -79,6 +81,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="FastColoredTextBox">
+      <HintPath>..\packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basic\HiResTimer.cs" />
@@ -185,10 +190,10 @@
     <Compile Include="UI\CharEditor\EditControl.Designer.cs">
       <DependentUpon>EditControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\GameGeneratorForm.cs">
+    <Compile Include="UI\GameGeneratorForm.cs" Condition=" '$(OS)' != 'Unix' ">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\GameGeneratorForm.Designer.cs">
+    <Compile Include="UI\GameGeneratorForm.Designer.cs" Condition=" '$(OS)' != 'Unix' ">
       <DependentUpon>GameGeneratorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\JoystickForm.cs">
@@ -306,7 +311,7 @@
     <EmbeddedResource Include="UI\CharEditor\EditControl.resx">
       <DependentUpon>EditControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\GameGeneratorForm.resx">
+    <EmbeddedResource Include="UI\GameGeneratorForm.resx" Condition=" '$(OS)' != 'Unix' ">
       <DependentUpon>GameGeneratorForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -388,6 +393,7 @@
     <None Include="Resources\FOENIX-CHARACTER-ASCII.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -427,7 +433,7 @@
     <Content Include="Resources\base_asm\VKYII_CFP9553_COLLISION_def.asm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\GameGeneratorTemplates.txt">
+	<Content Include="Resources\GameGeneratorTemplates.txt" Condition=" '$(OS)' != 'Unix' "> 
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="UI\Images\memory-btn.png" />

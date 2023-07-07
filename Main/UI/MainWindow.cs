@@ -31,8 +31,9 @@ namespace FoenixIDE.UI
         private CharEditorWindow charEditor;
         public SerialTerminal terminal;
         private JoystickForm joystickWindow = new JoystickForm();
+#if WINDOWS
         private GameGeneratorForm GGF = new GameGeneratorForm();
-
+#endif
         // Local variables and events
         private byte previousGraphicMode;
         private delegate void TileClickEvent(Point tile, PointF ratios, bool leftButton);
@@ -903,10 +904,12 @@ namespace FoenixIDE.UI
             {
                 memoryWindow.Close();
             }
+#if WINDOWS
             if (GGF != null)
             {
                 GGF.Close();
             }
+#endif
         }
 
         private void MenuOpenExecutableFile_Click(object sender, EventArgs e)
@@ -1798,6 +1801,7 @@ namespace FoenixIDE.UI
             client.Dispose();
         }
 
+#if WINDOWS
         private void GameEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!GGF.Visible)
@@ -1809,6 +1813,7 @@ namespace FoenixIDE.UI
                 GGF.BringToFront();
             }
         }
+#endif
 
         private void AutorunEmulatorToolStripMenuItem_Click(object sender, EventArgs e)
         {

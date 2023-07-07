@@ -338,6 +338,7 @@ namespace FoenixIDE.UI
             this.convertHexToPGZToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.convertHexToPGZToolStripMenuItem.Text = "Convert Hex to PGZ";
             this.convertHexToPGZToolStripMenuItem.Click += new System.EventHandler(this.ConvertHexToPGZToolStripMenuItem_Click);
+#if WINDOWS
             // 
             // gameEditorToolStripMenuItem
             // 
@@ -345,6 +346,7 @@ namespace FoenixIDE.UI
             this.gameEditorToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.gameEditorToolStripMenuItem.Text = "Game Editor";
             this.gameEditorToolStripMenuItem.Click += new System.EventHandler(this.GameEditorToolStripMenuItem_Click);
+#endif
             // 
             // mIDIToVGMConvertToolStripMenuItem
             // 
@@ -540,7 +542,7 @@ namespace FoenixIDE.UI
 
         }
 
-        #endregion
+#endregion
         private global::System.Windows.Forms.StatusStrip statusStrip1;
         private global::System.Windows.Forms.ToolStripStatusLabel ModeText;
         private global::System.Windows.Forms.ToolStripStatusLabel lastKeyPressed;
