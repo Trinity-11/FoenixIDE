@@ -159,7 +159,7 @@ namespace FoenixIDE.UI
                         break;
                     case BoardVersion.RevJr_6502:
                     case BoardVersion.RevJr_65816: // Both SKUs share the same kernelfile
-                        defaultKernel = Path.Combine(romsDir, "kernel_F256Jr.hex");
+                        defaultKernel = Path.Combine(romsDir, "kernel_F256jr.hex");
                         break;
                 }
             }
@@ -1340,32 +1340,32 @@ namespace FoenixIDE.UI
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
-                defaultKernel = @"romskernel_FMX.hex";
+                defaultKernel = Path.Combine("roms", "kernel_FMX.hex");
             }
             else if (version == BoardVersion.RevC)
             {
                 version = BoardVersion.RevU;
-                defaultKernel = @"romskernel_U.hex";
+                defaultKernel = Path.Combine("roms", "kernel_U.hex");
             }
             else if (version == BoardVersion.RevU)
             {
                 version = BoardVersion.RevUPlus;
-                defaultKernel = @"romskernel_U_Plus.hex";
+                defaultKernel = Path.Combine("roms", "kernel_U_Plus.hex");
             }
             else if (version == BoardVersion.RevUPlus)
             {
                 version = BoardVersion.RevJr_6502;
-                defaultKernel = @"romskernel_F256Jr.hex";
+                defaultKernel = Path.Combine("roms", "kernel_F256jr.hex");
             }
             else if (version == BoardVersion.RevJr_6502)
             {
                 version = BoardVersion.RevJr_65816;
-                defaultKernel = @"romskernel_F256Jr.hex";
+                defaultKernel = Path.Combine("roms", "kernel_F256jr.hex");
             }
             else
             {
                 version = BoardVersion.RevC;
-                defaultKernel = @"romskernel_FMX.hex";
+                defaultKernel = Path.Combine("roms", "kernel_FMX.hex");
             }
 
             kernel.SetVersion(version);
