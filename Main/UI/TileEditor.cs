@@ -221,7 +221,7 @@ namespace FoenixIDE.Simulator.UI
                 e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
                 e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                 frameBuffer.UnlockBits(bitmapData);
-                //frameBuffer.Save("c:\\temp\\test.bmp");
+                //frameBuffer.Save("c:temptest.bmp");
                 e.Graphics.DrawImage(frameBuffer, leftTile.ClientRectangle);
                 frameBuffer.Dispose();
             }

@@ -89,7 +89,7 @@
             this.CodeTextBox.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.CodeTextBox.DelayedEventsInterval = 500;
             this.CodeTextBox.DelayedTextChangedInterval = 500;
-            this.CodeTextBox.DescriptionFile = "C:\\Working\\foenix\\emulator\\Main\\Resources\\foenix-game-generator-syntax.xml";
+            //this.CodeTextBox.DescriptionFile = "C:\\Working\\foenix\\emulator\\Main\\Resources\\foenix-game-generator-syntax.xml";
             this.CodeTextBox.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.CodeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CodeTextBox.Font = new System.Drawing.Font("Consolas", 9.75F);

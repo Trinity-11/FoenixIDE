@@ -8,9 +8,11 @@ using System.Threading;
 using FoenixIDE.MemoryLocations;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
+using FoenixIDE.Simulator.UI;
 using FoenixIDE.UI;
 using System.IO;
 using System.Windows.Forms;
+
 
 namespace FoenixIDE
 {
@@ -189,7 +191,7 @@ namespace FoenixIDE
                 MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                 MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
                 string applicationDirectory = System.AppContext.BaseDirectory;
-                String micahFontPath = applicationDirectory + "\\Resources\\f256jr_font_micah_jan25th.bin";
+                String micahFontPath = Path.Combine(applicationDirectory, "Resources", "f256jr_font_micah_jan25th.bin");
                 if (System.IO.File.Exists(micahFontPath))
                 {
                     byte[] fontBuffer = global::System.IO.File.ReadAllBytes(micahFontPath);
@@ -476,22 +478,26 @@ namespace FoenixIDE
                 bool isAddressValid = false;
                 do
                 {
-                    string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the Start Address (Hexadecimal)", "Bin Start Address", "0");
-
-                    // Check if the user cancelled
-                    if (StrAddress == "")
+                    //string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the Start Address (Hexadecimal)", "Bin Start Address", "0");
+                    InputDialog addressWindow = new InputDialog("PGX Start Address", "Enter the PGX Start Address (Hexadecimal)");
+                    DialogResult result = addressWindow.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        try
+                        {
+                            DataStartAddress = Convert.ToInt32(addressWindow.Value, 16);
+                            isAddressValid = true;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Invalid Start Address", "Bin File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
                     {
                         return false;
                     }
-                    try
-                    {
-                        DataStartAddress = Convert.ToInt32(StrAddress, 16);
-                        isAddressValid = true;
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Invalid Start Address", "Bin File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+
                 } while (!isAddressValid);
                 // Copy the data into memory
                 MemMgr.RAM.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
