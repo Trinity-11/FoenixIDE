@@ -195,9 +195,10 @@ namespace FoenixIDE.UI
             {
                 gpu.SetMode(0);
                 gpu.VRAM = kernel.MemMgr.VIDEO;
-                
+
                 // This fontset is loaded just in case the kernel doesn't provide one.
-                gpu.LoadFontSet("Foenix", applicationDirectory + "ResourcesBm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+                String fontPath = Path.Combine(applicationDirectory, "Resources", "Bm437_PhoenixEGA_8x8.bin");
+                gpu.LoadFontSet("Foenix", fontPath, 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
                 joystickWindow.gabe = kernel.MemMgr.GABE;
 
