@@ -1326,6 +1326,8 @@ namespace FoenixIDE.UI
         // The user clicks on the tool strip for a different board version: B, FMX, U or U+
         private void ToolStripRevision_Click(object sender, EventArgs e)
         {
+            string applicationDirectory = System.AppContext.BaseDirectory;
+            defaultKernel = applicationDirectory ;
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;

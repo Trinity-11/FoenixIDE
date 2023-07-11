@@ -1,12 +1,18 @@
-Release 0.6.0.13
+Release 0.6.0.14
 ----------------
-Applied fix "Fix appearance of Autorun Emulator check box"
-Removed Game Developer Window and artifacts.
+Fixed path issue when kernel is loaded from CLI.
+Added tweak for Mono in GPU refresh.
+Use Path.DirectorySeparatorChar instead of "\\" to be compatible with Linux.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+
+Release 0.6.0.13
+----------------
+Applied fix "Fix appearance of Autorun Emulator check box"
+Removed Game Developer Window and artifacts.
 
 Release 0.6.0.12
 ----------------
