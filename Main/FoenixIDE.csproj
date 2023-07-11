@@ -66,10 +66,6 @@
     <StartupObject>FoenixIDE.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FastColoredTextBox, Version=2.16.28.1, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\FastColoredTextBox\FastColoredTextBox\bin\Release\FastColoredTextBox.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -184,12 +180,6 @@
     </Compile>
     <Compile Include="UI\CharEditor\EditControl.Designer.cs">
       <DependentUpon>EditControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\GameGeneratorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\GameGeneratorForm.Designer.cs">
-      <DependentUpon>GameGeneratorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\JoystickForm.cs">
       <SubType>Form</SubType>
@@ -306,10 +296,6 @@
     <EmbeddedResource Include="UI\CharEditor\EditControl.resx">
       <DependentUpon>EditControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\GameGeneratorForm.resx">
-      <DependentUpon>GameGeneratorForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\JoystickForm.resx">
       <DependentUpon>JoystickForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -369,9 +355,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="Resources\base_asm\asm.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Resources\Bm437_PhoenixEGA_8x8.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -394,12 +377,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
-    <Content Include="Resources\base_asm\VKYII_CFP9553_GENERAL_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\foenix-game-generator-syntax.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Resources\GENMIDI - Vanilla.op2">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -412,73 +389,10 @@
     <None Include="roms\kernel_U_Plus.hex" />
     <Content Include="roms\kernel_U_Plus.lst" />
     <None Include="Resources\save_btn.bmp" />
-    <Content Include="Resources\base_asm\EXP_C200_EVID_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\helper_functions.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\interrupt_handler.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\vgm_player.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\VKYII_CFP9553_COLLISION_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\GameGeneratorTemplates.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="UI\Images\memory-btn.png" />
     <None Include="UI\Images\delete-btn.png" />
     <None Include="Resources\foenix-96x96.png" />
     <None Include="Resources\DeleteButton.png" />
-    <Content Include="Resources\base_asm\bank_00_inc.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\base.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\gabe_control_registers_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\interrupt_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\io_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\kernel_inc.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\keyboard_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\macros_inc.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\math_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\timer_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\VKYII_CFP9553_BITMAP_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\VKYII_CFP9553_SDMA_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\VKYII_CFP9553_SPRITE_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\VKYII_CFP9553_TILEMAP_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\base_asm\VKYII_CFP9553_VDMA_def.asm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\PET-ASCII.png" />
   </ItemGroup>
   <ItemGroup>

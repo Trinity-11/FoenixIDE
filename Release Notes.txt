@@ -1,12 +1,17 @@
-Release 0.6.0.12
+Release 0.6.0.13
 ----------------
-Treat certain invalid opcodes on 6502 as NOP.
-Fixed the MSI file to place the f256jr_font in the correct location.
+Applied fix "Fix appearance of Autorun Emulator check box"
+Removed Game Developer Window and artifacts.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+
+Release 0.6.0.12
+----------------
+Treat certain invalid opcodes on 6502 as NOP.
+Fixed the MSI file to place the f256jr_font in the correct location.
 
 Release 0.6.0.11
 ----------------

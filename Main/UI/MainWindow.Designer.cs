@@ -58,7 +58,6 @@ namespace FoenixIDE.UI
             this.ConvertHexToPGXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ConvertBinToPGXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.convertHexToPGZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.gameEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mIDIToVGMConvertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autorunEmulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -270,7 +269,6 @@ namespace FoenixIDE.UI
             this.ConvertHexToPGXToolStripMenuItem,
             this.ConvertBinToPGXToolStripMenuItem,
             this.convertHexToPGZToolStripMenuItem,
-            this.gameEditorToolStripMenuItem,
             this.mIDIToVGMConvertToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
@@ -339,13 +337,6 @@ namespace FoenixIDE.UI
             this.convertHexToPGZToolStripMenuItem.Text = "Convert Hex to PGZ";
             this.convertHexToPGZToolStripMenuItem.Click += new System.EventHandler(this.ConvertHexToPGZToolStripMenuItem_Click);
             // 
-            // gameEditorToolStripMenuItem
-            // 
-            this.gameEditorToolStripMenuItem.Name = "gameEditorToolStripMenuItem";
-            this.gameEditorToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.gameEditorToolStripMenuItem.Text = "Game Editor";
-            this.gameEditorToolStripMenuItem.Click += new System.EventHandler(this.GameEditorToolStripMenuItem_Click);
-            // 
             // mIDIToVGMConvertToolStripMenuItem
             // 
             this.mIDIToVGMConvertToolStripMenuItem.Name = "mIDIToVGMConvertToolStripMenuItem";
@@ -369,12 +360,12 @@ namespace FoenixIDE.UI
             this.autorunEmulatorToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autorunEmulatorToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.autorunEmulatorToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
+            this.autorunEmulatorToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.autorunEmulatorToolStripMenuItem.Name = "autorunEmulatorToolStripMenuItem";
             this.autorunEmulatorToolStripMenuItem.Padding = new System.Windows.Forms.Padding(0, 2, 0, 1);
-            this.autorunEmulatorToolStripMenuItem.Size = new System.Drawing.Size(180, 23);
+            this.autorunEmulatorToolStripMenuItem.Size = new System.Drawing.Size(169, 23);
             this.autorunEmulatorToolStripMenuItem.Text = "Autorun Emulator";
             this.autorunEmulatorToolStripMenuItem.Click += new System.EventHandler(this.AutorunEmulatorToolStripMenuItem_Click);
-            this.autorunEmulatorToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             // 
             // windowsToolStripMenuItem
             // 
@@ -391,7 +382,7 @@ namespace FoenixIDE.UI
             // terminalToolStripMenuItem
             // 
             this.terminalToolStripMenuItem.Name = "terminalToolStripMenuItem";
-            this.terminalToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.terminalToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.terminalToolStripMenuItem.Text = "&Terminal";
             this.terminalToolStripMenuItem.Click += new System.EventHandler(this.TerminalToolStripMenuItem_Click);
             // 
@@ -399,7 +390,7 @@ namespace FoenixIDE.UI
             // 
             this.cPUToolStripMenuItem.Enabled = false;
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.cPUToolStripMenuItem.Text = "&CPU";
             this.cPUToolStripMenuItem.Click += new System.EventHandler(this.CPUToolStripMenuItem_Click);
             // 
@@ -407,21 +398,21 @@ namespace FoenixIDE.UI
             // 
             this.memoryToolStripMenuItem.Enabled = false;
             this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.memoryToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.memoryToolStripMenuItem.Text = "&Memory";
             this.memoryToolStripMenuItem.Click += new System.EventHandler(this.MemoryToolStripMenuItem_Click);
             // 
             // watchListToolStripMenuItem
             // 
             this.watchListToolStripMenuItem.Name = "watchListToolStripMenuItem";
-            this.watchListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.watchListToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.watchListToolStripMenuItem.Text = "Watch List";
             this.watchListToolStripMenuItem.Click += new System.EventHandler(this.WatchListToolStripMenuItem_Click);
             // 
             // assetListToolStripMenuItem
             // 
             this.assetListToolStripMenuItem.Name = "assetListToolStripMenuItem";
-            this.assetListToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.assetListToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.assetListToolStripMenuItem.Text = "Asset List";
             this.assetListToolStripMenuItem.Click += new System.EventHandler(this.AssetListToolStripMenuItem_Click);
             // 
@@ -579,7 +570,6 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem ConvertHexToPGXToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ConvertBinToPGXToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkForUpdateToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem gameEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem autorunEmulatorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem assetListToolStripMenuItem;
