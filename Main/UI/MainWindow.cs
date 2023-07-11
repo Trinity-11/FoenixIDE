@@ -1707,23 +1707,6 @@ namespace FoenixIDE.UI
                     {
                         return;
                     }
-
-
-                    /*
-                    // Check if the user cancelled
-                    if (StrAddress == "")
-                    {
-                        return;
-                    }
-                    try
-                    {
-                        DataStartAddress = Convert.ToInt32(StrAddress, 16);
-                        isAddressValid = true;
-                    } catch
-                    {
-                        MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    */
                 } while (!isAddressValid);
                 
                 

@@ -1,4 +1,0 @@
-Address=Address
-000000=000000
-Ok=Ok
-

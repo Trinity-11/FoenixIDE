@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using FoenixIDE.Processor;
-using FoenixIDE.Display;
-using System.Threading;
 using FoenixIDE.MemoryLocations;
 using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
-using FoenixIDE.UI;
 using System.IO;
 using System.Windows.Forms;
-
 
 namespace FoenixIDE
 {
@@ -478,7 +472,6 @@ namespace FoenixIDE
                 bool isAddressValid = false;
                 do
                 {
-                    //string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the Start Address (Hexadecimal)", "Bin Start Address", "0");
                     InputDialog addressWindow = new InputDialog("PGX Start Address", "Enter the PGX Start Address (Hexadecimal)");
                     DialogResult result = addressWindow.ShowDialog();
                     if (result == DialogResult.OK)
