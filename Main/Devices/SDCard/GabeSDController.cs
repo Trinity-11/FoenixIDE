@@ -652,7 +652,7 @@ namespace FoenixIDE.Simulator.Devices
                         {
                             entry.size = size;
                             FileInfo info = new FileInfo(entry.fqpn);
-                            string newFileName = info.DirectoryName + "\\" + name.Trim() + "." + ext.Trim();
+                            string newFileName = info.DirectoryName + Path.DirectorySeparatorChar + name.Trim() + "." + ext.Trim();
                             FileStream readStream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
                             FileStream writeStream = new FileStream(newFileName, FileMode.CreateNew);
                             try
@@ -1006,7 +1006,7 @@ namespace FoenixIDE.Simulator.Devices
         {
             string path = GetSDCardPath();
             string randomFileName = Guid.NewGuid().ToString();
-            string filename = path + "\\" + randomFileName + ".new";
+            string filename = path + Path.DirectorySeparatorChar + randomFileName + ".new";
             using (var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 fs.SetLength(size);

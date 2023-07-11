@@ -135,23 +135,25 @@ namespace FoenixIDE.UI
             }
             if (defaultKernel == null)
             {
+                string applicationDirectory = System.AppContext.BaseDirectory;
+                defaultKernel = applicationDirectory;
                 switch (version)
                 {
                     case BoardVersion.RevB:
-                        defaultKernel = applicationDirectory + "\\roms\\kernel_B.hex";
+                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_B.hex";
                         break;
                     case BoardVersion.RevC:
-                        defaultKernel = applicationDirectory + "\\roms\\kernel_FMX.hex";
+                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_FMX.hex";
                         break;
                     case BoardVersion.RevU:
-                        defaultKernel = applicationDirectory + "\\roms\\kernel_U.hex";
+                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U.hex";
                         break;
                     case BoardVersion.RevUPlus:
-                        defaultKernel = applicationDirectory + "\\roms\\kernel_U_Plus.hex";
+                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U_Plus.hex";
                         break;
                     case BoardVersion.RevJr_6502:
                     case BoardVersion.RevJr_65816: // Both SKUs share the same kernelfile
-                        defaultKernel = applicationDirectory + "\\roms\\kernel_F256Jr.hex";
+                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_F256Jr.hex";
                         break;
                 }
             }
@@ -189,7 +191,7 @@ namespace FoenixIDE.UI
                 gpu.VRAM = kernel.MemMgr.VIDEO;
                 
                 // This fontset is loaded just in case the kernel doesn't provide one.
-                gpu.LoadFontSet("Foenix", applicationDirectory + "\\Resources\\Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+                gpu.LoadFontSet("Foenix", applicationDirectory + "Resources" + Path.DirectorySeparatorChar + "Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
                 joystickWindow.gabe = kernel.MemMgr.GABE;
 
@@ -1324,35 +1326,37 @@ namespace FoenixIDE.UI
         // The user clicks on the tool strip for a different board version: B, FMX, U or U+
         private void ToolStripRevision_Click(object sender, EventArgs e)
         {
+            string applicationDirectory = System.AppContext.BaseDirectory;
+            defaultKernel = applicationDirectory ;
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
-                defaultKernel = @"roms\\kernel_FMX.hex";
+                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_FMX.hex";
             }
             else if (version == BoardVersion.RevC)
             {
                 version = BoardVersion.RevU;
-                defaultKernel = @"roms\\kernel_U.hex";
+                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U.hex";
             }
             else if (version == BoardVersion.RevU)
             {
                 version = BoardVersion.RevUPlus;
-                defaultKernel = @"roms\\kernel_U_Plus.hex";
+                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U_Plus.hex";
             }
             else if (version == BoardVersion.RevUPlus)
             {
                 version = BoardVersion.RevJr_6502;
-                defaultKernel = @"roms\\kernel_F256Jr.hex";
+                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_F256Jr.hex";
             }
             else if (version == BoardVersion.RevJr_6502)
             {
                 version = BoardVersion.RevJr_65816;
-                defaultKernel = @"roms\\kernel_F256Jr.hex";
+                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_F256Jr.hex";
             }
             else
             {
                 version = BoardVersion.RevC;
-                defaultKernel = @"roms\\kernel_FMX.hex";
+                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_FMX.hex";
             }
 
             kernel.SetVersion(version);

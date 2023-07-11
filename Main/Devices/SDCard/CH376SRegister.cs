@@ -255,7 +255,7 @@ namespace FoenixIDE.Simulator.Devices
             int pos = longname.IndexOf('.');
             if (pos > 0)
             {
-                string filename = longname.Substring(0, pos).Replace(" ", "").Replace("\\", "");
+                string filename = longname.Substring(0, pos).Replace(" ", "").Replace(Path.DirectorySeparatorChar.ToString(), "");
                 string extension = longname.Substring(pos+1);
                 if (filename.Length > 8)
                 {
@@ -271,7 +271,7 @@ namespace FoenixIDE.Simulator.Devices
             }
             else
             {
-                string filename = longname.Replace(" ", "").Replace("\\","");
+                string filename = longname.Replace(" ", "").Replace(Path.DirectorySeparatorChar.ToString(), "");
                 if (filename.Length > 8)
                 {
                     filename = filename.Substring(0, 6) + "~1";

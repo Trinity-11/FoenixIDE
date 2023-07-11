@@ -80,6 +80,7 @@ namespace FoenixIDE.Display
         /// </summary>
         private int BLINK_RATE = 30;
         private int BlinkingCounter;
+        private bool MonoRuntime = Type.GetType("Mono.Runtime") != null;
         void GpuRefreshTimer_Tick(object sender, EventArgs e)
         {
             if (BlinkingCounter-- == 0)
@@ -87,7 +88,16 @@ namespace FoenixIDE.Display
                 CursorState = !CursorState;
                 BlinkingCounter = BLINK_RATE;
             }
-            Invalidate();
+
+            if (MonoRuntime)
+            {
+                Refresh();
+            }
+            else
+            {
+                Invalidate();
+            }
+            //
             if (BlinkingCounter == 0)
             {
                 GpuUpdated?.Invoke();
