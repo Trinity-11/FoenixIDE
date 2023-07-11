@@ -51,13 +51,6 @@ namespace FoenixIDE.UI
 
         public MainWindow(Dictionary<string, string> context)
         {
-
-
-            if (Type.GetType("Mono.Runtime") == null)
-            {
-                this.GGF = new GameGeneratorForm();
-            }
-
             bool autoRunCommandLineSpecified = false;
             bool boardVersionCommandLineSpecified = false;
             applicationDirectory = System.AppContext.BaseDirectory;
