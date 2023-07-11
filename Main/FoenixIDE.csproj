@@ -75,9 +75,6 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="FastColoredTextBox">
-      <HintPath>..\packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basic\HiResTimer.cs" />
@@ -374,7 +371,6 @@
     <None Include="Resources\FOENIX-CHARACTER-ASCII.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
     <Compile Include="UI\InputDialog.cs">
       <SubType>Form</SubType>
     </Compile>
