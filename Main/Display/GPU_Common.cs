@@ -163,9 +163,8 @@ namespace FoenixIDE.Display
         {
             SpriteBaseAddress = val;
         }
-        private int[] GetTextLUT(byte fg, byte bg, bool gamma)
+        private void GetTextLUT(byte fg, byte bg, bool gamma, out int value0, out int value1)
         {
-            int[] values = new int[2];
             var fgt = FGTextLUT;
             if (fgt[fg] == 0)
             {
@@ -181,12 +180,12 @@ namespace FoenixIDE.Display
                     fgValueRed = VICKY.ReadByte(GammaBaseAddress + 0x200 + fgValueRed);//gammaCorrection[0x200 + fgValueRed];
                 }
 
-                values[0] = (int)((fgValueBlue << 16) + (fgValueGreen << 8) + fgValueRed + 0xFF000000);
-                fgt[fg] = values[0];
+                value0 = (int)((fgValueBlue << 16) + (fgValueGreen << 8) + fgValueRed + 0xFF000000);
+                fgt[fg] = value0;
             }
             else
             {
-                values[0] = fgt[fg];
+                value0 = fgt[fg];
             }
             var bgt = BGTextLUT;
             if (bgt[bg] == 0)
@@ -203,14 +202,13 @@ namespace FoenixIDE.Display
                     bgValueRed = VICKY.ReadByte(GammaBaseAddress + 0x200 + bgValueRed); //gammaCorrection[0x200 + bgValueRed];
                 }
 
-                values[1] = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
-                bgt[bg] = values[1];
+                value1 = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
+                bgt[bg] = value1;
             }
             else
             {
-                values[1] = bgt[bg];
+                value1 = bgt[bg];
             }
-            return values;
         }
 
         // We only cache items that are requested, instead of precomputing all 1024 colors.
@@ -237,6 +235,7 @@ namespace FoenixIDE.Display
             }
             return value;
         }
+
         private unsafe void DrawText(int* p, int MCR, bool gammaCorrection, byte TextColumns, byte TextRows, int colOffset, int rowOffset, int line, int width, int height)
         {
             bool overlayBitSet = (MCR & 0x02) == 0x02;
@@ -260,6 +259,8 @@ namespace FoenixIDE.Display
             // Each character is defined by 8 bytes
             int fontLine = (line - rowOffset) % CHAR_HEIGHT;
             int* ptr = p + line * STRIDE + colOffset;
+            int textcolor0;
+            int textcolor1;
             for (int col = 0; col < width / CHAR_WIDTH; col++)
             {
                 int x = col * CHAR_WIDTH;
@@ -287,7 +288,8 @@ namespace FoenixIDE.Display
                 byte fgColor = (byte)((color & 0xF0) >> 4);
                 byte bgColor = (byte)(color & 0x0F);
 
-                int[] textColors = GetTextLUT(fgColor, bgColor, gammaCorrection);
+                // This is where the memory goes:
+                GetTextLUT(fgColor, bgColor, gammaCorrection, out textcolor0, out textcolor1);
 
                 byte value = VICKY.ReadByte(fontBaseAddress + character * 8 + fontLine);
                 //int offset = (x + line * 640) * 4;
@@ -298,12 +300,12 @@ namespace FoenixIDE.Display
                     if ((value & b) != 0)
                     {
                         //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
-                        ptr[0] = textColors[0];
+                        ptr[0] = textcolor0;
                     }
                     else if (!overlayBitSet)
                     {
                         //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
-                        ptr[0] = textColors[1];
+                        ptr[0] = textcolor1;
                     }
                     ptr++;
                     //offset += 4;
