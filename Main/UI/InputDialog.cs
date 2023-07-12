@@ -20,11 +20,23 @@ namespace FoenixIDE.Simulator.UI
             InitializeComponent();
         }
 
-        public InputDialog(String title, String prompt)
+        public InputDialog(String prompt, String title = "", String defaultResponse = "", int XPos = -1, int YPos = -1 )
         {
-            this.title = title;
             this.prompt = prompt;
+            this.title = title;
+
+            if ( (XPos >= 0) && (YPos >= 0)) {
+                this.StartPosition = FormStartPosition.Manual;
+                this.Location = new Point(XPos, YPos);
+            }
+            else
+            {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+
             InitializeComponent();
+            this.txtAddress.Text = defaultResponse;
+
         }
 
         public String Value

@@ -33,7 +33,6 @@ namespace FoenixIDE.Simulator.UI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            //System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddressWindow));
             this.layoutPanel = new FlowLayoutPanel();
             this.lblAddress = new Label();
             this.txtAddress = new TextBox();
@@ -65,7 +64,7 @@ namespace FoenixIDE.Simulator.UI
             // txtAddress
             // 
             this.txtAddress.Name = "txtAddress";
-            this.txtAddress.Size = new Size(65, 13);
+            this.txtAddress.Size = new Size(310, 13);
             this.txtAddress.Location = new Point(5, y);
             this.txtAddress.TabIndex = 1;
             this.txtAddress.Text = "000000";
@@ -103,7 +102,6 @@ namespace FoenixIDE.Simulator.UI
 
             this.AcceptButton = btnOk;
             this.CancelButton = btnCancel;
-            this.StartPosition = FormStartPosition.CenterScreen;
             this.Controls.Add(this.layoutPanel);
             this.Text = this.title;
             this.Name = "Address";
@@ -111,7 +109,6 @@ namespace FoenixIDE.Simulator.UI
             this.AutoSize = true;
 
             this.layoutPanel.ResumeLayout(false);
-            //this.layoutPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

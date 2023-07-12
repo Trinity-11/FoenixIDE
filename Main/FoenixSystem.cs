@@ -472,7 +472,7 @@ namespace FoenixIDE
                 bool isAddressValid = false;
                 do
                 {
-                    InputDialog addressWindow = new InputDialog("PGX Start Address", "Enter the PGX Start Address (Hexadecimal)");
+                    InputDialog addressWindow = new InputDialog("Enter the PGX Start Address (Hexadecimal)", "PGX Start Address");
                     DialogResult result = addressWindow.ShowDialog();
                     if (result == DialogResult.OK)
                     {

@@ -418,8 +418,13 @@ namespace FoenixIDE.UI
                 {
                     DebugLine line = codeList[TopLineIndex + row];
                     string oldValue = line.label;
-                    InputDialog labelDialog = new InputDialog("Label Dialog", "Enter Label for Address: $" + line.PC.ToString("X6").Insert(2, ":"));
-                    labelDialog.Value = oldValue;
+                    InputDialog labelDialog = new InputDialog(
+                        "Enter Label for Address: $" + line.PC.ToString("X6").Insert(2, ":"),
+                        "Label Dialog",
+                        oldValue,
+                        Left + LabelOverlayButton.Left + LabelOverlayButton.Width,
+                        Top + LabelOverlayButton.Top
+                    );
                     DialogResult result = labelDialog.ShowDialog();
                     if (result == DialogResult.OK)
                     {
