@@ -79,8 +79,8 @@ namespace FoenixIDE.Display
         }
 
         // Text Lookup Tables
-        int[] FGTextLUT;
-        int[] BGTextLUT;
+        int[] FGTextLUT = new int[16];
+        int[] BGTextLUT = new int[16];
         int GammaBaseAddress;
         public void SetGammaBaseAddress(int val)
         {
@@ -245,12 +245,11 @@ namespace FoenixIDE.Display
             //if (txtline + 1 > RAM.ReadByte(MemoryMap.LINES_MAX)) return;
             //byte COLS_PER_LINE = RAM.ReadByte(MemoryMap.COLS_PER_LINE);
 
-            // Initialize the LUTs
-            FGTextLUT = new int[16];
-            BGTextLUT = new int[16];
+            Array.Clear(FGTextLUT, 0, 16);
+            Array.Clear(BGTextLUT, 0, 16);
 
             // Cursor Values
-            
+
             int curPosY = VICKY.ReadWord(CursorXAddress + 2);
             int curPosX = VICKY.ReadWord(CursorXAddress);
 
