@@ -428,7 +428,7 @@ namespace FoenixIDE.UI
                     DialogResult result = labelDialog.ShowDialog();
                     if (result == DialogResult.OK)
                     {
-                        line.label = labelDialog.Value;
+                        line.label = labelDialog.GetValue();
                         DebugPanel.Invalidate();
                     }
                 }
@@ -440,8 +440,11 @@ namespace FoenixIDE.UI
             if (position.X > 0 && position.Y > 0)
             {
                 int row = position.Y / ROW_HEIGHT;
-                DebugLine line = codeList[TopLineIndex + row];
-                MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
+                if (TopLineIndex + row <= codeList.Count)
+                {
+                    DebugLine line = codeList[TopLineIndex + row];
+                    MemoryWindow.Instance.GotoAddress(line.PC & 0xFF_FF00);
+                }
                 MemoryWindow.Instance.BringToFront();
             }
         }

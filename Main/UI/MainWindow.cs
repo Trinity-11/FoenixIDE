@@ -1697,7 +1697,7 @@ namespace FoenixIDE.UI
                     {
                         try
                         {
-                            DataStartAddress = Convert.ToInt32(addressWindow.Value, 16);
+                            DataStartAddress = Convert.ToInt32(addressWindow.GetValue(), 16);
                             isAddressValid = true;
                         }
                         catch
