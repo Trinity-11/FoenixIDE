@@ -1,5 +1,6 @@
 Tools/WDCTools Version 2.1.zip
 Obj
+obj
 CharSet Manager/.vs/CharSet Manager/v15/.suo
 /.vs/Nu64/v15
 *.pdb
@@ -9,4 +10,5 @@ CharSet Manager/.vs/CharSet Manager/v15/.suo
 Tests/*.hex
 Tests/*.lst
 bin/Debug
+bin/Release
 packages

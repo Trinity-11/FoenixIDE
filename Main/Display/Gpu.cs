@@ -97,7 +97,7 @@ namespace FoenixIDE.Display
             {
                 Invalidate();
             }
-            //
+
             if (BlinkingCounter == 0)
             {
                 GpuUpdated?.Invoke();
@@ -109,7 +109,6 @@ namespace FoenixIDE.Display
             hiresTimer.Enabled = false;
             hiresTimer.Interval = 200;
             hiresTimer.Elapsed -= GpuRefreshTimer_Tick;
-            
         }
 
         public void SetRefreshPeriod(uint time)
@@ -169,7 +168,10 @@ namespace FoenixIDE.Display
             {
                 byte MCRegister = VICKY.ReadByte(MCRAddress); // Reading address $AF:0000
 
-                pixVals = new byte[res.X];
+                if (pixVals == null || pixVals.Length != res.X)
+                {
+                    pixVals = new byte[res.X];
+                }
                 int top = 0; // top gets modified if error messages are displayed
                 //Graphics g = Graphics.FromImage(frameBuffer);
                 Graphics g = e.Graphics;

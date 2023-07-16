@@ -135,25 +135,24 @@ namespace FoenixIDE.UI
             }
             if (defaultKernel == null)
             {
-                string applicationDirectory = System.AppContext.BaseDirectory;
-                defaultKernel = applicationDirectory;
+                String romsDir = Path.Combine(applicationDirectory, "roms");
                 switch (version)
                 {
                     case BoardVersion.RevB:
-                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_B.hex";
+                        defaultKernel = Path.Combine(romsDir, "kernel_B.hex");
                         break;
                     case BoardVersion.RevC:
-                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_FMX.hex";
+                        defaultKernel = Path.Combine(romsDir, "kernel_FMX.hex");
                         break;
                     case BoardVersion.RevU:
-                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U.hex";
+                        defaultKernel = Path.Combine(romsDir, "kernel_U.hex");
                         break;
                     case BoardVersion.RevUPlus:
-                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U_Plus.hex";
+                        defaultKernel = Path.Combine(romsDir, "kernel_U_Plus.hex");
                         break;
                     case BoardVersion.RevJr_6502:
                     case BoardVersion.RevJr_65816: // Both SKUs share the same kernelfile
-                        defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_F256Jr.hex";
+                        defaultKernel = Path.Combine(romsDir, "kernel_F256jr.hex");
                         break;
                 }
             }
@@ -189,9 +188,10 @@ namespace FoenixIDE.UI
             {
                 gpu.SetMode(0);
                 gpu.VRAM = kernel.MemMgr.VIDEO;
-                
+
                 // This fontset is loaded just in case the kernel doesn't provide one.
-                gpu.LoadFontSet("Foenix", applicationDirectory + "Resources" + Path.DirectorySeparatorChar + "Bm437_PhoenixEGA_8x8.bin", 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
+                String fontPath = Path.Combine(applicationDirectory, "Resources", "Bm437_PhoenixEGA_8x8.bin");
+                gpu.LoadFontSet("Foenix", fontPath, 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
                 joystickWindow.gabe = kernel.MemMgr.GABE;
 
@@ -1331,32 +1331,32 @@ namespace FoenixIDE.UI
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
-                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_FMX.hex";
+                defaultKernel = Path.Combine("roms", "kernel_FMX.hex");
             }
             else if (version == BoardVersion.RevC)
             {
                 version = BoardVersion.RevU;
-                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U.hex";
+                defaultKernel = Path.Combine("roms", "kernel_U.hex");
             }
             else if (version == BoardVersion.RevU)
             {
                 version = BoardVersion.RevUPlus;
-                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_U_Plus.hex";
+                defaultKernel = Path.Combine("roms", "kernel_U_Plus.hex");
             }
             else if (version == BoardVersion.RevUPlus)
             {
                 version = BoardVersion.RevJr_6502;
-                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_F256Jr.hex";
+                defaultKernel = Path.Combine("roms", "kernel_F256jr.hex");
             }
             else if (version == BoardVersion.RevJr_6502)
             {
                 version = BoardVersion.RevJr_65816;
-                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_F256Jr.hex";
+                defaultKernel = Path.Combine("roms", "kernel_F256jr.hex");
             }
             else
             {
                 version = BoardVersion.RevC;
-                defaultKernel += "roms" + Path.DirectorySeparatorChar + "kernel_FMX.hex";
+                defaultKernel = Path.Combine("roms", "kernel_FMX.hex");
             }
 
             kernel.SetVersion(version);
@@ -1691,20 +1691,23 @@ namespace FoenixIDE.UI
                 int DataStartAddress = 0;
                 do
                 {
-                    string StrAddress = Microsoft.VisualBasic.Interaction.InputBox("Enter the PGX Start Address (Hexadecimal)", "PGX Start Address", "0");
-
-                    // Check if the user cancelled
-                    if (StrAddress == "")
+                    InputDialog addressWindow = new InputDialog("Enter the PGX Start Address (Hexadecimal)", "PGX Start Address");
+                    DialogResult result = addressWindow.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        try
+                        {
+                            DataStartAddress = Convert.ToInt32(addressWindow.GetValue(), 16);
+                            isAddressValid = true;
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
                     {
                         return;
-                    }
-                    try
-                    {
-                        DataStartAddress = Convert.ToInt32(StrAddress, 16);
-                        isAddressValid = true;
-                    } catch
-                    {
-                        MessageBox.Show("Invalid Start Address", "PGX File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 } while (!isAddressValid);
                 

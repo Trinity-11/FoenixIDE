@@ -819,13 +819,11 @@ namespace FoenixIDE.Processor
             }
         }
 
+        private RegisterBankNumber fakeBank = new RegisterBankNumber();
         public void ExecuteJumpReturn(byte instruction, AddressModes addressMode, int signature, out int effectiveAddress)
         {
             effectiveAddress = -1;
-            RegisterBankNumber fakeBank = new RegisterBankNumber
-            {
-                Value = cpu.PC >> 16
-            };
+            fakeBank.Value = cpu.PC >> 16;
             int addr = GetAddress(addressMode, signature, fakeBank);
             switch (instruction)
             {
