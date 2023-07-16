@@ -4,7 +4,7 @@ Development and Debugging Suite for the C256 Foenix Family of Computers.
 This project is derived from the Nu64 emulator built by Tom Wilson.  Nu64 is owned by Tom Wilson. 
 FoenixIDE is owned by the C256 team, led by Stefany Allaire.
 
-This is a virtual WDC 65816 powered computer. It is intended to be used as a software development tool and learning platform for assembly language and BASIC programming. The software will be relesed with an open source license and may be used for whatever purpose you want, including personal projects, education, and commercial use. 
+The FoenixIDE emulates the WDC 65816 and 6502 processors. It is intended to be used as a software development tool and learning platform for assembly language and BASIC programming. The software will be relesed with an open source license and may be used for whatever purpose you want, including personal projects, education, and commercial use. 
 
 The C256 is loosely based around the concept of the world's most popular computer, the Commodore 64. When you turn on the system, you see a BASIC screen, with the READY prompt. You can type in BASIC commands, enter programs, or load programs from disk, tape or cartridge. 
 
@@ -15,10 +15,12 @@ For more information on the project, go to [C256 Foenix Computer](https://www.c2
 The FoenixIDE is a work in progress.
 
 The C256 Foenix and its associated materials are owned by Stefany Allaire. There are three versions of the Foenix: 
-* RevB (2 MB RAM, 2xOPL2)
-* RevC - aka FMX (4 MB RAM, OPL3, OPN2, OPM and SN76489)
-* RevU - 1 MB RAM
-* RevU+ - 2 MB RAM
+* RevB (2 MB RAM, 2xOPL2)  - Processor: 65816
+* RevC - aka FMX (4 MB RAM, OPL3, OPN2, OPM and SN76489)  - Processor: 65816
+* RevU - 1 MB RAM  - Processor: 65816
+* RevU+ - 2 MB RAM  - Processor: 65816
+* RevJr - 1 MB RAM  - Processor: 6502
+* RevJr65816 - 1 MB RAM  - Processor: 65816
 
 The FoenixIDE looks for kernel.hex and kernel.lst files in the ROMs folder colocated with the executable.  Obtain the Kernel from the sister repository: https://github.com/Trinity-11/Kernel_FMX
 
