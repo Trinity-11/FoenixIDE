@@ -1,5 +1,8 @@
 Release 0.6.0.15
 ----------------
+Merged PR#34 - Establish compatibility with Mono on Linux.
+Replaced the InputDialog with a native one.
+
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
