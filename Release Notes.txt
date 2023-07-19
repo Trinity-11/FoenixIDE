@@ -3,6 +3,8 @@ Release 0.6.0.16
 Fixed regression error - the CLI fix was undone.
 Properly formatting breakpoint addresses after paste (Ctrl-V).
 Fixed issue when deleting breakpoints.
+Added PR#36 - Remember the user's choices for SD card settings.
+Added PR#37 - Add SD card support for F256.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.

@@ -4,7 +4,9 @@ namespace FoenixIDE.Simulator.Devices
 {
     class F256SDController : FakeFATSDCardDevice
     {
+#if DEBUG
         int LoggingLevel;
+#endif
 
         enum CommandOpType
         {
@@ -30,7 +32,9 @@ namespace FoenixIDE.Simulator.Devices
 
         public F256SDController(int StartAddress, int Length) : base(StartAddress, Length)
         {
+#if DEBUG
             LoggingLevel = 1;
+#endif
             rootEntryCount = 0;
         }
 
