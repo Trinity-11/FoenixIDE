@@ -404,6 +404,9 @@ namespace FoenixIDE.UI
                 {
                     DebugLine line = codeList[TopLineIndex + row];
                     breakpointWindow.DeleteBreakpoint(line.PC);
+                    knl_breakpointsExec.Remove(line.PC);
+                    knl_breakpointsRead.Remove(line.PC);
+                    knl_breakpointsWrite.Remove(line.PC);
                     DebugPanel.Invalidate();
                 }
             }

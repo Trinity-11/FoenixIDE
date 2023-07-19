@@ -52,6 +52,9 @@ namespace FoenixIDE.Simulator.UI
                 TabIndex = index
             };
             Controls.Add(tb);
+            //tb.TextChanged += BreakpointsText_Changed;
+            tb.KeyDown += BreakpointsText_KeyDown;
+            tb.KeyUp += BreakpointsText_KeyUp;
             return tb;
         }
 
@@ -92,6 +95,53 @@ namespace FoenixIDE.Simulator.UI
             if (e.KeyCode == Keys.Escape)
             {
                 this.Close();
+            }
+        }
+
+        // Is this the only way to detect a paste event?  This is awful.
+        bool pasteEvent = false;
+        private void BreakpointsText_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.V && e.Control)
+            {
+                pasteEvent = true;
+            }
+        }
+        private void BreakpointsText_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (pasteEvent)
+            {
+                // Remove all formatting marks $:
+                string value = ((TextBox)sender).Text.Replace("$", "").Replace(":", "");
+                try
+                {
+                    int rawVal = Convert.ToInt32(value, 16);
+                    string newValue = rawVal.ToString("X6");
+                    string address = "$" + newValue.Substring(0, 2) + ":" + newValue.Substring(2);
+                    ((TextBox)sender).Text = address;
+                }
+                catch
+                {
+                    // nothing happens
+                }
+                pasteEvent = false;
+            }
+        }
+
+        private void BreakpointsText_Changed(object sender, EventArgs args)
+        {
+            // Remove all formatting marks $:
+            string value = ((TextBox)sender).Text.Replace("$", "").Replace(":", "");
+            try
+            {
+                int rawVal = Convert.ToInt32(value, 16);
+                string newValue = rawVal.ToString("X6");
+                string address = "$" + newValue.Substring(0, 2) + ":" + newValue.Substring(2);
+                ((TextBox)sender).Text = address;
+            }
+            catch
+            {
+                // nothing happens
             }
         }
 

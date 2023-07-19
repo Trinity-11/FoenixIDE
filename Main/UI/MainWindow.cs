@@ -165,6 +165,19 @@ namespace FoenixIDE.UI
 
         private void BasicWindow_Load(object sender, EventArgs e)
         {
+            // Do the mono stuff here
+            bool runsOnMono = Type.GetType("Mono.Runtime") != null;
+            if (runsOnMono)
+            {
+                fileToolStripMenuItem.Text = "File";
+                toolsToolStripMenuItem.Text = "Tools";
+                settingsToolStripMenuItem.Text = "Settings";
+                windowsToolStripMenuItem.Text = "Windows";
+                resetToolStripMenuItem.Text = "Reset";
+                helpToolStripMenuItem.Text = "Help";
+            }
+            
+
             kernel = new FoenixSystem(version, defaultKernel);
             terminal = new SerialTerminal();
             ShowDebugWindow(version);
@@ -1326,37 +1339,36 @@ namespace FoenixIDE.UI
         // The user clicks on the tool strip for a different board version: B, FMX, U or U+
         private void ToolStripRevision_Click(object sender, EventArgs e)
         {
-            string applicationDirectory = System.AppContext.BaseDirectory;
-            defaultKernel = applicationDirectory ;
+            defaultKernel = System.AppContext.BaseDirectory;
             if (version == BoardVersion.RevB)
             {
                 version = BoardVersion.RevC;
-                defaultKernel = Path.Combine("roms", "kernel_FMX.hex");
+                defaultKernel += Path.Combine("roms", "kernel_FMX.hex");
             }
             else if (version == BoardVersion.RevC)
             {
                 version = BoardVersion.RevU;
-                defaultKernel = Path.Combine("roms", "kernel_U.hex");
+                defaultKernel += Path.Combine("roms", "kernel_U.hex");
             }
             else if (version == BoardVersion.RevU)
             {
                 version = BoardVersion.RevUPlus;
-                defaultKernel = Path.Combine("roms", "kernel_U_Plus.hex");
+                defaultKernel += Path.Combine("roms", "kernel_U_Plus.hex");
             }
             else if (version == BoardVersion.RevUPlus)
             {
                 version = BoardVersion.RevJr_6502;
-                defaultKernel = Path.Combine("roms", "kernel_F256jr.hex");
+                defaultKernel += Path.Combine("roms", "kernel_F256jr.hex");
             }
             else if (version == BoardVersion.RevJr_6502)
             {
                 version = BoardVersion.RevJr_65816;
-                defaultKernel = Path.Combine("roms", "kernel_F256jr.hex");
+                defaultKernel += Path.Combine("roms", "kernel_F256jr.hex");
             }
             else
             {
                 version = BoardVersion.RevC;
-                defaultKernel = Path.Combine("roms", "kernel_FMX.hex");
+                defaultKernel += Path.Combine("roms", "kernel_FMX.hex");
             }
 
             kernel.SetVersion(version);

@@ -31,7 +31,6 @@ namespace FoenixIDE.UI
         /// </summary>
         private void InitializeComponent()
         {
-            bool runsOnMono = Type.GetType("Mono.Runtime") != null;
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -215,7 +214,7 @@ namespace FoenixIDE.UI
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = runsOnMono ? "File" : "&File";
+            this.fileToolStripMenuItem.Text = "&File";
             // 
             // loadFNXMLFileToolStripMenuItem
             // 
@@ -274,7 +273,7 @@ namespace FoenixIDE.UI
             this.mIDIToVGMConvertToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
-            this.toolsToolStripMenuItem.Text = runsOnMono ? "Tools" : "&Tools";
+            this.toolsToolStripMenuItem.Text = "&Tools";
             // 
             // uploaderToolStripMenuItem
             // 
@@ -352,7 +351,7 @@ namespace FoenixIDE.UI
             this.autorunEmulatorToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
-            this.settingsToolStripMenuItem.Text = runsOnMono ? "Settings" : "&Settings";
+            this.settingsToolStripMenuItem.Text = "&Settings";
             // 
             // autorunEmulatorToolStripMenuItem
             // 
@@ -379,7 +378,7 @@ namespace FoenixIDE.UI
             this.assetListToolStripMenuItem});
             this.windowsToolStripMenuItem.Name = "windowsToolStripMenuItem";
             this.windowsToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
-            this.windowsToolStripMenuItem.Text = runsOnMono ? "Windows" : "&Windows";
+            this.windowsToolStripMenuItem.Text = "&Windows";
             // 
             // terminalToolStripMenuItem
             // 
@@ -428,7 +427,7 @@ namespace FoenixIDE.UI
             this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.R)));
             this.resetToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
-            this.resetToolStripMenuItem.Text = runsOnMono ? "Reset": "&Reset";
+            this.resetToolStripMenuItem.Text = "&Reset";
             // 
             // DefaultKernelToolStripMenuItem
             // 
@@ -461,7 +460,7 @@ namespace FoenixIDE.UI
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.helpToolStripMenuItem.Text = runsOnMono ? "Help" : "&Help";
+            this.helpToolStripMenuItem.Text = "&Help";
             // 
             // checkForUpdateToolStripMenuItem
             // 
