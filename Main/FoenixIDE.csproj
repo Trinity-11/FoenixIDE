@@ -92,6 +92,8 @@
     <Compile Include="Devices\PS2KeyboardRegister.cs" />
     <Compile Include="Devices\MathFloatRegister.cs" />
     <Compile Include="Devices\RTC.cs" />
+    <Compile Include="Devices\SDCard\F256SDController.cs" />
+    <Compile Include="Devices\SDCard\FakeFATSDCardDevice.cs" />
     <Compile Include="Devices\TimerRegister.cs" />
     <Compile Include="Devices\SDCard\GabeSDController.cs" />
     <Compile Include="Devices\VDMA.cs" />

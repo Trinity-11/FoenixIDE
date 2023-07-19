@@ -70,7 +70,7 @@ namespace FoenixIDE
             else if (BoardVersionHelpers.IsJr(boardVersion))
             {
                 codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_JR, 3);  // unlike the FMX, this register is 16-bits in F256Jr
-                sdcard = new GabeSDController(MemoryMap.SDCARD_JR, MemoryMap.SDCARD_SIZE);   // TODO: write yet a new SD controller.
+                sdcard = new F256SDController(MemoryMap.SDCARD_JR, 2);
             }
             else
             {
