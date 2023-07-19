@@ -65,7 +65,7 @@ namespace FoenixIDE.Simulator.UI
         // Virtual SD Card Capacity
         public void SetCapacity(int value)
         {
-            int index = CapacityCombo.Items.IndexOf(value);
+            int index = CapacityCombo.Items.IndexOf(value.ToString());
             if (index != -1)
             {
                 CapacityCombo.SelectedIndex = index;
@@ -79,7 +79,7 @@ namespace FoenixIDE.Simulator.UI
         // Virtual SD Card Cluster Size
         public void SetClusterSize(int value)
         {
-            int index = ClusterCombo.Items.IndexOf(value);
+            int index = ClusterCombo.Items.IndexOf(value.ToString());
             if (index != -1)
             {
                 ClusterCombo.SelectedIndex = index;
