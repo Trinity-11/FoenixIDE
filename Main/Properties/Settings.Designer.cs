@@ -46,5 +46,76 @@ namespace FoenixIDE.Simulator.Properties {
                 this["BoardRevision"] = value;
             }
         }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SDCardPath {
+            get {
+                return ((string)(this["SDCardPath"]));
+            }
+            set {
+                this["SDCardPath"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("64")]
+        public int SDCardCapacity
+        {
+            get
+            {
+                return ((int)(this["SDCardCapacity"]));
+            }
+            set
+            {
+                this["SDCardCapacity"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("512")]
+        public int SDCardClusterSize
+        {
+            get
+            {
+                return ((int)(this["SDCardClusterSize"]));
+            }
+            set
+            {
+                this["SDCardClusterSize"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("FAT32")]
+        public string SDCardFSType
+        {
+            get
+            {
+                return ((string)(this["SDCardFSType"]));
+            }
+            set
+            {
+                this["SDCardFSType"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SDCardISOMode
+        {
+            get
+            {
+                return ((bool)(this["SDCardISOMode"]));
+            }
+            set
+            {
+                this["SDCardISOMode"] = value;
+            }
+        }
     }
 }
