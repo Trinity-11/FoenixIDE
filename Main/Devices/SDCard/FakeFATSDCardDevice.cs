@@ -433,7 +433,7 @@ namespace FoenixIDE.Simulator.Devices
                 catch (Exception e)
                 {
                     // controller error
-                    data[5] = 1;
+                    ReportError();
                     System.Console.WriteLine(e.ToString());
                     return null;
                 }
@@ -522,7 +522,7 @@ namespace FoenixIDE.Simulator.Devices
                     catch (Exception e)
                     {
                         // controller error
-                        data[5] = 1;
+                        ReportError();
                         System.Console.WriteLine(e.ToString());
                         return null;
                     }
@@ -740,7 +740,7 @@ namespace FoenixIDE.Simulator.Devices
                 catch (Exception e)
                 {
                     // controller error
-                    data[5] = 1;
+                    ReportError();
                     System.Console.WriteLine(e.ToString());
                     return;
                 }
@@ -803,9 +803,14 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // Invalid address
                     Console.WriteLine("Gabe is trying to write to an invalid address:" + writeAddress);
-                    data[5] = 1;
+                    ReportError();
                 }
             }
+        }
+
+        protected virtual void ReportError()
+        {
+            data[5] = 1;
         }
 
         protected virtual bool ShouldPreparePlaceholderFileEntry(int page)

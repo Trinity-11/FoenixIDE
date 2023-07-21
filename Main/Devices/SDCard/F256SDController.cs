@@ -27,6 +27,8 @@ namespace FoenixIDE.Simulator.Devices
             public int WriteAddressInBytes;
             public List<byte> WriteBytes;
             public List<byte> DataResponseBytes;
+
+            public bool ReportError;
         }
         Command CurrentCommand;
 
@@ -159,6 +161,7 @@ namespace FoenixIDE.Simulator.Devices
 
                                 // Need to send response token now
                                 CurrentCommand.DataResponseBytes = new List<byte>();
+
                                 CurrentCommand.DataResponseBytes.Add(5);
                             }
                         }
@@ -374,6 +377,21 @@ namespace FoenixIDE.Simulator.Devices
                 return false;
 
             return true; 
+        }
+
+        protected override void ReportError()
+        {
+#if DEBUG
+            // TODO: Have reported errors be returned up as command codes. For now, this is a temporary measure to divert error handling
+            // from the GabeSDController path, since it returns errors through its memory-mapped register where there isn't an equivalent
+            // for this memory-mapped range.
+            System.Diagnostics.Debugger.Break();
+#endif
+            if (CurrentCommand != null)
+            {
+                CurrentCommand.ReportError = true;
+            }
+
         }
     }
 }
