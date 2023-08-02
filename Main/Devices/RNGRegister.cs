@@ -18,7 +18,7 @@ namespace FoenixIDE.Simulator.Devices
         public RNGRegister(int StartAddress, int Length) : base(StartAddress, Length)
         {
             System.Diagnostics.Debug.Assert(Length == 3);
-            random = new Random(0);
+            random = new Random();
         }
 
         byte NextRandomByte()
