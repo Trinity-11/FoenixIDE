@@ -1,3 +1,16 @@
+Release 0.6.0.17
+----------------
+Added PR#38 - Fix crash that can happen when using some cluster+capacity combinations on F256
+Added PR#40 - Add F256 RNG reg support
+Added PR#41 - Remember user's setting for view size, and allow setting view scale from a preset list
+
+** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Add breaklines in debugger listing, when memory is not contiguous.
+** TODO: Setup Virtual Joystick for the F256.
+** TODO: Implement and IEC interface to connect via USB to XUM1541
+
 Release 0.6.0.16
 ----------------
 Fixed regression error - the CLI fix was undone.
@@ -6,10 +19,6 @@ Fixed issue when deleting breakpoints.
 Added PR#36 - Remember the user's choices for SD card settings.
 Added PR#37 - Add SD card support for F256.
 
-** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Add breaklines in debugger listing, when memory is not contiguous.
 
 Release 0.6.0.15
 ----------------
