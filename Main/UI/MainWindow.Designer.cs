@@ -62,6 +62,10 @@ namespace FoenixIDE.UI
             this.mIDIToVGMConvertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autorunEmulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewScalingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scale1_0XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scale1_5XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scale2_0XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.terminalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -348,7 +352,8 @@ namespace FoenixIDE.UI
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.autorunEmulatorToolStripMenuItem});
+            this.autorunEmulatorToolStripMenuItem,
+            this.viewScalingToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "&Settings";
@@ -367,6 +372,40 @@ namespace FoenixIDE.UI
             this.autorunEmulatorToolStripMenuItem.Size = new System.Drawing.Size(169, 23);
             this.autorunEmulatorToolStripMenuItem.Text = "Autorun Emulator";
             this.autorunEmulatorToolStripMenuItem.Click += new System.EventHandler(this.AutorunEmulatorToolStripMenuItem_Click);
+            // 
+            // viewScalingToolStripMenuItem
+            // 
+            this.viewScalingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.scale1_0XToolStripMenuItem,
+            this.scale1_5XToolStripMenuItem,
+            this.scale2_0XToolStripMenuItem});
+            this.viewScalingToolStripMenuItem.Name = "viewScalingToolStripMenuItem";
+            this.viewScalingToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.viewScalingToolStripMenuItem.Text = "View Scaling";
+            // 
+            // scale1_0XToolStripMenuItem
+            // 
+            this.scale1_0XToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale1_0XToolStripMenuItem.Name = "scale1_0XToolStripMenuItem";
+            this.scale1_0XToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale1_0XToolStripMenuItem.Text = "Scale 1.0X";
+            this.scale1_0XToolStripMenuItem.Click += new System.EventHandler(this.scale1_0XToolStripMenuItem_Click);
+            // 
+            // scale1_5XToolStripMenuItem
+            // 
+            this.scale1_5XToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale1_5XToolStripMenuItem.Name = "scale1_5XToolStripMenuItem";
+            this.scale1_5XToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale1_5XToolStripMenuItem.Text = "Scale 1.5X";
+            this.scale1_5XToolStripMenuItem.Click += new System.EventHandler(this.scale1_5XToolStripMenuItem_Click);
+            // 
+            // scale2_0XToolStripMenuItem
+            // 
+            this.scale2_0XToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale2_0XToolStripMenuItem.Name = "scale2_0XToolStripMenuItem";
+            this.scale2_0XToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale2_0XToolStripMenuItem.Text = "Scale 2.0X";
+            this.scale2_0XToolStripMenuItem.Click += new System.EventHandler(this.scale2_0XToolStripMenuItem_Click);
             // 
             // windowsToolStripMenuItem
             // 
@@ -578,6 +617,10 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem DefaultKernelToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem convertHexToPGZToolStripMenuItem;
         public Gpu gpu;
+        private System.Windows.Forms.ToolStripMenuItem viewScalingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale1_0XToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale2_0XToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale1_5XToolStripMenuItem;
     }
 }
 

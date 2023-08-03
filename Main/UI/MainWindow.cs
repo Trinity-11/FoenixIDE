@@ -306,6 +306,15 @@ namespace FoenixIDE.UI
                 debugWindow.RunButton_Click(null, null);
             }
             autorunEmulatorToolStripMenuItem.Checked = autoRun;
+
+            if (Simulator.Properties.Settings.Default.ViewIsMaximized)
+            {
+                this.WindowState = FormWindowState.Maximized;
+            }
+            else
+            {
+                gpu.SetViewSize(Simulator.Properties.Settings.Default.ViewWidth, Simulator.Properties.Settings.Default.ViewHeight);
+            }
         }
 
         private void CenterForm(Form form)
@@ -908,6 +917,11 @@ namespace FoenixIDE.UI
                     kernel.CPU.CPUThread.Join(1000);
                 }
             }
+
+            Simulator.Properties.Settings.Default.ViewWidth = gpu.GetViewWidth();
+            Simulator.Properties.Settings.Default.ViewHeight = gpu.GetViewHeight();
+            Simulator.Properties.Settings.Default.ViewIsMaximized = this.WindowState == FormWindowState.Maximized;
+            Simulator.Properties.Settings.Default.Save();
 
             if (debugWindow != null)
             {
@@ -1843,6 +1857,24 @@ namespace FoenixIDE.UI
         {
             MIDI_VGM_From midiForm = new MIDI_VGM_From();
             midiForm.Show();
+        }
+
+        private void scale1_0XToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            gpu.SetViewScaling(1.0f);
+        }
+
+        private void scale1_5XToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            gpu.SetViewScaling(1.5f);
+        }
+
+        private void scale2_0XToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            gpu.SetViewScaling(2.0f);
         }
     }
 }
