@@ -147,5 +147,20 @@ namespace FoenixIDE.Simulator.Properties {
                 this["ViewHeight"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewIsMaximized
+        {
+            get
+            {
+                return ((bool)(this["ViewIsMaximized"]));
+            }
+            set
+            {
+                this["ViewIsMaximized"] = value;
+            }
+        }
     }
 }
