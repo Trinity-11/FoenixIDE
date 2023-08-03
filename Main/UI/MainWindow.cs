@@ -306,6 +306,8 @@ namespace FoenixIDE.UI
                 debugWindow.RunButton_Click(null, null);
             }
             autorunEmulatorToolStripMenuItem.Checked = autoRun;
+
+            gpu.SetViewSize(Simulator.Properties.Settings.Default.ViewWidth, Simulator.Properties.Settings.Default.ViewHeight);
         }
 
         private void CenterForm(Form form)
@@ -908,6 +910,10 @@ namespace FoenixIDE.UI
                     kernel.CPU.CPUThread.Join(1000);
                 }
             }
+
+            Simulator.Properties.Settings.Default.ViewWidth = gpu.GetViewWidth();
+            Simulator.Properties.Settings.Default.ViewHeight = gpu.GetViewHeight();
+            Simulator.Properties.Settings.Default.Save();
 
             if (debugWindow != null)
             {

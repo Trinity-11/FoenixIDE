@@ -117,5 +117,35 @@ namespace FoenixIDE.Simulator.Properties {
                 this["SDCardISOMode"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("768")]
+        public int ViewWidth
+        {
+            get
+            {
+                return ((int)(this["ViewWidth"]));
+            }
+            set
+            {
+                this["ViewWidth"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("480")]
+        public int ViewHeight
+        {
+            get
+            {
+                return ((int)(this["ViewHeight"]));
+            }
+            set
+            {
+                this["ViewHeight"] = value;
+            }
+        }
     }
 }

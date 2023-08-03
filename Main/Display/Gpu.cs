@@ -36,6 +36,11 @@ namespace FoenixIDE.Display
         private static readonly int[] vs = new int[256 * 8];
         private int[] lutCache = vs;
 
+        public const int NativeHeight = 480;
+        public const int NativeWidth = 768;
+        private int MarginHeight;
+        private int MarginWidth;
+
         public Gpu()
         {
             InitializeComponent();
@@ -65,13 +70,28 @@ namespace FoenixIDE.Display
             {
                 if (ParentForm == null)
                     return;
-                int htarget = 480;
-                int topmargin = ParentForm.Height - ClientRectangle.Height;
-                int sidemargin = ParentForm.Width - ClientRectangle.Width;
-                ParentForm.Height = htarget + topmargin;
-                ParentForm.Width = (int)Math.Ceiling(htarget * 1.6) + sidemargin;
+
+                MarginHeight = ParentForm.Height - ClientRectangle.Height;
+                MarginWidth = ParentForm.Width - ClientRectangle.Width;
+                SetViewSize(NativeWidth, NativeHeight);
+
                 hiresTimer.Start();
             }
+        }
+
+        public void SetViewSize(int viewWidth, int viewHeight)
+        {
+            ParentForm.Height = viewHeight + MarginHeight;
+            ParentForm.Width = viewWidth + MarginWidth;
+        }
+        public int GetViewWidth()
+        {
+            return ParentForm.Width - MarginWidth;
+        }
+
+        public int GetViewHeight()
+        {
+            return ParentForm.Height - MarginHeight;
         }
 
         /// <summary>
