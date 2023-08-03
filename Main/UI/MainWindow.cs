@@ -1850,6 +1850,21 @@ namespace FoenixIDE.UI
             MIDI_VGM_From midiForm = new MIDI_VGM_From();
             midiForm.Show();
         }
+
+        private void scale1_0XToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            gpu.SetViewScaling(1.0f);
+        }
+
+        private void scale1_5XToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            gpu.SetViewScaling(1.5f);
+        }
+
+        private void scale2_0XToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            gpu.SetViewScaling(2.0f);
+        }
     }
 }
 

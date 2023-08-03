@@ -84,6 +84,16 @@ namespace FoenixIDE.Display
             ParentForm.Height = viewHeight + MarginHeight;
             ParentForm.Width = viewWidth + MarginWidth;
         }
+
+        public void SetViewScaling(float scaling)
+        {
+            int viewHeight = (int)Math.Ceiling((float)NativeHeight * scaling);
+            int viewWidth = (int)Math.Ceiling((float)NativeWidth * scaling);
+
+            ParentForm.Height = viewHeight + MarginHeight;
+            ParentForm.Width = viewWidth + MarginWidth;
+        }
+
         public int GetViewWidth()
         {
             return ParentForm.Width - MarginWidth;
