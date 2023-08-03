@@ -130,7 +130,8 @@ namespace FoenixIDE
                     TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_JR, 8),
                     RTC = new RTC(MemoryMap.RTC_SEC_JR, 16),
                     CODEC = codec,
-                    MMU = new MMU_JR(0,16)
+                    MMU = new MMU_JR(0,16),
+                    RNG = new RNGRegister(MemoryMap.SEEDL_JR, 3)
                 };
             }
 

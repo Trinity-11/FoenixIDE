@@ -38,6 +38,9 @@ namespace FoenixIDE.MemoryLocations
         // F256JR addresses
         public const int SDCARD_JR = 0x00_DD00;
         public const int MATH_JR = 0x00_DE00;
+        public const int SEEDL_JR = 0x00_D6A4;
+        public const int SEEDH_JR = 0x00_D6A5;
+        public const int RND_CTRL_JR = 0x00_D6A6;
 
         // Handling code in CODEC_RAM
         public const int CODEC_START = 0xAF_E820;     // Start of CODEC memory range

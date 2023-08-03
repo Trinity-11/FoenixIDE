@@ -42,6 +42,7 @@ namespace FoenixIDE.MemoryLocations
         public TimerRegister TIMER1 = null;
         public TimerRegister TIMER2 = null;
         public RTC RTC = null;
+        public RNGRegister RNG = null;
 
         public bool VectorPull = false;
 
@@ -141,6 +142,15 @@ namespace FoenixIDE.MemoryLocations
                     {
                         Device = MATRIXKEYBOARD.VIA1;
                         DeviceAddress = Address - MATRIXKEYBOARD.VIA1.StartAddress;
+                        return;
+                    }
+                }
+                if (RNG != null)
+                {
+                    if (Address >= RNG.StartAddress && Address <= RNG.EndAddress)
+                    {
+                        Device = RNG;
+                        DeviceAddress = Address - RNG.StartAddress;
                         return;
                     }
                 }
@@ -281,6 +291,15 @@ namespace FoenixIDE.MemoryLocations
                         {
                             Device = MATRIXKEYBOARD.VIA1;
                             DeviceAddress = Address - MATRIXKEYBOARD.VIA1.StartAddress;
+                            return;
+                        }
+                    }
+                    if (RNG != null)
+                    {
+                        if (Address >= RNG.StartAddress && Address <= RNG.EndAddress)
+                        {
+                            Device = RNG;
+                            DeviceAddress = Address - RNG.StartAddress;
                             return;
                         }
                     }

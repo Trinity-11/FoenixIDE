@@ -91,6 +91,7 @@
     <Compile Include="Devices\MatrixKeyboardRegister.cs" />
     <Compile Include="Devices\PS2KeyboardRegister.cs" />
     <Compile Include="Devices\MathFloatRegister.cs" />
+    <Compile Include="Devices\RNGRegister.cs" />
     <Compile Include="Devices\RTC.cs" />
     <Compile Include="Devices\SDCard\F256SDController.cs" />
     <Compile Include="Devices\SDCard\FakeFATSDCardDevice.cs" />
