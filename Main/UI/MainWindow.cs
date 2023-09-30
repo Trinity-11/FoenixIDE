@@ -1359,38 +1359,38 @@ namespace FoenixIDE.UI
         }
 
         // The user clicks on the tool strip for a different board version: B, FMX, U or U+
-        private void ToolStripRevision_Click(object sender, EventArgs e)
+        private void ToolStripRevision_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             defaultKernel = System.AppContext.BaseDirectory;
-            if (version == BoardVersion.RevB)
+            if (e.ClickedItem == revBToolStripMenuItem)
+            {
+                version = BoardVersion.RevB;
+                defaultKernel += Path.Combine("roms", "kernel_B.hex");
+            }
+            else if (e.ClickedItem == revCToolStripMenuItem)
             {
                 version = BoardVersion.RevC;
                 defaultKernel += Path.Combine("roms", "kernel_FMX.hex");
             }
-            else if (version == BoardVersion.RevC)
+            else if (e.ClickedItem == revUToolStripMenuItem)
             {
                 version = BoardVersion.RevU;
                 defaultKernel += Path.Combine("roms", "kernel_U.hex");
             }
-            else if (version == BoardVersion.RevU)
+            else if (e.ClickedItem == revUPlusToolStripMenuItem)
             {
                 version = BoardVersion.RevUPlus;
                 defaultKernel += Path.Combine("roms", "kernel_U_Plus.hex");
             }
-            else if (version == BoardVersion.RevUPlus)
+            else if (e.ClickedItem == revJrToolStripMenuItem)
             {
                 version = BoardVersion.RevJr_6502;
                 defaultKernel += Path.Combine("roms", "kernel_F256jr.hex");
             }
-            else if (version == BoardVersion.RevJr_6502)
+            else if (e.ClickedItem == revJr816ToolStripMenuItem)
             {
                 version = BoardVersion.RevJr_65816;
                 defaultKernel += Path.Combine("roms", "kernel_F256jr.hex");
-            }
-            else
-            {
-                version = BoardVersion.RevC;
-                defaultKernel += Path.Combine("roms", "kernel_FMX.hex");
             }
 
             kernel.SetVersion(version);
@@ -1402,7 +1402,10 @@ namespace FoenixIDE.UI
             // Reset the memory, keyboard, GABE and reload the program?
             debugWindow.Pause();
             DisableTimers();
-            kernel.lstFile.Lines.Clear();
+            if (kernel.lstFile != null)
+            {
+                kernel.lstFile.Lines.Clear();
+            }
             BasicWindow_Load(null, null);
         }
 
