@@ -9,6 +9,7 @@ using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
 using Microsoft.VisualBasic;
+using System.Text;
 
 namespace FoenixIDE.UI
 {
@@ -1038,7 +1039,7 @@ namespace FoenixIDE.UI
 
         private void DebugPanel_MouseClick(object sender, MouseEventArgs e)
         {
-            if (ActiveLine[0] != 0 && kernel.lstFile.Lines.ContainsKey(ActiveLine[0]))
+            if (e.Button == MouseButtons.Left && ActiveLine[0] != 0 && kernel.lstFile.Lines.ContainsKey(ActiveLine[0]))
             {
                 DebugLine line = kernel.lstFile.Lines[ActiveLine[0]];
                 if (line != null)
@@ -1053,6 +1054,11 @@ namespace FoenixIDE.UI
                     kernel.WatchList.Add(name, mem);
                     MainWindow.Instance.WatchListToolStripMenuItem_Click(sender, e);
                 }
+            }
+            else if (e.Button == MouseButtons.Right && kernel.CPU.DebugPause)
+            {
+                Point contextMenuLocation = DebugPanel.PointToScreen(new Point(e.X, e.Y));
+                debugWindowContextMenuStrip.Show(contextMenuLocation);
             }
         }
 
@@ -1082,6 +1088,46 @@ namespace FoenixIDE.UI
             {
                 breakpointWindow.BringToFront();
             }
+        }
+
+        private void DebugWindowCopyToClipboardMenuItem_Click(object sender, EventArgs e)
+        {
+            // This function follows the same logic as DebugPanel_Paint.
+            StringBuilder clipboardText = new StringBuilder();
+
+            if (codeList != null)
+            {
+                int startIndex = -1;
+                for (int i = 0; i < codeList.Count; ++i)
+                {
+                    if (codeList[i].PC != kernel.CPU.PC)
+                    {
+                        continue;
+                    }
+                    startIndex = i;
+                }
+
+                if (startIndex > 4)
+                {
+                    startIndex -= 5;
+                }
+                int endIndex = Math.Min(startIndex + 26, codeList.Count);
+
+                for (int i = startIndex; i < endIndex; ++i)
+                {
+                    DebugLine line = codeList[i];
+                    if (line == null) // Line can be null for invalid opcodes
+                    {
+                        clipboardText.AppendLine("<invalid instruction>");
+                    }
+                    else
+                    {
+                        clipboardText.AppendLine(line.ToString());
+                    }
+                }
+            }
+
+            Clipboard.SetText(clipboardText.ToString());
         }
     }
 }
