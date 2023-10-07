@@ -496,7 +496,17 @@ namespace FoenixIDE
                 } while (!isAddressValid);
                 // Copy the data into memory
                 MemMgr.RAM.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
-                //MemMgr.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
+
+                if (BoardVersionHelpers.IsJr(boardVersion))
+                {
+                    bool binOverlapsFlash = DataStartAddress >= 0x08_0000;
+                    if (binOverlapsFlash)
+                    {
+                        int flashStart = DataStartAddress - 0x08_0000;
+                        int flashEnd = Math.Min(flashStart + flen, 0x10_0000);
+                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, flashStart, flashEnd - flashStart);
+                    }
+                }
             }
 
             // Load the .LST file if it exists
