@@ -1862,22 +1862,40 @@ namespace FoenixIDE.UI
             midiForm.Show();
         }
 
-        private void scale1_0XToolStripMenuItem_Click(object sender, EventArgs e)
+        private void scale1_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.0f);
+            gpu.SetViewScaling(1.0f, 640, 480);
         }
 
-        private void scale1_5XToolStripMenuItem_Click(object sender, EventArgs e)
+        private void scale1_5X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.5f);
+            gpu.SetViewScaling(1.5f, 640, 480);
         }
 
-        private void scale2_0XToolStripMenuItem_Click(object sender, EventArgs e)
+        private void scale2_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(2.0f);
+            gpu.SetViewScaling(2.0f, 640, 480);
+        }
+
+        private void scale1_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            gpu.SetViewScaling(1.0f, 640, 400);
+        }
+
+        private void scale1_5X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            gpu.SetViewScaling(1.5f, 640, 400);
+        }
+
+        private void scale2_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            gpu.SetViewScaling(2.0f, 640, 400);
         }
     }
 }

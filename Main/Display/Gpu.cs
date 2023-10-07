@@ -36,8 +36,11 @@ namespace FoenixIDE.Display
         private static readonly int[] vs = new int[256 * 8];
         private int[] lutCache = vs;
 
+
+        //NativeHeight and NativeWidth are no longer used in this fork proposition
         public const int NativeHeight = 480;
-        public const int NativeWidth = 768;
+        public const int NativeWidth = 640;
+
         private int MarginHeight;
         private int MarginWidth;
 
@@ -85,10 +88,10 @@ namespace FoenixIDE.Display
             ParentForm.Width = viewWidth + MarginWidth;
         }
 
-        public void SetViewScaling(float scaling)
+        public void SetViewScaling(float scaling, int requiredWidth, int requiredHeight)
         {
-            int viewHeight = (int)Math.Ceiling((float)NativeHeight * scaling);
-            int viewWidth = (int)Math.Ceiling((float)NativeWidth * scaling);
+            int viewHeight = (int)((float)requiredHeight * scaling);
+            int viewWidth = (int)((float)requiredWidth * scaling);
 
             ParentForm.Height = viewHeight + MarginHeight;
             ParentForm.Width = viewWidth + MarginWidth;

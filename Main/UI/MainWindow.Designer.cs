@@ -63,9 +63,16 @@ namespace FoenixIDE.UI
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autorunEmulatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewScalingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.scale1_0XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.scale1_5XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.scale2_0XToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resolution_label_640x480MenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scalingseparator1MenuItem = new System.Windows.Forms.ToolStripSeparator();
+            this.scale1_0X_H480ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scale1_5X_H480ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scale2_0X_H480ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resolution_label_640x400MenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scalingseparator2MenuItem = new System.Windows.Forms.ToolStripSeparator();
+            this.scale1_0X_H400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scale1_5X_H400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scale2_0X_H400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.terminalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -385,36 +392,89 @@ namespace FoenixIDE.UI
             // viewScalingToolStripMenuItem
             // 
             this.viewScalingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.scale1_0XToolStripMenuItem,
-            this.scale1_5XToolStripMenuItem,
-            this.scale2_0XToolStripMenuItem});
+            this.resolution_label_640x480MenuItem,
+            this.scalingseparator1MenuItem,
+            this.scale1_0X_H480ToolStripMenuItem,
+            this.scale1_5X_H480ToolStripMenuItem,
+            this.scale2_0X_H480ToolStripMenuItem,
+            this.resolution_label_640x400MenuItem,
+            this.scalingseparator2MenuItem,
+            this.scale1_0X_H400ToolStripMenuItem,
+            this.scale1_5X_H400ToolStripMenuItem,
+            this.scale2_0X_H400ToolStripMenuItem});
             this.viewScalingToolStripMenuItem.Name = "viewScalingToolStripMenuItem";
             this.viewScalingToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.viewScalingToolStripMenuItem.Text = "View Scaling";
+            //
+            // Disabled Menu Text entry to specify 640x480
+            //
+            this.resolution_label_640x480MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.resolution_label_640x480MenuItem.Name = "resolution_label_640x480MenuItem";
+            this.resolution_label_640x480MenuItem.Size = new System.Drawing.Size(126, 22);
+            this.resolution_label_640x480MenuItem.Text = "640 x 480";
+            this.resolution_label_640x480MenuItem.Enabled = false;
+            //
+            // Disabled Menu Text entry to specify 640x400 
+            //
+            this.resolution_label_640x400MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.resolution_label_640x400MenuItem.Name = "resolution_label_640x400MenuItem";
+            this.resolution_label_640x400MenuItem.Size = new System.Drawing.Size(126, 22);
+            this.resolution_label_640x400MenuItem.Text = "640 x 400";
+            this.resolution_label_640x400MenuItem.Enabled = false;
             // 
-            // scale1_0XToolStripMenuItem
+            // scale1_0X_H480ToolStripMenuItem 
+            // 640x480 at 1x
             // 
-            this.scale1_0XToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.scale1_0XToolStripMenuItem.Name = "scale1_0XToolStripMenuItem";
-            this.scale1_0XToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-            this.scale1_0XToolStripMenuItem.Text = "Scale 1.0X";
-            this.scale1_0XToolStripMenuItem.Click += new System.EventHandler(this.scale1_0XToolStripMenuItem_Click);
+            this.scale1_0X_H480ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale1_0X_H480ToolStripMenuItem.Name = "scale1_0X_H480ToolStripMenuItem";
+            this.scale1_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale1_0X_H480ToolStripMenuItem.Text = "Scale 1.0X";
+            this.scale1_0X_H480ToolStripMenuItem.Click += new System.EventHandler(this.scale1_0X_H480ToolStripMenuItem_Click);
             // 
-            // scale1_5XToolStripMenuItem
+            // scale1_5X_H480ToolStripMenuItem
+            // 640x480 at 1.5x
             // 
-            this.scale1_5XToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.scale1_5XToolStripMenuItem.Name = "scale1_5XToolStripMenuItem";
-            this.scale1_5XToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-            this.scale1_5XToolStripMenuItem.Text = "Scale 1.5X";
-            this.scale1_5XToolStripMenuItem.Click += new System.EventHandler(this.scale1_5XToolStripMenuItem_Click);
+            this.scale1_5X_H480ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale1_5X_H480ToolStripMenuItem.Name = "scale1_5X_H480ToolStripMenuItem";
+            this.scale1_5X_H480ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale1_5X_H480ToolStripMenuItem.Text = "Scale 1.5X";
+            this.scale1_5X_H480ToolStripMenuItem.Click += new System.EventHandler(this.scale1_5X_H480ToolStripMenuItem_Click);
             // 
-            // scale2_0XToolStripMenuItem
+            // scale2_0X_H480ToolStripMenuItem
+            // 640x480 at 2x
             // 
-            this.scale2_0XToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.scale2_0XToolStripMenuItem.Name = "scale2_0XToolStripMenuItem";
-            this.scale2_0XToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-            this.scale2_0XToolStripMenuItem.Text = "Scale 2.0X";
-            this.scale2_0XToolStripMenuItem.Click += new System.EventHandler(this.scale2_0XToolStripMenuItem_Click);
+            this.scale2_0X_H480ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale2_0X_H480ToolStripMenuItem.Name = "scale2_0X_H480ToolStripMenuItem";
+            this.scale2_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale2_0X_H480ToolStripMenuItem.Text = "Scale 2.0X";
+            this.scale2_0X_H480ToolStripMenuItem.Click += new System.EventHandler(this.scale2_0X_H480ToolStripMenuItem_Click);
+                        // 
+            // scale1_0X_H400ToolStripMenuItem 
+            // 640x400 at 1x
+            // 
+            this.scale1_0X_H400ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale1_0X_H400ToolStripMenuItem.Name = "scale1_0X_H400ToolStripMenuItem";
+            this.scale1_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale1_0X_H400ToolStripMenuItem.Text = "Scale 1.0X";
+            this.scale1_0X_H400ToolStripMenuItem.Click += new System.EventHandler(this.scale1_0X_H400ToolStripMenuItem_Click);
+            // 
+            // scale1_5X_H400ToolStripMenuItem
+            // 640x400 at 1.5x
+            // 
+            this.scale1_5X_H400ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale1_5X_H400ToolStripMenuItem.Name = "scale1_5X_H400ToolStripMenuItem";
+            this.scale1_5X_H400ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale1_5X_H400ToolStripMenuItem.Text = "Scale 1.5X";
+            this.scale1_5X_H400ToolStripMenuItem.Click += new System.EventHandler(this.scale1_5X_H400ToolStripMenuItem_Click);
+            // 
+            // scale2_0X_H400ToolStripMenuItem
+            // 640x400 at 2x
+            // 
+            this.scale2_0X_H400ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.scale2_0X_H400ToolStripMenuItem.Name = "scale2_0X_H400ToolStripMenuItem";
+            this.scale2_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.scale2_0X_H400ToolStripMenuItem.Text = "Scale 2.0X";
+            this.scale2_0X_H400ToolStripMenuItem.Click += new System.EventHandler(this.scale2_0X_H400ToolStripMenuItem_Click);
             // 
             // windowsToolStripMenuItem
             // 
@@ -663,9 +723,16 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem convertHexToPGZToolStripMenuItem;
         public Gpu gpu;
         private System.Windows.Forms.ToolStripMenuItem viewScalingToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem scale1_0XToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem scale2_0XToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem scale1_5XToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator scalingseparator1MenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resolution_label_640x480MenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale1_0X_H480ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale2_0X_H480ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale1_5X_H480ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resolution_label_640x400MenuItem;
+        private System.Windows.Forms.ToolStripSeparator scalingseparator2MenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale1_0X_H400ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale2_0X_H400ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale1_5X_H400ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revJr816ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revJrToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revUPlusToolStripMenuItem;
