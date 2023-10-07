@@ -22,6 +22,7 @@ namespace FoenixIDE.MemoryLocations
         //public List<IMappable> devices = new List<IMappable>();
         public MemoryRAM RAM = null;
         public MemoryRAM FLASH = null;
+        public FlashJr FLASHJR = null;
         public MemoryRAM VIDEO = null;
         public MemoryRAM VICKY = null;
         public MemoryRAM GABE = null;
@@ -335,8 +336,6 @@ namespace FoenixIDE.MemoryLocations
                     }
                 }
 
-                byte segment = (byte)(Address >> 13);  // take the top 3 bits
-                offset = MMU.GetPage((byte)(MMURegister & 3), segment) * 8192;
                 // bits 4 and 5 of MMURegister determine which LUT is being edited
                 if ((MMURegister & 0x80) != 0 && Address >= 8 && Address <= 0xF)
                 {
@@ -345,9 +344,20 @@ namespace FoenixIDE.MemoryLocations
                     DeviceAddress = Address;
                     return;
                 }
-                
+
+                byte segment = (byte)(Address >> 13);  // take the top 3 bits
+                byte page = MMU.GetPage((byte)(MMURegister & 3), segment);
+
+                if (page >= 0x40 && page <= 0x7F) // MMU entry points to FLASH
+                {
+                    Device = FLASHJR;
+                    offset = (page - 0x40) * 8192;
+                    DeviceAddress = offset + (Address & 0x1FFF);
+                    return;
+                }
+
                 Device = RAM;
-                offset = MMU.GetPage((byte)(MMURegister & 3), (byte)(Address >> 13)) * 8192;
+                offset = page * 8192;
                 DeviceAddress = offset + (Address & 0x1FFF);
                 return;
             }

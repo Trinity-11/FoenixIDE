@@ -248,7 +248,7 @@ namespace FoenixIDE.UI
                 case ".hex":
                     MemoryRAM memory = new MemoryRAM(0, FoenixSystem.TextAddressToInt(FileSizeResultLabel.Text) );
                     List<int> blockSizes;
-                    if (HexFile.Load(memory, FileNameTextBox.Text, 0, out _, out blockSizes))
+                    if (HexFile.Load(memory, null, FileNameTextBox.Text, 0, out _, out blockSizes))
                     {
 
                         res.Length = blockSizes[0];
