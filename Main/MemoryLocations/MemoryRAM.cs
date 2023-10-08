@@ -43,10 +43,6 @@ namespace FoenixIDE.MemoryLocations
             data = new byte[Length];
         }
 
-        private MemoryRAM()
-        {
-        }
-
         /// <summary>
         /// Clear all the bytes in the memory array.
         /// </summary>

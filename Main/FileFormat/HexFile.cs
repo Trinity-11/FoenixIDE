@@ -8,7 +8,7 @@ namespace FoenixIDE.Simulator.FileFormat
     public class HexFile
     {
 
-        static public bool Load(MemoryRAM ram, string Filename, int gabeAddressBank, out List<int> blocks, out List<int> blockLengths)
+        static public bool Load(MemoryRAM ram, FlashJr romJr, string Filename, int gabeAddressBank, out List<int> blocks, out List<int> blockLengths)
         {
             int bank = 0;
             int addrCursor = 0;
@@ -65,7 +65,16 @@ namespace FoenixIDE.Simulator.FileFormat
                                 for (int i = 0; i < data.Length; i += 2)
                                 {
                                     int b = GetByte(data, i, 1);
-                                    ram.WriteByte(bank + addrCursor, (byte)b);
+
+                                    if (romJr != null && bank >= 0x08_0000 && bank <= 0x10_0000)
+                                    {
+                                        romJr.SetFlash(bank + addrCursor - 0x08_0000, (byte)b);
+                                    }
+                                    else
+                                    {
+                                        ram.WriteByte(bank + addrCursor, (byte)b);
+                                    }
+
                                     // Copy bank $38 or $18 to page 0
                                     if (bank == gabeAddressBank)
                                     {
