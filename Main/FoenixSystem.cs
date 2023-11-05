@@ -93,7 +93,7 @@ namespace FoenixIDE
 
                     // Special devices
                     MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
-                    PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5),
+                    PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5, PS2KeyboardRegister.Mode.Mode1),
                     SDCARD = sdcard,
                     INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
                     UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
@@ -116,14 +116,14 @@ namespace FoenixIDE
             }
             else
             {
-                // This is either a 6502-based machine, or a 65816-based F256* with the same memory map
+                // This is a 6502 or 85816-based F256 machine; both have the same memory map
                 MemMgr = new MemoryManager
                 {
                     RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
                     FLASHJR = new FlashJr(MemoryMap.RAM_START, 0x08_0000),
                     // vicky will store 4 pages of data
                     VICKY = new MemoryRAM(0, 4 * 0x2000),
-                    PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5),
+                    PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5, PS2KeyboardRegister.Mode.Mode2),
                     MATRIXKEYBOARD = new MatrixKeyboardRegister(MemoryMap.MATRIX_KEYBOARD_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4),
                     MATH = new MathCoproRegister(MemoryMap.MATH_START_JR, MemoryMap.MATH_END_JR - MemoryMap.MATH_START_JR + 1), // 32 bytes
                     SDCARD = sdcard,
