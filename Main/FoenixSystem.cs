@@ -185,7 +185,15 @@ namespace FoenixIDE
             }
             else
             {
-                MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
+                if (boardVersion == BoardVersion.RevJr_6502 || boardVersion == BoardVersion.RevJr_65816)
+                {
+                    MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.Assert(boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816);
+                    MemMgr.WriteByte(MemoryMap.REVOFJR, 0x12);
+                }
                 MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                 MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
                 string applicationDirectory = System.AppContext.BaseDirectory;
