@@ -47,6 +47,12 @@ namespace FoenixIDE.UI
                 case BoardVersion.RevJr_65816:
                     RevModeLabel.Text = "Mode: F256Jr(816)";
                     break;
+                case BoardVersion.RevF256K_6502:
+                    RevModeLabel.Text = "Mode: F256K";
+                    break;
+                case BoardVersion.RevF256K_65816:
+                    RevModeLabel.Text = "Mode: F256K(816)";
+                    break;
             }
         }
 

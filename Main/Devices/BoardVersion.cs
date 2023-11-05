@@ -13,14 +13,19 @@ namespace FoenixIDE.Simulator.Devices
         RevU,
         RevUPlus,
         RevJr_6502,
-        RevJr_65816
+        RevJr_65816,
+        RevF256K_6502,
+        RevF256K_65816
     }
     
     public static class BoardVersionHelpers
     {
         public static bool IsF256(BoardVersion boardVersion)
         {
-            return boardVersion == BoardVersion.RevJr_6502 || boardVersion == BoardVersion.RevJr_65816;
+            return boardVersion == BoardVersion.RevJr_6502 || 
+                   boardVersion == BoardVersion.RevJr_65816 ||
+                   boardVersion == BoardVersion.RevF256K_6502 ||
+                   boardVersion == BoardVersion.RevF256K_65816;
         }
     }
 }

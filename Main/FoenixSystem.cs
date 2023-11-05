@@ -50,12 +50,14 @@ namespace FoenixIDE
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_U;
                     break;
                 case BoardVersion.RevJr_6502:
+                case BoardVersion.RevF256K_6502:
                     memSize = 1024*1024; // Includes both RAM and flash.
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
                     clock = 6293000;
                     is6502 = true;
                     break;
                 case BoardVersion.RevJr_65816:
+                case BoardVersion.RevF256K_65816:
                     memSize = 1024 * 1024;
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
                     clock = 6293000;

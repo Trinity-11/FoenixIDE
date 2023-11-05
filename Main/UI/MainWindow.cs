@@ -101,6 +101,14 @@ namespace FoenixIDE.UI
                     {
                         version = BoardVersion.RevJr_65816;
                     }
+                    else if (context["version"] == "RevF256K")
+                    {
+                        version = BoardVersion.RevF256K_6502;
+                    }
+                    else if (context["version"] == "RevF256K816")
+                    {
+                        version = BoardVersion.RevF256K_65816;
+                    }
                     boardVersionCommandLineSpecified = true;
                 }
             }
@@ -131,6 +139,12 @@ namespace FoenixIDE.UI
                     case "Jr(816)":
                         version = BoardVersion.RevJr_65816;
                         break;
+                    case "F256K":
+                        version = BoardVersion.RevF256K_6502;
+                        break;
+                    case "F256K(816)":
+                        version = BoardVersion.RevF256K_65816;
+                        break;
                 }
             }
             if (defaultKernel == null)
@@ -151,7 +165,9 @@ namespace FoenixIDE.UI
                         defaultKernel = Path.Combine(romsDir, "kernel_U_Plus.hex");
                         break;
                     case BoardVersion.RevJr_6502:
-                    case BoardVersion.RevJr_65816: // Both SKUs share the same kernelfile
+                    case BoardVersion.RevJr_65816:
+                    case BoardVersion.RevF256K_6502:
+                    case BoardVersion.RevF256K_65816:// All SKUs share the same kernelfile currently
                         defaultKernel = Path.Combine(romsDir, "kernel_F256jr.hex");
                         break;
                 }
@@ -1351,6 +1367,16 @@ namespace FoenixIDE.UI
                 toolStripRevision.Text = "Rev F256Jr(816)";
                 shortVersion = "Jr(816)";
             }
+            else if (version == BoardVersion.RevF256K_6502)
+            {
+                toolStripRevision.Text = "Rev F256K";
+                shortVersion = "F256K";
+            }
+            else if (version == BoardVersion.RevF256K_65816)
+            {
+                toolStripRevision.Text = "Rev F256K(816)";
+                shortVersion = "F256K(816)";
+            }
 
             // force repaint
             statusStrip1.Invalidate();
@@ -1390,6 +1416,16 @@ namespace FoenixIDE.UI
             else if (e.ClickedItem == revJr816ToolStripMenuItem)
             {
                 version = BoardVersion.RevJr_65816;
+                defaultKernel += Path.Combine("roms", "kernel_F256jr.hex");
+            }
+            else if (e.ClickedItem == revF256KToolStripMenuItem)
+            {
+                version = BoardVersion.RevF256K_6502;
+                defaultKernel += Path.Combine("roms", "kernel_F256jr.hex");
+            }
+            else if (e.ClickedItem == revF256K816ToolStripMenuItem)
+            {
+                version = BoardVersion.RevF256K_65816;
                 defaultKernel += Path.Combine("roms", "kernel_F256jr.hex");
             }
 

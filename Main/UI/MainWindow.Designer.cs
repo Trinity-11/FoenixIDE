@@ -85,6 +85,8 @@ namespace FoenixIDE.UI
             this.revUPlusToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.revJrToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.revJr816ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.revF256KToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.revF256K816ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.revBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gpu = new FoenixIDE.Display.Gpu();
             this.statusStrip1.SuspendLayout();
@@ -119,7 +121,9 @@ namespace FoenixIDE.UI
             this.revUToolStripMenuItem,
             this.revUPlusToolStripMenuItem,
             this.revJrToolStripMenuItem,
-            this.revJr816ToolStripMenuItem});
+            this.revJr816ToolStripMenuItem,
+            this.revF256KToolStripMenuItem,
+            this.revF256K816ToolStripMenuItem});
             this.toolStripRevision.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripRevision.Name = "toolStripRevision";
             this.toolStripRevision.Size = new System.Drawing.Size(110, 28);
@@ -554,6 +558,18 @@ namespace FoenixIDE.UI
             this.revJr816ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revJr816ToolStripMenuItem.Text = "Rev Jr(816)";
             // 
+            // revF256KToolStripMenuItem
+            // 
+            this.revF256KToolStripMenuItem.Name = "revF256KToolStripMenuItem";
+            this.revF256KToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revF256KToolStripMenuItem.Text = "Rev F256K";
+            // 
+            // revF256K816ToolStripMenuItem
+            // 
+            this.revF256K816ToolStripMenuItem.Name = "revF256K816ToolStripMenuItem";
+            this.revF256K816ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revF256K816ToolStripMenuItem.Text = "Rev F256K(816)";
+            // 
             // revBToolStripMenuItem
             // 
             this.revBToolStripMenuItem.Name = "revBToolStripMenuItem";
@@ -665,7 +681,9 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem viewScalingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scale1_0XToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scale2_0XToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem scale1_5XToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scale1_5XToolStripMenuItem;        
+        private System.Windows.Forms.ToolStripMenuItem revF256K816ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem revF256KToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revJr816ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revJrToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revUPlusToolStripMenuItem;
