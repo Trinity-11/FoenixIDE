@@ -271,7 +271,7 @@ namespace FoenixIDE.UI
             {
                 BaseBankAddress = 0x18_0000;
             }
-            else if (BoardVersionHelpers.IsJr(boardVersion))
+            else if (BoardVersionHelpers.IsF256(boardVersion))
             {
                 BaseBankAddress = 0;
             }
@@ -785,7 +785,7 @@ namespace FoenixIDE.UI
             // Maximum transmission size is 8192
             if (Size > 8192)
             {
-                if (!BoardVersionHelpers.IsJr(boardVersion))
+                if (!BoardVersionHelpers.IsF256(boardVersion))
                 {
                     Size = 8192;
                     Console.WriteLine("PreparePacket2Write: output truncated to 8K bytes.");

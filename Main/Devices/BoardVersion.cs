@@ -18,7 +18,7 @@ namespace FoenixIDE.Simulator.Devices
     
     public static class BoardVersionHelpers
     {
-        public static bool IsJr(BoardVersion boardVersion)
+        public static bool IsF256(BoardVersion boardVersion)
         {
             return boardVersion == BoardVersion.RevJr_6502 || boardVersion == BoardVersion.RevJr_65816;
         }

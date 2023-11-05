@@ -241,8 +241,8 @@ namespace FoenixIDE.UI
 
         private void DisplayInterruptTooltips()
         {
-            bool isJunior = BoardVersionHelpers.IsJr(boardVersion);
-            if (isJunior)
+            bool isF256 = BoardVersionHelpers.IsF256(boardVersion);
+            if (isF256)
             {
                 // this is going to be confusing - the F256 Interrupts are different
                 // Register 0
@@ -462,7 +462,7 @@ namespace FoenixIDE.UI
                 IRQPC = -1;
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(0, 0);
                 kernel.MemMgr.INTERRUPT.WriteFromGabe(1, 0);
-                if (!BoardVersionHelpers.IsJr(kernel.GetVersion()))
+                if (!BoardVersionHelpers.IsF256(kernel.GetVersion()))
                 {
                     kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
                     kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
@@ -896,7 +896,7 @@ namespace FoenixIDE.UI
         private void BreakOnIRQCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             bool visible = BreakOnIRQCheckBox.Checked;
-            if (BoardVersionHelpers.IsJr(boardVersion))
+            if (BoardVersionHelpers.IsF256(boardVersion))
             {
                 // Row 1
                 SOFCheckbox.Visible = visible;
@@ -1002,7 +1002,7 @@ namespace FoenixIDE.UI
             }
 
             // The F256s do not have the following registers
-            if (!BoardVersionHelpers.IsJr(kernel.GetVersion()))
+            if (!BoardVersionHelpers.IsF256(kernel.GetVersion()))
             {
                 //Read Interrupt Register 2 - we don't handle these yet
                 byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
