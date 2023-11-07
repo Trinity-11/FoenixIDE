@@ -50,7 +50,7 @@ namespace FoenixIDE
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_U;
                     break;
                 case BoardVersion.RevJr_6502:
-                    memSize = 1024*1024;
+                    memSize = 1024*1024; // Includes both RAM and flash.
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
                     clock = 6293000;
                     is6502 = true;
@@ -118,6 +118,7 @@ namespace FoenixIDE
                 MemMgr = new MemoryManager
                 {
                     RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
+                    FLASHJR = new FlashJr(MemoryMap.RAM_START, 0x08_0000),
                     // vicky will store 4 pages of data
                     VICKY = new MemoryRAM(0, 4 * 0x2000),
                     PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5),
@@ -380,7 +381,7 @@ namespace FoenixIDE
             }
             if (extension.Equals(".HEX"))
             {
-                if (!HexFile.Load(MemMgr.RAM, LoadedKernel, BasePageAddress, out _, out _))
+                if (!HexFile.Load(MemMgr.RAM, MemMgr.FLASHJR, LoadedKernel, BasePageAddress, out _, out _))
                 {
                     return false;
                 }
@@ -495,7 +496,17 @@ namespace FoenixIDE
                 } while (!isAddressValid);
                 // Copy the data into memory
                 MemMgr.RAM.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
-                //MemMgr.CopyBuffer(DataBuffer, 0, DataStartAddress, flen);
+
+                if (BoardVersionHelpers.IsJr(boardVersion))
+                {
+                    bool binOverlapsFlash = DataStartAddress >= 0x08_0000;
+                    if (binOverlapsFlash)
+                    {
+                        int flashStart = DataStartAddress - 0x08_0000;
+                        int flashEnd = Math.Min(flashStart + flen, 0x10_0000);
+                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, flashStart, flashEnd - flashStart);
+                    }
+                }
             }
 
             // Load the .LST file if it exists

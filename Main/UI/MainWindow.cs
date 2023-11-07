@@ -1621,7 +1621,7 @@ namespace FoenixIDE.UI
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 MemoryRAM temporaryRAM = new MemoryRAM(0, 4 * 1024 * 1024);
-                HexFile.Load(temporaryRAM, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
+                HexFile.Load(temporaryRAM, null, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
 
                 if (DataStartAddress.Count > 1)
                 {
@@ -1660,7 +1660,7 @@ namespace FoenixIDE.UI
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 MemoryRAM temporaryRAM = new MemoryRAM(0, 4 * 1024 * 1024);
-                HexFile.Load(temporaryRAM, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
+                HexFile.Load(temporaryRAM, null, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
                 // write the file
                 string outputFileName = Path.ChangeExtension(dialog.FileName, "PGZ");
 

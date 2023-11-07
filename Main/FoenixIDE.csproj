@@ -115,6 +115,7 @@
     <Compile Include="Devices\CodecRAM.cs" />
     <Compile Include="FileFormat\ListFile.cs" />
     <Compile Include="FileFormat\WatchedMemory.cs" />
+    <Compile Include="MemoryLocations\FlashJr.cs" />
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="Devices\MathCoproRegister.cs" />
     <Compile Include="Devices\SDCard\SDCardDevice.cs" />
