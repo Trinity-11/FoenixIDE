@@ -1,7 +1,8 @@
-Release 0.6.0.18
+Release 0.6.0.19
 ----------------
-Merged PR #42: Allow right-clicking on the debug window to copy to clipboard.
-Merged PR #43: Use dropdown for selecting the board mode instead of a button that linear searches.
+Merged PR #46 - Block attempt to write read-only memory on F256
+Merged PR #49 - Unblock F256K keyboard emulation on latest kernel
+Merged PR #50 - Made scaling choices pixel perfect
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
@@ -9,6 +10,13 @@ Merged PR #43: Use dropdown for selecting the board mode instead of a button tha
 ** TODO: Add breaklines in debugger listing, when memory is not contiguous.
 ** TODO: Setup Virtual Joystick for the F256.
 ** TODO: Implement and IEC interface to connect via USB to XUM1541
+** TODO: Fix SD Card implementation for F256.
+** TODO: Fix resolution menu and GPU such that it adheres to the machines MCR and the machine type.
+
+Release 0.6.0.18
+----------------
+Merged PR #42: Allow right-clicking on the debug window to copy to clipboard.
+Merged PR #43: Use dropdown for selecting the board mode instead of a button that linear searches.
 
 Release 0.6.0.17
 ----------------
