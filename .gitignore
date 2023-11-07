@@ -12,3 +12,4 @@ Tests/*.lst
 bin/Debug
 bin/Release
 packages
+UpgradeLog.htm
