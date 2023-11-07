@@ -128,8 +128,14 @@ namespace FoenixIDE
                                 case "jr816":
                                     context.Add("version", "RevJr816");
                                     break;
+                                case "f256k":
+                                    context.Add("version", "RevF256K");
+                                    break;
+                                case "f256k816":
+                                    context.Add("version", "RevF256K816");
+                                    break;
                                 default:
-                                    Console.Out.WriteLine("Invalid board specified: " + verArg + ". Must be one of b, c, u, u+, jr, jr816");
+                                    Console.Out.WriteLine("Invalid board specified: " + verArg + ". Must be one of b, c, u, u+, jr, jr816, f256k, f256k816");
                                     context["Continue"] = "false";
                                     break;
                             }
