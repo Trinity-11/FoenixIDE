@@ -10,12 +10,20 @@ namespace FoenixIDE.Simulator.Devices
         private byte ps2PacketCntr = 0;
         private int packetLength = 0;
         private byte[] ps2packet = new byte[6];
+        private Mode mode; // Mode 1 for C256, Mode 2 for F256
         public delegate void TriggerInterruptDelegate();
         public TriggerInterruptDelegate TriggerKeyboardInterrupt;
         public TriggerInterruptDelegate TriggerMouseInterrupt;
 
-        public PS2KeyboardRegister(int StartAddress, int Length) : base(StartAddress, Length)
+        public enum Mode
         {
+            Mode1,
+            Mode2
+        }
+
+        public PS2KeyboardRegister(int StartAddress, int Length, Mode m) : base(StartAddress, Length)
+        {
+            mode = m;
         }
 
         // This is used to simulate the Keyboard Register
@@ -143,6 +151,11 @@ namespace FoenixIDE.Simulator.Devices
                     }
                 }
                 return data[0];
+            }
+            else if (Address == 4 && mode == Mode.Mode2)
+            {
+                // PS2 mode 2 keyboards are not currently supported, so always return 0b11, indicating that they keyboard and mouse queues are empty.
+                return 3;
             }
             else if (Address == 5)
             {
