@@ -32,10 +32,10 @@ namespace FoenixIDE.Simulator.Devices
         protected Dictionary<int, FileEntry> FAT = new Dictionary<int, FileEntry>();
         protected string spaces = "        ";
         protected bool mbrPresent = false;
+        protected byte rootEntryCount = 2;
+        protected bool vfat = false;
 
         protected FileEntry voidEntry = null; // this is a "newfile" entry that gets used when creating a new file.
-
-        protected byte rootEntryCount;
 
         public FakeFATSDCardDevice(int StartAddress, int Length) : base(StartAddress, Length)
         {
@@ -241,7 +241,7 @@ namespace FoenixIDE.Simulator.Devices
                     boot_sector[0xE] = reserved_sectors;
                     boot_sector[0xF] = 0;
                     boot_sector[0x10] = 0x2; // Number of FATs
-                    boot_sector[0x12] = rootEntryCount;
+                    boot_sector[0x12] = rootEntryCount;   // rootEntryCount
                     boot_sector[0x13] = (byte)(small_sectors & 0xFF);
                     boot_sector[0x14] = (byte)((small_sectors & 0xFF00) >> 8);
                     boot_sector[0x15] = 0xF8; // media type
@@ -541,7 +541,7 @@ namespace FoenixIDE.Simulator.Devices
 
         protected void BuildFatPage(int page)
         {
-            Array.Clear(fat, 0, 512);
+             Array.Clear(fat, 0, 512);
             // The most likely used FS is FAT32
             int fatCount = 0;
             int byteOffset = 0;
