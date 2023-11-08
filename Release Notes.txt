@@ -1,8 +1,8 @@
-Release 0.6.0.19
+Release 0.6.0.20
 ----------------
-Merged PR #46 - Block attempt to write read-only memory on F256
-Merged PR #49 - Unblock F256K keyboard emulation on latest kernel
-Merged PR #50 - Made scaling choices pixel perfect
+Fixed defect #44 - (SD Card emulation) Endless looping directory listing.
+Fixed defect #48 - (SD Card Emulation) File storage error while accessing files with more than 3 letters in the extension.
+This fix is a new implementation of the VFAT long file names.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
@@ -12,6 +12,12 @@ Merged PR #50 - Made scaling choices pixel perfect
 ** TODO: Implement and IEC interface to connect via USB to XUM1541
 ** TODO: Fix SD Card implementation for F256.
 ** TODO: Fix resolution menu and GPU such that it adheres to the machines MCR and the machine type.
+
+Release 0.6.0.19
+----------------
+Merged PR #46 - Block attempt to write read-only memory on F256
+Merged PR #49 - Unblock F256K keyboard emulation on latest kernel
+Merged PR #50 - Made scaling choices pixel perfect
 
 Release 0.6.0.18
 ----------------
