@@ -32,10 +32,10 @@ namespace FoenixIDE.Simulator.Devices
         protected Dictionary<int, FileEntry> FAT = new Dictionary<int, FileEntry>();
         protected string spaces = "        ";
         protected bool mbrPresent = false;
+        protected byte rootEntryCount = 2;
+        protected bool vfat = false;
 
         protected FileEntry voidEntry = null; // this is a "newfile" entry that gets used when creating a new file.
-
-        protected byte rootEntryCount;
 
         public FakeFATSDCardDevice(int StartAddress, int Length) : base(StartAddress, Length)
         {
@@ -241,7 +241,7 @@ namespace FoenixIDE.Simulator.Devices
                     boot_sector[0xE] = reserved_sectors;
                     boot_sector[0xF] = 0;
                     boot_sector[0x10] = 0x2; // Number of FATs
-                    boot_sector[0x12] = rootEntryCount;
+                    boot_sector[0x12] = rootEntryCount;   // rootEntryCount
                     boot_sector[0x13] = (byte)(small_sectors & 0xFF);
                     boot_sector[0x14] = (byte)((small_sectors & 0xFF00) >> 8);
                     boot_sector[0x15] = 0xF8; // media type
@@ -353,12 +353,13 @@ namespace FoenixIDE.Simulator.Devices
             }
             foreach (string file in files)
             {
-
                 FileInfo info = new FileInfo(file);
                 int size = (int)info.Length;
                 int clusters = size / logicalSectorSize;
-                string extension = info.Extension.Length > 0 ? info.Extension.ToUpper().Substring(1) : "";
-                string filename = info.Name.Replace(" ", "").ToUpper();
+                string originalExtension = info.Extension;
+                string extension = originalExtension.Length > 0 ? info.Extension.ToUpper().Substring(1) : "";
+                string originalFilename = info.Name;
+                string filename = originalFilename.Replace(" ", "").ToUpper();
                 int dot = filename.IndexOf(".");
                 if (dot > -1)
                 {
@@ -393,6 +394,42 @@ namespace FoenixIDE.Simulator.Devices
                 };
 
                 FAT.Add(currentCluster, entry);
+                // Create the Long Filename Entries for F256 - LFN entries must precede the file entry
+                if (vfat & (originalFilename.Length > 12 | originalExtension.Length > 3))
+                {
+                    // Compute the checksum of filename
+                    byte chksum = LFNCheckSum(filename + extension);
+                    byte[] UCS2FN = Encoding.Unicode.GetBytes(originalFilename);
+                    // The filename needs to end with 0x0000
+                    int records = (UCS2FN.Length + 2) / 26 + 1;
+                    byte[] buffer = new byte[26 * records]; // I want an array that's always long enough to not raise errors
+                    for (int i=0;i< 26 * records;i++)
+                    {
+                        buffer[i] = 0xFF;
+                    }
+                    Array.Copy(UCS2FN, buffer, UCS2FN.Length);
+                    buffer[UCS2FN.Length] = 0;
+                    buffer[UCS2FN.Length+1] = 0;
+                    // records are written in reverse order
+                    for (int seq = records; seq > 0; seq--)
+                    {
+                        int offset = (seq - 1) * 26;
+                        // Copy 26 bytes - or 13 UCS-2 characters
+                        Array.Copy(buffer, offset, root, pointer + 1, 10);
+                        Array.Copy(buffer, offset + 10, root, pointer + 0xE, 12);
+                        Array.Copy(buffer, offset + 22, root, pointer + 0x1C, 4);
+
+                        // The first byte is the sequence number - if this is the last record, set bit 6.
+                        root[pointer] = (byte)((seq == records ? 0x40 : 0) + seq);
+                        root[pointer + 0xb] = 0xf;
+                        root[pointer + 0xc] = 0;
+                        root[pointer + 0xd] = chksum;
+                        root[pointer + 0x1a] = 0;
+
+                        // increase the root buffer pointer
+                        pointer += 32;
+                    }
+                }
                 Array.Copy(Encoding.ASCII.GetBytes(filename), 0, root, pointer, 8);
                 Array.Copy(Encoding.ASCII.GetBytes(extension), 0, root, pointer + 8, 3);
                 // cluster number
@@ -411,6 +448,17 @@ namespace FoenixIDE.Simulator.Devices
                 currentCluster += clusters + 1;
                 pointer += 32;
             }
+        }
+
+        public static byte LFNCheckSum(string v)
+        {
+            int sum = 0;
+            byte[] buffer = Encoding.ASCII.GetBytes(v);
+            for (int i = 0; i < 11; i++)
+            {
+                sum = (((sum & 1) << 7) | ((sum & 0xFE) >> 1)) + buffer[i];
+            }
+            return (byte)sum;
         }
 
         /*
@@ -541,7 +589,7 @@ namespace FoenixIDE.Simulator.Devices
 
         protected void BuildFatPage(int page)
         {
-            Array.Clear(fat, 0, 512);
+             Array.Clear(fat, 0, 512);
             // The most likely used FS is FAT32
             int fatCount = 0;
             int byteOffset = 0;

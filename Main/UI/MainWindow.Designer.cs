@@ -751,6 +751,8 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem scale1_5X_H400ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revJr816ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revJrToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem revF256KToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem revF256K816ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revUPlusToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revUToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revCToolStripMenuItem;

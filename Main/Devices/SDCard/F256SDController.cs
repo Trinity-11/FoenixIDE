@@ -38,6 +38,7 @@ namespace FoenixIDE.Simulator.Devices
             LoggingLevel = 1;
 #endif
             rootEntryCount = 0;
+            vfat = true;
         }
 
         public override void ResetMbrBootSector()
@@ -269,7 +270,7 @@ namespace FoenixIDE.Simulator.Devices
 
                             GetReadBlock(readAddressBytes);
 
-                            for (int i = 0; i < 512; ++i)
+                            for (int i = blockPtr; i < blockPtr + 512; ++i)
                             {
                                 if (readBlock != null)
                                 {
