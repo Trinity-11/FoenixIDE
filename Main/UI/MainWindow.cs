@@ -192,7 +192,7 @@ namespace FoenixIDE.UI
                 resetToolStripMenuItem.Text = "Reset";
                 helpToolStripMenuItem.Text = "Help";
             }
-            
+
 
             kernel = new FoenixSystem(version, defaultKernel);
             terminal = new SerialTerminal();
@@ -201,7 +201,7 @@ namespace FoenixIDE.UI
 
             // Now that the kernel is initialized, allocate variables to the GPU
             if (gpu.StartOfFrame == null)
-            { 
+            {
                 gpu.StartOfFrame += SOFRoutine;
             }
             if (gpu.StartOfLine == null)
@@ -274,7 +274,7 @@ namespace FoenixIDE.UI
                 gpu.SetTilesetBaseAddress(MemoryMap.TILESET_BASE_ADDR_JR - 0xC000);
                 gpu.SetSpriteBaseAddress(0xD900 - 0xC000);
             }
-           
+
             if (disabledIRQs)
             {
                 debugWindow.DisableIRQs(true);
@@ -492,7 +492,7 @@ namespace FoenixIDE.UI
                 // we need to this to avoid using the MMU IO Paging function
                 mask = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
             }
-            
+
             if (!kernel.CPU.DebugPause)
             {
                 // Set the SOF Interrupt
@@ -624,7 +624,7 @@ namespace FoenixIDE.UI
                 lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
                 if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
-                   WriteKeyboardCode(scanCode);
+                    WriteKeyboardCode(scanCode);
                 }
             }
             else if (e.KeyCode == Keys.Pause)
@@ -1783,8 +1783,8 @@ namespace FoenixIDE.UI
                         return;
                     }
                 } while (!isAddressValid);
-                
-                
+
+
                 byte[] buffer = File.ReadAllBytes(dialog.FileName);
                 // write the file
                 string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
@@ -1901,37 +1901,37 @@ namespace FoenixIDE.UI
         private void scale1_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.0f, 640, 480);
+            gpu.SetViewScaling(1.0f, 639, 479);
         }
 
         private void scale1_5X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.5f, 640, 480);
+            gpu.SetViewScaling(1.5f, 639, 479);
         }
 
         private void scale2_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(2.0f, 640, 480);
+            gpu.SetViewScaling(2.0f, 639, 479);
         }
 
         private void scale1_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.0f, 640, 400);
+            gpu.SetViewScaling(1.0f, 639, 399);
         }
 
         private void scale1_5X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.5f, 640, 400);
+            gpu.SetViewScaling(1.5f, 639, 399);
         }
 
         private void scale2_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(2.0f, 640, 400);
+            gpu.SetViewScaling(2.0f, 639, 399);
         }
     }
 }

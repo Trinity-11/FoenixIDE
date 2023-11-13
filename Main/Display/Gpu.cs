@@ -37,9 +37,9 @@ namespace FoenixIDE.Display
         private int[] lutCache = vs;
 
 
-        //NativeHeight and NativeWidth are no longer used in this fork proposition
-        public const int NativeHeight = 480;
-        public const int NativeWidth = 640;
+        //NativeHeight and NativeWidth have been adjusted for C#'s window size conventions
+        public const int NativeHeight = 479;
+        public const int NativeWidth = 639;
 
         private int MarginHeight;
         private int MarginWidth;
