@@ -323,13 +323,29 @@ namespace FoenixIDE.UI
             }
             autorunEmulatorToolStripMenuItem.Checked = autoRun;
 
-            if (Simulator.Properties.Settings.Default.ViewIsMaximized)
+            int height = Simulator.Properties.Settings.Default.ViewHeight;
+            gpu.SetViewSize(Simulator.Properties.Settings.Default.ViewWidth, height);
+            // Check the menu item that corresponds to the size
+            switch (height)
             {
-                this.WindowState = FormWindowState.Maximized;
-            }
-            else
-            {
-                gpu.SetViewSize(Simulator.Properties.Settings.Default.ViewWidth, Simulator.Properties.Settings.Default.ViewHeight);
+                case 400:
+                    scale1_0X_H400ToolStripMenuItem.Checked = true;
+                    break;
+                case 600:
+                    scale1_5X_H400ToolStripMenuItem.Checked = true;
+                    break;
+                case 800:
+                    scale2_0X_H400ToolStripMenuItem.Checked = true;
+                    break;
+                case 480:
+                    scale1_0X_H480ToolStripMenuItem.Checked = true;
+                    break;
+                case 720:
+                    scale1_5X_H480ToolStripMenuItem.Checked = true;
+                    break;
+                case 960:
+                    scale2_0X_H480ToolStripMenuItem.Checked = true;
+                    break;
             }
         }
 
@@ -936,7 +952,6 @@ namespace FoenixIDE.UI
 
             Simulator.Properties.Settings.Default.ViewWidth = gpu.GetViewWidth();
             Simulator.Properties.Settings.Default.ViewHeight = gpu.GetViewHeight();
-            Simulator.Properties.Settings.Default.ViewIsMaximized = this.WindowState == FormWindowState.Maximized;
             Simulator.Properties.Settings.Default.Save();
 
             if (debugWindow != null)
@@ -1898,40 +1913,55 @@ namespace FoenixIDE.UI
             midiForm.Show();
         }
 
-        private void scale1_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
+        ToolStripMenuItem CurrentCheckedMenuItem = null;
+        // Whenever a new scale menuitem is clicked, uncheck the old one and check the new one.
+        private void CommonScaleMenuItemClick(object sender)
         {
             this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.0f, 639, 479);
+            if (CurrentCheckedMenuItem != null)
+            {
+                CurrentCheckedMenuItem.Checked = false;
+            }
+            CurrentCheckedMenuItem = (ToolStripMenuItem)sender;
+            CurrentCheckedMenuItem.Checked = true;
+        }
+
+        private void scale1_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(1.0f, 640, 480);
+            this.Size = new Size(664, 582);
         }
 
         private void scale1_5X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.5f, 639, 479);
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(1.5f, 640, 480);
         }
 
+        
         private void scale2_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(2.0f, 639, 479);
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(2.0f, 640, 480);
         }
 
         private void scale1_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.0f, 639, 399);
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(1.0f, 640, 400);
         }
 
         private void scale1_5X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(1.5f, 639, 399);
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(1.5f, 640, 400);
         }
 
         private void scale2_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
-            gpu.SetViewScaling(2.0f, 639, 399);
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(2.0f, 640, 400);
         }
     }
 }

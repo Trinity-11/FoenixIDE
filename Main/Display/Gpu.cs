@@ -38,8 +38,8 @@ namespace FoenixIDE.Display
 
 
         //NativeHeight and NativeWidth have been adjusted for C#'s window size conventions
-        public const int NativeHeight = 479;
-        public const int NativeWidth = 639;
+        public const int NativeHeight = 480;
+        public const int NativeWidth = 640;
 
         private int MarginHeight;
         private int MarginWidth;
@@ -74,27 +74,26 @@ namespace FoenixIDE.Display
                 if (ParentForm == null)
                     return;
 
-                MarginHeight = ParentForm.Height - ClientRectangle.Height;
+                // Calculate the margin width,height
                 MarginWidth = ParentForm.Width - ClientRectangle.Width;
-                SetViewSize(NativeWidth, NativeHeight);
+                MarginHeight = ParentForm.Height - ClientRectangle.Height;
 
                 hiresTimer.Start();
             }
         }
 
-        public void SetViewSize(int viewWidth, int viewHeight)
+        public void SetViewSize(int width, int height)
         {
-            ParentForm.Height = viewHeight + MarginHeight;
-            ParentForm.Width = viewWidth + MarginWidth;
+            // Resize the window to what the user had selected
+            this.Size = new Size(width, height);
+            ParentForm.Size = new Size(width + MarginWidth, height + MarginHeight);
         }
-
         public void SetViewScaling(float scaling, int requiredWidth, int requiredHeight)
         {
-            int viewHeight = (int)((float)requiredHeight * scaling);
             int viewWidth = (int)((float)requiredWidth * scaling);
-
-            ParentForm.Height = viewHeight + MarginHeight;
-            ParentForm.Width = viewWidth + MarginWidth;
+            int viewHeight = (int)((float)requiredHeight * scaling);
+            this.Size = new Size(viewWidth, viewHeight);
+            ParentForm.Size = new Size(viewWidth + MarginWidth, viewHeight + MarginHeight);
         }
 
         public int GetViewWidth()
@@ -265,7 +264,7 @@ namespace FoenixIDE.Display
                 //    borderYSize >>= 1; // divide by 2
                 //}
 
-                Rectangle rect = new Rectangle(0, 0, res.X - 1, res.Y - 1);
+                Rectangle rect = new Rectangle(0, 0, res.X, res.Y);
                 BitmapData bitmapData = frameBuffer.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                 int* bitmapPointer = (int*)bitmapData.Scan0.ToPointer();
 
