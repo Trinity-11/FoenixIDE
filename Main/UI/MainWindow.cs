@@ -331,20 +331,26 @@ namespace FoenixIDE.UI
                 case 400:
                     scale1_0X_H400ToolStripMenuItem.Checked = true;
                     break;
-                case 600:
-                    scale1_5X_H400ToolStripMenuItem.Checked = true;
-                    break;
                 case 800:
                     scale2_0X_H400ToolStripMenuItem.Checked = true;
+                    break;
+                case 1200:
+                    scale3_0X_H400ToolStripMenuItem.Checked = true;
+                    break;
+                case 1600:
+                    scale4_0X_H400ToolStripMenuItem.Checked = true;
                     break;
                 case 480:
                     scale1_0X_H480ToolStripMenuItem.Checked = true;
                     break;
-                case 720:
-                    scale1_5X_H480ToolStripMenuItem.Checked = true;
-                    break;
                 case 960:
                     scale2_0X_H480ToolStripMenuItem.Checked = true;
+                    break;
+                case 1440:
+                    scale3_0X_H480ToolStripMenuItem.Checked = true;
+                    break;
+                case 1920:
+                    scale4_0X_H480ToolStripMenuItem.Checked = true;
                     break;
             }
         }
@@ -1933,17 +1939,23 @@ namespace FoenixIDE.UI
             this.Size = new Size(664, 582);
         }
 
-        private void scale1_5X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            CommonScaleMenuItemClick(sender);
-            gpu.SetViewScaling(1.5f, 640, 480);
-        }
-
-        
         private void scale2_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(2.0f, 640, 480);
+        }
+
+        
+        private void scale3_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(3.0f, 640, 480);
+        }
+
+        private void scale4_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(4.0f, 640, 480);
         }
 
         private void scale1_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1952,16 +1964,21 @@ namespace FoenixIDE.UI
             gpu.SetViewScaling(1.0f, 640, 400);
         }
 
-        private void scale1_5X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            CommonScaleMenuItemClick(sender);
-            gpu.SetViewScaling(1.5f, 640, 400);
-        }
-
         private void scale2_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(2.0f, 640, 400);
+        }
+
+        private void scale3_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(3.0f, 640, 400);
+        }
+        private void scale4_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CommonScaleMenuItemClick(sender);
+            gpu.SetViewScaling(4.0f, 640, 400);
         }
     }
 }
