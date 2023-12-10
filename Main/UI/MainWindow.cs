@@ -1298,6 +1298,11 @@ namespace FoenixIDE.UI
             string fsType = Simulator.Properties.Settings.Default.SDCardFSType;
             bool ISOMode = Simulator.Properties.Settings.Default.SDCardISOMode;
 
+            if ((ISOMode && !File.Exists(path)) || (!ISOMode && !Directory.Exists(path)))
+            {
+                path = null;
+            }
+
             kernel.MemMgr.SDCARD.SetSDCardPath(path);
             byte sdCardStat = 0;
             if (path == null || path.Length == 0)
