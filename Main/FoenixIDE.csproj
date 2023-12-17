@@ -278,10 +278,16 @@
     <Compile Include="UI\WatchForm.Designer.cs">
       <DependentUpon>WatchForm.cs</DependentUpon>
     </Compile>
-    <Content Include="roms\kernel_B.lst" />
+    <Content Include="roms\kernel_B.lst">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="roms\kernel_F256jr.lst" />
-    <Content Include="roms\kernel_FMX.lst" />
-    <Content Include="roms\kernel_U.lst" />
+    <Content Include="roms\kernel_FMX.lst">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="roms\kernel_U.lst">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="Display\Gpu.resx">
       <DependentUpon>Gpu.cs</DependentUpon>
     </EmbeddedResource>
@@ -395,12 +401,81 @@
     </None>
     <None Include="Resources\GENMIDI.op2" />
     <None Include="Resources\zero.bmp" />
-    <None Include="roms\kernel_B.hex" />
-    <None Include="roms\kernel_F256jr.hex" />
-    <None Include="roms\kernel_FMX.hex" />
-    <None Include="roms\kernel_U.hex" />
-    <None Include="roms\kernel_U_Plus.hex" />
-    <Content Include="roms\kernel_U_Plus.lst" />
+    <None Include="roms\F256\3b.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\3c.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\3d.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\3e.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\3f.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\bulk.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\docs_superbasic1.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\docs_superbasic2.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\docs_superbasic3.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\docs_superbasic4.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\dos.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\help.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\lockout.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\pexec.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\sb01.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\sb02.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\sb03.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\sb04.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\xdev.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\kernel_B.hex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\kernel_F256jr.hex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\kernel_FMX.hex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\kernel_U.hex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\kernel_U_Plus.hex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="roms\kernel_U_Plus.lst">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\save_btn.bmp" />
     <None Include="UI\Images\memory-btn.png" />
     <None Include="UI\Images\delete-btn.png" />

@@ -788,15 +788,18 @@ namespace FoenixIDE.UI
          */
         public void PreparePacket2Write(byte[] buffer, int FNXMemPointer, int FilePointer, int Size)
         {
-            // Maximum transmission size is 8192
-            if (Size > 8192)
+            // Maximum transmission size is 8192 for FMX, U/U+ but 2048 for F256
+            if (!BoardVersionHelpers.IsF256(boardVersion))
             {
-                if (!BoardVersionHelpers.IsF256(boardVersion))
+                if (Size > 8192)
                 {
                     Size = 8192;
                     Console.WriteLine("PreparePacket2Write: output truncated to 8K bytes.");
                 }
-                else
+            }
+            else
+            {
+                if (Size > 2048)
                 {
                     Size = 2048;
                     Console.WriteLine("PreparePacket2Write: output truncated to 2K bytes.");

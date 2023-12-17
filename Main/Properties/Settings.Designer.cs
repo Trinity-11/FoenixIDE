@@ -120,7 +120,7 @@ namespace FoenixIDE.Simulator.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("768")]
+        [global::System.Configuration.DefaultSettingValueAttribute("640")]
         public int ViewWidth
         {
             get

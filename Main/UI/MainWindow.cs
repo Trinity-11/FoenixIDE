@@ -284,13 +284,6 @@ namespace FoenixIDE.UI
             {
                 this.Top = 0;
                 this.Left = 0;
-
-                //this.Width = debugWindow.Left;
-                if (this.Width > 1200)
-                {
-                    this.Width = 1200;
-                }
-                this.Height = Convert.ToInt32(this.Width * 0.75);
             }
 
             SetDipSwitchMemory();
@@ -325,35 +318,71 @@ namespace FoenixIDE.UI
 
             int height = Simulator.Properties.Settings.Default.ViewHeight;
             gpu.SetViewSize(Simulator.Properties.Settings.Default.ViewWidth, height);
+
+            // 
             // Check the menu item that corresponds to the size
             switch (height)
             {
                 case 400:
-                    scale1_0X_H400ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem = scale1_0X_H400ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(true);
                     break;
                 case 800:
-                    scale2_0X_H400ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem = scale2_0X_H400ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(true);
                     break;
                 case 1200:
-                    scale3_0X_H400ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem = scale3_0X_H400ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(true);
                     break;
                 case 1600:
-                    scale4_0X_H400ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem= scale4_0X_H400ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(true);
                     break;
                 case 480:
-                    scale1_0X_H480ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem = scale1_0X_H480ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(false);
                     break;
                 case 960:
-                    scale2_0X_H480ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem = scale2_0X_H480ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(false);
                     break;
                 case 1440:
-                    scale3_0X_H480ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem = scale3_0X_H480ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(false);
                     break;
                 case 1920:
-                    scale4_0X_H480ToolStripMenuItem.Checked = true;
+                    CurrentCheckedMenuItem = scale4_0X_H480ToolStripMenuItem;
+                    CurrentCheckedMenuItem.Checked = true;
+                    SetF256_400LinesMode(false);
                     break;
             }
         }
+
+        // Modify MCR Hi, bit0 to toggle the resolution of the F256
+        private void SetF256_400LinesMode(bool value)
+        {
+            ushort bytes = ReadMCRBytesFromVicky();
+            byte hi = (byte)(bytes >> 8);
+            byte lo = (byte)(bytes & 0xFF);
+            if (value)
+            {
+                hi = (byte)(hi | 1);
+            }
+            else
+            {
+                hi = (byte)(hi & 0xFE);
+            }
+            WriteMCRBytesToVicky(lo, hi);
+        }
+
 
         private void CenterForm(Form form)
         {
@@ -1941,13 +1970,14 @@ namespace FoenixIDE.UI
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(1.0f, 640, 480);
-            this.Size = new Size(664, 582);
+            SetF256_400LinesMode(false);
         }
 
         private void scale2_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(2.0f, 640, 480);
+            SetF256_400LinesMode(false);
         }
 
         
@@ -1955,35 +1985,41 @@ namespace FoenixIDE.UI
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(3.0f, 640, 480);
+            SetF256_400LinesMode(false);
         }
 
         private void scale4_0X_H480ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(4.0f, 640, 480);
+            SetF256_400LinesMode(false);
         }
 
         private void scale1_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(1.0f, 640, 400);
+            SetF256_400LinesMode(true);
         }
 
         private void scale2_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(2.0f, 640, 400);
+            SetF256_400LinesMode(true);
         }
 
         private void scale3_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(3.0f, 640, 400);
+            SetF256_400LinesMode(true);
         }
         private void scale4_0X_H400ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(4.0f, 640, 400);
+            SetF256_400LinesMode(true);
         }
     }
 }
