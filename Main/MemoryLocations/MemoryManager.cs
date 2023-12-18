@@ -27,7 +27,7 @@ namespace FoenixIDE.MemoryLocations
         public MemoryRAM VICKY = null;
         public MemoryRAM GABE = null;
         public MMU_JR MMU = null;
-        public MathCoproRegister MATH = null;
+        public MemoryRAM MATH = null;
         public MathFloatRegister FLOAT = null;
         public CodecRAM CODEC = null;
         public PS2KeyboardRegister PS2KEYBOARD = null;

@@ -57,8 +57,19 @@ namespace FoenixIDE.Processor
 
         public void Inc()
         {
-            _value += 1;
-            _value &= Width == 1 ? 0xFF : 0xFFFF;
+            
+            // Ensure that INC A doesn't roll over B
+            if (Width == 1)
+            {
+                int _temp = _value & 0xFF;
+                _temp += 1;
+                _value = (_value & 0xFF00) | _temp;
+
+            }
+            else
+            {
+                _value += 1; 
+            }
         }
         public virtual int Low
         {

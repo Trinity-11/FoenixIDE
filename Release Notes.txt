@@ -1,11 +1,8 @@
-Release 0.6.0.21
-----------------
-Fix resolution menu and GPU such that it adheres to the machines MCR and the machine type. PR #50 and #53.
-Fixed double menu-items checked for the resolution detection.
-When switching resolution with the menu, also set the MCR bit to match.
-Fixed buffer size bug in uploader when in F256 mode. PR #54.
-Fixed crash when the user removes a sdcard directory or file... PR #52.
-Update the F256's kernel with new firmware.
+Release 0.7.0.0
+---------------
+Fixed bug in CPU for 65816 INC A when the B portion is non-zero.
+F256K emulator now supports DMA functions.
+F256K emulator now supports Math Co-pro functions.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
@@ -17,6 +14,15 @@ Update the F256's kernel with new firmware.
 ** TODO: Load kernel as CSV file and bins, instead of only .hex.
 ** TODO: Flash using multiple bin files, based on "bulk.csv" in a release folder.
 ** TODO: When uploading PGZ, PGX and HEX for the F256, execute the program on machine (using the RESET vector or XDEV).
+
+Release 0.6.0.21
+----------------
+Fix resolution menu and GPU such that it adheres to the machines MCR and the machine type. PR #50 and #53.
+Fixed double menu-items checked for the resolution detection.
+When switching resolution with the menu, also set the MCR bit to match.
+Fixed buffer size bug in uploader when in F256 mode. PR #54.
+Fixed crash when the user removes a sdcard directory or file... PR #52.
+Update the F256's kernel with new firmware.
 
 Release 0.6.0.20
 ----------------

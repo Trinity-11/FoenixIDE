@@ -20,7 +20,13 @@ namespace FoenixIDETester
         {
             MemMgr = new MemoryManager
             {
-                RAM = new MemoryRAM(0, 3 * 0x20_0000)
+                RAM = new MemoryRAM(0, 3 * 0x20_0000),
+                CODEC = new CodecRAM(MemoryMap.CODEC_START_FMX, 4),
+                MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1),
+                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
+                TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
+                TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
+                TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8)
             };
             cpu = new CPU(MemMgr, 14_000_000, false);
             cpu.SetEmulationMode();
@@ -384,6 +390,49 @@ namespace FoenixIDETester
             MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.INX_Implied);
             cpu.ExecuteNext();
             Assert.AreEqual(0, cpu.X.Value);
+        }
+
+        /**
+         * Bug reported by @dwsJason on 12/02/2023 in discord server - foenix_ide_dev
+            clc
+            xce
+            rep #$30
+            lda #$1234     ; A contain 34, and B contains 12
+            sep #$20
+            inc
+            ; now B is 0, so if I rep #$30,  A is $0034, but it should still be $1234 
+        */
+        [TestMethod]
+        public void CheckContentOfBIsValid()
+        {
+            ClearCarry();
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.XCE_Implied);
+            cpu.ExecuteNext();
+
+            // REP #$30
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.REP_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x30);
+            cpu.ExecuteNext();
+
+            // LDA #$1234
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteWord(cpu.PC + 1, 0x1234);
+            cpu.ExecuteNext();
+
+            // SEP #$20
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SEP_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x20);
+            cpu.ExecuteNext();
+
+            // INC A
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.INC_Accumulator);
+            cpu.ExecuteNext();
+
+            // REP #$30
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.REP_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x30);
+            cpu.ExecuteNext();
+            Assert.AreEqual(0x1235, cpu.A.Value);
         }
 
     }

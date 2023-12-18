@@ -125,7 +125,7 @@ namespace FoenixIDE
                     VICKY = new MemoryRAM(0, 4 * 0x2000),
                     PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5, PS2KeyboardRegister.Mode.Mode2),
                     MATRIXKEYBOARD = new MatrixKeyboardRegister(MemoryMap.MATRIX_KEYBOARD_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4),
-                    MATH = new MathCoproRegister(MemoryMap.MATH_START_JR, MemoryMap.MATH_END_JR - MemoryMap.MATH_START_JR + 1), // 32 bytes
+                    MATH = new MathCoproRegister_JR(MemoryMap.MATH_START_JR, MemoryMap.MATH_END_JR - MemoryMap.MATH_START_JR + 1), // 32 bytes
                     SDCARD = sdcard,
                     INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_JR, 2),
                     UART1 = new UART(MemoryMap.UART_REGISTERS_JR, 8),

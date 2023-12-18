@@ -1,11 +1,8 @@
 ﻿using FoenixIDE.MemoryLocations;
 using FoenixIDE.Processor;
+using FoenixIDE.Simulator.Devices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace FoenixIDETester
 {
@@ -20,7 +17,13 @@ namespace FoenixIDETester
         {
             MemMgr = new MemoryManager
             {
-                RAM = new MemoryRAM(0, 3 * 0x20_0000)
+                RAM = new MemoryRAM(0, 3 * 0x20_0000),
+                CODEC = new CodecRAM(MemoryMap.CODEC_START_FMX, 4),
+                MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1),
+                INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
+                TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
+                TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
+                TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8)
             };
             cpu = new CPU(MemMgr, 14_000_000, false);
             cpu.SetEmulationMode();

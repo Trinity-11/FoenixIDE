@@ -88,6 +88,7 @@
     <Compile Include="Devices\GabeRAM.cs" />
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
+    <Compile Include="Devices\MathCoproRegister_JR.cs" />
     <Compile Include="Devices\MatrixKeyboardRegister.cs" />
     <Compile Include="Devices\PS2KeyboardRegister.cs" />
     <Compile Include="Devices\MathFloatRegister.cs" />
