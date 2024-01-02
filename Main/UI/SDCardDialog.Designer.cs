@@ -1,6 +1,6 @@
 ﻿namespace FoenixIDE.Simulator.UI
 {
-    partial class SDCardWindow
+    partial class SDCardDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SDCardWindow));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SDCardDialog));
             this.SDCardFolderText = new System.Windows.Forms.TextBox();
             this.FolderSelectButton = new System.Windows.Forms.Button();
             this.SDCardEnabled = new System.Windows.Forms.CheckBox();

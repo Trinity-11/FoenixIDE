@@ -1,8 +1,15 @@
 Release 0.7.0.0
 ---------------
 Fixed bug in CPU for 65816 INC A when the B portion is non-zero.
-F256K emulator now supports DMA functions.
 F256K emulator now supports Math Co-pro functions.
+F256K emulator now supports DMA functions.
+The kernel can now be loaded with a bulk.csv file located in roms\F256 instead of a .hex file.  The binary files most be located there too.
+Added the debug port command $90 and $91 for boot to RAM and FLASH, respectively.
+Add machine CHIP version and sub-version.
+Implemented Start of Line (SOL) register for F256.
+Flash using multiple bin files, based on CSV master file.
+When uploading PGZ, PGX and HEX for the F256, execute the program on machine.
+Added rectype 5 to HexFile.load to set the start address - this is used by the Calypsi compiler.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
@@ -11,9 +18,8 @@ F256K emulator now supports Math Co-pro functions.
 ** TODO: Setup Virtual Joystick for the F256.
 ** TODO: Implement and IEC interface to connect via USB to XUM1541
 ** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
-** TODO: Load kernel as CSV file and bins, instead of only .hex.
-** TODO: Flash using multiple bin files, based on "bulk.csv" in a release folder.
-** TODO: When uploading PGZ, PGX and HEX for the F256, execute the program on machine (using the RESET vector or XDEV).
+** TODO: Implement CPU clock to count cycles for fast computers.
+** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
 
 Release 0.6.0.21
 ----------------

@@ -90,6 +90,7 @@
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\MathCoproRegister_JR.cs" />
     <Compile Include="Devices\MatrixKeyboardRegister.cs" />
+    <Compile Include="Devices\SOL.cs" />
     <Compile Include="Devices\PS2KeyboardRegister.cs" />
     <Compile Include="Devices\MathFloatRegister.cs" />
     <Compile Include="Devices\RNGRegister.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Devices\SDCard\FakeFATSDCardDevice.cs" />
     <Compile Include="Devices\TimerRegister.cs" />
     <Compile Include="Devices\SDCard\GabeSDController.cs" />
+    <Compile Include="Devices\DMA_JR.cs" />
     <Compile Include="Devices\VDMA.cs" />
     <Compile Include="Devices\MPU401.cs" />
     <Compile Include="Devices\OPL2.cs" />
@@ -150,11 +152,11 @@
     <Compile Include="UI\AccumulatorControl.Designer.cs">
       <DependentUpon>AccumulatorControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\AssetWindow.cs">
+    <Compile Include="UI\AssetDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\AssetWindow.Designer.cs">
-      <DependentUpon>AssetWindow.cs</DependentUpon>
+    <Compile Include="UI\AssetDialog.Designer.cs">
+      <DependentUpon>AssetDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\BreakpointWindow.cs">
       <SubType>Form</SubType>
@@ -204,11 +206,11 @@
     <Compile Include="UI\MidiVGMForm.Designer.cs">
       <DependentUpon>MidiVGMForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\SDCardWindow.cs">
+    <Compile Include="UI\SDCardDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\SDCardWindow.Designer.cs">
-      <DependentUpon>SDCardWindow.cs</DependentUpon>
+    <Compile Include="UI\SDCardDialog.Designer.cs">
+      <DependentUpon>SDCardDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\MainWindow.cs">
       <SubType>Form</SubType>
@@ -261,11 +263,11 @@
     <Compile Include="UI\TileEditor.Designer.cs">
       <DependentUpon>TileEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\UploaderWindow.cs">
+    <Compile Include="UI\UploaderDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\UploaderWindow.Designer.cs">
-      <DependentUpon>UploaderWindow.cs</DependentUpon>
+    <Compile Include="UI\UploaderDialog.Designer.cs">
+      <DependentUpon>UploaderDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\CharEditor\ViewControl.cs">
       <SubType>UserControl</SubType>
@@ -282,7 +284,6 @@
     <Content Include="roms\kernel_B.lst">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="roms\kernel_F256jr.lst" />
     <Content Include="roms\kernel_FMX.lst">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -295,8 +296,8 @@
     <EmbeddedResource Include="UI\AccumulatorControl.resx">
       <DependentUpon>AccumulatorControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\AssetWindow.resx">
-      <DependentUpon>AssetWindow.cs</DependentUpon>
+    <EmbeddedResource Include="UI\AssetDialog.resx">
+      <DependentUpon>AssetDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\BreakpointWindow.resx">
       <DependentUpon>BreakpointWindow.cs</DependentUpon>
@@ -347,8 +348,8 @@
     <EmbeddedResource Include="UI\AssetLoader.resx">
       <DependentUpon>AssetLoader.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\SDCardWindow.resx">
-      <DependentUpon>SDCardWindow.cs</DependentUpon>
+    <EmbeddedResource Include="UI\SDCardDialog.resx">
+      <DependentUpon>SDCardDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\SerialTerminal.resx">
       <DependentUpon>SerialTerminal.cs</DependentUpon>
@@ -356,8 +357,8 @@
     <EmbeddedResource Include="UI\TileEditor.resx">
       <DependentUpon>TileEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\UploaderWindow.resx">
-      <DependentUpon>UploaderWindow.cs</DependentUpon>
+    <EmbeddedResource Include="UI\UploaderDialog.resx">
+      <DependentUpon>UploaderDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\CharEditor\ViewControl.resx">
       <DependentUpon>ViewControl.cs</DependentUpon>
@@ -460,9 +461,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="roms\kernel_B.hex">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="roms\kernel_F256jr.hex">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="roms\kernel_FMX.hex">

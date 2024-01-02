@@ -82,6 +82,8 @@ namespace FoenixIDE
 
             if (!BoardVersionHelpers.IsF256(boardVersion))
             {
+                // Create the C256 VDMA
+                VDMA vdma = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE);
                 // These are the strictly 65816-based machines
                 MemMgr = new MemoryManager
                 {
@@ -101,7 +103,7 @@ namespace FoenixIDE
                     OPL2 = new OPL2(MemoryMap.OPL2_S_BASE, 256),
                     FLOAT = new MathFloatRegister(MemoryMap.FLOAT_START, MemoryMap.FLOAT_END - MemoryMap.FLOAT_START + 1),
                     MPU401 = new MPU401(MemoryMap.MPU401_REGISTERS, 2),
-                    VDMA = new VDMA(MemoryMap.VDMA_START, MemoryMap.VDMA_SIZE),
+                    DMA = vdma,
                     TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
                     TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
                     TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8),
@@ -109,13 +111,15 @@ namespace FoenixIDE
                     CODEC = codec,
                     MMU = null
                 };
-                MemMgr.VDMA.setVideoRam(MemMgr.VIDEO);
-                MemMgr.VDMA.setSystemRam(MemMgr.RAM);
-                MemMgr.VDMA.setVickyRam(MemMgr.VICKY);
+                vdma.setVideoRam(MemMgr.VIDEO);
+                vdma.setSystemRam(MemMgr.RAM);
+                vdma.setVickyRam(MemMgr.VICKY);
                 MemMgr.GABE.WriteByte(MemoryMap.GABE_SYS_STAT - MemoryMap.GABE_START, SystemStat);
             }
             else
             {
+                // Create the F256 DMA
+                DMA_JR dma = new DMA_JR(MemoryMap.DMA_START_JR, 20);
                 // This is a 6502 or 85816-based F256 machine; both have the same memory map
                 MemMgr = new MemoryManager
                 {
@@ -129,15 +133,18 @@ namespace FoenixIDE
                     SDCARD = sdcard,
                     INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_JR, 2),
                     UART1 = new UART(MemoryMap.UART_REGISTERS_JR, 8),
+                    DMA = dma,
                     TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG_JR, 8),
                     TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_JR, 8),
                     RTC = new RTC(MemoryMap.RTC_SEC_JR, 16),
                     CODEC = codec,
-                    MMU = new MMU_JR(0,16),
-                    RNG = new RNGRegister(MemoryMap.SEEDL_JR, 3)
+                    MMU = new MMU_JR(0, 16),
+                    RNG = new RNGRegister(MemoryMap.SEEDL_JR, 3),
+                    SOLRegister = new SOL(MemoryMap.SOL_CTRL_JR, 4)
                 };
+                dma.setSystemRam(MemMgr.RAM);
             }
-
+            
             // Assign memory variables used by other processes
             CPU = new CPU(MemMgr, clock, is6502);
 
@@ -185,6 +192,7 @@ namespace FoenixIDE
             }
             else
             {
+                // Set the Machine ID
                 if (boardVersion == BoardVersion.RevJr_6502 || boardVersion == BoardVersion.RevJr_65816)
                 {
                     MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
@@ -194,8 +202,21 @@ namespace FoenixIDE
                     System.Diagnostics.Debug.Assert(boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816);
                     MemMgr.WriteByte(MemoryMap.REVOFJR, 0x12);
                 }
+                // Set the MCR to be text mode
                 MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
+                // Set the layers??
                 MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+
+
+
+
+                // Set the PCB Hardware Version
+                MemMgr.VICKY.WriteWord(0xD6A8 - 0xC000, 0x3041);  // C256Jr
+                // Set the CHIP Sub-version, Version, Number
+                MemMgr.VICKY.WriteWord(0xD6AA - 0xC000, 0x0101);
+                MemMgr.VICKY.WriteWord(0xD6AC - 0xC000, 0x1400);
+                MemMgr.VICKY.WriteWord(0xD6AE - 0xC000, 0x0);
+
                 string applicationDirectory = System.AppContext.BaseDirectory;
                 String micahFontPath = Path.Combine(applicationDirectory, "Resources", "f256jr_font_micah_jan25th.bin");
                 if (System.IO.File.Exists(micahFontPath))
@@ -345,7 +366,37 @@ namespace FoenixIDE
             {
                 BasePageAddress = 0x38_0000;
             }
+
             FileInfo info = new FileInfo(LoadedKernel);
+            if (!info.Exists && BoardVersionHelpers.IsF256(boardVersion))
+            {
+                // check if the directory exists.  If it does, look for a bulk.csv file
+                string bulkCSV = Path.Combine(System.AppContext.BaseDirectory, "roms", "F256", "bulk.csv");
+                info = new FileInfo(bulkCSV);
+                
+                if (info.Exists)
+                {
+                    LoadedKernel = bulkCSV;
+                    // validate the csv file
+                    string[] entries = System.IO.File.ReadAllLines(bulkCSV);
+                    foreach (string entry in entries)
+                    {
+                        // Each entry is a block number, and a file name
+                        string[] split = entry.Split(',');
+                        if (split.Length > 1)
+                        {
+                            string blockFile = Path.Combine(System.AppContext.BaseDirectory, "roms", "F256", split[1]);
+                            // check the file exists
+                            FileInfo testFile = new FileInfo(blockFile);
+                            if (!testFile.Exists)
+                            {
+                                info = testFile;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
             while (!info.Exists)
             {
                 OpenFileDialog f = new OpenFileDialog
@@ -411,59 +462,71 @@ namespace FoenixIDE
                     MemMgr.CopyBuffer(DataBuffer, 0, FnxAddressPtr, flen);
                     reader.Close();
 
-                    // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
-                    MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
-                    MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
-                    MemMgr.WriteByte(0xFF03, 0x5C);      // JML
-                    MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+                    if (!BoardVersionHelpers.IsF256(boardVersion))
+                    {
+                        // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
+                        MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
+                        MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
+                        MemMgr.WriteByte(0xFF03, 0x5C);      // JML
+                        MemMgr.WriteLong(0xFF04, FnxAddressPtr);
+                    }
+                    else
+                    {
+                        MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, FnxAddressPtr);
+                    }
                 }
             }
             else if (extension.Equals(".PGZ"))
             {
                 BinaryReader reader = new BinaryReader(info.OpenRead());
                 byte header = reader.ReadByte();  // this should be Z for 24-bits and z for 32-bits
-                int size = header == 'z' ? 4 : 3;
-                int FnxAddressPtr = -1;
-
-                do
+                if (header == 'Z' || header == 'z')
                 {
-                    byte[] bufAddr = reader.ReadBytes(size);
-                    byte[] bufLength = reader.ReadBytes(size);
-                    int address = bufAddr[0] + bufAddr[1] * 0x100 + bufAddr[2] * 0x10000 + (size == 4 ? bufAddr[3] * 0x1000000 : 0);
-                    int blockLength = bufLength[0] + bufLength[1] * 0x100 + bufLength[2] * 0x10000 + (size == 4 ? bufLength[3] * 0x1000000 : 0);
-                    if (blockLength == 0)
+                    int size = header == 'z' ? 4 : 3;
+                    int FnxAddressPtr = -1;
+
+                    do
                     {
-                        FnxAddressPtr = address;
+                        byte[] bufAddr = reader.ReadBytes(size);
+                        byte[] bufLength = reader.ReadBytes(size);
+                        int address = bufAddr[0] + bufAddr[1] * 0x100 + bufAddr[2] * 0x10000 + (size == 4 ? bufAddr[3] * 0x1000000 : 0);
+                        int blockLength = bufLength[0] + bufLength[1] * 0x100 + bufLength[2] * 0x10000 + (size == 4 ? bufLength[3] * 0x1000000 : 0);
+                        if (blockLength == 0)
+                        {
+                            FnxAddressPtr = address;
+                        }
+                        else
+                        {
+                            byte[] DataBuffer = reader.ReadBytes(blockLength);
+                            MemMgr.CopyBuffer(DataBuffer, 0, address, blockLength);
+
+                            // This code block is only for FMX/U/U+ - the RESET vector for F256 is addressed later
+                            if (address >= (BasePageAddress + 0xFF00) && (address < (BasePageAddress + 0xFFFF)))
+                            {
+                                int pageFFLen = blockLength - ((address + blockLength) - (BasePageAddress + 0x1_0000));
+                                if (pageFFLen > blockLength)
+                                {
+                                    pageFFLen = blockLength;
+                                }
+                                MemMgr.CopyBuffer(DataBuffer, 0, address - BasePageAddress, pageFFLen);
+                            }
+                        }
+
+                    } while (reader.BaseStream.Position < info.Length);
+                    reader.Close();
+
+                    if (!BoardVersionHelpers.IsF256(boardVersion))
+                    {
+                        // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
+                        MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
+                        MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
+                        MemMgr.WriteByte(0xFF03, 0x5C);      // JML
+                        MemMgr.WriteLong(0xFF04, FnxAddressPtr);
                     }
                     else
                     {
-                        byte[] DataBuffer = reader.ReadBytes(blockLength);
-                        MemMgr.CopyBuffer(DataBuffer, 0, address, blockLength);
-
-                        // TODO - make this backward compatible
-                        if (address >= (BasePageAddress + 0xFF00) && (address < (BasePageAddress + 0xFFFF)))
-                        {
-                            int pageFFLen = blockLength - ((address + blockLength) - (BasePageAddress + 0x1_0000));
-                            if (pageFFLen > blockLength)
-                            {
-                                pageFFLen = blockLength;
-                            }
-                            MemMgr.CopyBuffer(DataBuffer, 0, address - BasePageAddress, pageFFLen);
-                        }
-
-                        
+                        MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, FnxAddressPtr);
                     }
-
-                } while (reader.BaseStream.Position < info.Length);
-                reader.Close();
-
-                if (!BoardVersionHelpers.IsF256(boardVersion))
-                {
-                    // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
-                    MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, 0xFF00);
-                    MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
-                    MemMgr.WriteByte(0xFF03, 0x5C);      // JML
-                    MemMgr.WriteLong(0xFF04, FnxAddressPtr);
                 }
             }
             else if (extension.Equals(".FNXML"))
@@ -484,7 +547,7 @@ namespace FoenixIDE
                 bool isAddressValid = false;
                 do
                 {
-                    InputDialog addressWindow = new InputDialog("Enter the PGX Start Address (Hexadecimal)", "PGX Start Address");
+                    InputDialog addressWindow = new InputDialog("Enter the Start Address (Hexadecimal)", "Start Address");
                     DialogResult result = addressWindow.ShowDialog();
                     if (result == DialogResult.OK)
                     {
@@ -513,10 +576,31 @@ namespace FoenixIDE
                     if (binOverlapsFlash)
                     {
                         int flashStart = DataStartAddress - 0x08_0000;
-                        int flashEnd = Math.Min(flashStart + flen, 0x10_0000);
-                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, flashStart, flashEnd - flashStart);
+                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, flashStart, flen);
                     }
                 }
+            }
+            else if (extension.Equals(".CSV"))
+            {
+                string[] entries = System.IO.File.ReadAllLines(info.FullName);
+                foreach (string entry in entries)
+                {
+                    // Each entry is a block number, and a file name
+                    string[] split = entry.Split(',');
+                    if (split.Length > 1)
+                    {
+                        string blockFile = Path.Combine(System.AppContext.BaseDirectory, "roms", "F256", split[1]);
+                        FileInfo blockInfo = new FileInfo(blockFile);
+                        int blockNumber = Convert.ToInt32(split[0], 16);
+                        int address = blockNumber * 8192;
+                        BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
+                        byte[] DataBuffer = reader.ReadBytes(8192);
+                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, address, 8192);
+                        
+                        reader.Close();
+                    }
+                }
+                MemMgr.MMU.WriteByte(0xF, 0x7F);
             }
 
             // Load the .LST file if it exists
@@ -596,7 +680,7 @@ namespace FoenixIDE
         {
             MemMgr.RAM.Zero();
             MemMgr.VICKY.Zero();
-            MemMgr.VDMA.Zero();
+            MemMgr.DMA.Zero();
         }
 
         public static int TextAddressToInt(string value)

@@ -24,6 +24,20 @@ namespace FoenixIDE.UI
 
         SerialPort serial = new SerialPort();
 
+        byte READ_BLOCK_CMD = 0;
+        byte WRITE_BLOCK_CMD = 1;
+        byte PROGRAM_FLASH_CMD = 0x10;
+        byte ERASE_FLASH_CMD = 0x11;
+        byte ERASE_FLASH_SECTOR_CMD = 0x12;
+        byte PROGRAM_FLASH_SECTOR_CMD = 0x13;
+        byte DEBUG_MODE_CMD = 0x80;
+        byte NORMAL_MODE_CMD = 0x81;
+        byte BOOT_RAM_CMD = 0x90;
+        byte BOOT_FLASH_CMD = 0x91;
+
+        // This is the file type selected in the file dialog (PGZ, HEX, CSV, etc)
+        int SelectedFilterIndex = -1;
+
         public void SetBoardVersion(BoardVersion ver)
         {
             boardVersion = ver;
@@ -86,6 +100,15 @@ namespace FoenixIDE.UI
             COMPortComboBox.SelectedItem = COMPortComboBox.Items[0];
         }
 
+        private void UploaderWindow_Load(object sender, EventArgs e)
+        {
+            if (BoardVersionHelpers.IsF256(boardVersion))
+            {
+                btnBootToFLASH.Visible = true;
+                btnBootToRAM.Visible = true;
+            }
+        }
+
         private int GetTransmissionSize()
         {
             int transmissionSize;
@@ -118,6 +141,8 @@ namespace FoenixIDE.UI
                 COMPortComboBox.Enabled = false;
                 ConnectButton.Visible = false;
                 DisconnectButton.Visible = true;
+                btnBootToFLASH.Enabled = true;
+                btnBootToRAM.Enabled = true;
 
                 Console.WriteLine("Serial Port Connected: " + ports[COMPortComboBox.SelectedIndex]);
             }
@@ -134,6 +159,8 @@ namespace FoenixIDE.UI
             DisconnectButton.Visible = false;
             COMPortComboBox.Enabled = true;
             SendBinaryButton.Enabled = false;
+            btnBootToFLASH.Enabled = false;
+            btnBootToRAM.Enabled = false;
         }
 
         private void UploaderWindow_FormClosed(object sender, FormClosedEventArgs e)
@@ -196,6 +223,13 @@ namespace FoenixIDE.UI
                     } while (reader.BaseStream.Position < f.Length);
                     reader.Close();
                 }
+                else if (fileExtension.Equals(".CSV"))
+                {
+                    FileInfo f = new FileInfo(filename);
+                    string[] entries = System.IO.File.ReadAllLines(f.FullName);
+                    // File length is the number of entries * 8192
+                    flen = entries.Length * 8192;
+                }
             }
             String hexSize = flen.ToString("X6");
             FileSizeResultLabel.Text = "$" + hexSize.Substring(0, 2) + ":" + hexSize.Substring(2);
@@ -210,9 +244,14 @@ namespace FoenixIDE.UI
             OpenFileDialog openFileDlg = new OpenFileDialog
             {
                 DefaultExt = ".hex",
-                Filter = "Hex documents|*.hex|Binary documents|*.bin|PGX Files|*.pgx|PGZ Files|*.pgz",
-                Title = "Upload to the C256 Foenix"
+                Filter = "Hex documents|*.hex|Binary documents|*.bin|PGX Files|*.pgx|PGZ Files|*.pgz|Bulk Files|*.csv",
+                Title = "Upload to the Foenix",
             };
+            // If the user has already picked a file type (i.e. PGZ) then set the filter index to this file type again.
+            if (FileNameTextBox.Text.Length > 0)
+            {
+                openFileDlg.FilterIndex = SelectedFilterIndex;
+            }
 
             // Load content of file in a TextBlock
             if (openFileDlg.ShowDialog() == DialogResult.OK)
@@ -221,14 +260,14 @@ namespace FoenixIDE.UI
                 // Display the file name
                 FileNameTextBox.Text = openFileDlg.FileName;
                 C256DestAddress.Enabled = extension.ToUpper().Equals(".BIN");
-                ReflashCheckbox.Enabled = extension.ToUpper().Equals(".BIN");
+                ReflashCheckbox.Enabled = extension.ToUpper().Equals(".BIN") || extension.ToUpper().Equals(".CSV");
                 if (!ReflashCheckbox.Enabled)
                 {
                     ReflashCheckbox.Checked = false;
                 }
                 // Display the file length
                 long flen = GetFileLength(openFileDlg.FileName);
-                    
+                SelectedFilterIndex = openFileDlg.FilterIndex;
                 SendBinaryButton.Enabled = (flen != -1) && !ConnectButton.Visible;
             }
         }
@@ -251,7 +290,7 @@ namespace FoenixIDE.UI
             else
             {
                 string extension = Path.GetExtension(FileNameTextBox.Text).ToUpper();
-                C256DestAddress.Enabled = (transmissionSize > 0 || BlockSendRadio.Checked) && (extension.Equals(".BIN") || ReflashCheckbox.Checked);
+                C256DestAddress.Enabled = (transmissionSize > 0 || BlockSendRadio.Checked) && (extension.Equals(".BIN") || (ReflashCheckbox.Checked && extension.Equals(".BIN")));
             }
             
 
@@ -289,7 +328,7 @@ namespace FoenixIDE.UI
                     // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
                     if (DebugModeCheckbox.Checked)
                     {
-                        GetFnxInDebugMode();
+                        SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
                     }
                     string fileExtension = Path.GetExtension(FileNameTextBox.Text).ToUpper();
                     if (fileExtension.Equals(".BIN"))
@@ -305,6 +344,80 @@ namespace FoenixIDE.UI
                         if (FnxAddressPtr < 0xFF00 && (FnxAddressPtr + DataBuffer.Length) > 0xFFFF || (FnxAddressPtr == BaseBankAddress && DataBuffer.Length > 0xFFFF))
                         {
                             PreparePacket2Write(DataBuffer, 0x00FF00, 0x00FF00, 256);
+                        }
+
+                        if (ReflashCheckbox.Checked && MessageBox.Show("Are you sure you want to reflash your Foenix system?", "Reflash", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                        {
+                            CountdownLabel.Visible = true;
+                            this.Update();
+
+                            CountdownLabel.Text = "Erasing Flash";
+                            this.Update();
+                            SendInterfaceCommand(ERASE_FLASH_CMD, 0, 0);
+
+                            int SrcFlashAddress = Convert.ToInt32(C256DestAddress.Text.Replace(":", ""), 16);
+                            CountdownLabel.Text = "Programming Flash";
+                            this.Update();
+                            SendInterfaceCommand(PROGRAM_FLASH_CMD, SrcFlashAddress, 10_000);
+                            CountdownLabel.Visible = false;
+                        }
+                    }
+                    else if (fileExtension.Equals(".CSV"))
+                    {
+                        FileInfo f = new FileInfo(FileNameTextBox.Text);
+                        string[] entries = System.IO.File.ReadAllLines(f.FullName);
+                        bool continueWriting = false;
+                        if (ReflashCheckbox.Checked)
+                        {
+                            if (MessageBox.Show("Are you sure you want to reflash your Foenix system?", "Reflash", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                            {
+                                continueWriting = true;
+                            }
+                        }
+                        else
+                        {
+                            continueWriting = true;
+                        }
+                        if (continueWriting)
+                        {
+                            foreach (string entry in entries)
+                            {
+                                // Each entry is a block number, and a file name
+                                string[] split = entry.Split(',');
+                                if (split.Length > 1)
+                                {
+                                    CountdownLabel.Visible = true;
+                                    this.Update();
+                                    string blockFile = Path.Combine(f.DirectoryName, split[1]);
+                                    FileInfo blockInfo = new FileInfo(blockFile);
+                                    int blockNumber = Convert.ToInt32(split[0], 16);
+                                    int address = blockNumber * 8192;
+                                    BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
+                                    byte[] DataBuffer = reader.ReadBytes(8192);
+                                    if (ReflashCheckbox.Checked)
+                                    {
+                                        SendData(DataBuffer, 0, 8192);
+                                        // Erase the flash sectors - a sector is 4K
+                                        // High address byte is the number of sector to program
+                                        CountdownLabel.Text = "Erasing Flash Sector - " + blockNumber;
+                                        this.Update();
+                                        SendInterfaceCommand(ERASE_FLASH_SECTOR_CMD, (blockNumber * 2) << 16, 0);
+                                        SendInterfaceCommand(ERASE_FLASH_SECTOR_CMD, (blockNumber * 2 + 1) << 16, 0);
+                                        // Wait 1 second
+                                        Thread.Sleep(1000);
+                                        // Program the flash
+                                        CountdownLabel.Text = "Program Flash Sector - " + blockNumber + " - with " + split[1];
+                                        this.Update();
+                                        SendInterfaceCommand(PROGRAM_FLASH_SECTOR_CMD, (blockNumber * 2) << 16, 2_000);
+                                    }
+                                    else
+                                    {
+                                        SendData(DataBuffer, address, 8192);
+                                    }
+
+                                    reader.Close();
+                                }
+                            }
                         }
                     }
                     else if (fileExtension.Equals(".PGX"))
@@ -373,7 +486,7 @@ namespace FoenixIDE.UI
                                     {
                                         pageFFLen = blockLength;
                                     }
-                                    Array.Copy(DataBuffer, 0, pageFF, address - (BaseBankAddress + 0xFF00), 0x100);
+                                    Array.Copy(DataBuffer, 0, pageFF, address - (BaseBankAddress + 0xFF00), pageFFLen);
                                     resetVector = true;
                                 }
                             }
@@ -391,8 +504,18 @@ namespace FoenixIDE.UI
                         // Update pageFF with the start address
                         if (resetVector)
                         {
-                            // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                            PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            if (!BoardVersionHelpers.IsF256(boardVersion))
+                            {
+                                // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                                PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            }
+                            else
+                            {
+                                byte[] resetBuffer = new byte[2];
+                                resetBuffer[0] = (byte)(FnxAddressPtr & 0xFF);
+                                resetBuffer[1] = (byte)(FnxAddressPtr >> 8);
+                                PreparePacket2Write(resetBuffer, 0, 0, 2);
+                            }
                         }
                     }
                     else if (fileExtension.Equals(".HEX"))
@@ -469,27 +592,28 @@ namespace FoenixIDE.UI
                             // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
                             if (resetVector)
                             {
-                                PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                                if (!BoardVersionHelpers.IsF256(boardVersion))
+                                {
+                                    PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                                }
+                                else
+                                {
+                                    byte[] resetVectorBuffer = new byte[2];
+                                    resetVectorBuffer[0] = pageFF[0xFC];
+                                    resetVectorBuffer[1] = pageFF[0xFD];
+                                    PreparePacket2Write(resetVectorBuffer, 0xFFFC, 0, 2);
+                                }
                             }
                         }
 
                     }
-                    if (ReflashCheckbox.Checked && MessageBox.Show("Are you sure you want to reflash your C256 System?", "Reflash", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
-                    {
-                        CountdownLabel.Visible = true;
-                        this.Update();
-
-                        EraseFlash();
-                        int SrcFlashAddress = Convert.ToInt32(C256DestAddress.Text.Replace(":", ""), 16);
-                        ProgramFlash(SrcFlashAddress);
-                        CountdownLabel.Visible = false;
-                    }
+                    
                     if (DebugModeCheckbox.Checked)
                     {
                         // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
-                        ExitFnxDebugMode();
+                        SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
                     }
-                    HideProgressBarAfter5Seconds("Transfer Done! System Reset!");
+                    HideProgressBarAfter5Seconds("Transfer Done! System Reset!", true);
                 }
             }
             else if (BlockSendRadio.Checked && kernel.CPU != null)
@@ -497,7 +621,7 @@ namespace FoenixIDE.UI
                 // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
                 if (DebugModeCheckbox.Checked)
                 {
-                    GetFnxInDebugMode();
+                    SendInterfaceCommand(DEBUG_MODE_CMD ,0, 0);
                 }
                 int blockAddress = Convert.ToInt32(EmuSrcAddress.Text.Replace(":",""), 16);
                 // Read the data directly from emulator memory
@@ -517,9 +641,9 @@ namespace FoenixIDE.UI
                 if (DebugModeCheckbox.Checked)
                 {
                     // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
-                    ExitFnxDebugMode();
+                    SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
                 }
-                HideProgressBarAfter5Seconds("Transfer Done! System Reset!");
+                HideProgressBarAfter5Seconds("Transfer Done! System Reset!", true);
             }
             else
             {
@@ -543,6 +667,44 @@ namespace FoenixIDE.UI
                 DisconnectButton.Enabled = true;
             }
             
+        }
+
+        private void btnBootToRAM_Click(object sender, EventArgs e)
+        {
+            if (serial.IsOpen)
+            {
+                bool SendButtonStatus = SendBinaryButton.Enabled;
+                DisconnectButton.Enabled = false;
+                btnBootToRAM.Enabled = false;
+                btnBootToFLASH.Enabled = false;
+                SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
+                SendInterfaceCommand(BOOT_RAM_CMD, 0, 0);
+                SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
+                SendBinaryButton.Enabled = SendButtonStatus;
+                DisconnectButton.Enabled = true;
+                btnBootToRAM.Enabled = true;
+                btnBootToFLASH.Enabled = true;
+                HideProgressBarAfter5Seconds("F256 will boot to RAM", SendButtonStatus);
+            }
+        }
+
+        private void btnBootToFLASH_Click(object sender, EventArgs e)
+        {
+            if (serial.IsOpen)
+            {
+                bool SendButtonStatus = SendBinaryButton.Enabled;
+                DisconnectButton.Enabled = false;
+                btnBootToRAM.Enabled = false;
+                btnBootToFLASH.Enabled = false;
+                SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
+                SendInterfaceCommand(BOOT_FLASH_CMD, 0, 0);
+                SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
+                SendBinaryButton.Enabled = SendButtonStatus;
+                DisconnectButton.Enabled = true;
+                btnBootToRAM.Enabled = true;
+                btnBootToFLASH.Enabled = true;
+                HideProgressBarAfter5Seconds("F256 will boot to FLASH", SendButtonStatus);
+            }
         }
 
         private byte[] CreateResetPage(int startAddress)
@@ -575,13 +737,13 @@ namespace FoenixIDE.UI
             return pageFF;
         }
 
-        private void HideProgressBarAfter5Seconds(string message)
+        private void HideProgressBarAfter5Seconds(string message, bool sendButtonEnabled)
         {
             UploadProgressBar.Visible = false;
             CountdownLabel.Visible = true;
             CountdownLabel.Text = message;
             hideLabelTimer.Enabled = true;
-            SendBinaryButton.Enabled = true;
+            SendBinaryButton.Enabled = sendButtonEnabled;
             DisconnectButton.Enabled = true;
         }
 
@@ -603,37 +765,7 @@ namespace FoenixIDE.UI
             return checksum;
         }
 
-        private void EraseFlash()
-        {
-            CountdownLabel.Text = "Erasing Flash";
-            this.Update();
-            byte[] commandBuffer = new byte[8];
-            commandBuffer[0] = 0x55;   // Header
-            commandBuffer[1] = 0x11;   // Reset Flash
-            commandBuffer[2] = 0x00;
-            commandBuffer[3] = 0x00;
-            commandBuffer[4] = 0x00;
-            commandBuffer[5] = 0x00;
-            commandBuffer[6] = 0x00;
-            commandBuffer[7] = Checksum(commandBuffer, 7);
-            SendMessage(commandBuffer, null);
-        }
-
-        private void ProgramFlash(int address)
-        {
-            CountdownLabel.Text = "Programming Flash";
-            this.Update();
-            byte[] commandBuffer = new byte[8];
-            commandBuffer[0] = 0x55;   // Header
-            commandBuffer[1] = 0x10;   // Reset Flash
-            commandBuffer[2] = (byte)((address & 0xFF_0000) >> 16);
-            commandBuffer[3] = (byte)((address & 0x00_FF00) >> 8);
-            commandBuffer[4] = (byte)(address & 0x00_00FF);
-            commandBuffer[5] = 0x00;
-            commandBuffer[6] = 0x00;
-            commandBuffer[7] = Checksum(commandBuffer, 7);
-            SendMessage(commandBuffer, null, 10000);
-        }
+        
 
         private void SendData(byte[] buffer, int startAddress, int size)
         {
@@ -653,7 +785,7 @@ namespace FoenixIDE.UI
                     }
                     else
                     {
-                        int BufferSize = 2048;
+                        int BufferSize = BoardVersionHelpers.IsF256(boardVersion)?1024:2048;
                         int Loop = size / BufferSize;
                         int offset = startAddress;
                         for (int j = 0; j < Loop; j++)
@@ -689,7 +821,7 @@ namespace FoenixIDE.UI
                 {
                     if (debugMode)
                     {
-                        GetFnxInDebugMode();
+                        SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
                     }
                     
                     if (size < 2048)
@@ -700,7 +832,7 @@ namespace FoenixIDE.UI
                     }
                     else
                     {
-                        int BufferSize = 2048;
+                        int BufferSize = BoardVersionHelpers.IsF256(boardVersion)?1024:2048;
                         int Loop = size / BufferSize;
 
                         for (int j = 0; j < Loop; j++)
@@ -722,7 +854,7 @@ namespace FoenixIDE.UI
 
                     if (debugMode)
                     {
-                        ExitFnxDebugMode();
+                        SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
                     }
                     success = true;
                 }
@@ -752,32 +884,18 @@ namespace FoenixIDE.UI
             }
         }
 
-        public void GetFnxInDebugMode()
+        private void SendInterfaceCommand(byte command, int address, int delay)
         {
             byte[] commandBuffer = new byte[8];
-            commandBuffer[0] = 0x55;   // Header
-            commandBuffer[1] = 0x80;   // GetFNXinDebugMode
-            commandBuffer[2] = 0x00;
-            commandBuffer[3] = 0x00;
-            commandBuffer[4] = 0x00;
+            commandBuffer[0] = 0x55;      // Header
+            commandBuffer[1] = command;   // GetFNXinDebugMode
+            commandBuffer[2] = (byte)((address & 0xFF_0000) >> 16);
+            commandBuffer[3] = (byte)((address & 0x00_FF00) >> 8);
+            commandBuffer[4] = (byte)(address & 0x00_00FF);
             commandBuffer[5] = 0x00;
             commandBuffer[6] = 0x00;
             commandBuffer[7] = Checksum(commandBuffer, 7);
-            SendMessage(commandBuffer, null);
-        }
-
-        public void ExitFnxDebugMode()
-        {
-            byte[] commandBuffer = new byte[8];
-            commandBuffer[0] = 0x55;   // Header
-            commandBuffer[1] = 0x81;   // ExitFNXinDebugMode
-            commandBuffer[2] = 0x00;
-            commandBuffer[3] = 0x00;
-            commandBuffer[4] = 0x00;
-            commandBuffer[5] = 0x00;
-            commandBuffer[6] = 0x00;
-            commandBuffer[7] = Checksum(commandBuffer, 7);
-            SendMessage(commandBuffer, null);
+            SendMessage(commandBuffer, null, delay);
         }
 
         /*
@@ -786,7 +904,7 @@ namespace FoenixIDE.UI
         CMD = 0x0E GetFNXinDebugMode - Stop Processor and put Bus in Tri-State - That needs to be done before any transaction.
         CMD = 0x0F 
          */
-        public void PreparePacket2Write(byte[] buffer, int FNXMemPointer, int FilePointer, int Size)
+        private void PreparePacket2Write(byte[] buffer, int FNXMemPointer, int FilePointer, int Size)
         {
             // Maximum transmission size is 8192 for FMX, U/U+ but 2048 for F256
             if (!BoardVersionHelpers.IsF256(boardVersion))
@@ -807,8 +925,8 @@ namespace FoenixIDE.UI
             }
 
             byte[] commandBuffer = new byte[8 + Size];
-            commandBuffer[0] = 0x55;   // Header
-            commandBuffer[1] = 0x01;   // Write 2 Memory
+            commandBuffer[0] = 0x55;                                 // Header
+            commandBuffer[1] = WRITE_BLOCK_CMD;                      // Write 2 Memory
             commandBuffer[2] = (byte)((FNXMemPointer >> 16) & 0xFF); // (H)24Bit Addy - Where to Store the Data
             commandBuffer[3] = (byte)((FNXMemPointer >> 8) & 0xFF);  // (M)24Bit Addy - Where to Store the Data
             commandBuffer[4] = (byte)(FNXMemPointer & 0xFF);         // (L)24Bit Addy - Where to Store the Data
@@ -827,18 +945,18 @@ namespace FoenixIDE.UI
          * address: the address to read from, in the machine
          * size: the number of bytes to read
          */
-        public byte[] PreparePacket2Read(int address, int size)
+        private byte[] PreparePacket2Read(int address, int size)
         {
             if (size > 0)
             {
                 byte[] commandBuffer = new byte[8];
-                commandBuffer[0] = 0x55;   // Header
-                commandBuffer[1] = 0x00;   // Command READ Memory
-                commandBuffer[2] = (byte)(address >> 16); // Address Hi
-                commandBuffer[3] = (byte)(address >> 8); // Address Med
-                commandBuffer[4] = (byte)(address & 0xFF); //Address Lo
-                commandBuffer[5] = (byte)(size >> 8); //Size HI
-                commandBuffer[6] = (byte)(size & 0xFF); //Size LO
+                commandBuffer[0] = 0x55;                     // Header
+                commandBuffer[1] = READ_BLOCK_CMD;           // Command READ Memory
+                commandBuffer[2] = (byte)(address >> 16);    // Address Hi
+                commandBuffer[3] = (byte)(address >> 8);     // Address Med
+                commandBuffer[4] = (byte)(address & 0xFF);   //Address Lo
+                commandBuffer[5] = (byte)(size >> 8);        //Size HI
+                commandBuffer[6] = (byte)(size & 0xFF);      //Size LO
                 commandBuffer[7] = Checksum(commandBuffer, 7);
 
                 byte[] partialBuffer = new byte[size];
@@ -848,7 +966,7 @@ namespace FoenixIDE.UI
             return null;
         }
 
-        public void SendMessage(byte[] command, byte[] data, int delay = 0)
+        private void SendMessage(byte[] command, byte[] data, int delay = 0)
         {
             //            int dwStartTime = System.Environment.TickCount;
             byte byte_buffer;
@@ -911,7 +1029,7 @@ namespace FoenixIDE.UI
             RxProcessLRC(data);
         }
 
-        public int TxProcessLRC(byte[] buffer)
+        private int TxProcessLRC(byte[] buffer)
         {
             int i;
             TxLRC = 0;
@@ -920,7 +1038,7 @@ namespace FoenixIDE.UI
             return TxLRC;
         }
 
-        public int RxProcessLRC(byte[] data)
+        private int RxProcessLRC(byte[] data)
         {
             int i;
             RxLRC = 0xAA;

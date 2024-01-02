@@ -108,9 +108,14 @@ namespace FoenixIDE.Simulator.FileFormat
                             bank = GetByte(data, 0, 2) << 16;
                             break;
 
-                        // extended linear start address
-                        // set the initial bank register value. Not used in the simulator.
+                        // set the start address
                         case "05":
+                            startAddress = GetByte(data, 0, 4);
+                            // If running on a F256, set the start address
+                            if (romJr != null)
+                            {
+                                ram.WriteWord(0xFFFC, startAddress);
+                            }
                             break;
 
                         default:

@@ -3,9 +3,9 @@ using System.Windows.Forms;
 
 namespace FoenixIDE.Simulator.UI
 {
-    public partial class SDCardWindow : Form
+    public partial class SDCardDialog : Form
     {
-        public SDCardWindow()
+        public SDCardDialog()
         {
             InitializeComponent();
             CapacityCombo.SelectedIndex = 3; // 64 MB

@@ -26,7 +26,7 @@ namespace FoenixIDE.UI
         public UploaderWindow uploaderWindow;
         private WatchForm watchWindow = new WatchForm();
         private AssetWindow assetWindow = new AssetWindow();
-        private SDCardWindow sdCardWindow = new SDCardWindow();
+        private SDCardDialog sdCardWindow = new SDCardDialog();
         private TileEditor tileEditor;
         private CharEditorWindow charEditor;
         public SerialTerminal terminal;
@@ -273,6 +273,7 @@ namespace FoenixIDE.UI
                 gpu.SetTileMapBaseAddress(MemoryMap.TILE_CONTROL_REGISTER_ADDR_JR - 0xC000);
                 gpu.SetTilesetBaseAddress(MemoryMap.TILESET_BASE_ADDR_JR - 0xC000);
                 gpu.SetSpriteBaseAddress(0xD900 - 0xC000);
+                gpu.F256SOLReg = kernel.MemMgr.SOLRegister;
             }
 
             if (disabledIRQs)
@@ -1731,7 +1732,15 @@ namespace FoenixIDE.UI
                         writer.Write((byte)'P');
                         writer.Write((byte)'G');
                         writer.Write((byte)'X');
-                        writer.Write((byte)1);
+                        // When in F256 mode, write that the CPU is 6502.
+                        if (BoardVersionHelpers.IsF256(version))
+                        {
+                            writer.Write((byte)3);
+                        }
+                        else
+                        {
+                            writer.Write((byte)1);
+                        }
                         writer.Write(DataStartAddress[0]);
                         writer.Write(buffer);
                     }

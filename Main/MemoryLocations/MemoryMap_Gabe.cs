@@ -41,6 +41,7 @@ namespace FoenixIDE.MemoryLocations
         public const int SEEDL_JR = 0x00_D6A4;
         public const int SEEDH_JR = 0x00_D6A5;
         public const int RND_CTRL_JR = 0x00_D6A6;
+        public const int SOL_CTRL_JR = 0x00_D018;
 
         // Handling code in CODEC_RAM
         public const int CODEC_START = 0xAF_E820;     // Start of CODEC memory range
@@ -82,8 +83,8 @@ namespace FoenixIDE.MemoryLocations
 
         /*
             GABE_SYS_STAT_MID0  = $01     ; Machine ID -- LSB
-            GABE_SYS_STAT_MID1 = $02     ; Machine ID -- MSB
-            GABE_SYS_STAT_EXP = $08     ; if Zero, there is an Expansion Card Preset
+            GABE_SYS_STAT_MID1 = $02      ; Machine ID -- MSB
+            GABE_SYS_STAT_EXP = $08       ; if Zero, there is an Expansion Card Preset
             GABE_SYS_STAT_CPUA  = $40     ; Indicates the(8bit/16bit) Size of the Accumulator
             GABE_SYS_STAT_CPUX  = $80     ; Indicates the(8bit/16bit) Size of the Accumulator
         */

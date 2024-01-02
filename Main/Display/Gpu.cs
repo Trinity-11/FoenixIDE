@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Drawing.Imaging;
 using FoenixIDE.MemoryLocations;
 using KGySoft.CoreLibraries;
+using FoenixIDE.Simulator.Devices;
 
 namespace FoenixIDE.Display
 {
@@ -20,6 +21,7 @@ namespace FoenixIDE.Display
 
         public MemoryRAM VRAM = null;
         public MemoryRAM VICKY = null;
+        public SOL F256SOLReg = null;
         public int paintCycle = 0;
         private bool tileEditorMode = false;
 
@@ -280,24 +282,37 @@ namespace FoenixIDE.Display
                 for (int line = 0; line < res.Y; line++)
                 {
                     // Handle SOL interrupts
-                    byte SOLRegister = VICKY.ReadByte(SOLRegAddr);
-                    if ((SOLRegister & 1) != 0)
+                    if (mode == 0)
                     {
-                        int SOLLine0 = VICKY.ReadWord(SOLLine0Addr);
-                        if (line == SOLLine0)
+                        byte SOLRegister = VICKY.ReadByte(SOLRegAddr);
+                        if ((SOLRegister & 1) != 0)
                         {
-                            StartOfLine?.Invoke();
+                            int SOLLine0 = VICKY.ReadWord(SOLLine0Addr);
+                            if (line == SOLLine0)
+                            {
+                                StartOfLine?.Invoke();
+                            }
+                        }
+                        if ((SOLRegister & 2) != 0)
+                        {
+                            int SOLLine1 = VICKY.ReadWord(SOLLine1Addr);
+                            if (line == SOLLine1)
+                            {
+                                StartOfLine?.Invoke();
+                            }
                         }
                     }
-                    if ((SOLRegister & 2) != 0)
+                    else
                     {
-                        int SOLLine1 = VICKY.ReadWord(SOLLine1Addr);
-                        if (line == SOLLine1)
+                        F256SOLReg.SetRasterRow(line);
+                        if (F256SOLReg.IsInterruptEnabled())
                         {
-                            StartOfLine?.Invoke();
+                            if (line == F256SOLReg.GetSOLLineNumber())
+                            {
+                                StartOfLine?.Invoke();
+                            }
                         }
                     }
-
                     bool gammaCorrection = (MCRegister & 0x40) == 0x40;
 
                     // Default background color to border color

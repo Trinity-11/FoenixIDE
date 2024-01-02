@@ -46,6 +46,7 @@ namespace FoenixIDE.MemoryLocations
 
         public const int VDMA_START = 0xAF_0400;
         public const int VDMA_SIZE = 0x31; // from $af:0400 to $af:0430
+        public const int DMA_START_JR = 0xDF00;
 
         public const int MOUSE_PTR_GRAP0 = 0xAF_0500; // image for pointer 0
         public const int MOUSE_PTR_GRAP1 = 0xAF_0600; // image for pointer 1

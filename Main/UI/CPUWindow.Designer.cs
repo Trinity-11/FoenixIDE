@@ -54,8 +54,6 @@ namespace FoenixIDE.UI
             this.StepOverOverlayButton = new System.Windows.Forms.Button();
             this.HeaderTextbox = new System.Windows.Forms.Label();
             this.irqPanel = new System.Windows.Forms.Panel();
-            this.debugWindowContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.debugWindowCopyToClipboardMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GabeInt1Check = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.VDMACheck = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.V2TileColCheck = new FoenixIDE.Simulator.Controls.ColorCheckBox();
@@ -84,14 +82,16 @@ namespace FoenixIDE.UI
             this.KeyboardCheckBox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.SOFCheckbox = new FoenixIDE.Simulator.Controls.ColorCheckBox();
             this.BreakOnIRQCheckBox = new System.Windows.Forms.CheckBox();
+            this.debugWindowContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.debugWindowCopyToClipboardMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LabelOverlayButton = new System.Windows.Forms.Button();
             this.DebugPanel = new System.Windows.Forms.PictureBox();
             this.registerDisplay1 = new FoenixIDE.RegisterDisplay();
             this.HeaderPanel.SuspendLayout();
             this.SecondPanel.SuspendLayout();
             this.irqPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
             this.debugWindowContextMenuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).BeginInit();
             this.SuspendLayout();
             // 
             // HeaderPanel
@@ -392,21 +392,6 @@ namespace FoenixIDE.UI
             this.irqPanel.Name = "irqPanel";
             this.irqPanel.Size = new System.Drawing.Size(226, 74);
             this.irqPanel.TabIndex = 12;
-            // 
-            // 
-            // debugWindowContextMenuStrip
-            // 
-            this.debugWindowContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.debugWindowCopyToClipboardMenuItem});
-            this.debugWindowContextMenuStrip.Name = "debugWindowContextMenuStrip";
-            this.debugWindowContextMenuStrip.Size = new System.Drawing.Size(181, 48);
-            this.debugWindowCopyToClipboardMenuItem.Click += DebugWindowCopyToClipboardMenuItem_Click;
-            // 
-            // debugWindowCopyToClipboardMenuItem
-            // 
-            this.debugWindowCopyToClipboardMenuItem.Name = "debugWindowCopyToClipboardMenuItem";
-            this.debugWindowCopyToClipboardMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.debugWindowCopyToClipboardMenuItem.Text = "Copy to Clipboard";
             // 
             // GabeInt1Check
             // 
@@ -816,6 +801,19 @@ namespace FoenixIDE.UI
             this.BreakOnIRQCheckBox.UseVisualStyleBackColor = false;
             this.BreakOnIRQCheckBox.CheckedChanged += new System.EventHandler(this.BreakOnIRQCheckBox_CheckedChanged);
             // 
+            // debugWindowContextMenuStrip
+            // 
+            this.debugWindowContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.debugWindowCopyToClipboardMenuItem});
+            this.debugWindowContextMenuStrip.Name = "debugWindowContextMenuStrip";
+            this.debugWindowContextMenuStrip.Size = new System.Drawing.Size(172, 26);
+            // 
+            // debugWindowCopyToClipboardMenuItem
+            // 
+            this.debugWindowCopyToClipboardMenuItem.Name = "debugWindowCopyToClipboardMenuItem";
+            this.debugWindowCopyToClipboardMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.debugWindowCopyToClipboardMenuItem.Text = "Copy to Clipboard";
+            // 
             // LabelOverlayButton
             // 
             this.LabelOverlayButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
@@ -895,8 +893,8 @@ namespace FoenixIDE.UI
             this.SecondPanel.PerformLayout();
             this.irqPanel.ResumeLayout(false);
             this.irqPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).EndInit();
             this.debugWindowContextMenuStrip.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.DebugPanel)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -62,6 +62,8 @@
             this.CountdownLabel = new System.Windows.Forms.Label();
             this.RevModeLabel = new System.Windows.Forms.Label();
             this.hideLabelTimer = new System.Windows.Forms.Timer(this.components);
+            this.btnBootToRAM = new System.Windows.Forms.Button();
+            this.btnBootToFLASH = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ConnectButton
@@ -88,7 +90,7 @@
             // BrowseFileButton
             // 
             this.BrowseFileButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BrowseFileButton.Location = new System.Drawing.Point(443, 47);
+            this.BrowseFileButton.Location = new System.Drawing.Point(443, 74);
             this.BrowseFileButton.Margin = new System.Windows.Forms.Padding(2);
             this.BrowseFileButton.Name = "BrowseFileButton";
             this.BrowseFileButton.Size = new System.Drawing.Size(24, 19);
@@ -99,7 +101,7 @@
             // 
             // FileNameTextBox
             // 
-            this.FileNameTextBox.Location = new System.Drawing.Point(116, 47);
+            this.FileNameTextBox.Location = new System.Drawing.Point(116, 74);
             this.FileNameTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.FileNameTextBox.Name = "FileNameTextBox";
             this.FileNameTextBox.ReadOnly = true;
@@ -110,7 +112,7 @@
             // 
             this.FileSizeLabel.AutoSize = true;
             this.FileSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FileSizeLabel.Location = new System.Drawing.Point(356, 67);
+            this.FileSizeLabel.Location = new System.Drawing.Point(356, 94);
             this.FileSizeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeLabel.Name = "FileSizeLabel";
             this.FileSizeLabel.Size = new System.Drawing.Size(59, 13);
@@ -120,7 +122,7 @@
             // FileSizeResultLabel
             // 
             this.FileSizeResultLabel.AutoSize = true;
-            this.FileSizeResultLabel.Location = new System.Drawing.Point(416, 67);
+            this.FileSizeResultLabel.Location = new System.Drawing.Point(416, 94);
             this.FileSizeResultLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.FileSizeResultLabel.Name = "FileSizeResultLabel";
             this.FileSizeResultLabel.Size = new System.Drawing.Size(52, 13);
@@ -131,7 +133,7 @@
             // 
             this.DestinationAddressLabel.AutoSize = true;
             this.DestinationAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DestinationAddressLabel.Location = new System.Drawing.Point(142, 108);
+            this.DestinationAddressLabel.Location = new System.Drawing.Point(142, 135);
             this.DestinationAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DestinationAddressLabel.Name = "DestinationAddressLabel";
             this.DestinationAddressLabel.Size = new System.Drawing.Size(119, 13);
@@ -155,7 +157,7 @@
             // C256DestAddress
             // 
             this.C256DestAddress.Enabled = false;
-            this.C256DestAddress.Location = new System.Drawing.Point(272, 105);
+            this.C256DestAddress.Location = new System.Drawing.Point(272, 132);
             this.C256DestAddress.Margin = new System.Windows.Forms.Padding(2);
             this.C256DestAddress.MaxLength = 7;
             this.C256DestAddress.Name = "C256DestAddress";
@@ -168,7 +170,7 @@
             // DollarSignLabel
             // 
             this.DollarSignLabel.AutoSize = true;
-            this.DollarSignLabel.Location = new System.Drawing.Point(260, 107);
+            this.DollarSignLabel.Location = new System.Drawing.Point(260, 134);
             this.DollarSignLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.DollarSignLabel.Name = "DollarSignLabel";
             this.DollarSignLabel.Size = new System.Drawing.Size(13, 13);
@@ -177,7 +179,7 @@
             // 
             // UploadProgressBar
             // 
-            this.UploadProgressBar.Location = new System.Drawing.Point(6, 160);
+            this.UploadProgressBar.Location = new System.Drawing.Point(6, 187);
             this.UploadProgressBar.Margin = new System.Windows.Forms.Padding(2);
             this.UploadProgressBar.Name = "UploadProgressBar";
             this.UploadProgressBar.Size = new System.Drawing.Size(459, 24);
@@ -203,7 +205,7 @@
             // 
             this.SendFileRadio.AutoSize = true;
             this.SendFileRadio.Checked = true;
-            this.SendFileRadio.Location = new System.Drawing.Point(15, 47);
+            this.SendFileRadio.Location = new System.Drawing.Point(15, 74);
             this.SendFileRadio.Margin = new System.Windows.Forms.Padding(2);
             this.SendFileRadio.Name = "SendFileRadio";
             this.SendFileRadio.Size = new System.Drawing.Size(69, 17);
@@ -216,7 +218,7 @@
             // BlockSendRadio
             // 
             this.BlockSendRadio.AutoSize = true;
-            this.BlockSendRadio.Location = new System.Drawing.Point(15, 82);
+            this.BlockSendRadio.Location = new System.Drawing.Point(15, 109);
             this.BlockSendRadio.Margin = new System.Windows.Forms.Padding(2);
             this.BlockSendRadio.Name = "BlockSendRadio";
             this.BlockSendRadio.Size = new System.Drawing.Size(120, 17);
@@ -228,7 +230,7 @@
             // EmuSrcAddress
             // 
             this.EmuSrcAddress.Enabled = false;
-            this.EmuSrcAddress.Location = new System.Drawing.Point(272, 82);
+            this.EmuSrcAddress.Location = new System.Drawing.Point(272, 109);
             this.EmuSrcAddress.Margin = new System.Windows.Forms.Padding(2);
             this.EmuSrcAddress.MaxLength = 7;
             this.EmuSrcAddress.Name = "EmuSrcAddress";
@@ -242,7 +244,7 @@
             // 
             this.EmuSourceAddressLabel.AutoSize = true;
             this.EmuSourceAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.EmuSourceAddressLabel.Location = new System.Drawing.Point(154, 83);
+            this.EmuSourceAddressLabel.Location = new System.Drawing.Point(154, 110);
             this.EmuSourceAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.EmuSourceAddressLabel.Name = "EmuSourceAddressLabel";
             this.EmuSourceAddressLabel.Size = new System.Drawing.Size(107, 13);
@@ -253,7 +255,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(260, 84);
+            this.label2.Location = new System.Drawing.Point(260, 111);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(13, 13);
@@ -263,7 +265,7 @@
             // EmuSrcSize
             // 
             this.EmuSrcSize.Enabled = false;
-            this.EmuSrcSize.Location = new System.Drawing.Point(394, 82);
+            this.EmuSrcSize.Location = new System.Drawing.Point(394, 109);
             this.EmuSrcSize.Margin = new System.Windows.Forms.Padding(2);
             this.EmuSrcSize.MaxLength = 7;
             this.EmuSrcSize.Name = "EmuSrcSize";
@@ -277,7 +279,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(346, 83);
+            this.label3.Location = new System.Drawing.Point(346, 110);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(35, 13);
@@ -287,7 +289,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(382, 84);
+            this.label4.Location = new System.Drawing.Point(382, 111);
             this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(13, 13);
@@ -297,7 +299,7 @@
             // FetchRadio
             // 
             this.FetchRadio.AutoSize = true;
-            this.FetchRadio.Location = new System.Drawing.Point(15, 137);
+            this.FetchRadio.Location = new System.Drawing.Point(15, 164);
             this.FetchRadio.Margin = new System.Windows.Forms.Padding(2);
             this.FetchRadio.Name = "FetchRadio";
             this.FetchRadio.Size = new System.Drawing.Size(122, 17);
@@ -309,7 +311,7 @@
             // C256SrcSize
             // 
             this.C256SrcSize.Enabled = false;
-            this.C256SrcSize.Location = new System.Drawing.Point(394, 135);
+            this.C256SrcSize.Location = new System.Drawing.Point(394, 162);
             this.C256SrcSize.Margin = new System.Windows.Forms.Padding(2);
             this.C256SrcSize.MaxLength = 7;
             this.C256SrcSize.Name = "C256SrcSize";
@@ -323,7 +325,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(346, 138);
+            this.label1.Location = new System.Drawing.Point(346, 165);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
@@ -333,7 +335,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(382, 139);
+            this.label5.Location = new System.Drawing.Point(382, 166);
             this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(13, 13);
@@ -343,7 +345,7 @@
             // C256SrcAddress
             // 
             this.C256SrcAddress.Enabled = false;
-            this.C256SrcAddress.Location = new System.Drawing.Point(272, 135);
+            this.C256SrcAddress.Location = new System.Drawing.Point(272, 162);
             this.C256SrcAddress.Margin = new System.Windows.Forms.Padding(2);
             this.C256SrcAddress.MaxLength = 7;
             this.C256SrcAddress.Name = "C256SrcAddress";
@@ -357,7 +359,7 @@
             // 
             this.C256SrcAddressLabel.AutoSize = true;
             this.C256SrcAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.C256SrcAddressLabel.Location = new System.Drawing.Point(149, 138);
+            this.C256SrcAddressLabel.Location = new System.Drawing.Point(149, 165);
             this.C256SrcAddressLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.C256SrcAddressLabel.Name = "C256SrcAddressLabel";
             this.C256SrcAddressLabel.Size = new System.Drawing.Size(112, 13);
@@ -368,7 +370,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(260, 137);
+            this.label7.Location = new System.Drawing.Point(260, 164);
             this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(13, 13);
@@ -380,7 +382,7 @@
             this.DebugModeCheckbox.AutoSize = true;
             this.DebugModeCheckbox.Checked = true;
             this.DebugModeCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.DebugModeCheckbox.Location = new System.Drawing.Point(15, 105);
+            this.DebugModeCheckbox.Location = new System.Drawing.Point(15, 47);
             this.DebugModeCheckbox.Name = "DebugModeCheckbox";
             this.DebugModeCheckbox.Size = new System.Drawing.Size(88, 17);
             this.DebugModeCheckbox.TabIndex = 27;
@@ -405,7 +407,7 @@
             this.CountdownLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CountdownLabel.ForeColor = System.Drawing.Color.White;
             this.CountdownLabel.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
-            this.CountdownLabel.Location = new System.Drawing.Point(10, 164);
+            this.CountdownLabel.Location = new System.Drawing.Point(10, 191);
             this.CountdownLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.CountdownLabel.Name = "CountdownLabel";
             this.CountdownLabel.Size = new System.Drawing.Size(451, 16);
@@ -428,12 +430,42 @@
             this.hideLabelTimer.Interval = 5000;
             this.hideLabelTimer.Tick += new System.EventHandler(this.HideLabelTimer_Tick);
             // 
+            // btnBootToRAM
+            // 
+            this.btnBootToRAM.Enabled = false;
+            this.btnBootToRAM.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBootToRAM.Location = new System.Drawing.Point(116, 42);
+            this.btnBootToRAM.Margin = new System.Windows.Forms.Padding(2);
+            this.btnBootToRAM.Name = "btnBootToRAM";
+            this.btnBootToRAM.Size = new System.Drawing.Size(92, 24);
+            this.btnBootToRAM.TabIndex = 31;
+            this.btnBootToRAM.Text = "Boot to RAM";
+            this.btnBootToRAM.UseVisualStyleBackColor = true;
+            this.btnBootToRAM.Visible = false;
+            this.btnBootToRAM.Click += new System.EventHandler(this.btnBootToRAM_Click);
+            // 
+            // btnBootToFLASH
+            // 
+            this.btnBootToFLASH.Enabled = false;
+            this.btnBootToFLASH.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBootToFLASH.Location = new System.Drawing.Point(212, 42);
+            this.btnBootToFLASH.Margin = new System.Windows.Forms.Padding(2);
+            this.btnBootToFLASH.Name = "btnBootToFLASH";
+            this.btnBootToFLASH.Size = new System.Drawing.Size(113, 24);
+            this.btnBootToFLASH.TabIndex = 32;
+            this.btnBootToFLASH.Text = "Boot to FLASH";
+            this.btnBootToFLASH.UseVisualStyleBackColor = true;
+            this.btnBootToFLASH.Visible = false;
+            this.btnBootToFLASH.Click += new System.EventHandler(this.btnBootToFLASH_Click);
+            // 
             // UploaderWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(472, 193);
+            this.ClientSize = new System.Drawing.Size(472, 220);
+            this.Controls.Add(this.btnBootToFLASH);
+            this.Controls.Add(this.btnBootToRAM);
             this.Controls.Add(this.RevModeLabel);
             this.Controls.Add(this.CountdownLabel);
             this.Controls.Add(this.ReflashCheckbox);
@@ -474,8 +506,9 @@
             this.Name = "UploaderWindow";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Uploader Window";
+            this.Text = "Uploader";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.UploaderWindow_FormClosed);
+            this.Load += new System.EventHandler(this.UploaderWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.UploaderWindow_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -516,5 +549,7 @@
         private System.Windows.Forms.Label CountdownLabel;
         private System.Windows.Forms.Label RevModeLabel;
         private System.Windows.Forms.Timer hideLabelTimer;
+        private System.Windows.Forms.Button btnBootToRAM;
+        private System.Windows.Forms.Button btnBootToFLASH;
     }
 }

@@ -38,12 +38,15 @@ namespace FoenixIDE.MemoryLocations
         public UART UART2 = null;
         public OPL2 OPL2 = null;
         public MPU401 MPU401 = null;
-        public VDMA VDMA = null;
+        public MemoryRAM DMA = null;
         public TimerRegister TIMER0 = null;
         public TimerRegister TIMER1 = null;
         public TimerRegister TIMER2 = null;
         public RTC RTC = null;
         public RNGRegister RNG = null;
+        // SOL Register handles the F256 write-only, read-only registers.
+        public SOL SOLRegister = null;
+
 
         public bool VectorPull = false;
 
@@ -187,7 +190,7 @@ namespace FoenixIDE.MemoryLocations
                 }
                 if (Address >= MemoryMap.VDMA_START && Address < MemoryMap.VDMA_START + MemoryMap.VDMA_SIZE)
                 {
-                    Device = VDMA;
+                    Device = DMA;
                     DeviceAddress = Address - MemoryMap.VDMA_START;
                     return;
                 }
@@ -248,6 +251,12 @@ namespace FoenixIDE.MemoryLocations
                     {
                         Device = CODEC;
                         DeviceAddress = Address - CODEC.StartAddress;
+                        return;
+                    }
+                    if (Address >= DMA.StartAddress && Address <= DMA.EndAddress)
+                    {
+                        Device = DMA;
+                        DeviceAddress = Address - DMA.StartAddress;
                         return;
                     }
                     if (Address >= MATH.StartAddress && Address <= MATH.EndAddress)
@@ -314,6 +323,12 @@ namespace FoenixIDE.MemoryLocations
                     {
                         Device = SDCARD;
                         DeviceAddress = Address - SDCARD.StartAddress;
+                        return;
+                    }
+                    if (Address >= 0xD018 && Address < 0xD01C)
+                    {
+                        Device = SOLRegister;
+                        DeviceAddress = Address - 0xD018;
                         return;
                     }
                     // These addresses are hard-coded - this is done to store all text and LUT data in vicky
