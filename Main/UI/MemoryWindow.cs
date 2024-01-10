@@ -1,4 +1,5 @@
 ﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.Devices;
 using System;
 using System.Drawing;
 using System.IO;
@@ -23,6 +24,7 @@ namespace FoenixIDE.UI
         public WriteMCRBytesDelegate WriteMCRBytes;
         public delegate ushort ReadMCRBytesDelegate(); // little-endian
         public ReadMCRBytesDelegate ReadMCRBytes;
+        private BoardVersion version;
 
         public MemoryWindow()
         {
@@ -30,6 +32,43 @@ namespace FoenixIDE.UI
             Instance = this;
         }
 
+        public void SetVersion(BoardVersion version)
+        {
+            this.version = version;
+            // F256K/Jr have different MCRs
+            if (BoardVersionHelpers.IsF256(version))
+            {
+                MemoryWindowTooltips.SetToolTip(MCRBit13Button, "Font Set");
+                MemoryWindowTooltips.SetToolTip(MCRBit12Button, "Font Overlay");
+                MemoryWindowTooltips.SetToolTip(MCRBit11Button, "Monitor Sleep");
+                MemoryWindowTooltips.SetToolTip(MCRBit10Button, "Double Y");
+                MemoryWindowTooltips.SetToolTip(MCRBit9Button, "Double X");
+                MemoryWindowTooltips.SetToolTip(MCRBit8Button, "Clock 70");
+                MemoryWindowTooltips.SetToolTip(MCRBit7Button, "Disable Video");
+
+                MCRBit8Button.Text = "CX";
+                MCRBit9Button.Text = "DX";
+                MCRBit7Button.Visible = false;
+                MCRBit10Button.Visible = true;
+                MCRBit11Button.Visible = true;
+                MCRBit12Button.Visible = true;
+                MCRBit13Button.Visible = true;
+            }
+            else
+            {
+                MemoryWindowTooltips.SetToolTip(MCRBit9Button, "Double Pixels");
+                MemoryWindowTooltips.SetToolTip(MCRBit8Button, "High-Res");
+                MemoryWindowTooltips.SetToolTip(MCRBit7Button, "Disable Video");
+
+                MCRBit8Button.Text = "HR";
+                MCRBit9Button.Text = "DP";
+                MCRBit7Button.Visible = true;
+                MCRBit10Button.Visible = false;
+                MCRBit11Button.Visible = false;
+                MCRBit12Button.Visible = false;
+                MCRBit13Button.Visible = false;
+            }
+        }
         private void MemoryWindow_Load(object sender, EventArgs e)
         {
             MemoryWindowTooltips.SetToolTip(NextButton, "Next Page");
@@ -59,6 +98,10 @@ namespace FoenixIDE.UI
             MCRBit7Button.Tag = 0;
             MCRBit8Button.Tag = 0;
             MCRBit9Button.Tag = 0;
+            MCRBit10Button.Tag = 0;
+            MCRBit11Button.Tag = 0;
+            MCRBit12Button.Tag = 0;
+            MCRBit13Button.Tag = 0;
 
             // Set the Address to Bank $00
             if (Memory is MemoryRAM)
@@ -77,7 +120,6 @@ namespace FoenixIDE.UI
                 HighlightPanel.ReadOnly = true;
                 HighlightPanel.ReadOnly = false;
             }
-
         }
 
         public void AllowSave()
@@ -328,11 +370,25 @@ namespace FoenixIDE.UI
 
             int high = ((int)MCRBit8Button.Tag);
             high |= ((int)MCRBit9Button.Tag) << 1;
+            high |= ((int)MCRBit10Button.Tag) << 2;
+            high |= ((int)MCRBit11Button.Tag) << 3;
+            high |= ((int)MCRBit12Button.Tag) << 4;
+            high |= ((int)MCRBit13Button.Tag) << 5;
             WriteMCRBytes?.Invoke((byte)low, (byte)high);
 
-            if ("AF0000".Equals(StartAddressText.Text))
+            if (BoardVersionHelpers.IsF256(version))
             {
-                RefreshMemoryView();
+                if ("D000".Equals(StartAddressText.Text) || "D001".Equals(StartAddressText.Text))
+                {
+                    RefreshMemoryView();
+                }
+            }
+            else
+            {
+                if ("AF0000".Equals(StartAddressText.Text) || "AF0001".Equals(StartAddressText.Text))
+                {
+                    RefreshMemoryView();
+                }
             }
             if (btn == MCRBit6Button)
             {
@@ -360,12 +416,12 @@ namespace FoenixIDE.UI
             {
                 SetGamma?.Invoke(newGamma != 0);
             }
-            SetMCRButton(MCRBit5Button, (low & 0x20) == 0x20);
-            SetMCRButton(MCRBit4Button, (low & 0x10) == 0x10);
-            SetMCRButton(MCRBit3Button, (low & 0x08) == 0x08);
-            SetMCRButton(MCRBit2Button, (low & 0x04) == 0x04);
-            SetMCRButton(MCRBit1Button, (low & 0x02) == 0x02);
-            SetMCRButton(MCRBit0Button, (low & 0x01) == 0x01);
+            SetMCRButton(MCRBit5Button, (low & 0x20) != 0);
+            SetMCRButton(MCRBit4Button, (low & 0x10) != 0);
+            SetMCRButton(MCRBit3Button, (low & 0x08) != 0);
+            SetMCRButton(MCRBit2Button, (low & 0x04) != 0);
+            SetMCRButton(MCRBit1Button, (low & 0x02) != 0);
+            SetMCRButton(MCRBit0Button, (low & 0x01) != 0);
 
             // High-res and double-pixels
             // Determine if the Hi-Res was changed, if so toggle the dip switch
@@ -376,7 +432,11 @@ namespace FoenixIDE.UI
             {
                 SetHiRes?.Invoke(newHires != 0);
             }
-            SetMCRButton(MCRBit9Button, (high & 0x02) != 0);
+            SetMCRButton(MCRBit13Button, (high & 0x20) != 0);
+            SetMCRButton(MCRBit12Button, (high & 0x10) != 0);
+            SetMCRButton(MCRBit11Button, (high & 0x08) != 0);
+            SetMCRButton(MCRBit10Button, (high & 0x04) != 0);
+            SetMCRButton(MCRBit9Button,  (high & 0x02) != 0);
         }
 
         private void SetMCRButton(Button btn, bool value)

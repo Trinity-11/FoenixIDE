@@ -10,6 +10,7 @@ using FoenixIDE.Simulator.FileFormat;
 using FoenixIDE.Simulator.UI;
 using Microsoft.VisualBasic;
 using System.Text;
+using System.IO;
 
 namespace FoenixIDE.UI
 {
@@ -23,6 +24,7 @@ namespace FoenixIDE.UI
         private List<int> knl_breakpointsWrite = new List<int>();
         private BreakpointWindow breakpointWindow = new BreakpointWindow();
         private List<DebugLine> codeList = null;
+        private SortedList<string, int> DbgLabels = new SortedList<string, int>();
 
         public static CPUWindow Instance = null;
         private FoenixSystem kernel = null;
@@ -30,13 +32,14 @@ namespace FoenixIDE.UI
         
 
         const int ROW_HEIGHT = 13;
-        private int IRQPC = 0; // we only keep track of a single interrupt
+        private int IRQPC = -1; // we only keep track of a single interrupt
         private int TopLineIndex = 0; // this is to help us track which line is the current one being executed
 
         Point position = new Point();
         private int MemoryLimit = 0;
         // Depending on the board
         private BoardVersion boardVersion;
+        private string lastLoadedKernel;
 
         public CPUWindow()
         {
@@ -78,20 +81,46 @@ namespace FoenixIDE.UI
         {
             DebugPanel.Invalidate();
         }
+
+        // Called when resetting the CPU
+        // Need to re-read the DbgLabels because we are reloading the listing from kernel
         private void UpdateQueue()
         {
-            if (kernel.lstFile != null && kernel.lstFile.Lines.Count > 0)
+            string newkernelname = kernel.GetKernelName();
+            if (!newkernelname.Equals(lastLoadedKernel))
             {
-                codeList = new List<DebugLine>(kernel.lstFile.Lines.Count);
-                foreach (DebugLine line in kernel.lstFile.Lines.Values)
+                if (kernel.lstFile != null && kernel.lstFile.Lines.Count > 0)
                 {
-                    codeList.Add(line);
+                    codeList = new List<DebugLine>(kernel.lstFile.Lines.Count);
+                    foreach (DebugLine line in kernel.lstFile.Lines.Values)
+                    {
+                        codeList.Add(line);
+                        if (line.label != null)
+                        {
+                            if (!DbgLabels.ContainsKey(line.label))
+                            {
+                                DbgLabels.Add(line.label, line.PC);
+                            }
+                            else
+                            {
+                                // Check for duplicate labels
+                                for (int i = 1; i < 100; i++)
+                                {
+                                    if (!DbgLabels.ContainsKey(line.label + "#" + i))
+                                    {
+                                        DbgLabels.Add(line.label + "#" + i, line.PC);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-            }
-            else
-            {
-                codeList = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
-                GenerateNextInstruction(kernel.CPU.PC);
+                else
+                {
+                    codeList = new List<DebugLine>(DebugPanel.Height / ROW_HEIGHT);
+                    GenerateNextInstruction(kernel.CPU.PC);
+                }
+                lastLoadedKernel = newkernelname;
             }
         }
 
@@ -145,6 +174,7 @@ namespace FoenixIDE.UI
                 }
 
                 bool offsetPrinted = false;
+                int previousPC = -1;
                 foreach (DebugLine line in codeList)
                 {
                     if (line != null)
@@ -187,6 +217,14 @@ namespace FoenixIDE.UI
                                         {
                                             e.Graphics.DrawLine(Pens.Black, LABEL_WIDTH + ActiveLine[1], (painted + 1) * ROW_HEIGHT, LABEL_WIDTH + ActiveLine[1] + ActiveLine[2], (painted + 1) * ROW_HEIGHT);
                                         }
+                                        // If the source code listing has a gap, draw a dashed line
+                                        if (previousPC != -1 && (previousPC  != q0.PC))
+                                        {
+                                            Pen dashGreenPen = new Pen(Color.DarkOliveGreen, 2);
+                                            dashGreenPen.DashPattern = new float[]{5,2,15,4};
+                                            e.Graphics.DrawLine(dashGreenPen, 0, painted * ROW_HEIGHT, this.Width, painted * ROW_HEIGHT);
+                                        }
+                                        previousPC = q0.PC + q0.commandLength;
                                         painted++;
                                     }
                                 }
@@ -226,6 +264,14 @@ namespace FoenixIDE.UI
                             {
                                 e.Graphics.DrawLine(Pens.Black, LABEL_WIDTH + ActiveLine[1], (painted + 1) * ROW_HEIGHT, LABEL_WIDTH + ActiveLine[1] + ActiveLine[2], (painted + 1) * ROW_HEIGHT);
                             }
+                            // If the source code listing has a gap, draw a dashed line
+                            if (previousPC != -1 && (previousPC != line.PC))
+                            {
+                                Pen dashGreenPen = new Pen(Color.DarkOliveGreen, 2);
+                                dashGreenPen.DashPattern = new float[] { 5, 2, 15, 4 };
+                                e.Graphics.DrawLine(dashGreenPen, 0, painted * ROW_HEIGHT, this.Width, painted * ROW_HEIGHT);
+                            }
+                            previousPC = line.PC + line.commandLength;
                             painted++;
                         }
                     }
@@ -432,13 +478,58 @@ namespace FoenixIDE.UI
                     DialogResult result = labelDialog.ShowDialog();
                     if (result == DialogResult.OK)
                     {
-                        line.label = labelDialog.GetValue();
+                        string label = labelDialog.GetValue();
+                        
+                        AddLabel(label, line);
+
                         DebugPanel.Invalidate();
                     }
                 }
             }
         }
 
+        private bool AddLabel(string label, DebugLine line)
+        {
+            if (DbgLabels.ContainsKey(label))
+            {
+                bool newlabelAssigned = false;
+                for (int i = 1; i < 100; i++)
+                {
+                    if (!DbgLabels.ContainsKey(label + "#" + i))
+                    {
+                        label = label + "#" + i;
+                        newlabelAssigned = true;
+                        break;
+                    }
+                }
+                if (!newlabelAssigned)
+                {
+                    return false;
+                }    
+            }
+            
+            DbgLabels.Add(label, line.PC);
+            line.SetLabel(label);
+
+            // Replace matching addresses in JMP/JML/JSR/JSL with this label
+            foreach (DebugLine srcLine in codeList)
+            {
+                string opcodes = srcLine.GetOpcodes();
+                string[] codes = opcodes.Split(',');
+                if (codes[0].Equals("4C") || codes[0].Equals("5C") || codes[0].Equals("20") || codes[0].Equals("22"))
+                {
+                    if (codes.Length >= 3)
+                    {
+                        int address = Convert.ToInt32(codes[2] + codes[1], 16);
+                        if (address == line.PC)
+                        {
+                            srcLine.SetSource(srcLine.GetSource().Replace("$" + address.ToString("X4"), label));
+                        }
+                    }
+                }
+            }
+            return true;
+        }
         private void InspectButton_Click(object sender, EventArgs e)
         {
             if (position.X > 0 && position.Y > 0)
@@ -459,27 +550,29 @@ namespace FoenixIDE.UI
             if (RunButton.Tag.Equals("0"))
             {
                 // Clear the interrupt
-                IRQPC = -1;
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, 0);
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(1, 0);
-                if (!BoardVersionHelpers.IsF256(kernel.GetVersion()))
+                if (IRQPC != -1 && !kernel.CPU.Flags.IrqDisable)
                 {
-                    kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
-                    kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
+                    ResetInterrupts();
                 }
-               
-                InterruptMatchesCheckboxes();
+                //if (BreakOnIRQCheckBox.Checked)
+                //{
+                //    InterruptMatchesCheckboxes();
+                //}
                 registerDisplay1.RegistersReadOnly(true);
                 MainWindow.Instance.SetGpuPeriod(17);
                 kernel.CPU.DebugPause = false;
                 lastLine.Text = "";
                 kernel.CPU.CPUThread = new Thread(new ThreadStart(ThreadProc));
                 UpdateTraceTimer.Enabled = true;
+                if (sender != null)
+                {
+                    knl_breakpointsExec.Clear();
+                }
+                addBreakpoints();
                 kernel.CPU.CPUThread.Start();
                 RunButton.Text = "Pause (F5)";
                 RunButton.Tag = "1";
                 DebugPanel.Refresh();
-                addBreakpoints();
             }
             else
             {
@@ -549,6 +642,7 @@ namespace FoenixIDE.UI
             {
                 int row = position.Y / ROW_HEIGHT;
                 DebugLine line = codeList[TopLineIndex + row];
+                knl_breakpointsExec.Clear();
                 // Set a breakpoint to the next address
                 knl_breakpointsExec.Add(line.PC);
 
@@ -573,6 +667,7 @@ namespace FoenixIDE.UI
             DebugLine line = GetExecutionInstruction(pc);
             if (line != null && line.StepOver)
             {
+                knl_breakpointsExec.Clear();
                 // Set a breakpoint to the next address
                 knl_breakpointsExec.Add(pc + line.commandLength);
 
@@ -721,9 +816,13 @@ namespace FoenixIDE.UI
                         kernel.CPU.DebugPause = true;
                         //queue.Clear();
                     }
-                    if (kernel.CPU.Pins.GetInterruptPinActive && !kernel.CPU.Flags.IrqDisable)
+                    if (kernel.CPU.Pins.GetInterruptPinActive)
                     {
                         IRQPC = kernel.CPU.PC;
+                        kernel.CPU.ExecuteNext();
+                        kernel.CPU.Pins.IRQ = false;
+                        nextPC = kernel.CPU.PC;
+                        UpdateInterruptCheckboxes();
                     }
                     if (line == null)
                     {
@@ -733,7 +832,7 @@ namespace FoenixIDE.UI
                             GenerateNextInstruction(nextPC);
                         }
                     }
-                    Invoke(new breakpointSetter(BreakpointReached), new object[] { nextPC });
+                    Invoke(new breakpointSetter(BreakpointReached), new object[] { IRQPC });
                 }
             }
 
@@ -758,7 +857,7 @@ namespace FoenixIDE.UI
 
         private DebugLine GetExecutionInstruction(int PC)
         {
-            if (kernel.lstFile != null)
+            if (codeList.Count > 0)
             {
                 DebugLine dl = codeList.Find(x => x.PC == PC);
                 return dl;
@@ -785,6 +884,17 @@ namespace FoenixIDE.UI
                 DebugLine line = new DebugLine(pc);
                 line.SetOpcodes(command);
                 line.SetMnemonic(opcodes);
+                
+                // Check if there's a matching label in the DbgLabels list
+                if (command[0] == 0x20 || command[0] == 0x4c || command[0] == 0x5c || command[0] == 0x22)
+                {
+                    int address = command[2] << 8 | command[1];
+                    if (DbgLabels.ContainsValue(address))
+                    {
+                        string dLabel = DbgLabels.Keys[DbgLabels.IndexOfValue(address)];
+                        line.SetSource(line.GetSource().Replace("$" + address.ToString("X4"), dLabel));
+                    }
+                }
                 if (!lastLine.InvokeRequired)
                 {
                     lastLine.Text = line.ToString();
@@ -838,7 +948,7 @@ namespace FoenixIDE.UI
 
         public void ClearTrace()
         {
-            IRQPC = 0;
+            ResetInterrupts();
             kernel.CPU.Stack.TopOfStack = kernel.CPU.Flags.Emulation ? CPU.DefaultStackValueEmulation : CPU.DefaultStackValueNative;
             stackText.Clear();
             DebugPanel.Refresh();
@@ -896,72 +1006,73 @@ namespace FoenixIDE.UI
         private void BreakOnIRQCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             bool visible = BreakOnIRQCheckBox.Checked;
-            if (BoardVersionHelpers.IsF256(boardVersion))
+            if (!visible)
             {
-                // Row 1
-                SOFCheckbox.Visible = visible;
-                SOLCheckbox.Visible = visible;
-                TMR0Checkbox.Visible = visible;
-                TMR1Checkbox.Visible = visible;
-                TMR2Checkbox.Visible = visible;
-                RTCCheckbox.Visible = visible;
-                FDCCheckbox.Visible = visible;
-                MouseCheckbox.Visible = visible;
-
-                // Row 2
-                KeyboardCheckBox.Visible = visible;
-                V2SprColCheck.Visible = visible;
-                V2BitColCheck.Visible = visible;
-                COM2Checkbox.Visible = visible;
-                COM1Checkbox.Visible = visible;
-                MPU401Checkbox.Visible = visible;
-                ParallelPortCheck.Visible = visible;
-                SDCardCheckBox.Visible = visible;
-
-                // Row 3
-                OPL3Checkbox.Visible = false;
-                GabeInt0Check.Visible = false;
-                GabeInt1Check.Visible = false;
-                VDMACheck.Visible = false;
-                V2TileColCheck.Visible = false;
-                GabeInt2Check.Visible = false;
-                ExtExpCheck.Visible = false;
-                SDCardInsertCheck.Visible = false;
+                ResetInterrupts();
             }
-            else
-            {
-                // Row 1
-                SOFCheckbox.Visible = visible;
-                SOLCheckbox.Visible = visible;
-                TMR0Checkbox.Visible = visible;
-                TMR1Checkbox.Visible = visible;
-                TMR2Checkbox.Visible = visible;
-                RTCCheckbox.Visible = visible;
-                FDCCheckbox.Visible = visible;
-                MouseCheckbox.Visible = visible;
-
-                // Row 2
-                KeyboardCheckBox.Visible = visible;
-                V2SprColCheck.Visible = visible;
-                V2BitColCheck.Visible = visible;
-                COM2Checkbox.Visible = visible;
-                COM1Checkbox.Visible = visible;
-                MPU401Checkbox.Visible = visible;
-                ParallelPortCheck.Visible = visible;
-                SDCardCheckBox.Visible = visible;
-
-                // Row 3
-                OPL3Checkbox.Visible = visible;
-                GabeInt0Check.Visible = visible;
-                GabeInt1Check.Visible = visible;
-                VDMACheck.Visible = visible;
-                V2TileColCheck.Visible = visible;
-                GabeInt2Check.Visible = visible;
-                ExtExpCheck.Visible = visible;
-                SDCardInsertCheck.Visible = visible;
-            }
+            // Row 1
+            SOFCheckbox.Visible = visible;
+            SOLCheckbox.Visible = visible;
+            TMR0Checkbox.Visible = visible;
+            TMR1Checkbox.Visible = visible;
+            TMR2Checkbox.Visible = visible;
+            RTCCheckbox.Visible = visible;
+            FDCCheckbox.Visible = visible;
+            MouseCheckbox.Visible = visible;
+            
+            // Row 2
+            KeyboardCheckBox.Visible = visible;
+            V2SprColCheck.Visible = visible;
+            V2BitColCheck.Visible = visible;
+            COM2Checkbox.Visible = visible;
+            COM1Checkbox.Visible = visible;
+            MPU401Checkbox.Visible = visible;
+            ParallelPortCheck.Visible = visible;
+            SDCardCheckBox.Visible = visible;
+            
+            // Row 3
+            OPL3Checkbox.Visible = visible;
+            GabeInt0Check.Visible = visible;
+            GabeInt1Check.Visible = visible;
+            VDMACheck.Visible = visible;
+            V2TileColCheck.Visible = visible;
+            GabeInt2Check.Visible = visible;
+            ExtExpCheck.Visible = visible;
+            SDCardInsertCheck.Visible = visible;
         }
 
+        /// <summary>
+        /// If an interrupt is fired, highlight the corresponding checkbox.
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private void UpdateInterruptCheckboxes()
+        {
+            // Read Interrupt Register 0
+            byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
+            ColorCheckBox[] row1 = { SOFCheckbox, SOLCheckbox, TMR0Checkbox, TMR1Checkbox, TMR2Checkbox, RTCCheckbox, FDCCheckbox, MouseCheckbox };
+            for (int i = 0; i < 8; i++)
+            {
+                row1[i].IsActive = (row1[i].Checked && (reg0 & 1 << i) != 0);
+            }
+
+            // Read Interrupt Register 1
+            byte reg1 = kernel.MemMgr.INTERRUPT.ReadByte(1);
+            ColorCheckBox[] row2 = { KeyboardCheckBox, V2SprColCheck, V2BitColCheck, COM2Checkbox, COM1Checkbox, MPU401Checkbox, ParallelPortCheck, SDCardCheckBox };
+            for (int i = 0; i < 8; i++)
+            {
+                row2[i].IsActive = (row2[i].Checked && (reg1 & 1 << i) != 0);
+                
+            }
+
+            //Read Interrupt Register 2 - we don't handle these yet
+            byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
+            ColorCheckBox[] row3 = { OPL3Checkbox, GabeInt0Check, GabeInt1Check, VDMACheck, V2TileColCheck, GabeInt2Check, ExtExpCheck, SDCardInsertCheck };
+            for (int i = 0; i < 8; i++)
+            {
+                row3[i].IsActive = (row3[i].Checked && (reg1 & 1 << i) != 0);
+            }
+        }
         /// <summary>
         /// Determine if the objects in IRQ Registers match on of the checkboxes.
         /// </summary>
@@ -970,18 +1081,12 @@ namespace FoenixIDE.UI
         {
             // Read Interrupt Register 0
             byte reg0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
-            bool result = false;
             ColorCheckBox[] row1 = { SOFCheckbox, SOLCheckbox, TMR0Checkbox, TMR1Checkbox, TMR2Checkbox, RTCCheckbox, FDCCheckbox, MouseCheckbox };
             for (int i =0; i<8;i++)
             {
                 if (row1[i].Checked && (reg0 & 1 << i) != 0)
                 {
-                    row1[i].IsActive = true;
-                    result = true;
-                }
-                else
-                {
-                    row1[i].IsActive = false;
+                    return true;
                 }
             }
 
@@ -992,39 +1097,66 @@ namespace FoenixIDE.UI
             {
                 if (row2[i].Checked && (reg1 & 1 << i) != 0)
                 {
-                    row2[i].IsActive = true;
-                    result = true;
-                }
-                else
-                {
-                    row2[i].IsActive = false;
+                    return true;
                 }
             }
 
-            // The F256s do not have the following registers
-            if (!BoardVersionHelpers.IsF256(kernel.GetVersion()))
+            //Read Interrupt Register 2 - we don't handle these yet
+            byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
+            ColorCheckBox[] row3 = { OPL3Checkbox, GabeInt0Check, GabeInt1Check, VDMACheck, V2TileColCheck, GabeInt2Check, ExtExpCheck, SDCardInsertCheck };
+            for (int i = 0; i < 8; i++)
             {
-                //Read Interrupt Register 2 - we don't handle these yet
-                byte reg2 = kernel.MemMgr.INTERRUPT.ReadByte(2);
-                ColorCheckBox[] row3 = { OPL3Checkbox, GabeInt0Check, GabeInt1Check, VDMACheck, V2TileColCheck, GabeInt2Check, ExtExpCheck, SDCardInsertCheck };
-                for (int i = 0; i < 8; i++)
+                if (row3[i].Checked && (reg1 & 1 << i) != 0)
                 {
-                    if (row3[i].Checked && (reg1 & 1 << i) != 0)
-                    {
-                        row3[i].IsActive = true;
-                        result = true;
-                    }
-                    else
-                    {
-                        row3[i].IsActive = false;
-                    }
+                    return true;
                 }
-
-                //Read Interrupt Register 3 - we don't handle these yet
-                byte reg3 = kernel.MemMgr.INTERRUPT.ReadByte(3);
-                // As you can see, row4 is not implemented
             }
-            return result;
+            return false;
+        }
+
+        private void ResetInterrupts()
+        {
+            IRQPC = -1;
+            if (kernel != null)
+            {
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, 0);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(1, 0);
+                kernel.MemMgr.INTERRUPT.WriteFromGabe(2, 0);
+                if (!BoardVersionHelpers.IsF256(kernel.GetVersion()))
+                {
+                    kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
+                }
+            }
+            // turn off the checkboxes
+            // Row 1
+            SOFCheckbox.IsActive = false;
+            SOLCheckbox.IsActive = false;
+            TMR0Checkbox.IsActive = false;
+            TMR1Checkbox.IsActive = false;
+            TMR2Checkbox.IsActive = false;
+            RTCCheckbox.IsActive = false;
+            FDCCheckbox.IsActive = false;
+            MouseCheckbox.IsActive = false;
+
+            // Row 2
+            KeyboardCheckBox.IsActive = false;
+            V2SprColCheck.IsActive = false;
+            V2BitColCheck.IsActive = false;
+            COM2Checkbox.IsActive = false;
+            COM1Checkbox.IsActive = false;
+            MPU401Checkbox.IsActive = false;
+            ParallelPortCheck.IsActive = false;
+            SDCardCheckBox.IsActive = false;
+
+            // Row 3
+            OPL3Checkbox.IsActive = false;
+            GabeInt0Check.IsActive = false;
+            GabeInt1Check.IsActive = false;
+            VDMACheck.IsActive = false;
+            V2TileColCheck.IsActive = false;
+            GabeInt2Check.IsActive = false;
+            ExtExpCheck.IsActive = false;
+            SDCardInsertCheck.IsActive = false;
         }
 
         private void ResetButton_Click(object sender, EventArgs e)
@@ -1039,9 +1171,10 @@ namespace FoenixIDE.UI
 
         private void DebugPanel_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left && ActiveLine[0] != 0 && kernel.lstFile.Lines.ContainsKey(ActiveLine[0]))
+            // TODO: remove the reference to kernel.lstFile and replace with codeList.
+            DebugLine line = SourceCodeListingFind(ActiveLine[0]);
+            if (e.Button == MouseButtons.Left && ActiveLine[0] != 0 && line != null)
             {
-                DebugLine line = kernel.lstFile.Lines[ActiveLine[0]];
                 if (line != null)
                 {
                     string name = line.GetAddressName();
@@ -1062,6 +1195,17 @@ namespace FoenixIDE.UI
             }
         }
 
+        private DebugLine SourceCodeListingFind(int pc)
+        {
+            foreach (DebugLine line in codeList)
+            {
+                if (line.PC == pc)
+                {
+                    return line;
+                }
+            }
+            return null;
+        }
         private void IRQCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             if (sender is ColorCheckBox ccb)
@@ -1090,6 +1234,12 @@ namespace FoenixIDE.UI
             }
         }
 
+        // This is called when new code is loaded in the Main Window.
+        public void ClearSourceListing()
+        {
+            DbgLabels.Clear();
+            codeList.Clear();
+        }
         private void DebugWindowCopyToClipboardMenuItem_Click(object sender, EventArgs e)
         {
             // This function follows the same logic as DebugPanel_Paint.
@@ -1128,6 +1278,37 @@ namespace FoenixIDE.UI
             }
 
             Clipboard.SetText(clipboardText.ToString());
+        }
+
+        private void saveSourceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string srcListingFileName = lastLoadedKernel.Substring(0, lastLoadedKernel.LastIndexOf('.')) + ".LST";
+            SaveFileDialog saveDialog = new SaveFileDialog()
+            {
+                Title = "Save Source Listing",
+                DefaultExt = ".LST",
+                FileName = srcListingFileName,
+                Filter = "Source Listing|.LST"
+            };
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter outputFile = new StreamWriter(saveDialog.FileName))
+                {
+                    foreach (DebugLine line in codeList)
+                    {
+                        // Format the label or insert spaces so the source is properly aligned
+                        // Add underscores (_) for labels that are shorter than 4 characters long.
+                        string label = line.label != null 
+                            ? ( 
+                                line.label.Length > 4
+                                ? string.Format("{0,-10}", line.label)
+                                : line.label + new string('_', 4-line.label.Length) + new string(' ', 6)
+                              )
+                            : new string(' ', 10);
+                        outputFile.WriteLine("." + line.PC.ToString("X6") + "\t" + line.GetOpcodes().Replace(',',' ').Trim() + "\t\t" + line.GetSource() + "\t\t" + label + line.GetSource());
+                    }
+                }
+            }
         }
     }
 }

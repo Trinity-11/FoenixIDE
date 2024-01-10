@@ -1,3 +1,26 @@
+Release 0.7.0.1
+---------------
+In CPU Window, add a context menu to Save Source Listing.  This is useful when decompiling an application.
+In CPU Window, when adding a label, track the labels and addresses and replace in the source listing.
+In CPU Window, when successive code addresses are not contiguous, then add a dashed line.
+Fixed the BBS/BBR opcodes - it was using the operands in reverse order.
+Fixed the display of BBS/BBR/RMB/SMB in the CPU window.
+In Memory Window, added MCR buttons for the F256K.  Buttons and tooltips are dependent on the board version.
+Tightened up the IRQ handling in the CPU window. Now, when an interrupt is raised, the Program Counter is set to the IRQ handler.
+I am also checking that IRQ Flag is allowing IRQ before allowing SOL and SOF to be raised.
+Added third Interrupt Register for F256.
+Clearing breakpoint list when Run button is pressed, to ensure the list of breakpoints is populated correctly.  This is properly handling the "Step Over" case.
+
+** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Setup Virtual Joystick for the F256.
+** TODO: Implement and IEC interface to connect via USB to XUM1541
+** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
+** TODO: Implement CPU clock to count cycles for fast computers.
+** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
+** TODO: Add remote debugging capability for Calypsi compiler.
+
 Release 0.7.0.0
 ---------------
 Fixed bug in CPU for 65816 INC A when the B portion is non-zero.
@@ -10,16 +33,6 @@ Implemented Start of Line (SOL) register for F256.
 Flash using multiple bin files, based on CSV master file.
 When uploading PGZ, PGX and HEX for the F256, execute the program on machine.
 Added rectype 5 to HexFile.load to set the start address - this is used by the Calypsi compiler.
-
-** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Add breaklines in debugger listing, when memory is not contiguous.
-** TODO: Setup Virtual Joystick for the F256.
-** TODO: Implement and IEC interface to connect via USB to XUM1541
-** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
-** TODO: Implement CPU clock to count cycles for fast computers.
-** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
 
 Release 0.6.0.21
 ----------------

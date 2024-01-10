@@ -16,6 +16,7 @@ namespace FoenixIDE.Processor
         public event ExecuteDelegate ExecuteOp;
         public int Length8Bit;
         public Register ActionRegister = null;
+        public bool rockwell = false;
 
         public OpCode(byte Value, string Mnemonic, int Length8Bit, Register ActionRegister, AddressModes Mode, ExecuteDelegate newDelegate)
         {
@@ -36,6 +37,18 @@ namespace FoenixIDE.Processor
             this.Mnemonic = Mnemonic;
             this.AddressMode = Mode;
             this.ExecuteOp += newDelegate;
+
+            global::System.Diagnostics.Debug.WriteLine("public const int " + Mnemonic + "_" + Mode.ToString() + "=0x" + Value.ToString("X2") + ";");
+        }
+
+        public OpCode(byte Value, string Mnemonic, int Length, bool rockwell, AddressModes Mode, ExecuteDelegate newDelegate)
+        {
+            this.Value = Value;
+            this.Length8Bit = Length;
+            this.Mnemonic = Mnemonic;
+            this.AddressMode = Mode;
+            this.ExecuteOp += newDelegate;
+            this.rockwell = rockwell;
 
             global::System.Diagnostics.Debug.WriteLine("public const int " + Mnemonic + "_" + Mode.ToString() + "=0x" + Value.ToString("X2") + ";");
         }
@@ -142,7 +155,15 @@ namespace FoenixIDE.Processor
                     arg = "";
                     break;
             }
-            return this.Mnemonic + " " + arg;
+            if (this.rockwell)
+            {
+
+                return this.Mnemonic.Substring(0, 3) + " " + this.Mnemonic.Substring(3) + "," + (this.Length == 3? "$" + (Signature & 0xFF).ToString("X2") + ",$" + (Signature >> 8).ToString("X2"): arg);
+            }
+            else
+            {
+                return this.Mnemonic + " " + arg;
+            }
         }
 
     }

@@ -114,6 +114,12 @@ namespace FoenixIDE.Simulator.FileFormat
         {
             return source;
         }
+        public void SetSource(string value)
+        {
+            source = value;
+            evaled = null;
+        }
+
         public void SetLabel(string value)
         {
             label = value;
@@ -130,6 +136,7 @@ namespace FoenixIDE.Simulator.FileFormat
                     label = tokens[0];
                     // Remove the first item
                     source = value.Substring(label.Length).Trim();
+                    label = tokens[0].TrimEnd(new char[] { '_' });
                 }
                 else
                 {
@@ -195,5 +202,6 @@ namespace FoenixIDE.Simulator.FileFormat
             }
             return address;
         }
+
     }
 }

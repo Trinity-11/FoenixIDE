@@ -54,7 +54,8 @@ namespace FoenixIDE.Simulator.FileFormat
                             string[] strOpcodes = tokens[CommandOffset].Split(new char[] { ' ' });
                             if (strOpcodes[0].Length == 0)
                             {
-                                match.SetLabel(tokens[tokens.Length - 1].Trim());
+                                string label = tokens[tokens.Length - 1].Trim();
+                                match.SetLabel(label);
                             }
                             else
                             {

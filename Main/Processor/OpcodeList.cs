@@ -765,41 +765,41 @@ namespace FoenixIDE.Processor
                 list[0xFC] = new OpCode(0xEA, "NOP", 3, AddressModes.Implied, new OpCode.ExecuteDelegate(operations.ExecuteMisc));
 
                 // Variants - Rockwell
-                list[0x07] = new OpCode(0x07, "RMB0", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
-                list[0x17] = new OpCode(0x17, "RMB1", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
-                list[0x27] = new OpCode(0x27, "RMB2", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
-                list[0x37] = new OpCode(0x37, "RMB3", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
-                list[0x47] = new OpCode(0x47, "RMB4", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
-                list[0x57] = new OpCode(0x57, "RMB5", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
-                list[0x67] = new OpCode(0x67, "RMB6", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
-                list[0x77] = new OpCode(0x77, "RMB7", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x07] = new OpCode(0x07, "RMB0", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x17] = new OpCode(0x17, "RMB1", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x27] = new OpCode(0x27, "RMB2", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x37] = new OpCode(0x37, "RMB3", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x47] = new OpCode(0x47, "RMB4", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x57] = new OpCode(0x57, "RMB5", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x67] = new OpCode(0x67, "RMB6", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
+                list[0x77] = new OpCode(0x77, "RMB7", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.ResetMemoryBit));
 
-                list[0x0F] = new OpCode(0x0F, "BBR0", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
-                list[0x1F] = new OpCode(0x1F, "BBR1", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
-                list[0x2F] = new OpCode(0x2F, "BBR2", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
-                list[0x3F] = new OpCode(0x3F, "BBR3", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
-                list[0x4F] = new OpCode(0x4F, "BBR4", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
-                list[0x5F] = new OpCode(0x5F, "BBR5", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
-                list[0x6F] = new OpCode(0x6F, "BBR6", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
-                list[0x7F] = new OpCode(0x7F, "BBR7", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x0F] = new OpCode(0x0F, "BBR0", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x1F] = new OpCode(0x1F, "BBR1", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x2F] = new OpCode(0x2F, "BBR2", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x3F] = new OpCode(0x3F, "BBR3", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x4F] = new OpCode(0x4F, "BBR4", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x5F] = new OpCode(0x5F, "BBR5", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x6F] = new OpCode(0x6F, "BBR6", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
+                list[0x7F] = new OpCode(0x7F, "BBR7", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITReset));
 
-                list[0x87] = new OpCode(0x87, "SMB0", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
-                list[0x97] = new OpCode(0x97, "SMB1", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
-                list[0xA7] = new OpCode(0xA7, "SMB2", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
-                list[0xB7] = new OpCode(0xB7, "SMB3", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
-                list[0xC7] = new OpCode(0xC7, "SMB4", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
-                list[0xD7] = new OpCode(0xD7, "SMB5", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
-                list[0xE7] = new OpCode(0xE7, "SMB6", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
-                list[0xF7] = new OpCode(0xF7, "SMB7", 2, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0x87] = new OpCode(0x87, "SMB0", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0x97] = new OpCode(0x97, "SMB1", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0xA7] = new OpCode(0xA7, "SMB2", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0xB7] = new OpCode(0xB7, "SMB3", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0xC7] = new OpCode(0xC7, "SMB4", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0xD7] = new OpCode(0xD7, "SMB5", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0xE7] = new OpCode(0xE7, "SMB6", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
+                list[0xF7] = new OpCode(0xF7, "SMB7", 2, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.SetMemoryBit));
 
-                list[0x8F] = new OpCode(0x8F, "BBS0", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
-                list[0x9F] = new OpCode(0x9F, "BBS1", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
-                list[0xAF] = new OpCode(0xAF, "BBS2", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
-                list[0xBF] = new OpCode(0xBF, "BBS3", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
-                list[0xCF] = new OpCode(0xCF, "BBS4", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
-                list[0xDF] = new OpCode(0xDF, "BBS5", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
-                list[0xEF] = new OpCode(0xEF, "BBS6", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
-                list[0xFF] = new OpCode(0xFF, "BBS7", 3, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0x8F] = new OpCode(0x8F, "BBS0", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0x9F] = new OpCode(0x9F, "BBS1", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0xAF] = new OpCode(0xAF, "BBS2", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0xBF] = new OpCode(0xBF, "BBS3", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0xCF] = new OpCode(0xCF, "BBS4", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0xDF] = new OpCode(0xDF, "BBS5", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0xEF] = new OpCode(0xEF, "BBS6", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
+                list[0xFF] = new OpCode(0xFF, "BBS7", 3, true, AddressModes.DirectPage, new OpCode.ExecuteDelegate(operations.BranchBITSet));
             }
         }
     }

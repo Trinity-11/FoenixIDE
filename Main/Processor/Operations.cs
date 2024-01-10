@@ -1177,12 +1177,12 @@ namespace FoenixIDE.Processor
             byte nibble = (byte)(1 << bit);
 
             // direct page addressing
-            int address = cpu.DirectPage.Value + (signature >> 8);
+            int address = cpu.DirectPage.Value + (signature & 0xFF);
             effectiveAddress = address;
             byte val = cpu.MemMgr.ReadByte(address);
             if ((val & nibble) == 0)
             {
-                BranchNear((byte)(signature & 0xFF));
+                BranchNear((byte)(signature >> 8));
             }
         }
 
@@ -1193,12 +1193,12 @@ namespace FoenixIDE.Processor
             byte nibble = (byte)(1 << bit);
 
             // direct page addressing
-            int address = cpu.DirectPage.Value + (signature >> 8);
+            int address = cpu.DirectPage.Value + (signature & 0xFF);
             effectiveAddress = address;
             byte val = cpu.MemMgr.ReadByte(address);
-            if ((val & nibble) == 1)
+            if ((val & nibble) != 0)
             {
-                BranchNear((byte)(signature & 0xFF));
+                BranchNear((byte)(signature >> 8));
             }
         }
 

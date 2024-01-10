@@ -453,7 +453,7 @@ namespace FoenixIDE.Display
                                 {
                                     DrawSprites(bitmapPointer, gammaCorrection, 3, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
-                                if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
+                                if ((MCRegister & 0x8) != 0)
                                 {
                                     switch (LayerMgr2)
                                     {
@@ -466,6 +466,13 @@ namespace FoenixIDE.Display
                                         case 2:
                                             DrawBitmap(bitmapPointer, gammaCorrection, 2, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
                                             break;
+                                    }
+                                    
+                                }
+                                if ((MCRegister & 0x10) != 0)
+                                {
+                                    switch (LayerMgr2)
+                                    {
                                         case 4:
                                             DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
                                             break;
@@ -476,13 +483,12 @@ namespace FoenixIDE.Display
                                             DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 2, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
                                             break;
                                     }
-                                    
                                 }
                                 if ((MCRegister & 0x20) != 0)
                                 {
                                     DrawSprites(bitmapPointer, gammaCorrection, 2, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
-                                if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
+                                if ((MCRegister & 0x8) != 0)
                                 {
                                     switch (LayerMgr1)
                                     {
@@ -495,6 +501,13 @@ namespace FoenixIDE.Display
                                         case 2:
                                             DrawBitmap(bitmapPointer, gammaCorrection, 2, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
                                             break;
+                                    }
+
+                                }
+                                if ((MCRegister & 0x10) != 0)
+                                {
+                                    switch (LayerMgr1)
+                                    {
                                         case 4:
                                             DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
                                             break;
@@ -511,7 +524,7 @@ namespace FoenixIDE.Display
                                 {
                                     DrawSprites(bitmapPointer, gammaCorrection, 1, displayBorder, borderXSize, borderYSize, line, res.X, BitmapY, doubleX, doubleY);
                                 }
-                                if ((MCRegister & 0x8) != 0 || (MCRegister & 0x10) != 0)
+                                if ((MCRegister & 0x8) != 0)
                                 {
                                     switch (LayerMgr0)
                                     {
@@ -524,6 +537,13 @@ namespace FoenixIDE.Display
                                         case 2:
                                             DrawBitmap(bitmapPointer, gammaCorrection, 2, displayBorder, backgroundColor, borderXSize, borderYSize, line, res.X, doubleX, doubleY);
                                             break;
+                                    }
+
+                                }
+                                if ((MCRegister & 0x10) != 0)
+                                {
+                                    switch (LayerMgr0)
+                                    {
                                         case 4:
                                             DrawTiles(bitmapPointer, gammaCorrection, ColumnsVisible, 0, displayBorder, borderXSize, line, res.X, doubleX, doubleY);
                                             break;

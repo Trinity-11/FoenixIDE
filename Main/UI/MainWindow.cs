@@ -197,7 +197,7 @@ namespace FoenixIDE.UI
             kernel = new FoenixSystem(version, defaultKernel);
             terminal = new SerialTerminal();
             ShowDebugWindow(version);
-            ShowMemoryWindow();
+            ShowMemoryWindow(version);
 
             // Now that the kernel is initialized, allocate variables to the GPU
             if (gpu.StartOfFrame == null)
@@ -320,9 +320,31 @@ namespace FoenixIDE.UI
             int height = Simulator.Properties.Settings.Default.ViewHeight;
             gpu.SetViewSize(Simulator.Properties.Settings.Default.ViewWidth, height);
 
+            CheckMenuItemResolutionScale(height);
+        }
+
+        // Modify MCR Hi, bit0 to toggle the resolution of the F256
+        private void SetF256_400LinesMode(bool value)
+        {
+            ushort bytes = ReadMCRBytesFromVicky();
+            byte hi = (byte)(bytes >> 8);
+            byte lo = (byte)(bytes & 0xFF);
+            if (value)
+            {
+                hi = (byte)(hi | 1);
+            }
+            else
+            {
+                hi = (byte)(hi & 0xFE);
+            }
+            WriteMCRBytesToVicky(lo, hi);
+        }
+
+        private void CheckMenuItemResolutionScale(int h)
+        {
             // 
             // Check the menu item that corresponds to the size
-            switch (height)
+            switch (h)
             {
                 case 400:
                     CurrentCheckedMenuItem = scale1_0X_H400ToolStripMenuItem;
@@ -340,7 +362,7 @@ namespace FoenixIDE.UI
                     SetF256_400LinesMode(true);
                     break;
                 case 1600:
-                    CurrentCheckedMenuItem= scale4_0X_H400ToolStripMenuItem;
+                    CurrentCheckedMenuItem = scale4_0X_H400ToolStripMenuItem;
                     CurrentCheckedMenuItem.Checked = true;
                     SetF256_400LinesMode(true);
                     break;
@@ -367,24 +389,6 @@ namespace FoenixIDE.UI
             }
         }
 
-        // Modify MCR Hi, bit0 to toggle the resolution of the F256
-        private void SetF256_400LinesMode(bool value)
-        {
-            ushort bytes = ReadMCRBytesFromVicky();
-            byte hi = (byte)(bytes >> 8);
-            byte lo = (byte)(bytes & 0xFF);
-            if (value)
-            {
-                hi = (byte)(hi | 1);
-            }
-            else
-            {
-                hi = (byte)(hi & 0xFE);
-            }
-            WriteMCRBytesToVicky(lo, hi);
-        }
-
-
         private void CenterForm(Form form)
         {
             int left = this.Left + (this.Width - form.Width) / 2;
@@ -396,15 +400,17 @@ namespace FoenixIDE.UI
         {
             debugWindow.Pause();
             kernel.SetVersion(version);
+            debugWindow.ClearSourceListing();
             if (kernel.ResetCPU(Filename))
             {
                 gpu.Refresh();
                 if (kernel.lstFile != null)
                 {
                     ShowDebugWindow(version);
-                    ShowMemoryWindow();
+                    ShowMemoryWindow(version);
                 }
                 ResetSDCard();
+                
                 debugWindow.ClearTrace();
             }
         }
@@ -432,7 +438,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void ShowMemoryWindow()
+        private void ShowMemoryWindow(BoardVersion version)
         {
             memoryToolStripMenuItem.Enabled = true;
             if (memoryWindow == null || memoryWindow.IsDisposed)
@@ -450,6 +456,7 @@ namespace FoenixIDE.UI
                 memoryWindow.Memory = kernel.CPU.MemMgr;
                 memoryWindow.BringToFront();
             }
+            memoryWindow.SetVersion(version);
             if (memoryWindow.WriteMCRBytes == null)
             {
                 memoryWindow.WriteMCRBytes += WriteMCRBytesToVicky;
@@ -537,52 +544,60 @@ namespace FoenixIDE.UI
 
         public void SOFRoutine()
         {
-            // Check if the interrupt is enabled
-            byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (BoardVersionHelpers.IsF256(version))
+            // Check if interrupts are allowed
+            if (!kernel.CPU.Flags.IrqDisable)
             {
-                // we need to this to avoid using the MMU IO Paging function
-                mask = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
-            }
-
-            if (!kernel.CPU.DebugPause)
-            {
-                // Set the SOF Interrupt
-                byte IRQ0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
+                // Check if the interrupt is enabled
+                byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
                 if (BoardVersionHelpers.IsF256(version))
                 {
                     // we need to this to avoid using the MMU IO Paging function
-                    IRQ0 = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    mask = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
                 }
-                IRQ0 |= (byte)Register0.FNX0_INT00_SOF;
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
-                if ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF)
+
+                if (!kernel.CPU.DebugPause)
                 {
-                    kernel.CPU.Pins.IRQ = true;
+                    // Set the SOF Interrupt
+                    byte IRQ0 = kernel.MemMgr.INTERRUPT.ReadByte(0);
+                    if (BoardVersionHelpers.IsF256(version))
+                    {
+                        // we need to this to avoid using the MMU IO Paging function
+                        IRQ0 = kernel.MemMgr.VICKY.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    }
+                    IRQ0 |= (byte)Register0.FNX0_INT00_SOF;
+                    kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                    if ((~mask & (byte)Register0.FNX0_INT00_SOF) == (byte)Register0.FNX0_INT00_SOF)
+                    {
+                        kernel.CPU.Pins.IRQ = true;
+                    }
                 }
             }
         }
 
         public void SOLRoutine()
         {
-            // Check if the interrupt is enabled
-            byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            if (BoardVersionHelpers.IsF256(version))
+            // Check if interrupts are allowed
+            if (!kernel.CPU.Flags.IrqDisable)
             {
-                mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR);
-            }
-            // if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
-            if (!kernel.CPU.DebugPause && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
-            {
-                // Set the SOL Interrupt
-                byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                // Check if the interrupt is enabled
+                byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
                 if (BoardVersionHelpers.IsF256(version))
                 {
-                    IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR);
                 }
-                IRQ0 |= (byte)Register0.FNX0_INT01_SOL;
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
-                kernel.CPU.Pins.IRQ = true;
+                // if (!kernel.CPU.DebugPause && !kernel.CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
+                if (!kernel.CPU.DebugPause && ((~mask & (byte)Register0.FNX0_INT01_SOL) == (byte)Register0.FNX0_INT01_SOL))
+                {
+                    // Set the SOL Interrupt
+                    byte IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0);
+                    if (BoardVersionHelpers.IsF256(version))
+                    {
+                        IRQ0 = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    }
+                    IRQ0 |= (byte)Register0.FNX0_INT01_SOL;
+                    kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
+                    kernel.CPU.Pins.IRQ = true;
+                }
             }
         }
 
@@ -856,7 +871,7 @@ namespace FoenixIDE.UI
 
         private void MemoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowMemoryWindow();
+            ShowMemoryWindow(version);
         }
 
         private void UploaderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1042,7 +1057,7 @@ namespace FoenixIDE.UI
                         kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                         kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
                     }
-                    ShowMemoryWindow();
+                    ShowMemoryWindow(version);
                     EnableMenuItems();
                     assetWindow.UpdateAssets();
                 }
@@ -1660,8 +1675,23 @@ namespace FoenixIDE.UI
 
         public void UpdateHiRes(bool hires)
         {
-            switches[4] = hires;
-            dipSwitch.Invalidate();
+            if (BoardVersionHelpers.IsF256(version))
+            {
+                // Clock 70 has been clicked
+                Size size = gpu.Size;
+                int scale = size.Width / 640;
+                gpu.SetViewScaling((float)scale, 640, hires ? 400:480);
+                if (CurrentCheckedMenuItem != null)
+                {
+                    CurrentCheckedMenuItem.Checked = false;
+                }
+                CheckMenuItemResolutionScale(scale * (hires ? 400 : 480));
+            }
+            else
+            {
+                switches[4] = hires;
+                dipSwitch.Invalidate();
+            }
         }
 
         private void JoystickSimulatorToolStripMenuItem_Click(object sender, EventArgs e)
