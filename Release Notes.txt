@@ -10,6 +10,10 @@ Tightened up the IRQ handling in the CPU window. Now, when an interrupt is raise
 I am also checking that IRQ Flag is allowing IRQ before allowing SOL and SOF to be raised.
 Added third Interrupt Register for F256.
 Clearing breakpoint list when Run button is pressed, to ensure the list of breakpoints is populated correctly.  This is properly handling the "Step Over" case.
+Added the Memory slots for F256 in Memory Window.
+Fixed the Interrupt checkboxes in CPU Window to account for F256.
+Adjusted to repaint the CPU Window upon interrupt/Breakpoint.
+Fixed the tangled up MCR bits in the GPU paint routine for the F256 mode.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
