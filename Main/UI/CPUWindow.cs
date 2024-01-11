@@ -298,18 +298,36 @@ namespace FoenixIDE.UI
                 Tooltip.SetToolTip(TMR1Checkbox, "Break on Mouse Interrupts");
                 Tooltip.SetToolTip(TMR2Checkbox, "Break on Timer0 Interrupts");
                 Tooltip.SetToolTip(RTCCheckbox, "Break on Timer1 Interrupts");
-                Tooltip.SetToolTip(FDCCheckbox, "Break on DMA Interrupts");
-                Tooltip.SetToolTip(MouseCheckbox, "Break on Reserved Interrupts");
+                Tooltip.SetToolTip(FDCCheckbox, "Reserved");
+                Tooltip.SetToolTip(MouseCheckbox, "Break on Cartridge Inserted Interrupts");
+                FDCCheckbox.Visible = false;
 
                 // Register 1
                 Tooltip.SetToolTip(KeyboardCheckBox, "Break on UART Interrupts");
-                Tooltip.SetToolTip(V2SprColCheck, "Break on Vicky Int2 Interrupts");
-                Tooltip.SetToolTip(V2BitColCheck, "Break on Vicky Int3 Interrupts");
-                Tooltip.SetToolTip(COM2Checkbox, "Break on Vicky Int4 Interrupts");
+                Tooltip.SetToolTip(V2SprColCheck, "Reserved");
+                Tooltip.SetToolTip(V2BitColCheck, "Reserved");
+                Tooltip.SetToolTip(COM2Checkbox, "Reserved");
                 Tooltip.SetToolTip(COM1Checkbox, "Break on RTC Interrupts");
-                Tooltip.SetToolTip(MPU401Checkbox, "Break on VIA Interrupts");
-                Tooltip.SetToolTip(ParallelPortCheck, "Break on IEC Interrupts");
+                Tooltip.SetToolTip(MPU401Checkbox, "Break on VIA 0 Interrupts");
+                Tooltip.SetToolTip(ParallelPortCheck, "Break on VIA 1 Interrupts");
                 Tooltip.SetToolTip(SDCardCheckBox, "Break on SD Card Interrupts");
+                V2SprColCheck.Visible = false;
+                V2BitColCheck.Visible = false;
+                COM2Checkbox.Visible = false;
+
+                // Register 2
+                Tooltip.SetToolTip(OPL3Checkbox, "Break on IEC Data In Interrupts");
+                Tooltip.SetToolTip(GabeInt0Check, "Break on IEC Clock In Interrupts");
+                Tooltip.SetToolTip(GabeInt1Check, "Break on IEC ATN In Interrupts");
+                Tooltip.SetToolTip(VDMACheck, "Break on IEC SEQ In Interrupts");
+                Tooltip.SetToolTip(V2TileColCheck, "Reserved");
+                Tooltip.SetToolTip(GabeInt2Check, "Reserved");
+                Tooltip.SetToolTip(ExtExpCheck, "Reserved");
+                Tooltip.SetToolTip(SDCardInsertCheck, "Reserved");
+                V2TileColCheck.Visible = false;
+                GabeInt2Check.Visible = false;
+                ExtExpCheck.Visible = false;
+                SDCardInsertCheck.Visible = false;
             }
             else
             {
@@ -322,6 +340,7 @@ namespace FoenixIDE.UI
                 Tooltip.SetToolTip(RTCCheckbox, "Break on RTC Interrupts");
                 Tooltip.SetToolTip(FDCCheckbox, "Break on FDC Interrupts");
                 Tooltip.SetToolTip(MouseCheckbox, "Break on Mouse Interrupts");
+                FDCCheckbox.Visible = true;
 
                 // Register 1
                 Tooltip.SetToolTip(KeyboardCheckBox, "Break on Keyboard Interrupts");
@@ -332,6 +351,9 @@ namespace FoenixIDE.UI
                 Tooltip.SetToolTip(MPU401Checkbox, "Break on MIDI Ctrlr Interrupts");
                 Tooltip.SetToolTip(ParallelPortCheck, "Break on Parallel Interrupts");
                 Tooltip.SetToolTip(SDCardCheckBox, "Break on SD Card Interrupts");
+                V2SprColCheck.Visible = true;
+                V2BitColCheck.Visible = true;
+                COM2Checkbox.Visible = true;
 
                 // Register 2
                 Tooltip.SetToolTip(OPL3Checkbox, "Break on OPL3 Interrupts");
@@ -342,6 +364,10 @@ namespace FoenixIDE.UI
                 Tooltip.SetToolTip(GabeInt2Check, "Break on Gabe INT2 Interrupts");
                 Tooltip.SetToolTip(ExtExpCheck, "Break on External Expansion Interrupts");
                 Tooltip.SetToolTip(SDCardInsertCheck, "Break on SDCard Insertion Interrupts");
+                V2TileColCheck.Visible = true;
+                GabeInt2Check.Visible = true;
+                ExtExpCheck.Visible = true;
+                SDCardInsertCheck.Visible = true;
             }
         }
         private void DebugPanel_MouseMove(object sender, MouseEventArgs e)
@@ -554,6 +580,7 @@ namespace FoenixIDE.UI
                 {
                     ResetInterrupts();
                 }
+                TurnOffActiveInterrupts();
                 //if (BreakOnIRQCheckBox.Checked)
                 //{
                 //    InterruptMatchesCheckboxes();
@@ -823,6 +850,7 @@ namespace FoenixIDE.UI
                         kernel.CPU.Pins.IRQ = false;
                         nextPC = kernel.CPU.PC;
                         UpdateInterruptCheckboxes();
+                        Invoke(new nullParamMethod(Refresh));
                     }
                     if (line == null)
                     {
@@ -1010,6 +1038,8 @@ namespace FoenixIDE.UI
             {
                 ResetInterrupts();
             }
+            bool isF256 = BoardVersionHelpers.IsF256(boardVersion);
+
             // Row 1
             SOFCheckbox.Visible = visible;
             SOLCheckbox.Visible = visible;
@@ -1017,28 +1047,28 @@ namespace FoenixIDE.UI
             TMR1Checkbox.Visible = visible;
             TMR2Checkbox.Visible = visible;
             RTCCheckbox.Visible = visible;
-            FDCCheckbox.Visible = visible;
+            FDCCheckbox.Visible = !isF256 && visible;
             MouseCheckbox.Visible = visible;
-            
+
             // Row 2
             KeyboardCheckBox.Visible = visible;
-            V2SprColCheck.Visible = visible;
-            V2BitColCheck.Visible = visible;
-            COM2Checkbox.Visible = visible;
+            V2SprColCheck.Visible = !isF256 && visible;
+            V2BitColCheck.Visible = !isF256 && visible;
+            COM2Checkbox.Visible = !isF256 && visible;
             COM1Checkbox.Visible = visible;
             MPU401Checkbox.Visible = visible;
             ParallelPortCheck.Visible = visible;
             SDCardCheckBox.Visible = visible;
-            
+
             // Row 3
             OPL3Checkbox.Visible = visible;
             GabeInt0Check.Visible = visible;
             GabeInt1Check.Visible = visible;
             VDMACheck.Visible = visible;
-            V2TileColCheck.Visible = visible;
-            GabeInt2Check.Visible = visible;
-            ExtExpCheck.Visible = visible;
-            SDCardInsertCheck.Visible = visible;
+            V2TileColCheck.Visible = !isF256 && visible;
+            GabeInt2Check.Visible = !isF256 && visible;
+            ExtExpCheck.Visible = !isF256 && visible;
+            SDCardInsertCheck.Visible = !isF256 && visible;
         }
 
         /// <summary>
@@ -1127,6 +1157,10 @@ namespace FoenixIDE.UI
                     kernel.MemMgr.INTERRUPT.WriteFromGabe(3, 0);
                 }
             }
+        }
+
+        private void TurnOffActiveInterrupts()
+        {
             // turn off the checkboxes
             // Row 1
             SOFCheckbox.IsActive = false;
@@ -1158,7 +1192,6 @@ namespace FoenixIDE.UI
             ExtExpCheck.IsActive = false;
             SDCardInsertCheck.IsActive = false;
         }
-
         private void ResetButton_Click(object sender, EventArgs e)
         {
             MainWindow.Instance.RestartMenuItemClick(sender, e);

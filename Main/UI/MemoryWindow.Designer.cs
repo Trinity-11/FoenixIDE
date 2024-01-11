@@ -113,27 +113,6 @@
             // 
             this.AddressCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.AddressCombo.FormattingEnabled = true;
-            this.AddressCombo.Items.AddRange(new object[] {
-            "Bank $00",
-            "Bank $18",
-            "Bank $19",
-            "Bank $AF (Vicky)",
-            "Bank $B0 (Video)",
-            "Address $AF:0100 (Bitmap Registers)",
-            "Address $AF:0200 (Tile Registers)",
-            "Address $AF:0C00 (Sprite Registers)",
-            "Address $AF:1F40 (Text Color Palette Foreground)",
-            "Address $AF:1F80 (Text Color Palette Background)",
-            "Address $AF:2000 (LUT 0)",
-            "Address $AF:2400 (LUT 1)",
-            "Address $AF:2800 (LUT 2)",
-            "Address $AF:2C00 (LUT 3)",
-            "Address $AF:8000 (Font Memory Bank 0)",
-            "Address $AF:8800 (Font Memory Bank 1)",
-            "Address $AF:A000 (Text Memory)",
-            "Address $AF:C000 (Text Colors)",
-            "Address $AF:E000 (Gabe)",
-            "Unspecified Page"});
             this.AddressCombo.Location = new System.Drawing.Point(428, 4);
             this.AddressCombo.Margin = new System.Windows.Forms.Padding(4);
             this.AddressCombo.Name = "AddressCombo";

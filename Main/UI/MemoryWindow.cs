@@ -53,6 +53,18 @@ namespace FoenixIDE.UI
                 MCRBit11Button.Visible = true;
                 MCRBit12Button.Visible = true;
                 MCRBit13Button.Visible = true;
+
+                AddressCombo.Items.Clear();
+                AddressCombo.Items.Add("Slot $00");
+                AddressCombo.Items.Add("Slot $01");
+                AddressCombo.Items.Add("Slot $02");
+                AddressCombo.Items.Add("Slot $03");
+                AddressCombo.Items.Add("Slot $04");
+                AddressCombo.Items.Add("Slot $05");
+                AddressCombo.Items.Add("Address $C000 (IO Page)");
+                AddressCombo.Items.Add("Address $D000 (IO Page)");
+                AddressCombo.Items.Add("Slot $07");
+                AddressCombo.Items.Add("Unspecified Page");
             }
             else
             {
@@ -67,7 +79,30 @@ namespace FoenixIDE.UI
                 MCRBit11Button.Visible = false;
                 MCRBit12Button.Visible = false;
                 MCRBit13Button.Visible = false;
+
+                AddressCombo.Items.Clear();
+                AddressCombo.Items.Add("Bank $00");
+                AddressCombo.Items.Add("Bank $18");
+                AddressCombo.Items.Add("Bank $19");
+                AddressCombo.Items.Add("Bank $AF(Vicky)");
+                AddressCombo.Items.Add("Bank $B0(Video)");
+                AddressCombo.Items.Add("Address $AF: 0100(Bitmap Registers)");
+                AddressCombo.Items.Add("Address $AF: 0200(Tile Registers)");
+                AddressCombo.Items.Add("Address $AF: 0C00(Sprite Registers)");
+                AddressCombo.Items.Add("Address $AF: 1F40(Text Color Palette Foreground)");
+                AddressCombo.Items.Add("Address $AF: 1F80(Text Color Palette Background)");
+                AddressCombo.Items.Add("Address $AF: 2000(LUT 0)");
+                AddressCombo.Items.Add("Address $AF: 2400(LUT 1)");
+                AddressCombo.Items.Add("Address $AF: 2800(LUT 2)");
+                AddressCombo.Items.Add("Address $AF: 2C00(LUT 3)");
+                AddressCombo.Items.Add("Address $AF: 8000(Font Memory Bank 0)");
+                AddressCombo.Items.Add("Address $AF: 8800(Font Memory Bank 1)");
+                AddressCombo.Items.Add("Address $AF: A000(Text Memory)");
+                AddressCombo.Items.Add("Address $AF: C000(Text Colors)");
+                AddressCombo.Items.Add("Address $AF: E000(Gabe)");
+                AddressCombo.Items.Add("Unspecified Page");
             }
+            AddressCombo.SelectedIndex = 0;
         }
         private void MemoryWindow_Load(object sender, EventArgs e)
         {
@@ -116,7 +151,6 @@ namespace FoenixIDE.UI
             }
             else
             {
-                AddressCombo.SelectedIndex = 0;
                 HighlightPanel.ReadOnly = true;
                 HighlightPanel.ReadOnly = false;
             }
@@ -259,18 +293,25 @@ namespace FoenixIDE.UI
             bool matched = false;
             foreach (string item in AddressCombo.Items)
             {
-                dropdownAddress = 0;
+                dropdownAddress = -1;
                 if (item.StartsWith("Bank"))
                 {
                     int start = item.IndexOf('$');
                     dropdownAddress = Convert.ToInt32(item.Substring(start + 1, 2) + "0000", 16);
                 }
+                else if (item.StartsWith("Slot"))
+                {
+                    // Read two characters and pad with '0000' to get a 16 bit address
+                    int start = item.IndexOf('$');
+                    dropdownAddress = Convert.ToInt32(item.Substring(start + 1, 2), 16) * 8192;
+                }
                 else if (item.StartsWith("Address"))
                 {
                     int start = item.IndexOf('$');
-                    dropdownAddress = Convert.ToInt32(item.Replace(":", "").Substring(start + 1, 6), 16);
+                    int paren = item.IndexOf('(', start);
+                    dropdownAddress = Convert.ToInt32(item.Replace(":", "").Substring(start + 1, paren-start-1).Trim(), 16);
                 }
-                if (dropdownAddress != 0 && dropdownAddress == address)
+                if (dropdownAddress != -1 && dropdownAddress == address)
                 {
                     AddressCombo.SelectedItem = item;
                     matched = true;
@@ -314,11 +355,18 @@ namespace FoenixIDE.UI
                 int start = value.IndexOf('$');
                 startAddress = Convert.ToInt32(value.Substring(start + 1, 2) + "0000", 16);
             }
+            else if (value.StartsWith("Slot"))
+            {
+                // Read two characters and pad with '0000' to get a 16 bit address
+                int start = value.IndexOf('$');
+                startAddress = Convert.ToInt32(value.Substring(start + 1, 2), 16) * 8192;
+            }
             else if (value.StartsWith("Address"))
             {
                 // Read all 6 characters, but omit the ':'
                 int start = value.IndexOf('$');
-                startAddress = Convert.ToInt32(value.Replace(":", "").Substring(start + 1, 6), 16);
+                int paren = value.IndexOf('(', start);
+                startAddress = Convert.ToInt32(value.Replace(":", "").Substring(start + 1, paren-start-1).Trim(), 16);
             }
             else
             {
