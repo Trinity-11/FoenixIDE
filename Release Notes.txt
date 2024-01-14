@@ -1,6 +1,7 @@
 Release 0.7.0.2
 ---------------
 When updating the release, remove previous installations.
+Added the RTC to the Memory Manager.
 
 ** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.

@@ -158,6 +158,12 @@ namespace FoenixIDE.MemoryLocations
                         return;
                     }
                 }
+                if (Address >= RTC.StartAddress && Address <= RTC.EndAddress)
+                {
+                    Device = RTC;
+                    DeviceAddress = Address - RTC.StartAddress;
+                    return;
+                }
                 if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
                 {
                     Device = UART1;
@@ -281,6 +287,12 @@ namespace FoenixIDE.MemoryLocations
                     {
                         Device = TIMER1;
                         DeviceAddress = Address - TIMER1.StartAddress;
+                        return;
+                    }
+                    if (Address >= RTC.StartAddress && Address <= RTC.EndAddress)
+                    {
+                        Device = RTC;
+                        DeviceAddress = Address - RTC.StartAddress;
                         return;
                     }
                     if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
