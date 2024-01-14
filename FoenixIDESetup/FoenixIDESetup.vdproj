@@ -1127,7 +1127,7 @@
         "Manufacturer" = "8:C256 Foenix Project"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/Trinity-11/FoenixIDE"
-        "Title" = "8:FoenixIDE Setup"
+        "Title" = "8:FoenixIDE"
         "Subject" = "8:"
         "ARPCONTACT" = "8:C256 Foenix Project"
         "Keywords" = "8:"
@@ -1665,7 +1665,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_05BB69B027C149C699B0E2980589B4DF"
             {
-            "SourcePath" = "8:..\\Main\\obj\\Release\\FoenixIDE.exe"
+            "SourcePath" = "8:..\\Main\\obj\\Debug\\FoenixIDE.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E6F0D81DDC2A4228B28F5AF3B10C767F"

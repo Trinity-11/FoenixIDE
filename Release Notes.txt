@@ -1,3 +1,18 @@
+Release 0.7.0.2
+---------------
+When updating the release, remove previous installations.
+
+** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Setup Virtual Joystick for the F256.
+** TODO: Implement and IEC interface to connect via USB to XUM1541
+** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
+** TODO: Implement CPU clock to count cycles for fast computers.
+** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
+** TODO: Add remote debugging capability for Calypsi compiler.
+** TODO: Try to sort out the issue with the character sets in non-unicode installation.
+
 Release 0.7.0.1
 ---------------
 In CPU Window, add a context menu to Save Source Listing.  This is useful when decompiling an application.
@@ -14,16 +29,6 @@ Added the Memory slots for F256 in Memory Window.
 Fixed the Interrupt checkboxes in CPU Window to account for F256.
 Adjusted to repaint the CPU Window upon interrupt/Breakpoint.
 Fixed the tangled up MCR bits in the GPU paint routine for the F256 mode.
-
-** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Setup Virtual Joystick for the F256.
-** TODO: Implement and IEC interface to connect via USB to XUM1541
-** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
-** TODO: Implement CPU clock to count cycles for fast computers.
-** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
-** TODO: Add remote debugging capability for Calypsi compiler.
 
 Release 0.7.0.0
 ---------------
