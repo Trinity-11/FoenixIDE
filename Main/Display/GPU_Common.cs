@@ -53,6 +53,7 @@ namespace FoenixIDE.Display
             return p;
         }
 
+        // The F256K displays text at a different resolution than the graphics
         public Point GetScreenSize_JR()
         {
             Point p = new Point(640, 480);
@@ -65,14 +66,11 @@ namespace FoenixIDE.Display
                     // @ 70Hz - Text 640x400, Graphics 320x200
                     p.X = 640;
                     p.Y = 400;
+                    if (hiresTimer != null) hiresTimer.Interval = 14; // 70 Hz
                 }
-                if ((MCRHigh & 2) != 0)
+                else
                 {
-                    p.X = 320;
-                }
-                if ((MCRHigh & 4) != 0)
-                {
-                    p.Y = (MCRHigh & 1) != 0? 200 : 240;
+                    if (hiresTimer != null) hiresTimer.Interval = 17; // 70 Hz
                 }
             }
             return p;
@@ -239,9 +237,32 @@ namespace FoenixIDE.Display
         private unsafe void DrawText(int* p, int MCR, bool gammaCorrection, byte TextColumns, byte TextRows, int colOffset, int rowOffset, int line, int width, int height)
         {
             bool overlayBitSet = (MCR & 0x02) == 0x02;
+            bool doubleTextY = false;
+            bool doubleTextX = false;
 
             // Find which line of characters to display
-            int txtline = (line - rowOffset) / CHAR_HEIGHT;
+            int txtline = 0;
+            bool showFont1 = false;
+            if (mode == 1)
+            {
+                byte MCRHigh = (byte)(VICKY.ReadByte(MCRAddress + 1) & 0x3F);
+                doubleTextY = (MCRHigh & 4) != 0;
+                doubleTextX = (MCRHigh & 2) != 0;
+                showFont1 = (MCRHigh & 0x20) != 0;
+                //  the desired output is txtline = ((doubleTextY ? line / 2 : line) - rowOffset) / CHAR_HEIGHT;
+                txtline = ((doubleTextY ? line / 2 : line) - rowOffset) / CHAR_HEIGHT;
+                // this makes the text display with a weird alias, but the machine does this, so...
+                if (doubleTextX)
+                {
+                    TextColumns /= 2;
+                }
+            } 
+            else
+            {
+                txtline  = (line - rowOffset) / CHAR_HEIGHT;
+            }
+
+            
             //if (txtline + 1 > RAM.ReadByte(MemoryMap.LINES_MAX)) return;
             //byte COLS_PER_LINE = RAM.ReadByte(MemoryMap.COLS_PER_LINE);
 
@@ -256,7 +277,7 @@ namespace FoenixIDE.Display
             bool CursorEnabled = (VICKY.ReadByte(CursorCtrlRegister) & 1) != 0;
 
             // Each character is defined by 8 bytes
-            int fontLine = (line - rowOffset) % CHAR_HEIGHT;
+            int fontLine = ((doubleTextY ? line / 2 : line) - rowOffset) % CHAR_HEIGHT;
             int* ptr = p + line * STRIDE + colOffset;
             int textcolor0;
             int textcolor1;
@@ -290,23 +311,42 @@ namespace FoenixIDE.Display
                 // This is where the memory goes:
                 GetTextLUT(fgColor, bgColor, gammaCorrection, out textcolor0, out textcolor1);
 
-                byte value = VICKY.ReadByte(fontBaseAddress + character * 8 + fontLine);
+                byte value = VICKY.ReadByte(fontBaseAddress + (showFont1 ? 0x800 : 0) + character * 8 + fontLine);
                 //int offset = (x + line * 640) * 4;
 
                 // For each bit in the font, set the foreground color - if the bit is 0 and overlay is set, skip it (keep the background)
                 for (int b = 0x80; b > 0; b >>= 1)
                 {
-                    if ((value & b) != 0)
+                    if (doubleTextX)
                     {
-                        //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
-                        ptr[0] = textcolor0;
+                        if ((value & b) != 0)
+                        {
+                            //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
+                            ptr[0] = textcolor0;
+                            ptr[1] = textcolor0;
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
+                            ptr[0] = textcolor1;
+                            ptr[1] = textcolor1;
+                        }
+                        ptr += 2;
                     }
-                    else if (!overlayBitSet)
+                    else
                     {
-                        //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
-                        ptr[0] = textcolor1;
+                        if ((value & b) != 0)
+                        {
+                            //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
+                            ptr[0] = textcolor0;
+                        }
+                        else if (!overlayBitSet)
+                        {
+                            //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
+                            ptr[0] = textcolor1;
+                        }
+                        ptr++;
                     }
-                    ptr++;
                     //offset += 4;
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.Devices;
 using FoenixIDE.Simulator.FileFormat;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,12 @@ namespace FoenixIDE.UI
 {
     public partial class AssetLoader : Form
     {
-        public MemoryManager MemMgrRef = null;
+        private MemoryManager MemMgrRef = null;
         public ResourceChecker ResChecker;
         public int topLeftPixelColor = 0;
+        private bool isF256;
+        private Display.Gpu GpuRef;
+        private int F256_LUT_STORE = 0x7_0000;
 
         public AssetLoader()
         {
@@ -36,6 +40,22 @@ namespace FoenixIDE.UI
             LUTCombo.SelectedIndex = 0;
         }
 
+        public void SetMemoryManager(MemoryManager value)
+        {
+            MemMgrRef = value;
+        }
+
+        public void SetBoardVersion(BoardVersion value)
+        {
+            isF256 = BoardVersionHelpers.IsF256(value);
+            LoadAddressTextBox.Text = isF256 ? "00:0000" : "B0:0000";
+        }
+
+        public void SetGPU(Display.Gpu value)
+        {
+            GpuRef = value;
+        }
+
         /**
          * The LUT list box is only selected when loading bitmaps, sprites and tiles
          */
@@ -53,7 +73,8 @@ namespace FoenixIDE.UI
         {
             if (FileTypesCombo.SelectedIndex == 4)
             {
-                int lutAddress = 0xAF_2000 + 0x400 * LUTCombo.SelectedIndex;
+                // In F256, LUTs are stored in Page 4 of IO RAM
+                int lutAddress = isF256 ? 0x3000 + 0x400 * LUTCombo.SelectedIndex :  0xAF_2000 + 0x400 * LUTCombo.SelectedIndex;
                 LoadAddressTextBox.Text = lutAddress.ToString("X6");
             }
         }
@@ -126,34 +147,18 @@ namespace FoenixIDE.UI
 
             // Store the address in the pointer address - little endian - 24 bits
             int destAddress = Convert.ToInt32(LoadAddressTextBox.Text.Replace(":", ""), 16);
+            Point screenSize = isF256 ? GpuRef.GetScreenSize_JR() : GpuRef.GetScreenSize();
             byte MCRHigh = (byte)(MemMgrRef.VICKY.ReadByte(1) & 3);
-            int screenResX = 640;
-            int screenResY = 480;
-            switch(MCRHigh)
-            {
-                case 1:
-                    screenResX = 800;
-                    screenResY = 600;
-                    break;
-                case 2:
-                    screenResX = 320;
-                    screenResY = 240;
-                    break;
-                case 3:
-                    screenResX = 400;
-                    screenResY = 300;
-                    break;
-            }
 
             ResourceType operationType = ResourceType.raw;
             int conversionStride = 0;
-            int maxHeight = screenResY;
+            int maxHeight = screenSize.Y;
             byte lutIndex = 0;
             switch (FileTypesCombo.SelectedIndex)
             {
                 case 0:  // bitmaps
                     operationType = ResourceType.bitmap;
-                    conversionStride = screenResX;
+                    conversionStride = screenSize.X;
                     lutIndex = (byte)LUTCombo.SelectedIndex;
                     break;
                 case 1:  // tilesets 16 x 16
@@ -298,8 +303,9 @@ namespace FoenixIDE.UI
             bool gray = lutIndex == 0xFF;
             if (ResChecker.Add(resource))
             {
+
                 // Load LUT from memory - ignore indexes 0 and 1
-                int lutBaseAddress = MemoryLocations.MemoryMap.GRP_LUT_BASE_ADDR + lutIndex * 0x400 - MemoryLocations.MemoryMap.VICKY_BASE_ADDR;
+                int lutBaseAddress = isF256 ? 0x3000 + lutIndex * 0x400 : MemoryLocations.MemoryMap.GRP_LUT_BASE_ADDR + lutIndex * 0x400 - MemoryLocations.MemoryMap.VICKY_BASE_ADDR;
                 
                 // Limit how much data is imported based on the type of image
                 int importedLines = maxHeight < bitmap.Height ? maxHeight : bitmap.Height;
@@ -450,7 +456,13 @@ namespace FoenixIDE.UI
 
                 if (mask != 0xc0)
                 {
-                    int videoAddress = resource.StartAddress - 0xB0_0000;
+                   
+
+                    int videoAddress = resource.StartAddress;
+                    if (!isF256)
+                    {
+                        videoAddress = resource.StartAddress - 0xB0_0000;
+                    }
 
                     // Reorganize the bitmap for sprites
                     if (stride < bitmap.Width)
@@ -477,7 +489,15 @@ namespace FoenixIDE.UI
                     }
                     else
                     {
-                        MemMgrRef.VIDEO.CopyBuffer(data, 0, videoAddress, data.Length);
+                        if (isF256)
+                        {
+                            MemMgrRef.RAM.CopyBuffer(data, 0, videoAddress, data.Length);
+                        }
+                        else
+                        {
+                            MemMgrRef.VIDEO.CopyBuffer(data, 0, videoAddress, data.Length);
+                        }
+                        
                     }
 
                     if (lut != null)
@@ -506,7 +526,7 @@ namespace FoenixIDE.UI
                     if (!gray)
                     {
                         // Check if a LUT matching our index is present in the Resources, if so don't do anything.
-                        Resource resLut = ResChecker.Find(ResourceType.lut, lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
+                        Resource resLut = ResChecker.Find(ResourceType.lut, isF256? lutBaseAddress + F256_LUT_STORE - 0x3000 : lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
                         if (resLut == null)
                         {
                             Resource lutPlaceholder = new Resource
@@ -514,7 +534,7 @@ namespace FoenixIDE.UI
                                 Length = 0x400,
                                 FileType = ResourceType.lut,
                                 Name = "Generated LUT",
-                                StartAddress = lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
+                                StartAddress = isF256 ? lutBaseAddress + F256_LUT_STORE - 0x3000 : lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
                             };
                             ResChecker.Add(lutPlaceholder);
                         }

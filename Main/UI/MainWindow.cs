@@ -528,7 +528,6 @@ namespace FoenixIDE.UI
             AssetLoader loader = new AssetLoader
             {
                 StartPosition = FormStartPosition.CenterParent,
-                MemMgrRef = kernel.CPU.MemMgr,
                 ResChecker = ResChecker
             };
             IWin32Window parent = this;
@@ -536,6 +535,9 @@ namespace FoenixIDE.UI
             {
                 parent = (IWin32Window)sender;
             }
+            loader.SetMemoryManager(kernel.CPU.MemMgr);
+            loader.SetBoardVersion(version);
+            loader.SetGPU(gpu);
             if (loader.ShowDialog(parent) == DialogResult.OK)
             {
                 AssetWindow.Instance.UpdateAssets();
@@ -601,9 +603,9 @@ namespace FoenixIDE.UI
             }
         }
 
-        public void SetGpuPeriod(uint time)
+        public void ResetGPU(bool value)
         {
-            gpu.SetRefreshPeriod(time);
+            gpu.ResetGPU(value);
         }
 
         public void SDCardInterrupt(CH376SInterrupt irq)

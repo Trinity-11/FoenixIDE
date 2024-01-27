@@ -2,8 +2,11 @@ Release 0.7.0.2
 ---------------
 When updating the release, remove previous installations.
 Added the RTC to the Memory Manager.
+Fixed the Asset Loader when in F256 mode.
+Fixed the problem with incorrect resolution displayed when DY or DX set in MCR.
+Added Fontset 1 handling from the MCR.
 
-** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).
+** TODO: Update the Keyboard device for F256Jr (PS/2 ScanCode Set 2).  The whole keyboard handling routine for the K needs to be redone.
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Setup Virtual Joystick for the F256.

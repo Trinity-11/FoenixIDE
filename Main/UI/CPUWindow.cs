@@ -586,7 +586,7 @@ namespace FoenixIDE.UI
                 //    InterruptMatchesCheckboxes();
                 //}
                 registerDisplay1.RegistersReadOnly(true);
-                MainWindow.Instance.SetGpuPeriod(17);
+                MainWindow.Instance.ResetGPU(true);
                 kernel.CPU.DebugPause = false;
                 lastLine.Text = "";
                 kernel.CPU.CPUThread = new Thread(new ThreadStart(ThreadProc));
@@ -617,7 +617,7 @@ namespace FoenixIDE.UI
             RunButton.Tag = "0";
             RefreshStatus();
             registerDisplay1.RegistersReadOnly(false);
-            MainWindow.Instance.SetGpuPeriod(500);
+            MainWindow.Instance.ResetGPU(false);
         }
 
         private void addBreakpoints()
@@ -659,7 +659,7 @@ namespace FoenixIDE.UI
             ExecuteStep();
             RefreshStatus();
             registerDisplay1.RegistersReadOnly(false);
-            MainWindow.Instance.SetGpuPeriod(500);
+            MainWindow.Instance.ResetGPU(false);
             kernel.CPU.DebugPause = true;
         }
 
@@ -706,7 +706,7 @@ namespace FoenixIDE.UI
                 RunButton.Text = "Run (F5)";
                 RunButton.Tag = "0";
                 registerDisplay1.RegistersReadOnly(false);
-                MainWindow.Instance.SetGpuPeriod(500);
+                MainWindow.Instance.ResetGPU(false);
             }
             else
             {

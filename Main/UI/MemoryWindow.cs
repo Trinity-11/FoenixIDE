@@ -46,7 +46,7 @@ namespace FoenixIDE.UI
                 MemoryWindowTooltips.SetToolTip(MCRBit8Button, "Clock 70");
                 MemoryWindowTooltips.SetToolTip(MCRBit7Button, "Disable Video");
 
-                MCRBit8Button.Text = "CX";
+                MCRBit8Button.Text = "70";
                 MCRBit9Button.Text = "DX";
                 MCRBit7Button.Visible = false;
                 MCRBit10Button.Visible = true;

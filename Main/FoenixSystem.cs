@@ -128,7 +128,6 @@ namespace FoenixIDE
                     // vicky will store 4 pages of data
                     VICKY = new MemoryRAM(0, 4 * 0x2000),
                     PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5, PS2KeyboardRegister.Mode.Mode2),
-                    MATRIXKEYBOARD = new MatrixKeyboardRegister(MemoryMap.MATRIX_KEYBOARD_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4),
                     MATH = new MathCoproRegister_JR(MemoryMap.MATH_START_JR, MemoryMap.MATH_END_JR - MemoryMap.MATH_START_JR + 1), // 32 bytes
                     SDCARD = sdcard,
                     INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_JR, 3),
@@ -142,6 +141,11 @@ namespace FoenixIDE
                     RNG = new RNGRegister(MemoryMap.SEEDL_JR, 3),
                     SOLRegister = new SOL(MemoryMap.SOL_CTRL_JR, 4)
                 };
+                // Only the K machines have a matrix keyboard
+                if (boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816)
+                {
+                    MemMgr.MATRIXKEYBOARD = new MatrixKeyboardRegister(MemoryMap.MATRIX_KEYBOARD_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
+                }
                 dma.setSystemRam(MemMgr.RAM);
             }
             
