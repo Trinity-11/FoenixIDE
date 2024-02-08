@@ -222,7 +222,7 @@ namespace FoenixIDE.UI
                 String fontPath = Path.Combine(applicationDirectory, "Resources", "Bm437_PhoenixEGA_8x8.bin");
                 gpu.LoadFontSet("Foenix", fontPath, 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
-                joystickWindow.gabe = kernel.MemMgr.GABE;
+                joystickWindow.SetGabe(kernel.MemMgr.GABE, MemoryLocations.MemoryMap.JOYSTICK0 - MemoryLocations.MemoryMap.GABE_START, 0);
 
                 gpu.SetMCRAddress(0);
                 gpu.SetFGLUTAddress(MemoryMap.FG_CHAR_LUT_PTR - gpu.VICKY.StartAddress);
@@ -252,6 +252,9 @@ namespace FoenixIDE.UI
                 gpu.SetMode(1);
                 gpu.VRAM = kernel.MemMgr.RAM;
 
+                // VIA Chip Port B is joystick 1
+                joystickWindow.SetMatrix(kernel.MemMgr.MATRIXKEYBOARD, 0, 0);
+
                 // Addresses for VICKY in Junior are zero-based
                 gpu.SetMCRAddress(0x1000);
                 gpu.SetFGLUTAddress(MemoryMap.FG_CHAR_LUT_PTR_JR - 0xC000);  // IO Page 0
@@ -267,7 +270,7 @@ namespace FoenixIDE.UI
                 gpu.SetGammaBaseAddress(MemoryMap.GAMMA_BASE_ADDR_JR - 0xC000);  // IO Page 0
                 gpu.SetLineIRQRegister(MemoryMap.VKY_LINE_IRQ_CTRL_REG_JR - 0xC000);  // IO Page 0
                 gpu.SetSOL0Address(MemoryMap.VKY_LINE_CMP_VALUE_JR - 0xC000);  // IO Page 0
-                gpu.SetMousePointerRegister(0x1000);  // IO Page 0
+                gpu.SetMousePointerRegister(0xD6E0 - 0xC000);  // IO Page 0
 
                 gpu.SetBitmapControlRegister(0xD100 - 0xC000);  // IO Page 0
                 gpu.SetTileMapBaseAddress(MemoryMap.TILE_CONTROL_REGISTER_ADDR_JR - 0xC000);
@@ -679,18 +682,18 @@ namespace FoenixIDE.UI
                 {
                     case Keys.F11:
                         FullScreenToggle();
-                        break;
+                        return;
                     case Keys.F5:
                         this.debugWindow.RunButton_Click(sender, null);
-                        break;
+                        return;
                 }
             }
 
-            ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
-            if (scanCode != ScanCode.sc_null)
+            byte[] scanCode = (version == BoardVersion.RevJr_6502 || version == BoardVersion.RevJr_65816) ? ScanCodes.GetSCSet2(e.KeyCode, false) : ScanCodes.GetScanCodeSet1(e.KeyCode, false);
+            if (scanCode[0] != ScanCodes.sc_null)
             {
                 e.Handled = true;
-                lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
+                lastKeyPressed.Text = "$" + scanCode[0].ToString("X2");
                 if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
                 {
                     WriteKeyboardCode(scanCode);
@@ -711,7 +714,24 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void WriteKeyboardCode(ScanCode sc)
+        private void BasicWindow_KeyUp(object sender, KeyEventArgs e)
+        {
+            byte[] scanCode = (version == BoardVersion.RevJr_6502 || version == BoardVersion.RevJr_65816) ? ScanCodes.GetSCSet2(e.KeyCode, true) : ScanCodes.GetScanCodeSet1(e.KeyCode, true);
+            if (scanCode[0] != ScanCodes.sc_null)
+            {
+                lastKeyPressed.Text = "$" + scanCode[scanCode.Length-1].ToString("X2");
+                if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
+                {
+                    WriteKeyboardCode(scanCode);
+                }
+            }
+            else
+            {
+                lastKeyPressed.Text = "";
+            }
+        }
+
+        private void WriteKeyboardCode(byte[] sc)
         {
             if (!BoardVersionHelpers.IsF256(version))
             {
@@ -719,7 +739,7 @@ namespace FoenixIDE.UI
                 byte mask = kernel.MemMgr.ReadByte(MemoryMap.INT_MASK_REG1);
                 if ((~mask & (byte)Register1.FNX1_INT00_KBD) != 0)
                 {
-                    kernel.MemMgr.PS2KEYBOARD.WriteByte(0, (byte)sc);
+                    kernel.MemMgr.PS2KEYBOARD.WriteByte(0, sc[0]);
                     kernel.MemMgr.PS2KEYBOARD.WriteByte(4, 0);
 
                     TriggerKeyboardInterrupt();
@@ -730,18 +750,21 @@ namespace FoenixIDE.UI
                 // Notify the F256K matrix keyboard
                 if (kernel.MemMgr.MATRIXKEYBOARD != null)
                 {
-                    kernel.MemMgr.MATRIXKEYBOARD.WriteScanCode(sc);
-                }
+                    kernel.MemMgr.MATRIXKEYBOARD.WriteScanCode(sc[0]);
 
-                // Check if the Keyboard interrupt is allowed
-                byte mask = kernel.MemMgr.VICKY.ReadByte(MemoryMap.INT_MASK_REG0_JR - 0xC000);
-                if ((~mask & (byte)Register0_JR.JR0_INT02_KBD) != 0)
+                    // Check if the Keyboard interrupt is allowed
+                    byte mask = kernel.MemMgr.VICKY.ReadByte(MemoryMap.INT_MASK_REG0_JR + 1 - 0xC000);
+                    if ((~mask & (byte)Register1_JR.JR1_INT06_VIA1) != 0)
+                    {
+                        TriggerKeyboardInterrupt();
+                    }
+                }
+                else
                 {
-                    kernel.MemMgr.PS2KEYBOARD.WriteByte(0, (byte)sc);
-                    kernel.MemMgr.PS2KEYBOARD.WriteByte(4, 0);
-
-                    TriggerKeyboardInterrupt();
+                    // Check if the Keyboard interrupt is allowed
+                    kernel.MemMgr.PS2KEYBOARD.WriteScanCodeSequence(sc, sc.Length);
                 }
+                
             }
         }
         private void TriggerKeyboardInterrupt()
@@ -756,11 +779,26 @@ namespace FoenixIDE.UI
             }
             else
             {
-                // Set the Keyboard Interrupt
-                byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(0);
-                IrqVal |= (byte)Register0_JR.JR0_INT02_KBD;
-                kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IrqVal);
-                kernel.CPU.Pins.IRQ = true;
+                if (kernel.MemMgr.MATRIXKEYBOARD != null)
+                {
+                    // Set the Keyboard Interrupt
+                    byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(1);
+                    IrqVal |= (byte)Register1_JR.JR1_INT06_VIA1;
+                    kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IrqVal);
+                    kernel.CPU.Pins.IRQ = true;
+                }
+                else
+                {
+                    byte mask = kernel.MemMgr.VICKY.ReadByte(MemoryMap.INT_MASK_REG0_JR - 0xC000);
+                    if ((~mask & (byte)Register0_JR.JR0_INT02_KBD) != 0)
+                    {
+                        // Set the Keyboard Interrupt
+                        byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(0);
+                        IrqVal |= (byte)Register0_JR.JR0_INT02_KBD;
+                        kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IrqVal);
+                        kernel.CPU.Pins.IRQ = true;
+                    }
+                }
             }
         }
 
@@ -784,23 +822,7 @@ namespace FoenixIDE.UI
             }
         }
 
-        private void BasicWindow_KeyUp(object sender, KeyEventArgs e)
-        {
-            ScanCode scanCode = ScanCodes.GetScanCode(e.KeyCode);
-            if (scanCode != ScanCode.sc_null)
-            {
-                scanCode += 0x80;
-                lastKeyPressed.Text = "$" + ((byte)scanCode).ToString("X2");
-                if (kernel.MemMgr != null && !kernel.CPU.DebugPause)
-                {
-                    WriteKeyboardCode(scanCode);
-                }
-            }
-            else
-            {
-                lastKeyPressed.Text = "";
-            }
-        }
+        
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1198,7 +1220,7 @@ namespace FoenixIDE.UI
             Point size = gpu.GetScreenSize();
             if (BoardVersionHelpers.IsF256(version))
             {
-                size = gpu.GetScreenSize_JR();
+                size = gpu.GetScreenSize_F256();
             }
             float ratioW = gpu.Width / (float)size.X;
             float ratioH = gpu.Height / (float)size.Y;
@@ -1225,6 +1247,13 @@ namespace FoenixIDE.UI
                     GenerateMouseInterrupt(e);
                 }
             }
+            else
+            {
+                if (kernel.MemMgr != null)
+                {
+                    GenerateMouseInterrupt(e);
+                }
+            }
         }
 
         private void Gpu_MouseDown(object sender, MouseEventArgs e)
@@ -1232,7 +1261,7 @@ namespace FoenixIDE.UI
             Point size = gpu.GetScreenSize();
             if (BoardVersionHelpers.IsF256(version))
             {
-                size = gpu.GetScreenSize_JR();
+                size = gpu.GetScreenSize_F256();
             }
             float ratioW = gpu.Width / (float)size.X;
             float ratioH = gpu.Height / (float)size.Y;
@@ -1290,7 +1319,7 @@ namespace FoenixIDE.UI
             Point size = gpu.GetScreenSize();
             if (BoardVersionHelpers.IsF256(version))
             {
-                gpu.GetScreenSize_JR();
+                size = gpu.GetScreenSize_F256();
             }
             double ratioW = gpu.Width / (double)size.X;
             double ratioH = gpu.Height / (double)size.Y;
@@ -1298,18 +1327,50 @@ namespace FoenixIDE.UI
             int Y = (int)(e.Y / ratioH);
 
             byte buttons = (byte)((left ? 1 : 0) + (right ? 2 : 0) + (middle ? 4 : 0));
-
-            kernel.MemMgr.VICKY.WriteWord(0x702, X);
-            kernel.MemMgr.VICKY.WriteWord(0x704, Y);
-            kernel.MemMgr.VICKY.WriteByte(0x706, buttons);
-
-            // Generate three interrupts - to emulate how the PS/2 controller works
-            byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
-            // The PS/2 packet is byte0, xm, ym
-            if ((~mask & (byte)Register0.FNX0_INT07_MOUSE) == (byte)Register0.FNX0_INT07_MOUSE)
+            if (!BoardVersionHelpers.IsF256(version))
             {
-                kernel.MemMgr.PS2KEYBOARD.MousePackets((byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)), (byte)(X & 0xFF), (byte)(Y & 0xFF));
+                kernel.MemMgr.VICKY.WriteWord(0x702, X);
+                kernel.MemMgr.VICKY.WriteWord(0x704, Y);
+                kernel.MemMgr.VICKY.WriteByte(0x706, buttons);
+
+                // Generate three interrupts - to emulate how the PS/2 controller works
+                byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+                // The PS/2 packet is byte0, xm, ym
+                if ((~mask & (byte)Register0.FNX0_INT07_MOUSE) == (byte)Register0.FNX0_INT07_MOUSE)
+                {
+                    kernel.MemMgr.PS2KEYBOARD.MousePackets((byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)), (byte)(X & 0xFF), (byte)(Y & 0xFF));
+                }
             }
+            else
+            {
+                byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0xD6E0 - 0xC000);
+                bool mouseEnabled = (mouseReg & 1) != 0;
+                bool mouseMode1 = (mouseReg & 2) != 0;
+
+                if (mouseEnabled)
+                {
+                    if (mouseMode1)
+                    {
+                        kernel.MemMgr.VICKY.WriteWord(0xD6E6 - 0xC000, (byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)));
+                        kernel.MemMgr.VICKY.WriteWord(0xD6E7 - 0xC000, (byte)(X & 0xFF));
+                        kernel.MemMgr.VICKY.WriteWord(0xD6E8 - 0xC000, (byte)(Y & 0xFF));
+                    }
+                    else
+                    {
+                        kernel.MemMgr.VICKY.WriteWord(0xD6E2 - 0xC000, X);
+                        kernel.MemMgr.VICKY.WriteWord(0xD6E4 - 0xC000, Y);
+                    }
+                }
+
+                // Generate three interrupts - to emulate how the PS/2 controller works
+                byte mask = kernel.MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR);
+                // The PS/2 packet is byte0, xm, ym
+                if ((~mask & (byte)Register0_JR.JR0_INT03_MOUSE) == (byte)Register0_JR.JR0_INT03_MOUSE)
+                {
+                    kernel.MemMgr.PS2KEYBOARD.MousePackets((byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)), (byte)(X & 0xFF), (byte)(Y & 0xFF));
+                }
+            }
+            
         }
 
         private void Gpu_MouseLeave(object sender, EventArgs e)

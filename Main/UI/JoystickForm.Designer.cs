@@ -43,6 +43,7 @@
             this.UpButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.UpButton.CausesValidation = false;
             this.UpButton.FlatAppearance.BorderSize = 0;
+            this.UpButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.ControlDark;
             this.UpButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.UpButton.Location = new System.Drawing.Point(54, 49);
             this.UpButton.Name = "UpButton";
@@ -59,6 +60,7 @@
             this.DownButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.DownButton.CausesValidation = false;
             this.DownButton.FlatAppearance.BorderSize = 0;
+            this.DownButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.ControlDark;
             this.DownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DownButton.Location = new System.Drawing.Point(54, 119);
             this.DownButton.Name = "DownButton";
@@ -75,6 +77,7 @@
             this.LeftButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.LeftButton.CausesValidation = false;
             this.LeftButton.FlatAppearance.BorderSize = 0;
+            this.LeftButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.ControlDark;
             this.LeftButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LeftButton.Location = new System.Drawing.Point(18, 85);
             this.LeftButton.Name = "LeftButton";
@@ -91,6 +94,7 @@
             this.RightButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.RightButton.CausesValidation = false;
             this.RightButton.FlatAppearance.BorderSize = 0;
+            this.RightButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.ControlDark;
             this.RightButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RightButton.Location = new System.Drawing.Point(90, 85);
             this.RightButton.Name = "RightButton";
@@ -107,6 +111,7 @@
             this.Fire2Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.Fire2Button.CausesValidation = false;
             this.Fire2Button.FlatAppearance.BorderSize = 0;
+            this.Fire2Button.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.ControlDark;
             this.Fire2Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Fire2Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Fire2Button.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -126,6 +131,7 @@
             this.Fire1Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.Fire1Button.CausesValidation = false;
             this.Fire1Button.FlatAppearance.BorderSize = 0;
+            this.Fire1Button.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.ControlDark;
             this.Fire1Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Fire1Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Fire1Button.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -153,6 +159,8 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "JoystickForm";
             this.Text = "Joystick";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.JoystickForm_FormClosing);

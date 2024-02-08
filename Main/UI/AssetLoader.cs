@@ -147,7 +147,7 @@ namespace FoenixIDE.UI
 
             // Store the address in the pointer address - little endian - 24 bits
             int destAddress = Convert.ToInt32(LoadAddressTextBox.Text.Replace(":", ""), 16);
-            Point screenSize = isF256 ? GpuRef.GetScreenSize_JR() : GpuRef.GetScreenSize();
+            Point screenSize = isF256 ? GpuRef.GetScreenSize_F256() : GpuRef.GetScreenSize();
             byte MCRHigh = (byte)(MemMgrRef.VICKY.ReadByte(1) & 3);
 
             ResourceType operationType = ResourceType.raw;

@@ -1,192 +1,49 @@
-﻿using FoenixIDE.Basic;
+﻿using FoenixIDE.MemoryLocations;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class PS2KeyboardRegister: MemoryLocations.MemoryRAM
-    {
-        private bool mouseDevice = false;
-        private bool breakKey = false;
-        private byte ps2PacketCntr = 0;
-        private int packetLength = 0;
-        private byte[] ps2packet = new byte[6];
-        private Mode mode; // Mode 1 for C256, Mode 2 for F256
+    public abstract class PS2KeyboardRegister: IMappable
+    {   
+        protected byte[] data;
+
         public delegate void TriggerInterruptDelegate();
         public TriggerInterruptDelegate TriggerKeyboardInterrupt;
         public TriggerInterruptDelegate TriggerMouseInterrupt;
 
-        public enum Mode
+        public int StartAddress { get; }
+        public int Length { get; }
+        public int EndAddress { get; }
+
+        public PS2KeyboardRegister(int StartAddress, int Length)
         {
-            Mode1,
-            Mode2
+            this.StartAddress = StartAddress;
+            this.Length = Length;
+            this.EndAddress = StartAddress + Length - 1;
+               
+            data = new byte[Length];
         }
 
-        public PS2KeyboardRegister(int StartAddress, int Length, Mode m) : base(StartAddress, Length)
+        public abstract byte ReadByte(int Address);
+
+        public abstract void WriteByte(int Address, byte Data);
+
+        public abstract void MousePackets(byte buttons, byte X, byte Y);
+
+        public abstract void WriteScanCodeSequence(byte[] codes, int seqLength);
+
+        public void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length)
         {
-            mode = m;
+            throw new NotImplementedException();
         }
 
-        // This is used to simulate the Keyboard Register
-        public override void WriteByte(int Address, byte Value)
+        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer)
         {
-            // In order to avoid an infinite loop, we write to the device directly
-            data[Address] = Value;
-            
-            
-            switch (Address)
-            {
-                case 0:
-                    switch (Value)
-                    {
-                        case 0x69:
-                            data[4] = 1;
-                            break;
-                        case 0xEE: // echo command
-                            data[4] = 1;
-                            break;
-                        case 0xF4:
-                            data[0] = 0xFA;
-                            data[4] = 1;
-                            break;
-                        case 0xF6:
-                            data[4] = 1;
-                            break;
-                    }
-                    break;
-                case 4:
-                    switch (Value)
-                    {
-                        case 0x60:
-
-                            break;
-                        case 0xA9:
-                            data[0] = 0;
-                            break;
-                        case 0xAA: // self test
-                            data[0] = 0x55;
-                            data[4] = 1;
-                            break;
-                        case 0xAB: // keyboard test
-                            data[0] = 0;
-                            data[4] = 1;
-                            break;
-                        case 0xAD: // disable keyboard
-                            data[0] = 0;
-                            data[1] = 0;
-                            break;
-                        case 0xAE: // re-enabled sending data
-                            data[4] = 1;
-                            break;
-                        case 0xFF:  // reset 
-                            data[4] = 0xAA;
-                            break;
-                        case 0x20:
-                            data[4] = 1;
-                            break;
-                        //case 0x60:
-                        //    data[4] = 0;
-                        //    break;
-                        //case 0xAA:
-                        //    data[0] = 0x55;
-                        //    data[4] = 1;
-                        //    break;
-                        //case 0xA8:
-                        //    data[4] = 1;
-                        //    break;
-                        //case 0xA9:
-                        //    data[0] = 0;
-                        //    data[4] = 1;
-                        //    break;
-                        //case 0xAB:
-                        //    data[0] = 0;
-                        //    break;
-                        case 0xD4:
-                            data[4] = 1;
-                            break;
-
-                    }
-                    
-                    break;
-            }
+            throw new NotImplementedException();
         }
-
-        public override byte ReadByte(int Address)
-        {
-            // Whenever the buffer is read, set the buffer to empty.
-            if (Address == 0)
-            {
-                if (!mouseDevice && !breakKey)
-                {
-                    data[4] = 0;
-                }
-                else if (packetLength != 0)
-                {
-                    
-
-                    // raise interrupt
-                    if (mouseDevice)
-                    {
-                        // send the next byte in the packet
-                        data[4] = ps2packet[ps2PacketCntr++];
-                        TriggerMouseInterrupt();
-                        if (ps2PacketCntr == packetLength)
-                        {
-                            ps2PacketCntr = 0;
-                            mouseDevice = false;
-                            packetLength = 0;
-                        }
-                    } 
-                    else if (breakKey)  // this doesn't work yet
-                    {
-                        // send the next byte in the packet
-                        data[0] = ps2packet[ps2PacketCntr++];
-                        data[4] = 0;
-                        TriggerKeyboardInterrupt();
-                        if (ps2PacketCntr == packetLength)
-                        {
-                            ps2PacketCntr = 0;
-                            breakKey = false;
-                            packetLength = 0;
-                        }
-                    }
-                }
-                return data[0];
-            }
-            else if (Address == 4 && mode == Mode.Mode2)
-            {
-                // PS2 mode 2 keyboards are not currently supported, so always return 0b11, indicating that they keyboard and mouse queues are empty.
-                return 3;
-            }
-            else if (Address == 5)
-            {
-                return 0;
-            }
-            return data[Address];
-        }
-        public void WriteScanCodeSequence(byte[] codes, int seqLength)
-        {
-            breakKey = true;
-            data[0] = codes[0];
-            data[4] = 0;
-            ps2PacketCntr = 1;
-            packetLength = seqLength;
-            Array.Copy(codes, ps2packet, seqLength);
-
-            TriggerKeyboardInterrupt?.Invoke();
-        }
-        
-        public void MousePackets(byte buttons, byte X, byte Y)
-        {
-            mouseDevice = true;
-            data[0] = buttons;
-            ps2PacketCntr = 1;
-            packetLength = 3;
-            ps2packet[0] = buttons;
-            ps2packet[1] = X;
-            ps2packet[2] = Y;
-
-            TriggerMouseInterrupt?.Invoke();
-        }
-        
     }
 }

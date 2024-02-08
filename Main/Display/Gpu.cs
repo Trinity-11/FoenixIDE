@@ -168,7 +168,7 @@ namespace FoenixIDE.Display
             {
                 BLINK_RATE = 100;
             }
-            
+            hiresTimer.Interval = time;
             BlinkingCounter = BLINK_RATE;
             hiresTimer.Start();
         }
@@ -216,7 +216,7 @@ namespace FoenixIDE.Display
             }
             else
             {
-                res = GetScreenSize_JR();
+                res = GetScreenSize_F256();
             }
             if (VICKY != null)
             {
@@ -588,10 +588,7 @@ namespace FoenixIDE.Display
                     }
                     if (!TileEditorMode)
                     {
-                        if (mode == 0)
-                        {
-                            DrawMouse(bitmapPointer, gammaCorrection, line, res.X, res.Y);
-                        }
+                        DrawMouse(bitmapPointer, gammaCorrection, line, res.X, res.Y);
                     }
 
                 }

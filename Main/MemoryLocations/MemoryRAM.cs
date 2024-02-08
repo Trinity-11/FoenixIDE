@@ -7,39 +7,18 @@ namespace FoenixIDE.MemoryLocations
     public class MemoryRAM : IMappable
     {
         protected byte[] data = null;
-        private readonly int startAddress;
-        private readonly int length;
-        private readonly int endAddress;
 
-        public int StartAddress
-        {
-            get
-            {
-                return this.startAddress;
-            }
-        }
+        public int StartAddress { get; }
 
-        public int Length
-        {
-            get
-            {
-                return length;
-            }
-        }
+        public int Length { get; }
 
-        public int EndAddress
-        {
-            get
-            {
-                return endAddress;
-            }
-        }
+        public int EndAddress { get; }
 
         public MemoryRAM(int StartAddress, int Length)
         {
-            this.startAddress = StartAddress;
-            this.length = Length;
-            this.endAddress = StartAddress + Length - 1;
+            this.StartAddress = StartAddress;
+            this.Length = Length;
+            this.EndAddress = StartAddress + Length - 1;
             data = new byte[Length];
         }
 

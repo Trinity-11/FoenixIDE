@@ -78,18 +78,20 @@ namespace FoenixIDE.MemoryLocations
         public const int INT_POL_REG1 = 0x00_0145 ;
         public const int INT_POL_REG2 = 0x00_0146 ;
         public const int INT_POL_REG7 = 0x00_0147 ; // FMX Model
+        public const int INT_POL_REG0_JR = 0xD664;  // F256
 
         // Edge Detection Enable
         public const int INT_EDGE_REG0 = 0x00_0148;
         public const int INT_EDGE_REG1 = 0x00_0149;
         public const int INT_EDGE_REG2 = 0x00_014A;
         public const int INT_EDGE_REG3 = 0x00_014B; // FMX Model
+        public const int INT_EDGE_REG0_JR = 0xD668; // F256
         // Mask
         public const int INT_MASK_REG0 = 0x00_014C;
         public const int INT_MASK_REG1 = 0x00_014D;
         public const int INT_MASK_REG2 = 0x00_014E;
-        public const int INT_MASK_REG3 = 0x00_014F; // FMX Model
-        public const int INT_MASK_REG0_JR = 0x00_D666;
+        public const int INT_MASK_REG3 = 0x00_014F;    // FMX Model
+        public const int INT_MASK_REG0_JR = 0xD66C; // F256
 
         public const int TIMER0_CTRL_REG = 0x00_0160;
         public const int TIMER0_CTRL_REG_JR = 0xD650;
@@ -161,10 +163,10 @@ namespace FoenixIDE.MemoryLocations
         //// public const int KEYBOARD_SC_FLG = 0X000F43; // 1 Bytes that indicate the Status of Left Shift, Left CTRL, Left ALT, Right Shift
         //// public const int KEYBOARD_SC_TMP = 0X000F44; // 1 Byte, Interrupt Save Scan Code while Processing
 
-        public const int MATRIX_KEYBOARD_VIA0_PORT_B = 0xDC00;
-        public const int MATRIX_KEYBOARD_VIA0_PORT_A = 0xDC01;
-        public const int MATRIX_KEYBOARD_VIA0_DATA_DIRECTION_B = 0xDC02;
-        public const int MATRIX_KEYBOARD_VIA0_DATA_DIRECTION_A = 0xDC03;
+        public const int JOYSTICK_VIA0_PORT_B = 0xDC00;
+        public const int JOYSTICK_VIA0_PORT_A = 0xDC01;
+        public const int JOYSTICK_VIA0_DATA_DIRECTION_B = 0xDC02;
+        public const int JOYSTICK_VIA0_DATA_DIRECTION_A = 0xDC03;
 
         public const int MATRIX_KEYBOARD_VIA1_PORT_B = 0xDB00;
         public const int MATRIX_KEYBOARD_VIA1_PORT_A = 0xDB01;

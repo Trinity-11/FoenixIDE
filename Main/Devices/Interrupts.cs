@@ -68,25 +68,37 @@ namespace FoenixIDE.Simulator.Devices
 
     enum Register0_JR
     {
-        JR0_INT00_SOF = 1,
-        JR0_INT01_SOL = 2,
-        JR0_INT02_KBD = 4,
+        JR0_INT00_SOF =   1,
+        JR0_INT01_SOL =   2,
+        JR0_INT02_KBD =   4,
         JR0_INT03_MOUSE = 8,
-        JR0_INT04_TMR0 = 16,
-        JR0_INT05_TMR1 = 32,
-        JR0_INT06_DMA = 64,
-        JR0_INT07_RSVD = 128
+        JR0_INT04_TMR0 =  0x10,
+        JR0_INT05_TMR1 =  0x20,
+        JR0_INT06_DMA =   0x40,
+        JR0_INT07_CART =  0x80
     }
 
     enum Register1_JR
     {
-        JR1_INT00_UART = 1,
-        JR1_INT01_VKY2 = 2,
-        JR1_INT02_VKY3 = 4,
-        JR1_INT03_VKY4 = 8,
-        JR1_INT04_RTC = 16,
-        JR1_INT05_VIA = 32,
-        JR1_INT06_IEC = 64,
-        JR1_INT07_SDCARD = 128
+        JR1_INT00_UART =   1,
+        JR1_INT01_VKY2 =   2,
+        JR1_INT02_VKY3 =   4,
+        JR1_INT03_VKY4 =   8,
+        JR1_INT04_RTC =    0x10,
+        JR1_INT05_VIA0 =   0x20,
+        JR1_INT06_VIA1 =   0x40,  // only F256K Matrix Keyboard
+        JR1_INT07_SDCARD = 0x80
+    }
+
+    enum Register2_JR
+    {
+        JR2_INT00_IEC_DI    = 1,
+        JR2_INT01_IEC_CLKI  = 2,
+        JR2_INT02_IEC_ATNI  = 4,
+        JR2_INT03_IEC_SREQI = 8,
+        JR2_INT04_RSVD1     = 0x10,
+        JR2_INT04_RSVD2 =     0x20,
+        JR2_INT04_RSVD3 =     0x40,
+        JR2_INT04_RSVD4 =     0x80
     }
 }

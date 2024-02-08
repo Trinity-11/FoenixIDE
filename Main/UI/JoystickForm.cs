@@ -1,4 +1,5 @@
 ﻿using FoenixIDE.MemoryLocations;
+using FoenixIDE.Simulator.Devices;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,17 +7,43 @@ namespace FoenixIDE.Simulator.UI
 {
     public partial class JoystickForm : Form
     {
-        public MemoryRAM gabe = null;
+        private MemoryRAM gabe = null;
+        private MatrixKeyboardRegister matrix = null;
+        private int portAddress = 0;
+        private int port = 0;
+        private byte NO_BUTTON = 0xDF;
         public JoystickForm()
         {
             InitializeComponent();
         }
 
-        private void SendJoystickValue(int joystick, byte value)
+        public void SetGabe(MemoryRAM device, int address, int port)
+        {
+            gabe = device;
+            matrix = null;
+            portAddress = address;
+            this.port = port;
+            NO_BUTTON = 0xDF;
+        }
+
+        public void SetMatrix(MatrixKeyboardRegister device, int address, int port)
+        {
+            gabe = null;
+            matrix = device;
+            portAddress = address;
+            this.port = port;
+            NO_BUTTON = 0x3F;
+        }
+
+        private void SendJoystickValue(byte value)
         {
             if (gabe != null)
             {
-                gabe.WriteByte(MemoryLocations.MemoryMap.JOYSTICK0 - MemoryLocations.MemoryMap.GABE_START + joystick, value);
+                gabe.WriteByte(portAddress + port, value);
+            }
+            if (matrix != null)
+            {
+                matrix.JoystickCode((byte)port, value);
             }
         }
 
@@ -41,38 +68,38 @@ namespace FoenixIDE.Simulator.UI
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    value = 0xDB;
+                    value = (byte)(NO_BUTTON ^ 4); // 0xDB;
                     LeftButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.S:
-                    value = 0xDD;
+                    value = (byte)(NO_BUTTON ^ 2); // 0xDD;
                     DownButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.D:
-                    value = 0xD7;
+                    value = (byte)(NO_BUTTON ^ 8); //  0xD7;
                     RightButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.W:
-                    value = 0xDE;
+                    value = (byte)(NO_BUTTON ^ 1); // 0xDE;
                     UpButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.Q:
-                    value = 0xCF;
+                    value = (byte)(NO_BUTTON ^ 0x10); // 0xCF;
                     Fire1Button.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.E:
-                    value = 0x5F;
+                    value = (byte)(NO_BUTTON ^ 0x20); // 0x5F;
                     Fire2Button.BackColor = SystemColors.ControlDark;
                     break;
             }
             if (value != 0)
             {
-                SendJoystickValue(0, value);
+                SendJoystickValue(value);
             }
         }
         private void JoystickForm_KeyUp(object sender, KeyEventArgs e)
         {
-            SendJoystickValue(0, 0xDF);
+            SendJoystickValue(NO_BUTTON);
             switch (e.KeyCode)
             {
                 case Keys.A:
@@ -101,15 +128,15 @@ namespace FoenixIDE.Simulator.UI
          */
         private void AllButtonsUp(object sender, MouseEventArgs e)
         {
-            SendJoystickValue(0, 0xDF);
+            SendJoystickValue(NO_BUTTON);
         }
         private void AllButtonsDown(object sender, MouseEventArgs e)
         {
             if (sender is Control ctrl)
             {
                 int buttonPressed = int.Parse((string)(ctrl.Tag));
-                byte value = (byte)(0xDF & ~buttonPressed);
-                SendJoystickValue(0, value);
+                byte value = (byte)(0xFF & ~buttonPressed);
+                SendJoystickValue(value);
             }
         }
     }

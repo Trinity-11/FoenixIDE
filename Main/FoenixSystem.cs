@@ -95,7 +95,7 @@ namespace FoenixIDE
 
                     // Special devices
                     MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1), // 48 bytes
-                    PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5, PS2KeyboardRegister.Mode.Mode1),
+                    PS2KEYBOARD = new PS2KeyboardRegisterSet1(keyboardAddress, 5),
                     SDCARD = sdcard,
                     INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
                     UART1 = new UART(MemoryMap.UART1_REGISTERS, 8),
@@ -127,10 +127,11 @@ namespace FoenixIDE
                     FLASHJR = new FlashJr(MemoryMap.RAM_START, 0x08_0000),
                     // vicky will store 4 pages of data
                     VICKY = new MemoryRAM(0, 4 * 0x2000),
-                    PS2KEYBOARD = new PS2KeyboardRegister(keyboardAddress, 5, PS2KeyboardRegister.Mode.Mode2),
+                    PS2KEYBOARD = new PS2KeyboardRegisterSet2(keyboardAddress, 5),
                     MATH = new MathCoproRegister_JR(MemoryMap.MATH_START_JR, MemoryMap.MATH_END_JR - MemoryMap.MATH_START_JR + 1), // 32 bytes
                     SDCARD = sdcard,
-                    INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_JR, 3),
+                    // Set to 4 bytes, just to be compatible with old boards and avoid exceptions in BreakOnIRQCheckBox_CheckedChanged
+                    INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_JR, 4),  
                     UART1 = new UART(MemoryMap.UART_REGISTERS_JR, 8),
                     DMA = dma,
                     TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG_JR, 8),
@@ -144,7 +145,7 @@ namespace FoenixIDE
                 // Only the K machines have a matrix keyboard
                 if (boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816)
                 {
-                    MemMgr.MATRIXKEYBOARD = new MatrixKeyboardRegister(MemoryMap.MATRIX_KEYBOARD_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
+                    MemMgr.MATRIXKEYBOARD = new MatrixKeyboardRegister(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
                 }
                 dma.setSystemRam(MemMgr.RAM);
             }
@@ -211,8 +212,8 @@ namespace FoenixIDE
                 // Set the layers??
                 MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
 
-
-
+                // Write the byte $9F in the joystick registers to mean they
+                MemMgr.VICKY.WriteWord(0xDC00 - 0xC000, 0xDFDF);
 
                 // Set the PCB Hardware Version
                 MemMgr.VICKY.WriteWord(0xD6A8 - 0xC000, 0x3041);  // C256Jr
@@ -669,15 +670,17 @@ namespace FoenixIDE
             
             if (MemMgr.MATRIXKEYBOARD != null)
             {
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(0, 0);
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(1, 0);
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(2, 0);
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(3, 0);
+                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(2, 0xFF);  // DDRB
+                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(3, 0xFF);  // DDRA
+                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(0, 0xFF); // JOYSTICK 2
+                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(1, 0xFF); // JOYSTICK 1
+                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(2, 0);  // DDRB
+                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(3, 0);  // DDRA
 
                 MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(0, 0);
                 MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(1, 0);
-                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(2, 0);
-                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(3, 0);
+                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(2, 0);  // DDRB
+                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(3, 0);  // DDRA
             }
 
             return true;

@@ -32,6 +32,11 @@ namespace FoenixIDE.Simulator.Devices
         bool isAlarmEnabled = false;
         bool isPeriodicEnabled = false;
 
+        /**
+         * The reason I'm using a timer is to emulate how the RTC time is always updated.
+         * I could have written this to only return the PC date when the registers are read, 
+         * but it wouldn't be how the machine works.
+         */
         public RTC(int StartAddress, int Length) : base(StartAddress, Length)
         {
             secondTimer = new HiResTimer(1000);
@@ -43,7 +48,7 @@ namespace FoenixIDE.Simulator.Devices
             periodicTimer.Enabled = false;
 
             // By default, set the current date and time to now - users can overwrite this
-            DateTime currentTime = new DateTime();
+            DateTime currentTime = DateTime.Now;
             // write the time to memory - values are BCD
             data[0] = BCD(currentTime.Second);
             data[2] = BCD(currentTime.Minute);
@@ -64,11 +69,11 @@ namespace FoenixIDE.Simulator.Devices
         void Second_Timer_Tick(object sender, EventArgs e)
         {
             // increment seconds
-            byte second = data[0];
+            byte second = (byte)(((data[0] & 0xF0) >> 4) * 10 + (data[0] & 0xF));
             if (second < 59)
             {
                 second++;
-                data[0] = second;
+                data[0] = BCD(second);
             }
             else
             {
@@ -101,11 +106,11 @@ namespace FoenixIDE.Simulator.Devices
 
         void Increment_Minutes()
         {
-            byte minutes = data[2];
+            byte minutes = (byte)(((data[2] & 0xF0) >> 4) * 10 + (data[2] & 0xF));
             if (minutes < 59)
             {
                 minutes++;
-                data[2] = minutes;
+                data[2] = BCD(minutes);
             }
             else
             {
@@ -116,11 +121,11 @@ namespace FoenixIDE.Simulator.Devices
 
         void Increment_Hours()
         {
-            byte hours = data[4];
+            byte hours = (byte)(((data[4] & 0xF0) >> 4) * 10 + (data[4] & 0xF));
             if (hours < 24)
             {
                 hours++;
-                data[4] = hours;
+                data[4] = BCD(hours);
             }
             else
             {
@@ -134,11 +139,11 @@ namespace FoenixIDE.Simulator.Devices
          */
         void Increment_Days()
         {
-            byte days = data[6];
+            byte days = (byte)(((data[6] & 0xF0) >> 4) * 10 + (data[6] & 0xF));
             if (days < 31)
             {
                 days++;
-                data[6] = days;
+                data[6] = BCD(days);
             }
             else
             {
@@ -149,11 +154,11 @@ namespace FoenixIDE.Simulator.Devices
 
         void Increment_Months()
         {
-            byte months = data[9];
+            byte months = (byte)(((data[9] & 0xF0) >> 4) * 10 + (data[9] & 0xF));
             if (months < 12)
             {
                 months++;
-                data[9] = months;
+                data[9] = BCD(months);
             }
             else
             {

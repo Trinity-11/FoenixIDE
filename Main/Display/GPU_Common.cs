@@ -54,7 +54,7 @@ namespace FoenixIDE.Display
         }
 
         // The F256K displays text at a different resolution than the graphics
-        public Point GetScreenSize_JR()
+        public Point GetScreenSize_F256()
         {
             Point p = new Point(640, 480);
             if (VICKY != null)
@@ -70,7 +70,7 @@ namespace FoenixIDE.Display
                 }
                 else
                 {
-                    if (hiresTimer != null) hiresTimer.Interval = 17; // 70 Hz
+                    if (hiresTimer != null) hiresTimer.Interval = 17; // 60 Hz
                 }
             }
             return p;
@@ -243,11 +243,13 @@ namespace FoenixIDE.Display
             // Find which line of characters to display
             int txtline = 0;
             bool showFont1 = false;
+            bool fontOverlay = false;
             if (mode == 1)
             {
                 byte MCRHigh = (byte)(VICKY.ReadByte(MCRAddress + 1) & 0x3F);
                 doubleTextY = (MCRHigh & 4) != 0;
                 doubleTextX = (MCRHigh & 2) != 0;
+                fontOverlay = (MCRHigh & 0x10) != 0;
                 showFont1 = (MCRHigh & 0x20) != 0;
                 //  the desired output is txtline = ((doubleTextY ? line / 2 : line) - rowOffset) / CHAR_HEIGHT;
                 txtline = ((doubleTextY ? line / 2 : line) - rowOffset) / CHAR_HEIGHT;
@@ -325,7 +327,7 @@ namespace FoenixIDE.Display
                             ptr[0] = textcolor0;
                             ptr[1] = textcolor0;
                         }
-                        else if (!overlayBitSet)
+                        else if (!overlayBitSet || (fontOverlay & bgColor == 0))
                         {
                             //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
                             ptr[0] = textcolor1;
@@ -340,7 +342,7 @@ namespace FoenixIDE.Display
                             //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, fgValue);
                             ptr[0] = textcolor0;
                         }
-                        else if (!overlayBitSet)
+                        else if (!overlayBitSet || (fontOverlay & bgColor != 0))
                         {
                             //System.Runtime.InteropServices.Marshal.WriteInt32(p, offset, bgValue);
                             ptr[0] = textcolor1;
@@ -686,7 +688,8 @@ namespace FoenixIDE.Display
         }
         private unsafe void DrawMouse(int* p, bool gammaCorrection, int line, int width, int height)
         {
-            byte mouseReg = VICKY.ReadByte(MemoryMap.MOUSE_PTR_REG - VICKY.StartAddress);
+            byte mouseReg = VICKY.ReadByte(mode == 0 ? MemoryMap.MOUSE_PTR_REG - VICKY.StartAddress: 0xD6e0 -0xC000);
+            
             bool MousePointerEnabled = (mouseReg & 3) != 0;
 
             if (MousePointerEnabled)
@@ -695,7 +698,7 @@ namespace FoenixIDE.Display
                 int PosY = VICKY.ReadWord(MousePointerRegister + 4);
                 if (line >= PosY && line < PosY + 16)
                 {
-                    int pointerAddress = (mouseReg & 2) == 0 ? MemoryMap.MOUSE_PTR_GRAP0 - VICKY.StartAddress : MemoryMap.MOUSE_PTR_GRAP1 - VICKY.StartAddress;
+                    int pointerAddress = mode == 0 ? ((mouseReg & 2) == 0 ? MemoryMap.MOUSE_PTR_GRAP0 - VICKY.StartAddress : MemoryMap.MOUSE_PTR_GRAP1 - VICKY.StartAddress) : 0xCC00 - 0xC000;
 
                     // Mouse pointer is a 16x16 icon
                     int colsToDraw = PosX < width - 16 ? 16 : width - PosX;
