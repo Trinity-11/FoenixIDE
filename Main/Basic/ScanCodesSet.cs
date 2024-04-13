@@ -207,6 +207,7 @@ namespace FoenixIDE.Basic
                 case Keys.Escape:
                     result[0] =  sc1_escape;
                     break;
+                case Keys.Oem8:
                 case Keys.Oem3: // back tick
                     result[0] =  sc1_grave;
                     break;
