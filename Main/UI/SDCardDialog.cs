@@ -3,13 +3,18 @@ using System.Windows.Forms;
 
 namespace FoenixIDE.Simulator.UI
 {
+
+    /**
+     * TODO: once the SD card is mounted, monitor the contents following this:
+     *   https://learn.microsoft.com/en-us/dotnet/api/system.io.filesystemwatcher?view=net-8.0
+     */
     public partial class SDCardDialog : Form
     {
         public SDCardDialog()
         {
             InitializeComponent();
             CapacityCombo.SelectedIndex = 3; // 64 MB
-            ClusterCombo.SelectedIndex = 0;  // 512 bytes
+            ClusterCombo.SelectedIndex = 2;  // 2048 bytes
             FSTypeCombo.SelectedIndex = 2;   // FAT32
         }
 
@@ -139,7 +144,7 @@ namespace FoenixIDE.Simulator.UI
             {
                 CapacityCombo.SelectedIndex = 3; // 64 MB
                 CapacityCombo.Enabled = true;
-                ClusterCombo.SelectedIndex = 0; // 512
+                ClusterCombo.SelectedIndex = 2; // 2048
                 ClusterCombo.Enabled = true;
                 FSTypeCombo.SelectedIndex = 2; // FAT32
                 FSTypeCombo.Enabled = true;
@@ -153,30 +158,30 @@ namespace FoenixIDE.Simulator.UI
             {
                 case 0: // 8MB
                     ClusterCombo.SelectedIndex = 3; // 4096
-                    FSTypeCombo.SelectedIndex = 0; // FAT12
+                    //FSTypeCombo.SelectedIndex = 0; // FAT12
                     break;
                 case 1: // 16 MB
                     ClusterCombo.SelectedIndex = 4; // 8192
-                    FSTypeCombo.SelectedIndex = 0; // FAT12
+                    //FSTypeCombo.SelectedIndex = 0; // FAT12
                     break;
                 case 2: // 32 MB
-                    ClusterCombo.SelectedIndex = 1; // 1024
-                    FSTypeCombo.SelectedIndex = 1; // FAT16
+                    ClusterCombo.SelectedIndex = 2; // 2048
+                    //FSTypeCombo.SelectedIndex = 1; // FAT16
                     break;
                 case 3: // 64 MB
                     ClusterCombo.SelectedIndex = 2; // 2048
-                    FSTypeCombo.SelectedIndex = 1; // FAT16
+                    //FSTypeCombo.SelectedIndex = 1; // FAT16
                     break;
                 case 4: // 128 MB
                     ClusterCombo.SelectedIndex = 3; // 4096
-                    FSTypeCombo.SelectedIndex = 1; // FAT16
+                    //FSTypeCombo.SelectedIndex = 1; // FAT16
                     break;
                 case 5: // 256 MB
-                    ClusterCombo.SelectedIndex = 0; // 512
+                    ClusterCombo.SelectedIndex = 2; // 2048
                     FSTypeCombo.SelectedIndex = 2; // FAT32
                     break;
                 case 6: // 512 MB
-                    ClusterCombo.SelectedIndex = 1; // 1024
+                    ClusterCombo.SelectedIndex = 2; // 2048
                     FSTypeCombo.SelectedIndex = 2; // FAT32
                     break;
                 case 7: // 1024 MB

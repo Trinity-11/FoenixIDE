@@ -253,7 +253,7 @@ namespace FoenixIDE.UI
                 gpu.VRAM = kernel.MemMgr.RAM;
 
                 // VIA Chip Port B is joystick 1
-                joystickWindow.SetMatrix(kernel.MemMgr.MATRIXKEYBOARD, 0, 0);
+                joystickWindow.SetMatrix(kernel.MemMgr.VIAREGISTERS, 0, 0);
 
                 // Addresses for VICKY in Junior are zero-based
                 gpu.SetMCRAddress(0x1000);
@@ -748,9 +748,9 @@ namespace FoenixIDE.UI
             else
             {
                 // Notify the F256K matrix keyboard
-                if (kernel.MemMgr.MATRIXKEYBOARD != null)
+                if (kernel.MemMgr.VIAREGISTERS != null && kernel.MemMgr.VIAREGISTERS.VIA1 != null)
                 {
-                    kernel.MemMgr.MATRIXKEYBOARD.WriteScanCode(sc[0]);
+                    kernel.MemMgr.VIAREGISTERS.WriteScanCode(sc[0]);
 
                     // Check if the Keyboard interrupt is allowed
                     byte mask = kernel.MemMgr.VICKY.ReadByte(MemoryMap.INT_MASK_REG0_JR + 1 - 0xC000);
@@ -779,7 +779,7 @@ namespace FoenixIDE.UI
             }
             else
             {
-                if (kernel.MemMgr.MATRIXKEYBOARD != null)
+                if (kernel.MemMgr.VIAREGISTERS != null && kernel.MemMgr.VIAREGISTERS.VIA1 != null)
                 {
                     // Set the Keyboard Interrupt
                     byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(1);
@@ -1853,25 +1853,29 @@ namespace FoenixIDE.UI
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 MemoryRAM temporaryRAM = new MemoryRAM(0, 4 * 1024 * 1024);
-                HexFile.Load(temporaryRAM, null, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
+                int startAddress = HexFile.Load(temporaryRAM, null, dialog.FileName, 0, out List<int> DataStartAddress, out List<int> DataLength);
                 // write the file
                 string outputFileName = Path.ChangeExtension(dialog.FileName, "PGZ");
 
-                int startAddress = temporaryRAM.ReadLong(0xFFE1);
                 // If the start address 0, then check at $38:FFE1, the FMX, U+ executable location.
-                if (startAddress == 0)
+                if (startAddress == -1)
                 {
-                    startAddress = temporaryRAM.ReadLong(0x38FFE1);
-                }
-                // If the start address is 0, then check at $18:FFE1, for a U executable
-                if (startAddress == 0)
-                {
-                    startAddress = temporaryRAM.ReadLong(0x18FFE1);
-                }
-                // The last effort is to use the address of the first segment
-                if (startAddress == 0)
-                {
-                    startAddress = DataStartAddress[0];
+                    startAddress = temporaryRAM.ReadLong(0xFFE1);
+                    if (startAddress == 0)
+                    {
+                        startAddress = temporaryRAM.ReadLong(0x38FFE1);
+                    }
+
+                    // If the start address is 0, then check at $18:FFE1, for a U executable
+                    if (startAddress == 0)
+                    {
+                        startAddress = temporaryRAM.ReadLong(0x18FFE1);
+                    }
+                    // The last effort is to use the address of the first segment
+                    if (startAddress == 0)
+                    {
+                        startAddress = DataStartAddress[0];
+                    }
                 }
                 using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
                 {

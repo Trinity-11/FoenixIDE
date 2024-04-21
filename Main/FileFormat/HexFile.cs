@@ -8,7 +8,7 @@ namespace FoenixIDE.Simulator.FileFormat
     public class HexFile
     {
 
-        static public bool Load(MemoryRAM ram, FlashJr romJr, string Filename, int gabeAddressBank, out List<int> blocks, out List<int> blockLengths)
+        static public int Load(MemoryRAM ram, FlashJr romJr, string Filename, int gabeAddressBank, out List<int> blocks, out List<int> blockLengths)
         {
             int bank = 0;
             int addrCursor = 0;
@@ -20,7 +20,7 @@ namespace FoenixIDE.Simulator.FileFormat
 
             if (!System.IO.File.Exists(Filename))
             {
-                return false;
+                return startAddress;
             }
                 
 
@@ -128,7 +128,7 @@ namespace FoenixIDE.Simulator.FileFormat
                     break;
                 }
             }
-            return true;
+            return startAddress;
         }
 
         // Read a two-character hex string into a byte

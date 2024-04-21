@@ -145,7 +145,11 @@ namespace FoenixIDE
                 // Only the K machines have a matrix keyboard
                 if (boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816)
                 {
-                    MemMgr.MATRIXKEYBOARD = new MatrixKeyboardRegister(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
+                    MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
+                }
+                else
+                {
+                    MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4);
                 }
                 dma.setSystemRam(MemMgr.RAM);
             }
@@ -376,6 +380,7 @@ namespace FoenixIDE
             }
 
             FileInfo info = new FileInfo(LoadedKernel);
+            // Implement the bulk.CSV feature for the F256 computers
             if (!info.Exists && BoardVersionHelpers.IsF256(boardVersion))
             {
                 // check if the directory exists.  If it does, look for a bulk.csv file
@@ -450,7 +455,7 @@ namespace FoenixIDE
             }
             if (extension.Equals(".HEX"))
             {
-                if (!HexFile.Load(MemMgr.RAM, MemMgr.FLASHJR, LoadedKernel, BasePageAddress, out _, out _))
+                if (HexFile.Load(MemMgr.RAM, MemMgr.FLASHJR, LoadedKernel, BasePageAddress, out _, out _) == -1)
                 {
                     return false;
                 }
@@ -603,7 +608,8 @@ namespace FoenixIDE
                         int address = blockNumber * 8192;
                         BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
                         byte[] DataBuffer = reader.ReadBytes(8192);
-                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, address, 8192);
+                        // Handle the case when the file is less than 8192 bytes.
+                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, address, DataBuffer.Length <= 8192 ? DataBuffer.Length : 8192);
                         
                         reader.Close();
                     }
@@ -639,7 +645,7 @@ namespace FoenixIDE
 
             // See if lines of code exist in the 0x18_0000 to 0x18_FFFF block for RevB/RevU or 0x38_0000 to 0x38_FFFF block for RevC/RevU+
             List<DebugLine> copiedLines = new List<DebugLine>();
-            if (lstFile.Lines.Count > 0)
+            if (lstFile.Lines.Count > 0 && !BoardVersionHelpers.IsF256(boardVersion))
             {
                 foreach (DebugLine line in lstFile.Lines.Values)
                 {
@@ -668,19 +674,22 @@ namespace FoenixIDE
             MemMgr.PS2KEYBOARD.WriteByte(0, 0);
             MemMgr.PS2KEYBOARD.WriteByte(4, 0);
             
-            if (MemMgr.MATRIXKEYBOARD != null)
+            if (MemMgr.VIAREGISTERS != null)
             {
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(2, 0xFF);  // DDRB
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(3, 0xFF);  // DDRA
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(0, 0xFF); // JOYSTICK 2
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(1, 0xFF); // JOYSTICK 1
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(2, 0);  // DDRB
-                MemMgr.MATRIXKEYBOARD.VIA0.WriteByte(3, 0);  // DDRA
+                MemMgr.VIAREGISTERS.VIA0.WriteByte(2, 0xFF);  // DDRB
+                MemMgr.VIAREGISTERS.VIA0.WriteByte(3, 0xFF);  // DDRA
+                MemMgr.VIAREGISTERS.VIA0.WriteByte(0, 0xFF); // JOYSTICK 2
+                MemMgr.VIAREGISTERS.VIA0.WriteByte(1, 0xFF); // JOYSTICK 1
+                MemMgr.VIAREGISTERS.VIA0.WriteByte(2, 0);  // DDRB
+                MemMgr.VIAREGISTERS.VIA0.WriteByte(3, 0);  // DDRA
 
-                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(0, 0);
-                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(1, 0);
-                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(2, 0);  // DDRB
-                MemMgr.MATRIXKEYBOARD.VIA1.WriteByte(3, 0);  // DDRA
+                if (MemMgr.VIAREGISTERS.VIA1 != null)
+                {
+                    MemMgr.VIAREGISTERS.VIA1.WriteByte(0, 0);
+                    MemMgr.VIAREGISTERS.VIA1.WriteByte(1, 0);
+                    MemMgr.VIAREGISTERS.VIA1.WriteByte(2, 0);  // DDRB
+                    MemMgr.VIAREGISTERS.VIA1.WriteByte(3, 0);  // DDRA
+                }
             }
 
             return true;

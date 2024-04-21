@@ -1,3 +1,20 @@
+Release 0.7.0.4
+---------------
+Fixed the joystick handler for the F256JR - this uses VIA0.
+Changed default SD card settings to 64MB, 2048 byte, FAT32.
+
+
+** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
+** TODO: Implemented the various cursor modes and rates.
+** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
+** TODO: Implement the joystick using a USB joystick (try using the SerialPort class?).
+** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
+** TODO: Implement CPU clock to count cycles for fast computers.
+** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
+** TODO: Add remote debugging capability for Calypsi compiler.
+** TODO: Try to sort out the issue with the character sets in non-unicode installation.
+** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
+
 Release 0.7.0.3
 ---------------
 Added Virtual Joystick support for the F256.
@@ -7,16 +24,6 @@ Fixed matrix keyboard handling.  Matrix keyboard raises correct interrupt.
 Updated the Keyboard device for F256 (PS/2 ScanCode Set 2).
 Added FON_OVLY handling.
 Implemented the Mouse Register for F256.
-
-** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
-** TODO: Implement an IEC interface to connect via USB to XUM1541.
-** TODO: Implement the joystick using a USB joystick.
-** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
-** TODO: Implement CPU clock to count cycles for fast computers.
-** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
-** TODO: Add remote debugging capability for Calypsi compiler.
-** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 
 Release 0.7.0.2
 ---------------

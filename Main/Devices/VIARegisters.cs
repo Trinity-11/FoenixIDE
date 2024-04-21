@@ -3,15 +3,15 @@
 namespace FoenixIDE.Simulator.Devices
 {
 
-    public class MatrixKeyboardRegister
+    public class VIARegisters
     {
         // The VIA0 is used for the joystick in F256JR and F256K
         // While the VIA can be used to output to external devices, this capability is not used in the emulator.
         public class VIA0Range : MemoryLocations.MemoryRAM
         {
-            MatrixKeyboardRegister matrix;
+            VIARegisters matrix;  
 
-            public VIA0Range(MatrixKeyboardRegister m, int StartAddress, int Length) : base(StartAddress, Length)
+            public VIA0Range(VIARegisters m, int StartAddress, int Length) : base(StartAddress, Length)
             {
                 System.Diagnostics.Debug.Assert(Length == 4);
                 matrix = m;
@@ -44,8 +44,11 @@ namespace FoenixIDE.Simulator.Devices
                         return (byte)(data[0] | matrix.joystickB);
                     case 1:
                         return (byte)(data[1] | matrix.joystickA);
-                    default:
+                    case 2:
+                    case 3:
                         return data[Address];
+                    default:
+                        return 0;
                 }
             }
 
@@ -79,14 +82,14 @@ namespace FoenixIDE.Simulator.Devices
         // VIA1 is only available on the F256K - the Matrix Keyboard
         public class VIA1Range : MemoryLocations.MemoryRAM
         {
-            MatrixKeyboardRegister matrix;
+            VIARegisters matrix;
             byte VIA1_PRB { get { return data[0]; } set { data[0] = value; } }
             byte VIA1_PRA { get { return data[1]; } set { data[1] = value; } }
 
             byte VIA1_DDRB { get { return data[2]; } set { data[2] = value; } }
             byte VIA1_DDRA { get { return data[3]; } set { data[3] = value; } }
 
-            public VIA1Range(MatrixKeyboardRegister m, int StartAddress, int Length) : base(StartAddress, Length)
+            public VIA1Range(VIARegisters m, int StartAddress, int Length) : base(StartAddress, Length)
             {
                 System.Diagnostics.Debug.Assert(Length == 4);
                 matrix = m;
@@ -346,8 +349,14 @@ namespace FoenixIDE.Simulator.Devices
             {
                 if (!CanRead(Address))
                     return 0;
-
-                return data[Address];
+                if (Address < 4)
+                {
+                    return data[Address];
+                }
+                else 
+                { 
+                    return 0;
+                }
             }
         }
 
@@ -359,7 +368,17 @@ namespace FoenixIDE.Simulator.Devices
         public VIA0Range VIA0; // Used for the joystick and right and down arrow keys
         public VIA1Range VIA1; // Used for all the other keys
 
-        public MatrixKeyboardRegister(int Range0StartAddress, int Range0Length, int Range1StartAddress, int Range1Length)
+        // This constructor is called for the F256Jr
+        public VIARegisters(int Range0StartAddress, int Range0Length)
+        {
+            System.Diagnostics.Debug.Assert(Range0Length == 4);
+            scanCodeBuffer = new bool[0x80];
+            VIA0 = new VIA0Range(this, Range0StartAddress, Range0Length);        // The joystick port for F256K and F256Jr + 2 keys in F256K
+            VIA1 = null;
+        }
+
+        // This constructor is called for the F256K
+        public VIARegisters(int Range0StartAddress, int Range0Length, int Range1StartAddress, int Range1Length)
         {
             System.Diagnostics.Debug.Assert(Range0Length == 4);
             scanCodeBuffer = new bool[(int)ScanCodes.sc1_down_arrow + 1];
@@ -369,7 +388,7 @@ namespace FoenixIDE.Simulator.Devices
 
         public void WriteScanCode(byte sc)
         {
-            // if bit 7 is set, the key was unpressed
+            // if bit 7 is set, the key was released
             scanCodeBuffer[sc & 0x7F] = (sc & 0x80) == 0;
         }
         public void JoystickCode(byte port, byte value)

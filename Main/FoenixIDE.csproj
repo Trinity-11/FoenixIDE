@@ -88,7 +88,7 @@
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\MathCoproRegister_JR.cs" />
-    <Compile Include="Devices\MatrixKeyboardRegister.cs" />
+    <Compile Include="Devices\VIARegisters.cs" />
     <Compile Include="Devices\PS2KeyboardRegister.cs" />
     <Compile Include="Devices\PS2KeyboardRegisterSet2.cs" />
     <Compile Include="Devices\SOL.cs" />

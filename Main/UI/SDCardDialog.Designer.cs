@@ -198,7 +198,7 @@
             this.label4.TabIndex = 16;
             this.label4.Text = "Type:";
             // 
-            // SDCardWindow
+            // SDCardDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -219,7 +219,7 @@
             this.Controls.Add(this.FolderSelectButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "SDCardWindow";
+            this.Name = "SDCardDialog";
             this.Text = "SD Card";
             this.ResumeLayout(false);
             this.PerformLayout();

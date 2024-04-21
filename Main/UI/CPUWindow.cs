@@ -87,7 +87,8 @@ namespace FoenixIDE.UI
         private void UpdateQueue()
         {
             string newkernelname = kernel.GetKernelName();
-            if (!newkernelname.Equals(lastLoadedKernel))
+
+            if (!newkernelname.Equals(lastLoadedKernel) || codeList == null || (kernel.lstFile.Lines.Count>0 && codeList.Count != kernel.lstFile.Lines.Count))
             {
                 if (kernel.lstFile != null && kernel.lstFile.Lines.Count > 0)
                 {

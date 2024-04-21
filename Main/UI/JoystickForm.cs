@@ -8,7 +8,7 @@ namespace FoenixIDE.Simulator.UI
     public partial class JoystickForm : Form
     {
         private MemoryRAM gabe = null;
-        private MatrixKeyboardRegister matrix = null;
+        private VIARegisters matrix = null;
         private int portAddress = 0;
         private int port = 0;
         private byte NO_BUTTON = 0xDF;
@@ -26,7 +26,7 @@ namespace FoenixIDE.Simulator.UI
             NO_BUTTON = 0xDF;
         }
 
-        public void SetMatrix(MatrixKeyboardRegister device, int address, int port)
+        public void SetMatrix(VIARegisters device, int address, int port)
         {
             gabe = null;
             matrix = device;

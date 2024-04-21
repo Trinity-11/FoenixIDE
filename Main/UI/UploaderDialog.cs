@@ -440,11 +440,20 @@ namespace FoenixIDE.UI
                             Console.WriteLine("File Size: " + transmissionSize);
                             SendData(DataBuffer, FnxAddressPtr, transmissionSize);
 
-                            // Generate a fresh page $FF
-                            byte[] pageFF = CreateResetPage(FnxAddressPtr);
-
-                            // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
-                            PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            if (!BoardVersionHelpers.IsF256(boardVersion))
+                            {
+                                // Generate a fresh page $FF
+                                byte[] pageFF = CreateResetPage(FnxAddressPtr);
+                                // Update the Reset Vectors from the Binary Files Considering that the Files Keeps the Vector @ $00:FF00
+                                PreparePacket2Write(pageFF, 0x00FF00, 0, 256);
+                            }
+                            else
+                            {
+                                byte[] resetBuffer = new byte[2];
+                                resetBuffer[0] = (byte)(FnxAddressPtr & 0xFF);
+                                resetBuffer[1] = (byte)((FnxAddressPtr >> 8) & 0xFF);
+                                PreparePacket2Write(resetBuffer, 0xFFFC, 0, 2);
+                            }
                         }
                         else
                         {
@@ -513,8 +522,8 @@ namespace FoenixIDE.UI
                             {
                                 byte[] resetBuffer = new byte[2];
                                 resetBuffer[0] = (byte)(FnxAddressPtr & 0xFF);
-                                resetBuffer[1] = (byte)(FnxAddressPtr >> 8);
-                                PreparePacket2Write(resetBuffer, 0, 0, 2);
+                                resetBuffer[1] = (byte)((FnxAddressPtr >> 8) & 0xFF);
+                                PreparePacket2Write(resetBuffer, 0xFFFC, 0, 2);
                             }
                         }
                     }
@@ -530,6 +539,7 @@ namespace FoenixIDE.UI
                         string[] lines = System.IO.File.ReadAllLines(FileNameTextBox.Text);
                         int bank = 0;
                         int address = 0;
+                        int FnxAddressPtr = -1;
 
                         foreach (string l in lines)
                         {
@@ -580,6 +590,12 @@ namespace FoenixIDE.UI
                                         bank = HexFile.GetByte(data, 0, 2) << 16;
                                         break;
 
+                                    case "05":
+                                        FnxAddressPtr = HexFile.GetByte(data, 0, 4);
+                                        resetVector = true;
+
+                                        break;
+
                                     default:
                                         Console.WriteLine("Unsupport HEX record type:" + rectype);
                                         break;
@@ -598,9 +614,17 @@ namespace FoenixIDE.UI
                                 }
                                 else
                                 {
+
                                     byte[] resetVectorBuffer = new byte[2];
-                                    resetVectorBuffer[0] = pageFF[0xFC];
-                                    resetVectorBuffer[1] = pageFF[0xFD];
+                                    if (FnxAddressPtr == -1) { 
+                                        resetVectorBuffer[0] = pageFF[0xFC];
+                                        resetVectorBuffer[1] = pageFF[0xFD];
+                                    }
+                                    else
+                                    {
+                                        resetVectorBuffer[0] = (byte)(FnxAddressPtr & 0xFF);
+                                        resetVectorBuffer[1] = (byte)((FnxAddressPtr >> 8) & 0xFF);
+                                    }
                                     PreparePacket2Write(resetVectorBuffer, 0xFFFC, 0, 2);
                                 }
                             }

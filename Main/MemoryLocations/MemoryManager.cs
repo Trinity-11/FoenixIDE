@@ -31,7 +31,7 @@ namespace FoenixIDE.MemoryLocations
         public MathFloatRegister FLOAT = null;
         public CodecRAM CODEC = null;
         public PS2KeyboardRegister PS2KEYBOARD = null;
-        public MatrixKeyboardRegister MATRIXKEYBOARD = null;
+        public VIARegisters VIAREGISTERS = null;
         public SDCardDevice SDCARD = null;
         public InterruptController INTERRUPT = null;
         public UART UART1 = null;
@@ -134,18 +134,18 @@ namespace FoenixIDE.MemoryLocations
                     DeviceAddress = Address - PS2KEYBOARD.StartAddress;
                     return;
                 }
-                if (MATRIXKEYBOARD != null)
+                if (VIAREGISTERS != null)
                 {
-                    if (Address >= MATRIXKEYBOARD.VIA0.StartAddress && Address <= MATRIXKEYBOARD.VIA0.EndAddress)
+                    if (Address >= VIAREGISTERS.VIA0.StartAddress && Address <= VIAREGISTERS.VIA0.EndAddress)
                     {
-                        Device = MATRIXKEYBOARD.VIA0;
-                        DeviceAddress = Address - MATRIXKEYBOARD.VIA0.StartAddress;
+                        Device = VIAREGISTERS.VIA0;
+                        DeviceAddress = Address - VIAREGISTERS.VIA0.StartAddress;
                         return;
                     }
-                    if (Address >= MATRIXKEYBOARD.VIA1.StartAddress && Address <= MATRIXKEYBOARD.VIA1.EndAddress)
+                    if (Address >= VIAREGISTERS.VIA1.StartAddress && Address <= VIAREGISTERS.VIA1.EndAddress)
                     {
-                        Device = MATRIXKEYBOARD.VIA1;
-                        DeviceAddress = Address - MATRIXKEYBOARD.VIA1.StartAddress;
+                        Device = VIAREGISTERS.VIA1;
+                        DeviceAddress = Address - VIAREGISTERS.VIA1.StartAddress;
                         return;
                     }
                 }
@@ -301,18 +301,18 @@ namespace FoenixIDE.MemoryLocations
                         DeviceAddress = Address - PS2KEYBOARD.StartAddress;
                         return;
                     }
-                    if (MATRIXKEYBOARD != null)
+                    if (VIAREGISTERS != null)
                     {
-                        if (Address >= MATRIXKEYBOARD.VIA0.StartAddress && Address <= MATRIXKEYBOARD.VIA0.EndAddress)
+                        if (Address >= VIAREGISTERS.VIA0.StartAddress && Address <= VIAREGISTERS.VIA0.EndAddress)
                         {
-                            Device = MATRIXKEYBOARD.VIA0;
-                            DeviceAddress = Address - MATRIXKEYBOARD.VIA0.StartAddress;
+                            Device = VIAREGISTERS.VIA0;
+                            DeviceAddress = Address - VIAREGISTERS.VIA0.StartAddress;
                             return;
                         }
-                        if (Address >= MATRIXKEYBOARD.VIA1.StartAddress && Address <= MATRIXKEYBOARD.VIA1.EndAddress)
+                        if (VIAREGISTERS.VIA1 != null && Address >= VIAREGISTERS.VIA1.StartAddress && Address <= VIAREGISTERS.VIA1.EndAddress)
                         {
-                            Device = MATRIXKEYBOARD.VIA1;
-                            DeviceAddress = Address - MATRIXKEYBOARD.VIA1.StartAddress;
+                            Device = VIAREGISTERS.VIA1;
+                            DeviceAddress = Address - VIAREGISTERS.VIA1.StartAddress;
                             return;
                         }
                     }
