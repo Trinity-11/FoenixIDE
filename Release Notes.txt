@@ -2,7 +2,7 @@ Release 0.7.0.4
 ---------------
 Fixed the joystick handler for the F256JR - this uses VIA0.
 Changed default SD card settings to 64MB, 2048 byte, FAT32.
-
+Handling the AltGr keyboard key as the back tick `.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
