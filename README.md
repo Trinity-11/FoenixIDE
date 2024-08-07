@@ -21,6 +21,8 @@ The C256 Foenix and its associated materials are owned by Stefany Allaire. There
 * RevU+ - 2 MB RAM  - Processor: 65816
 * RevJr - 1 MB RAM  - Processor: 6502
 * RevJr65816 - 1 MB RAM  - Processor: 65816
+* RevK - 1MB RAM - Processor: 6502
+* RevK65816 - 1MB RAM - Processor: 65816
 
 The FoenixIDE looks for kernel.hex and kernel.lst files in the ROMs folder colocated with the executable.  Obtain the Kernel from the sister repository: https://github.com/Trinity-11/Kernel_FMX
 
