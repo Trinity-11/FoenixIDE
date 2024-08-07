@@ -403,6 +403,8 @@ namespace FoenixIDE
                             FileInfo testFile = new FileInfo(blockFile);
                             if (!testFile.Exists)
                             {
+                                Console.WriteLine("File {0} was not found", split[1]);
+                                MessageBox.Show("The file " + split[1] + " is specified in bulk.csv, but not present in the file system.", "Bulk.CSV File Missing", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 info = testFile;
                                 break;
                             }

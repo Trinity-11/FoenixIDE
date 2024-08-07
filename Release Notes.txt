@@ -1,9 +1,5 @@
-Release 0.7.0.4
+Release 0.7.0.5
 ---------------
-Fixed the joystick handler for the F256JR - this uses VIA0.
-Changed default SD card settings to 64MB, 2048 byte, FAT32.
-Handling the AltGr keyboard key as the back tick `.
-
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
@@ -14,6 +10,12 @@ Handling the AltGr keyboard key as the back tick `.
 ** TODO: Add remote debugging capability for Calypsi compiler.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
+
+Release 0.7.0.4
+---------------
+Fixed the joystick handler for the F256JR - this uses VIA0.
+Changed default SD card settings to 64MB, 2048 byte, FAT32.
+Handling the AltGr keyboard key as the back tick `.
 
 Release 0.7.0.3
 ---------------
