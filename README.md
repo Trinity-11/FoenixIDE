@@ -3,6 +3,7 @@ Development and Debugging Suite for the C256 Foenix Family of Computers.
 
 This project is derived from the Nu64 emulator built by Tom Wilson.  Nu64 is owned by Tom Wilson. 
 FoenixIDE is owned by the C256 team, led by Stefany Allaire.
+You need to use Microsoft Visual Studio 2019 to compile/build this project.
 
 The FoenixIDE emulates the WDC 65816 and 6502 processors. It is intended to be used as a software development tool and learning platform for assembly language and BASIC programming. The software will be relesed with an open source license and may be used for whatever purpose you want, including personal projects, education, and commercial use. 
 
@@ -24,7 +25,9 @@ The C256 Foenix and its associated materials are owned by Stefany Allaire. There
 * RevK - 1MB RAM - Processor: 6502
 * RevK65816 - 1MB RAM - Processor: 65816
 
-The FoenixIDE looks for kernel.hex and kernel.lst files in the ROMs folder colocated with the executable.  Obtain the Kernel from the sister repository: https://github.com/Trinity-11/Kernel_FMX
+The FoenixIDE looks for kernel.hex and kernel.lst files in the ROMs folder colocated with the executable.  
+Obtain the Kernel from the sister repository: https://github.com/Trinity-11/Kernel_FMX
+For the F256Ks, the kernel is specified in bulk.csv with references to 8KB files.  See here: https://github.com/FoenixRetro/f256-firmware
 
 # Keyboard shortcuts 
 ## Main Window
