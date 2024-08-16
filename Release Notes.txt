@@ -1,7 +1,7 @@
-Release 0.7.0.6
+Release 0.7.0.7
 ---------------
-Added missing F256 kernel files: wget.bin and fm0*.bin
-
+Fixed typo in CPU Window - Address was mis-spelled.
+Fixed Gamma Offset for F256K.
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
@@ -13,6 +13,10 @@ Added missing F256 kernel files: wget.bin and fm0*.bin
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Support two joysticks and allow for multiple joystick buttons
+
+Release 0.7.0.6
+---------------
+Added missing F256 kernel files: wget.bin and fm0*.bin
 
 Release 0.7.0.5
 ---------------

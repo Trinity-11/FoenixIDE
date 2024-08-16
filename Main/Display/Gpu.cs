@@ -174,9 +174,11 @@ namespace FoenixIDE.Display
         }
 
         private int mode = 0; // Mode 0 is FAT Vicky, 1 is Tiny Vicky.
+        private int GammaOffset = 0x100; // Gamma Offset is 0x400 for F256K
         public void SetMode(int mode)
         {
             this.mode = mode;
+            GammaOffset = mode == 0 ? 0x100 : 0x400;
         }
 
         const int STRIDE = 800;
@@ -342,8 +344,8 @@ namespace FoenixIDE.Display
                     byte borderBlue = VICKY.ReadByte(MCRAddress + 7);
                     if (gammaCorrection)
                     {
-                        borderRed = VICKY.ReadByte(GammaBaseAddress + 0x200 + borderRed); //gammaCorrection[0x200 + borderGreen];
-                        borderGreen = VICKY.ReadByte(GammaBaseAddress + 0x100 + borderGreen); //gammaCorrection[0x100 + borderGreen];
+                        borderRed = VICKY.ReadByte(GammaBaseAddress + GammaOffset * 2 + borderRed); //gammaCorrection[0x200 + borderGreen];
+                        borderGreen = VICKY.ReadByte(GammaBaseAddress + GammaOffset + borderGreen); //gammaCorrection[0x100 + borderGreen];
                         borderBlue = VICKY.ReadByte(GammaBaseAddress + borderBlue); // gammaCorrection[borderBlue];
                     }
                     int borderColor = (int)(0xFF000000 + (borderBlue << 16) + (borderGreen << 8) + borderRed);
@@ -373,8 +375,8 @@ namespace FoenixIDE.Display
                             byte backBlue = VICKY.ReadByte(MCRAddress + 0x0F);
                             if (gammaCorrection)
                             {
-                                backRed = VICKY.ReadByte(GammaBaseAddress + 0x200 + backRed); // gammaCorrection[0x200 + backRed];
-                                backGreen = VICKY.ReadByte(GammaBaseAddress + 0x100 + backGreen); //gammaCorrection[0x100 + backGreen];
+                                backRed = VICKY.ReadByte(GammaBaseAddress + GammaOffset * 2 + backRed); // gammaCorrection[0x200 + backRed];
+                                backGreen = VICKY.ReadByte(GammaBaseAddress + GammaOffset + backGreen); //gammaCorrection[0x100 + backGreen];
                                 backBlue = VICKY.ReadByte(GammaBaseAddress + backBlue); //gammaCorrection[backBlue];
                             }
                             backgroundColor = (int)(0xFF000000 + (backBlue << 16) + (backGreen << 8) + backRed);

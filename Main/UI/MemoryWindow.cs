@@ -509,7 +509,7 @@ namespace FoenixIDE.UI
                 String val = mem.Y.ToString("X2");
 
                 String address = mem.X.ToString("X6");
-                PositionLabel.Text = "Adress: $" + address.Substring(0, 2) + ":" + address.Substring(2) + ", Value: " + val; // + ", X: " + e.X + ", Y: " + e.Y + ", Col: " + col + ", Line: " + line;
+                PositionLabel.Text = "Address: $" + address.Substring(0, 2) + ":" + address.Substring(2) + ", Value: " + val; // + ", X: " + e.X + ", Y: " + e.Y + ", Col: " + col + ", Line: " + line;
             }
             else
             {

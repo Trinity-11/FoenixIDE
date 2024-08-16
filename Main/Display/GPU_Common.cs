@@ -174,8 +174,8 @@ namespace FoenixIDE.Display
                 if (gamma)
                 {
                     fgValueBlue = VICKY.ReadByte(GammaBaseAddress + fgValueBlue); //gammaCorrection[fgValueBlue];
-                    fgValueGreen = VICKY.ReadByte(GammaBaseAddress + 0x100 + fgValueGreen);//gammaCorrection[0x100 + fgValueGreen];
-                    fgValueRed = VICKY.ReadByte(GammaBaseAddress + 0x200 + fgValueRed);//gammaCorrection[0x200 + fgValueRed];
+                    fgValueGreen = VICKY.ReadByte(GammaBaseAddress + GammaOffset + fgValueGreen);//gammaCorrection[0x100 + fgValueGreen];
+                    fgValueRed = VICKY.ReadByte(GammaBaseAddress + GammaOffset * 2 + fgValueRed);//gammaCorrection[0x200 + fgValueRed];
                 }
 
                 value0 = (int)((fgValueBlue << 16) + (fgValueGreen << 8) + fgValueRed + 0xFF000000);
@@ -196,8 +196,8 @@ namespace FoenixIDE.Display
                 if (gamma)
                 {
                     bgValueBlue = VICKY.ReadByte(GammaBaseAddress + bgValueBlue); //gammaCorrection[bgValueBlue];
-                    bgValueGreen = VICKY.ReadByte(GammaBaseAddress + 0x100 + bgValueGreen); //gammaCorrection[0x100 + bgValueGreen];
-                    bgValueRed = VICKY.ReadByte(GammaBaseAddress + 0x200 + bgValueRed); //gammaCorrection[0x200 + bgValueRed];
+                    bgValueGreen = VICKY.ReadByte(GammaBaseAddress + GammaOffset + bgValueGreen); //gammaCorrection[0x100 + bgValueGreen];
+                    bgValueRed = VICKY.ReadByte(GammaBaseAddress + GammaOffset * 2 + bgValueRed); //gammaCorrection[0x200 + bgValueRed];
                 }
 
                 value1 = (int)((bgValueBlue << 16) + (bgValueGreen << 8) + bgValueRed + 0xFF000000);
@@ -225,8 +225,8 @@ namespace FoenixIDE.Display
                 if (gamma)
                 {
                     blue = VICKY.ReadByte(GammaBaseAddress + blue);           // gammaCorrection[fgValueBlue];
-                    green = VICKY.ReadByte(GammaBaseAddress + 0x100 + green); // gammaCorrection[0x100 + fgValueGreen];
-                    red = VICKY.ReadByte(GammaBaseAddress + 0x200 + red);     // gammaCorrection[0x200 + fgValueRed];
+                    green = VICKY.ReadByte(GammaBaseAddress + GammaOffset + green); // gammaCorrection[0x100 + fgValueGreen];
+                    red = VICKY.ReadByte(GammaBaseAddress + GammaOffset * 2 + red);     // gammaCorrection[0x200 + fgValueRed];
                 }
                 value = (int)((blue << 16) + (green << 8) + red + 0xFF000000);
                 lc[lutIndex * 256 + color] = value;
@@ -716,8 +716,8 @@ namespace FoenixIDE.Display
                             if (gammaCorrection)
                             {
                                 pixelIndexB = VICKY.ReadByte(GammaBaseAddress + pixelIndexR); // gammaCorrection[pixelIndexR];
-                                pixelIndexG = VICKY.ReadByte(GammaBaseAddress + 0x100 + pixelIndexR); //gammaCorrection[0x100 + pixelIndexR];
-                                pixelIndexR = VICKY.ReadByte(GammaBaseAddress + 0x200 + pixelIndexR); //gammaCorrection[0x200 + pixelIndexR];
+                                pixelIndexG = VICKY.ReadByte(GammaBaseAddress + GammaOffset + pixelIndexR); //gammaCorrection[0x100 + pixelIndexR];
+                                pixelIndexR = VICKY.ReadByte(GammaBaseAddress + GammaOffset * 2 + pixelIndexR); //gammaCorrection[0x200 + pixelIndexR];
                             }
                             int value = (int)((pixelIndexB << 16) + (pixelIndexG << 8) + pixelIndexR + 0xFF000000);
                             ptr[col + PosX] = value;
