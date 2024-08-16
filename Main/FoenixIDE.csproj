@@ -437,6 +437,13 @@
     <None Include="roms\F256\dos.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="roms\F256\fm.00" />
+    <None Include="roms\F256\fm.01" />
+    <None Include="roms\F256\fm.02" />
+    <None Include="roms\F256\fm.03" />
+    <None Include="roms\F256\fm.04" />
+    <None Include="roms\F256\fm.05" />
+    <None Include="roms\F256\fm.06" />
     <None Include="roms\F256\help.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -458,6 +465,7 @@
     <None Include="roms\F256\sb04.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="roms\F256\wget.bin" />
     <None Include="roms\F256\xdev.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

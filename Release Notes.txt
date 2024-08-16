@@ -1,5 +1,7 @@
-Release 0.7.0.5
+Release 0.7.0.6
 ---------------
+Added missing F256 kernel files: wget.bin and fm0*.bin
+
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
@@ -10,6 +12,12 @@ Release 0.7.0.5
 ** TODO: Add remote debugging capability for Calypsi compiler.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
+** TODO: Support two joysticks and allow for multiple joystick buttons
+
+Release 0.7.0.5
+---------------
+Updated the readme file to include the F256Ks.
+Added a message box when a file referenced in bulk.csv is missing from kernel files.
 
 Release 0.7.0.4
 ---------------
