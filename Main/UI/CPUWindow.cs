@@ -1227,6 +1227,9 @@ namespace FoenixIDE.UI
 
         private void DebugPanel_MouseClick(object sender, MouseEventArgs e)
         {
+            if (!kernel.CPU.DebugPause)
+                return;
+
             // TODO: remove the reference to kernel.lstFile and replace with codeList.
             DebugLine line = SourceCodeListingFind(ActiveLine[0]);
             if (e.Button == MouseButtons.Left && ActiveLine[0] != 0 && line != null)
@@ -1244,7 +1247,7 @@ namespace FoenixIDE.UI
                     MainWindow.Instance.WatchListToolStripMenuItem_Click(sender, e);
                 }
             }
-            else if (e.Button == MouseButtons.Right && kernel.CPU.DebugPause)
+            else if (e.Button == MouseButtons.Right)
             {
                 Point contextMenuLocation = DebugPanel.PointToScreen(new Point(e.X, e.Y));
                 debugWindowContextMenuStrip.Show(contextMenuLocation);
