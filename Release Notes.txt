@@ -2,6 +2,10 @@ Release 0.7.0.7
 ---------------
 Fixed typo in CPU Window - Address was mis-spelled.
 Fixed Gamma Offset for F256K.
+PR #61: clandrew - Don't let the user "add watch" on an invisible element
+PR #60: clandrew - Fix problem where new breakpoints don't "take effect" until after you pause the debugger
+PR #59: clandrew - Show debugger's breakpoint address instead of hardcoded FFFFFFFF
+
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
