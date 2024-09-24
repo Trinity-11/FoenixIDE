@@ -779,6 +779,29 @@ namespace FoenixIDE.UI
         }
         private delegate void nullParamMethod();
 
+        private bool ShouldBreakExecution(int nextPC, ref int breakAddress)
+        {
+            if (knl_breakpointsExec.Contains(nextPC))
+            {
+                breakAddress = nextPC;
+                return true;
+            }
+
+            if (kernel.CPU.CurrentOpcode.Value == 0)
+            {
+                breakAddress = 0;
+                return true;
+            }
+
+            if (BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()))
+            {
+                breakAddress = IRQPC;
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Executes next step of 65C816 code, logs dubeugging data
         /// if debugging check box is set on CPU Window
@@ -819,10 +842,9 @@ namespace FoenixIDE.UI
                     }
                     Invoke(new breakpointSetter(BreakpointReached), new object[] { effAddr });
                 }
-                if ( knl_breakpointsExec.Contains(nextPC) || 
-                     kernel.CPU.CurrentOpcode.Value == 0 ||
-                     ( BreakOnIRQCheckBox.Checked && (kernel.CPU.Pins.GetInterruptPinActive && InterruptMatchesCheckboxes()))
-                   )
+
+                int breakAddress = 0;
+                if (ShouldBreakExecution(nextPC, ref breakAddress))
                 {
                     if (kernel.CPU.CurrentOpcode.Value == 0)
                     {
@@ -861,7 +883,7 @@ namespace FoenixIDE.UI
                             GenerateNextInstruction(nextPC);
                         }
                     }
-                    Invoke(new breakpointSetter(BreakpointReached), new object[] { IRQPC });
+                    Invoke(new breakpointSetter(BreakpointReached), new object[] { breakAddress });
                 }
             }
 
