@@ -1282,15 +1282,11 @@ namespace FoenixIDE.UI
 
         private void BreakpointButton_Click(object sender, EventArgs e)
         {
-            if (!breakpointWindow.Visible)
-            {
-                CenterForm(breakpointWindow);
-                breakpointWindow.Show();
-            }
-            else
-            {
-                breakpointWindow.BringToFront();
-            }
+            Pause();
+
+            CenterForm(breakpointWindow);
+
+            breakpointWindow.ShowDialog();
         }
 
         // This is called when new code is loaded in the Main Window.
