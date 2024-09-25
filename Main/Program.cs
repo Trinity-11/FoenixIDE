@@ -97,6 +97,24 @@ namespace FoenixIDE
                     case "--irq":
                         context.Add("disabledIRQs", "true");
                         break;
+                    case "-x":
+                    case "--exec-breakpoint":
+                        {
+                            string addressArg = args[i + 1];
+
+                            int addressValue = Convert.ToInt32(addressArg.Replace("$:", ""), 16);
+                            if (addressValue != 0)
+                            {
+                                context.Add("executionBreakpointAddressAtStartup", addressValue.ToString());
+                                i++; // skip the next argument
+                            }
+                            else
+                            {
+                                Console.Out.WriteLine("Invalid address specified: " + args[i + 1]);
+                                context["Continue"] = "false";
+                            }
+                            break;
+                        }
                     // Board Version B, C, U, U+, Jr, Jr816
                     case "-b":
                     case "--board":
@@ -176,6 +194,7 @@ namespace FoenixIDE
             Console.Out.WriteLine("   -j, --jump: jump to specified address");
             Console.Out.WriteLine("   -r, --run: autorun true/false");
             Console.Out.WriteLine("   -i, --irq: disable IRQs true/false");
+            Console.Out.WriteLine("   -x, --exec-breakpoint: address, in hex, at which to put an execution breakpoint");
             Console.Out.WriteLine("   -b, --board: board revision b, c, u, u+, jr, jr816");
             Console.Out.WriteLine("   -h, --help, /?: show this usage");
             Console.Out.WriteLine("   -v, --version: show the version");
