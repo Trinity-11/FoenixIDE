@@ -797,7 +797,7 @@ namespace FoenixIDE.UI
                 return true;
             }
 
-            if (kernel.CPU.CurrentOpcode.Value == 0)
+            if (kernel.CPU.CurrentOpcode.Value == 0 && nextPC == 0)
             {
                 breakAddress = 0;
                 return true;

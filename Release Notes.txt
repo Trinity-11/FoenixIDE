@@ -1,8 +1,9 @@
-Release 0.7.0.8
+Release 0.7.0.9
 ---------------
-PR #61: clandrew - Don't let the user "add watch" on an invisible element
-PR #60: clandrew - Fix problem where new breakpoints don't "take effect" until after you pause the debugger
-PR #59: clandrew - Show debugger's breakpoint address instead of hardcoded FFFFFFFF
+PR #62: clandrew - Add --exec-breakpoint command line option for adding a breakpoint on launch.
+Fixed the RTC not raising alerts correctly.
+Fixed stack overflow issue with 6502 processor.
+
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
@@ -14,6 +15,13 @@ PR #59: clandrew - Show debugger's breakpoint address instead of hardcoded FFFFF
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Support two joysticks and allow for multiple joystick buttons
+
+Release 0.7.0.8
+---------------
+PR #61: clandrew - Don't let the user "add watch" on an invisible element
+PR #60: clandrew - Fix problem where new breakpoints don't "take effect" until after you pause the debugger
+PR #59: clandrew - Show debugger's breakpoint address instead of hardcoded FFFFFFFF
+
 
 Release 0.7.0.7
 ---------------

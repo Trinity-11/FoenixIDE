@@ -62,6 +62,7 @@ namespace FoenixIDE.Processor
 
         public const int DefaultStackValueNative = 0xd6ff;
         public const int DefaultStackValueEmulation = 0x01ff;
+        private bool is6502 = false;
 
         public int ClockSpeed
         {
@@ -101,6 +102,7 @@ namespace FoenixIDE.Processor
             Operations operations = new Operations(this);
             operations.SimulatorCommand += Operations_SimulatorCommand;
             opcodes = new OpcodeList(operations, this, is6502);
+            this.is6502 = is6502;
             Flags.Emulation = true;
         }
 
@@ -269,7 +271,7 @@ namespace FoenixIDE.Processor
         }
 
         /// <summary>
-        /// Clock cycles used for performance counte This will be periodically reset to zero
+        /// Clock cycles used for performance counter. This will be periodically reset to zero
         /// as the throttling routine adjusts the system performance. 
         /// </summary>
         public int CycleCounter
@@ -323,6 +325,11 @@ namespace FoenixIDE.Processor
                 throw new Exception("bytes must be between 1 and 3. Got " + bytes.ToString());
 
             Stack.Value -= bytes;
+            // Check if the stack has overflowed
+            if (is6502 && (Stack.Value & 0xFF00 ) != 0x100)
+            {
+                Stack.Value = 0x100 + (Stack.Value & 0xFF);
+            } 
             MemMgr.Write(Stack.Value + 1, value, bytes);
         }
 
@@ -339,7 +346,9 @@ namespace FoenixIDE.Processor
         public int Pull(int bytes)
         {
             if (bytes < 1 || bytes > 3)
+            {
                 throw new Exception("bytes must be between 1 and 3. got " + bytes.ToString());
+            }
 
             int ret = MemMgr.Read(Stack.Value + 1, bytes);
             

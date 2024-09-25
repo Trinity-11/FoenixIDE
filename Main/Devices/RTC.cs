@@ -201,13 +201,19 @@ namespace FoenixIDE.Simulator.Devices
                 data[13] = 0;
                 return value;
             }
-            return base.ReadByte(Address);
+            return data[Address];
         }
         public override void WriteByte(int Address, byte Value)
         {
             // Allow writing to the control register
             switch (Address)
             {
+                case 1:
+                case 3:
+                case 5:
+                case 7:
+                    data[Address] = Value;
+                    break;
                 case 0xB:
                     // reset the value of the hi-res periodic timer - the watch dog is ignored
                     freq = 0.0305175f * (1 << (Value & 0xF)); // ms
@@ -216,15 +222,16 @@ namespace FoenixIDE.Simulator.Devices
                         freq = 200;
                     }
                     data[0xB] = (byte)(Value & 0x7F);
+                    periodicTimer.Interval = freq;
                     break;
                 case 0xC:
                     // Enables Register
                     data[0xC] = (byte)(Value & 0xF);
                     isAlarmEnabled = (Value & 8) != 0;
                     isPeriodicEnabled = (Value & 4) != 0;
-                    if (periodicTimer != null && !isPeriodicEnabled)
+                    if (periodicTimer != null) 
                     {
-                        periodicTimer.Enabled = false;
+                        periodicTimer.Enabled = isPeriodicEnabled;
                     }
                     if (isPeriodicEnabled)
                     {
@@ -253,12 +260,12 @@ namespace FoenixIDE.Simulator.Devices
                     }
                     data[0xE] = (byte)(Value & 0xF);
                     break;
-            
-                
-            }
-            if (is_UTI_Set && (Address < 0xB || Address == 0xF))
-            {
-                tempValues[Address] = Value;
+                default:
+                    if (is_UTI_Set)
+                    {
+                        tempValues[Address] = Value;
+                    }
+                    break;
             }
         }
     }

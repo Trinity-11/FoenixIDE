@@ -199,7 +199,7 @@ namespace FoenixIDE.MemoryLocations
 
 
         public const int VECTOR_ECOP = 0x00FFF4; // 2 Bytes Emulation mode interrupt handler
-        public const int VECTOR_EBRK = 0x00FFF6; // 2 Bytes Emulation mode interrupt handler
+        public const int VECTOR_EBRK = 0x00FFFE; // 2 Bytes Emulation mode interrupt handler
         public const int VECTOR_EABORT = 0x00FFF8; // 2 Bytes Emulation mode interrupt handler
         public const int VECTOR_ENMI = 0x00FFFA; // 2 Bytes Emulation mode interrupt handler
         public const int VECTOR_ERESET = 0x00FFFC; // 2 Bytes Emulation mode interrupt handler
