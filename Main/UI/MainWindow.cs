@@ -42,6 +42,7 @@ namespace FoenixIDE.UI
         private String defaultKernel;
         private int jumpStartAddress;
         private bool disabledIRQs = false;
+        private int executionBreakpointAddressAtStartup;
         private bool autoRun = true;
         private BoardVersion version = BoardVersion.RevC;
         public static MainWindow Instance = null;
@@ -73,6 +74,10 @@ namespace FoenixIDE.UI
                 if (context.ContainsKey("disabledIRQs"))
                 {
                     disabledIRQs = "true".Equals(context["disabledIRQs"]);
+                }
+                if (context.ContainsKey("executionBreakpointAddressAtStartup"))
+                {
+                    executionBreakpointAddressAtStartup = int.Parse(context["executionBreakpointAddressAtStartup"]);
                 }
                 if (context.ContainsKey("version"))
                 {
@@ -313,6 +318,10 @@ namespace FoenixIDE.UI
             {
                 debugWindow.locationInput.Text = jumpStartAddress.ToString("X6");
                 debugWindow.JumpButton_Click(null, null);
+            }
+            if (executionBreakpointAddressAtStartup != 0)
+            {
+                debugWindow.AddExecutionBreakpointProgrammatically(executionBreakpointAddressAtStartup);
             }
             if (autoRun)
             {

@@ -621,6 +621,16 @@ namespace FoenixIDE.UI
             MainWindow.Instance.ResetGPU(false);
         }
 
+        public void AddExecutionBreakpointProgrammatically(int address)
+        {
+            breakpointWindow.AddBreakpoint(address);
+
+            if (!knl_breakpointsExec.Contains(address))
+            {
+                knl_breakpointsExec.Add(address);
+            }
+        }
+
         private void addBreakpoints()
         {
             List<int> execs = breakpointWindow.GetExecuteBreakpoints();
