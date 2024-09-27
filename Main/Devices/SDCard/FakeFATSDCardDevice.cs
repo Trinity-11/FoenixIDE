@@ -344,7 +344,7 @@ namespace FoenixIDE.Simulator.Devices
                 
 
                 // Don't write a record for the root folder
-                if (dirCount == 0)
+                if (rootDirCount == 0)
                 {
                     string dirname = dirInfo.Name.Replace(" ", "").ToUpper();
                     if (dirname.Length < 8)

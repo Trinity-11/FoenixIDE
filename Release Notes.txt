@@ -1,8 +1,6 @@
-Release 0.7.0.10
+Release 0.7.0.11
 ----------------
-Added handling of sub-folders in the SD Card device.
-Moved the Revision Menu to left-align.
-
+Fixed trivial bug where the directory list is empty if the SD Card folder has no sub-folders.
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
@@ -15,6 +13,11 @@ Moved the Revision Menu to left-align.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Support two joysticks and allow for multiple joystick buttons
 ** TODO: Merge the flat memory PR - https://github.com/RetroPM/FoenixIDE
+
+Release 0.7.0.10
+----------------
+Added handling of sub-folders in the SD Card device.
+Moved the Revision Menu to left-align.
 
 Release 0.7.0.9
 ---------------
