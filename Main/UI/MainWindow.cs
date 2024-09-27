@@ -55,7 +55,7 @@ namespace FoenixIDE.UI
             bool autoRunCommandLineSpecified = false;
             bool boardVersionCommandLineSpecified = false;
             applicationDirectory = System.AppContext.BaseDirectory;
-
+            
             if (context != null)
             {
                 if (context.ContainsKey("jumpStartAddress"))
@@ -203,6 +203,8 @@ namespace FoenixIDE.UI
             terminal = new SerialTerminal();
             ShowDebugWindow(version);
             ShowMemoryWindow(version);
+            
+            ((ToolStripDropDownMenu)toolStripRevision.DropDown).ShowImageMargin = false;
 
             // Now that the kernel is initialized, allocate variables to the GPU
             if (gpu.StartOfFrame == null)

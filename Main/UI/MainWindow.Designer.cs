@@ -73,14 +73,12 @@ namespace FoenixIDE.UI
             this.viewScalingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.start_label_MenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resolution_label_640x480MenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resolution_label2_640x480MenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scalingseparator1MenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.scale1_0X_H480ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scale2_0X_H480ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scale3_0X_H480ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scale4_0X_H480ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resolution_label_640x400MenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resolution_label2_640x400MenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scalingseparator2MenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.scale1_0X_H400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scale2_0X_H400ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,6 +97,8 @@ namespace FoenixIDE.UI
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resolution_label2_640x480MenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resolution_label2_640x400MenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.gpu = new FoenixIDE.Display.Gpu();
             this.statusStrip1.SuspendLayout();
@@ -128,6 +128,7 @@ namespace FoenixIDE.UI
             // toolStripRevision
             // 
             this.toolStripRevision.AutoSize = false;
+            this.toolStripRevision.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripRevision.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.revBToolStripMenuItem,
             this.revCToolStripMenuItem,
@@ -138,59 +139,85 @@ namespace FoenixIDE.UI
             this.revF256KToolStripMenuItem,
             this.revF256K816ToolStripMenuItem});
             this.toolStripRevision.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.toolStripRevision.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.toolStripRevision.Name = "toolStripRevision";
             this.toolStripRevision.Size = new System.Drawing.Size(109, 28);
             this.toolStripRevision.Text = "Rev B";
+            this.toolStripRevision.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.toolStripRevision.ToolTipText = "Board Version";
             this.toolStripRevision.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.ToolStripRevision_DropDownItemClicked);
             // 
             // revBToolStripMenuItem
             // 
+            this.revBToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revBToolStripMenuItem.Name = "revBToolStripMenuItem";
-            this.revBToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revBToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revBToolStripMenuItem.Text = "Rev B";
+            this.revBToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revBToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // revCToolStripMenuItem
             // 
+            this.revCToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revCToolStripMenuItem.Name = "revCToolStripMenuItem";
-            this.revCToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revCToolStripMenuItem.Text = "Rev C";
+            this.revCToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revCToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // revUToolStripMenuItem
             // 
+            this.revUToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revUToolStripMenuItem.Name = "revUToolStripMenuItem";
-            this.revUToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revUToolStripMenuItem.Text = "Rev U";
+            this.revUToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revUToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // revUPlusToolStripMenuItem
             // 
+            this.revUPlusToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revUPlusToolStripMenuItem.Name = "revUPlusToolStripMenuItem";
-            this.revUPlusToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revUPlusToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revUPlusToolStripMenuItem.Text = "Rev U+";
+            this.revUPlusToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revUPlusToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // revJrToolStripMenuItem
             // 
+            this.revJrToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revJrToolStripMenuItem.Name = "revJrToolStripMenuItem";
-            this.revJrToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revJrToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revJrToolStripMenuItem.Text = "Rev Jr";
+            this.revJrToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revJrToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // revJr816ToolStripMenuItem
             // 
+            this.revJr816ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revJr816ToolStripMenuItem.Name = "revJr816ToolStripMenuItem";
-            this.revJr816ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revJr816ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revJr816ToolStripMenuItem.Text = "Rev Jr(816)";
+            this.revJr816ToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revJr816ToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // revF256KToolStripMenuItem
             // 
+            this.revF256KToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revF256KToolStripMenuItem.Name = "revF256KToolStripMenuItem";
-            this.revF256KToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revF256KToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revF256KToolStripMenuItem.Text = "Rev F256K";
+            this.revF256KToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revF256KToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // revF256K816ToolStripMenuItem
             // 
+            this.revF256K816ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revF256K816ToolStripMenuItem.Name = "revF256K816ToolStripMenuItem";
-            this.revF256K816ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revF256K816ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revF256K816ToolStripMenuItem.Text = "Rev F256K(816)";
+            this.revF256K816ToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.revF256K816ToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             // 
             // dipSwitch
             // 
@@ -258,7 +285,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(174, 25);
+            this.SDCardPath.Size = new System.Drawing.Size(143, 25);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -443,7 +470,7 @@ namespace FoenixIDE.UI
             this.autorunEmulatorToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.autorunEmulatorToolStripMenuItem.Name = "autorunEmulatorToolStripMenuItem";
             this.autorunEmulatorToolStripMenuItem.Padding = new System.Windows.Forms.Padding(0, 2, 0, 1);
-            this.autorunEmulatorToolStripMenuItem.Size = new System.Drawing.Size(180, 23);
+            this.autorunEmulatorToolStripMenuItem.Size = new System.Drawing.Size(169, 23);
             this.autorunEmulatorToolStripMenuItem.Text = "Autorun Emulator";
             this.autorunEmulatorToolStripMenuItem.Click += new System.EventHandler(this.AutorunEmulatorToolStripMenuItem_Click);
             // 
@@ -464,7 +491,7 @@ namespace FoenixIDE.UI
             this.scale3_0X_H400ToolStripMenuItem,
             this.scale4_0X_H400ToolStripMenuItem});
             this.viewScalingToolStripMenuItem.Name = "viewScalingToolStripMenuItem";
-            this.viewScalingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.viewScalingToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.viewScalingToolStripMenuItem.Text = "View Scaling";
             // 
             // start_label_MenuItem
@@ -474,7 +501,7 @@ namespace FoenixIDE.UI
             this.start_label_MenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.start_label_MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.start_label_MenuItem.Name = "start_label_MenuItem";
-            this.start_label_MenuItem.Size = new System.Drawing.Size(180, 22);
+            this.start_label_MenuItem.Size = new System.Drawing.Size(378, 22);
             this.start_label_MenuItem.Text = "-All following choices are double sized in the emulator-";
             // 
             // resolution_label_640x480MenuItem
@@ -484,29 +511,19 @@ namespace FoenixIDE.UI
             this.resolution_label_640x480MenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.resolution_label_640x480MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.resolution_label_640x480MenuItem.Name = "resolution_label_640x480MenuItem";
-            this.resolution_label_640x480MenuItem.Size = new System.Drawing.Size(180, 22);
+            this.resolution_label_640x480MenuItem.Size = new System.Drawing.Size(378, 22);
             this.resolution_label_640x480MenuItem.Text = "Native 320 x 240 @ 60Hz";
-            // 
-            // resolution_label2_640x480MenuItem
-            // 
-            this.resolution_label2_640x480MenuItem.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.resolution_label2_640x480MenuItem.Enabled = false;
-            this.resolution_label2_640x480MenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.resolution_label2_640x480MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.resolution_label2_640x480MenuItem.Name = "resolution_label_640x480MenuItem";
-            this.resolution_label2_640x480MenuItem.Size = new System.Drawing.Size(180, 22);
-            this.resolution_label2_640x480MenuItem.Text = "(default mode at bootup)";
             // 
             // scalingseparator1MenuItem
             // 
             this.scalingseparator1MenuItem.Name = "scalingseparator1MenuItem";
-            this.scalingseparator1MenuItem.Size = new System.Drawing.Size(177, 6);
+            this.scalingseparator1MenuItem.Size = new System.Drawing.Size(375, 6);
             // 
             // scale1_0X_H480ToolStripMenuItem
             // 
             this.scale1_0X_H480ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale1_0X_H480ToolStripMenuItem.Name = "scale1_0X_H480ToolStripMenuItem";
-            this.scale1_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale1_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale1_0X_H480ToolStripMenuItem.Text = "Scale 1.0X";
             this.scale1_0X_H480ToolStripMenuItem.Click += new System.EventHandler(this.scale1_0X_H480ToolStripMenuItem_Click);
             // 
@@ -514,7 +531,7 @@ namespace FoenixIDE.UI
             // 
             this.scale2_0X_H480ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale2_0X_H480ToolStripMenuItem.Name = "scale2_0X_H480ToolStripMenuItem";
-            this.scale2_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale2_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale2_0X_H480ToolStripMenuItem.Text = "Scale 2.0X";
             this.scale2_0X_H480ToolStripMenuItem.Click += new System.EventHandler(this.scale2_0X_H480ToolStripMenuItem_Click);
             // 
@@ -522,7 +539,7 @@ namespace FoenixIDE.UI
             // 
             this.scale3_0X_H480ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale3_0X_H480ToolStripMenuItem.Name = "scale3_0X_H480ToolStripMenuItem";
-            this.scale3_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale3_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale3_0X_H480ToolStripMenuItem.Text = "Scale 3.0X";
             this.scale3_0X_H480ToolStripMenuItem.Click += new System.EventHandler(this.scale3_0X_H480ToolStripMenuItem_Click);
             // 
@@ -530,7 +547,7 @@ namespace FoenixIDE.UI
             // 
             this.scale4_0X_H480ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale4_0X_H480ToolStripMenuItem.Name = "scale4_0X_H480ToolStripMenuItem";
-            this.scale4_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale4_0X_H480ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale4_0X_H480ToolStripMenuItem.Text = "Scale 4.0X";
             this.scale4_0X_H480ToolStripMenuItem.Click += new System.EventHandler(this.scale4_0X_H480ToolStripMenuItem_Click);
             // 
@@ -541,29 +558,19 @@ namespace FoenixIDE.UI
             this.resolution_label_640x400MenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.resolution_label_640x400MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.resolution_label_640x400MenuItem.Name = "resolution_label_640x400MenuItem";
-            this.resolution_label_640x400MenuItem.Size = new System.Drawing.Size(180, 22);
+            this.resolution_label_640x400MenuItem.Size = new System.Drawing.Size(378, 22);
             this.resolution_label_640x400MenuItem.Text = "Native 320 x 200 @ 70Hz";
-            // 
-            // resolution_label2_640x400MenuItem
-            // 
-            this.resolution_label2_640x400MenuItem.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.resolution_label2_640x400MenuItem.Enabled = false;
-            this.resolution_label2_640x400MenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.resolution_label2_640x400MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.resolution_label2_640x400MenuItem.Name = "resolution_label2_640x400MenuItem";
-            this.resolution_label2_640x400MenuItem.Size = new System.Drawing.Size(180, 22);
-            this.resolution_label2_640x400MenuItem.Text = "(toggle bit 0 to value 1 at $D001)";
             // 
             // scalingseparator2MenuItem
             // 
             this.scalingseparator2MenuItem.Name = "scalingseparator2MenuItem";
-            this.scalingseparator2MenuItem.Size = new System.Drawing.Size(177, 6);
+            this.scalingseparator2MenuItem.Size = new System.Drawing.Size(375, 6);
             // 
             // scale1_0X_H400ToolStripMenuItem
             // 
             this.scale1_0X_H400ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale1_0X_H400ToolStripMenuItem.Name = "scale1_0X_H400ToolStripMenuItem";
-            this.scale1_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale1_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale1_0X_H400ToolStripMenuItem.Text = "Scale 1.0X";
             this.scale1_0X_H400ToolStripMenuItem.Click += new System.EventHandler(this.scale1_0X_H400ToolStripMenuItem_Click);
             // 
@@ -571,7 +578,7 @@ namespace FoenixIDE.UI
             // 
             this.scale2_0X_H400ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale2_0X_H400ToolStripMenuItem.Name = "scale2_0X_H400ToolStripMenuItem";
-            this.scale2_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale2_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale2_0X_H400ToolStripMenuItem.Text = "Scale 2.0X";
             this.scale2_0X_H400ToolStripMenuItem.Click += new System.EventHandler(this.scale2_0X_H400ToolStripMenuItem_Click);
             // 
@@ -579,7 +586,7 @@ namespace FoenixIDE.UI
             // 
             this.scale3_0X_H400ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale3_0X_H400ToolStripMenuItem.Name = "scale3_0X_H400ToolStripMenuItem";
-            this.scale3_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale3_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale3_0X_H400ToolStripMenuItem.Text = "Scale 3.0X";
             this.scale3_0X_H400ToolStripMenuItem.Click += new System.EventHandler(this.scale3_0X_H400ToolStripMenuItem_Click);
             // 
@@ -587,7 +594,7 @@ namespace FoenixIDE.UI
             // 
             this.scale4_0X_H400ToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.scale4_0X_H400ToolStripMenuItem.Name = "scale4_0X_H400ToolStripMenuItem";
-            this.scale4_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scale4_0X_H400ToolStripMenuItem.Size = new System.Drawing.Size(378, 22);
             this.scale4_0X_H400ToolStripMenuItem.Text = "Scale 4.0X";
             this.scale4_0X_H400ToolStripMenuItem.Click += new System.EventHandler(this.scale4_0X_H400ToolStripMenuItem_Click);
             // 
@@ -698,6 +705,26 @@ namespace FoenixIDE.UI
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
+            // 
+            // resolution_label2_640x480MenuItem
+            // 
+            this.resolution_label2_640x480MenuItem.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.resolution_label2_640x480MenuItem.Enabled = false;
+            this.resolution_label2_640x480MenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.resolution_label2_640x480MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.resolution_label2_640x480MenuItem.Name = "resolution_label2_640x480MenuItem";
+            this.resolution_label2_640x480MenuItem.Size = new System.Drawing.Size(180, 22);
+            this.resolution_label2_640x480MenuItem.Text = "(default mode at bootup)";
+            // 
+            // resolution_label2_640x400MenuItem
+            // 
+            this.resolution_label2_640x400MenuItem.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.resolution_label2_640x400MenuItem.Enabled = false;
+            this.resolution_label2_640x400MenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.resolution_label2_640x400MenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.resolution_label2_640x400MenuItem.Name = "resolution_label2_640x400MenuItem";
+            this.resolution_label2_640x400MenuItem.Size = new System.Drawing.Size(180, 22);
+            this.resolution_label2_640x400MenuItem.Text = "(toggle bit 0 to value 1 at $D001)";
             // 
             // gpu
             // 

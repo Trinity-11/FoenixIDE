@@ -19,6 +19,7 @@ namespace FoenixIDE.Simulator.Devices
         protected readonly byte[] fat = new byte[512];
         protected byte[] readBlock, writeBlock = new byte[512];
         protected byte[] root = new byte[32 * 512]; // root dir is always 32 sectors, except FAT32, which omits it.
+        protected Dictionary<string, byte[]> subdirectories = new Dictionary<string, byte[]>(); // these will hold the data files for the sub-folders
         protected int blockPtr = 0;
         protected int BOOT_SECTOR_ADDR = 0x29 * 512;
         protected int FAT_OFFSET_START = -1; // must be calcuated based on capacity
@@ -44,6 +45,7 @@ namespace FoenixIDE.Simulator.Devices
 
         public override void ResetMbrBootSector()
         {
+            blockPtr = 0;
             if (isPresent)
             {
                 mbrPresent = false;
@@ -305,8 +307,93 @@ namespace FoenixIDE.Simulator.Devices
             }
         }
 
-
+        /**
+         * Should probably make this a recursive function.
+         */
         public void PrepareRootArea()
+        {
+            // The first record in the Root Area is the drive name
+            Array.Clear(root, 0, root.Length);
+            Array.Copy(Encoding.ASCII.GetBytes("FOENIXIDE  "), root, 11);
+            root[11] = 8; // volume type
+
+            string path = GetSDCardPath();
+            List<string> dirs = new List<string>();
+            dirs.Add(path);
+            dirs.AddRange(Directory.GetDirectories(path, "*.*", SearchOption.TopDirectoryOnly));
+            
+            FAT.Clear();
+            subdirectories.Clear();
+
+            int pointer = 32;
+            // Current cluster points to the start of FAT
+            int currentCluster = 4;
+            if (GetFSType() == FSType.FAT32)
+            {
+                // this skips the "root" area which is reserved for directories
+                currentCluster = 2 + 32 * 512 / GetClusterSize();
+            }
+            int dirCount = dirs.Count - 1;
+            int rootDirCount = 1;
+
+            byte[] directory = root;
+            foreach (string dir in dirs)
+            {
+                FileInfo dirInfo = new FileInfo(dir);
+                string[] files = Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly);
+                
+
+                // Don't write a record for the root folder
+                if (dirCount == 0)
+                {
+                    string dirname = dirInfo.Name.Replace(" ", "").ToUpper();
+                    if (dirname.Length < 8)
+                    {
+                        dirname += spaces.Substring(0, 8 - dirname.Length);
+                    }
+                    directory = new byte[0x4000];  // we reserving all this space for a new directory
+                    subdirectories.Add(dirname, directory);
+
+                    Array.Copy(Encoding.ASCII.GetBytes(dirname), 0, root, pointer, 8);
+                    Array.Copy(Encoding.ASCII.GetBytes("   "), 0, root, pointer+8, 3);
+                    root[pointer + 11] = 0x10;
+
+                    // each directory uses a new cluster - the number of files in the cluster determines the number of clusters
+                    // the starting cluster of directories is beyond the root files
+                    // write the start of the cluster - high two bytes
+                    root[pointer + 0x14] = (byte)((currentCluster & 0xFF_0000) >> 16);
+                    root[pointer + 0x15] = (byte)((currentCluster & 0xFF00_0000) >> 24);
+                    // write the start of the cluster - low two bytes
+                    root[pointer + 0x1a] = (byte)(currentCluster & 0xFF);
+                    root[pointer + 0x1b] = (byte)((currentCluster & 0xFF00) >> 8);
+                    pointer += 32;
+
+                    FileEntry entry = new FileEntry()
+                    {
+                        fqpn = dir,
+                        shortname = dirname,
+                        clusters = 0x4000/GetClusterSize(),
+                        size = 0
+                    };
+
+                    FAT.Add(currentCluster, entry);
+                    currentCluster += 0x4000 / GetClusterSize();
+                }
+
+                // We need to get the number of entries, because F256K may use long filenames
+                int entries = BuildFileRecordsToDirectory(files, currentCluster, directory, 32 * (dirCount + rootDirCount), out int oCluster);
+                currentCluster = oCluster;
+
+                // number of entries in the Root area is 1 + dirs + files - we're not storing long file names
+                // we can put 16 entries per sector (512 bytes / 32)
+                // int dirSectors = (rootDirCount + dirCount + entries ) / 16 + 1; // TODO --- this line seems incorrect: is it entries per sector or per cluster?
+                
+                rootDirCount = 0;
+                dirCount = 0;
+            }
+        }
+
+        private int BuildFileRecordsToDirectory(string[] files, int cluster, byte[] dirBuffer, int dirPointer, out int outCluster)
         {
             bool AlreadyExists(string fn)
             {
@@ -319,43 +406,18 @@ namespace FoenixIDE.Simulator.Devices
                 }
                 return false;
             }
-            Array.Clear(root, 0, root.Length);
-            Array.Copy(Encoding.ASCII.GetBytes("FOENIXIDE  "), root, 11);
-            root[11] = 8; // volume type
 
-            string path = GetSDCardPath();
-            string[] dirs = Directory.GetDirectories(path, "*", SearchOption.TopDirectoryOnly);
-            string[] files = Directory.GetFiles(path, "*", SearchOption.TopDirectoryOnly);
-            // number of entries in the Root area is 1 + dirs + files - we're not storing long file names
-            int entries = 1 + dirs.Length + files.Length; // we can put 16 entries per sector
-            int rootPages = entries / 16 + 1;
-            FAT.Clear();
-
-            int pointer = 32;
-            int currentCluster = 4;
-            if (GetFSType() == FSType.FAT32)
-            {
-                currentCluster = 2 + 32 * 512 / GetClusterSize();
-            }
-
-            foreach (string dir in dirs)
-            {
-                FileInfo info = new FileInfo(dir);
-                string dirname = info.Name.Replace(" ", "").ToUpper();
-                if (dirname.Length < 8)
-                {
-                    dirname += spaces.Substring(0, 8 - dirname.Length);
-                }
-
-                Array.Copy(Encoding.ASCII.GetBytes(dirname), 0, root, pointer, 8);
-                root[pointer + 11] = 0x10;
-                pointer += 32;
-            }
+            int recordCount = 0;
             foreach (string file in files)
             {
                 FileInfo info = new FileInfo(file);
                 int size = (int)info.Length;
                 int clusters = size / logicalSectorSize;
+                // ensure there is enough storage for all data
+                if (size % logicalSectorSize != 0 || clusters == 0)
+                {
+                    clusters += 1;
+                }
                 string originalExtension = info.Extension;
                 string extension = originalExtension.Length > 0 ? info.Extension.ToUpper().Substring(1) : "";
                 string originalFilename = info.Name;
@@ -393,7 +455,7 @@ namespace FoenixIDE.Simulator.Devices
                     size = size
                 };
 
-                FAT.Add(currentCluster, entry);
+                FAT.Add(cluster, entry);
                 // Create the Long Filename Entries for F256 - LFN entries must precede the file entry
                 if (vfat & (originalFilename.Length > 12 | originalExtension.Length > 3))
                 {
@@ -403,51 +465,55 @@ namespace FoenixIDE.Simulator.Devices
                     // The filename needs to end with 0x0000
                     int records = (UCS2FN.Length + 2) / 26 + 1;
                     byte[] buffer = new byte[26 * records]; // I want an array that's always long enough to not raise errors
-                    for (int i=0;i< 26 * records;i++)
+                    for (int i = 0; i < 26 * records; i++)
                     {
                         buffer[i] = 0xFF;
                     }
                     Array.Copy(UCS2FN, buffer, UCS2FN.Length);
                     buffer[UCS2FN.Length] = 0;
-                    buffer[UCS2FN.Length+1] = 0;
+                    buffer[UCS2FN.Length + 1] = 0;
                     // records are written in reverse order
                     for (int seq = records; seq > 0; seq--)
                     {
                         int offset = (seq - 1) * 26;
                         // Copy 26 bytes - or 13 UCS-2 characters
-                        Array.Copy(buffer, offset, root, pointer + 1, 10);
-                        Array.Copy(buffer, offset + 10, root, pointer + 0xE, 12);
-                        Array.Copy(buffer, offset + 22, root, pointer + 0x1C, 4);
+                        Array.Copy(buffer, offset, dirBuffer, dirPointer + 1, 10);
+                        Array.Copy(buffer, offset + 10, dirBuffer, dirPointer + 0xE, 12);
+                        Array.Copy(buffer, offset + 22, dirBuffer, dirPointer + 0x1C, 4);
 
                         // The first byte is the sequence number - if this is the last record, set bit 6.
-                        root[pointer] = (byte)((seq == records ? 0x40 : 0) + seq);
-                        root[pointer + 0xb] = 0xf;
-                        root[pointer + 0xc] = 0;
-                        root[pointer + 0xd] = chksum;
-                        root[pointer + 0x1a] = 0;
+                        dirBuffer[dirPointer] = (byte)((seq == records ? 0x40 : 0) + seq);
+                        dirBuffer[dirPointer + 0xb] = 0xf;
+                        dirBuffer[dirPointer + 0xc] = 0;
+                        dirBuffer[dirPointer + 0xd] = chksum;
+                        dirBuffer[dirPointer + 0x1a] = 0;
 
                         // increase the root buffer pointer
-                        pointer += 32;
+                        dirPointer += 32;
+                        recordCount++;
                     }
                 }
-                Array.Copy(Encoding.ASCII.GetBytes(filename), 0, root, pointer, 8);
-                Array.Copy(Encoding.ASCII.GetBytes(extension), 0, root, pointer + 8, 3);
+                Array.Copy(Encoding.ASCII.GetBytes(filename), 0, dirBuffer, dirPointer, 8);
+                Array.Copy(Encoding.ASCII.GetBytes(extension), 0, dirBuffer, dirPointer + 8, 3);
                 // cluster number
-                root[pointer + 0x1a] = (byte)(currentCluster & 0xFF);
-                root[pointer + 0x1b] = (byte)((currentCluster & 0xFF00) >> 8);
+                dirBuffer[dirPointer + 0x1a] = (byte)(cluster & 0xFF);
+                dirBuffer[dirPointer + 0x1b] = (byte)((cluster & 0xFF00) >> 8);
                 if (GetFSType() == FSType.FAT32)
                 {
-                    root[pointer + 0x14] = (byte)((currentCluster & 0xFF0000) >> 16);
-                    root[pointer + 0x15] = (byte)((currentCluster & 0xFF000000) >> 24);
+                    dirBuffer[dirPointer + 0x14] = (byte)((cluster & 0xFF_0000) >> 16);
+                    dirBuffer[dirPointer + 0x15] = (byte)((cluster & 0xFF00_0000) >> 24);
                 }
                 // file size
-                root[pointer + 0x1c] = (byte)(size & 0xFF);
-                root[pointer + 0x1d] = (byte)((size & 0xFF00) >> 8);
-                root[pointer + 0x1e] = (byte)((size & 0xFF_0000) >> 16);
-                root[pointer + 0x1f] = (byte)((size & 0xFF00_0000) >> 24);
-                currentCluster += clusters + 1;
-                pointer += 32;
+                dirBuffer[dirPointer + 0x1c] = (byte)(size & 0xFF);
+                dirBuffer[dirPointer + 0x1d] = (byte)((size & 0xFF00) >> 8);
+                dirBuffer[dirPointer + 0x1e] = (byte)((size & 0xFF_0000) >> 16);
+                dirBuffer[dirPointer + 0x1f] = (byte)((size & 0xFF00_0000) >> 24);
+                cluster += clusters;
+                dirPointer += 32;
+                recordCount++;
             }
+            outCluster = cluster;
+            return recordCount;
         }
 
         public static byte LFNCheckSum(string v)
@@ -556,29 +622,42 @@ namespace FoenixIDE.Simulator.Devices
             {
                 FileEntry entry = FAT[key];
                 int firstSector = (key - 2) * sectors_per_cluster;
-                if (page >= firstSector && page <= (key - 2 + entry.clusters) * sectors_per_cluster)
+                if (page >= firstSector && page < (key - 2 + entry.clusters) * sectors_per_cluster)
                 {
                     byte[] buffer = new byte[512];
-                    FileStream stream = null;
-                    try
+                    if (entry.size != 0)
                     {
-                        stream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
-                        stream.Seek((page - firstSector) * 512, SeekOrigin.Begin);
-                        stream.Read(buffer, 0, 512);
-                        return buffer;
-                    }
-                    catch (Exception e)
-                    {
-                        // controller error
-                        ReportError();
-                        System.Console.WriteLine(e.ToString());
-                        return null;
-                    }
-                    finally
-                    {
-                        if (stream != null)
+                        FileStream stream = null;
+                        try
                         {
-                            stream.Close();
+                            stream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
+                            stream.Seek((page - firstSector) * 512, SeekOrigin.Begin);
+                            stream.Read(buffer, 0, 512);
+                            return buffer;
+                        }
+                        catch (Exception e)
+                        {
+                            // controller error
+                            ReportError();
+                            System.Console.WriteLine(e.ToString());
+                            return null;
+                        }
+                        finally
+                        {
+                            if (stream != null)
+                            {
+                                stream.Close();
+                            }
+                        }
+                    } 
+                    else
+                    {
+                        // this is a directory
+                        if (page - firstSector < 32)
+                        {
+                            byte[] dirStruct = subdirectories[entry.shortname];
+                            Array.Copy(dirStruct, (page - firstSector) * 512, buffer, 0, 512);
+                            return buffer;
                         }
                     }
                 }
@@ -589,7 +668,7 @@ namespace FoenixIDE.Simulator.Devices
 
         protected void BuildFatPage(int page)
         {
-             Array.Clear(fat, 0, 512);
+            Array.Clear(fat, 0, 512);
             // The most likely used FS is FAT32
             int fatCount = 0;
             int byteOffset = 0;
