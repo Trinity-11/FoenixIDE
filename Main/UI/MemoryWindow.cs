@@ -86,20 +86,20 @@ namespace FoenixIDE.UI
                 AddressCombo.Items.Add("Bank $19");
                 AddressCombo.Items.Add("Bank $AF(Vicky)");
                 AddressCombo.Items.Add("Bank $B0(Video)");
-                AddressCombo.Items.Add("Address $AF: 0100(Bitmap Registers)");
-                AddressCombo.Items.Add("Address $AF: 0200(Tile Registers)");
-                AddressCombo.Items.Add("Address $AF: 0C00(Sprite Registers)");
-                AddressCombo.Items.Add("Address $AF: 1F40(Text Color Palette Foreground)");
-                AddressCombo.Items.Add("Address $AF: 1F80(Text Color Palette Background)");
-                AddressCombo.Items.Add("Address $AF: 2000(LUT 0)");
-                AddressCombo.Items.Add("Address $AF: 2400(LUT 1)");
-                AddressCombo.Items.Add("Address $AF: 2800(LUT 2)");
-                AddressCombo.Items.Add("Address $AF: 2C00(LUT 3)");
-                AddressCombo.Items.Add("Address $AF: 8000(Font Memory Bank 0)");
-                AddressCombo.Items.Add("Address $AF: 8800(Font Memory Bank 1)");
-                AddressCombo.Items.Add("Address $AF: A000(Text Memory)");
-                AddressCombo.Items.Add("Address $AF: C000(Text Colors)");
-                AddressCombo.Items.Add("Address $AF: E000(Gabe)");
+                AddressCombo.Items.Add("Address $AF:0100(Bitmap Registers)");
+                AddressCombo.Items.Add("Address $AF:0200(Tile Registers)");
+                AddressCombo.Items.Add("Address $AF:0C00(Sprite Registers)");
+                AddressCombo.Items.Add("Address $AF:1F40(Text Color Palette Foreground)");
+                AddressCombo.Items.Add("Address $AF:1F80(Text Color Palette Background)");
+                AddressCombo.Items.Add("Address $AF:2000(LUT 0)");
+                AddressCombo.Items.Add("Address $AF:2400(LUT 1)");
+                AddressCombo.Items.Add("Address $AF:2800(LUT 2)");
+                AddressCombo.Items.Add("Address $AF:2C00(LUT 3)");
+                AddressCombo.Items.Add("Address $AF:8000(Font Memory Bank 0)");
+                AddressCombo.Items.Add("Address $AF:8800(Font Memory Bank 1)");
+                AddressCombo.Items.Add("Address $AF:A000(Text Memory)");
+                AddressCombo.Items.Add("Address $AF:C000(Text Colors)");
+                AddressCombo.Items.Add("Address $AF:E000(Gabe)");
                 AddressCombo.Items.Add("Unspecified Page");
             }
             AddressCombo.SelectedIndex = 0;
@@ -309,7 +309,7 @@ namespace FoenixIDE.UI
                 {
                     int start = item.IndexOf('$');
                     int paren = item.IndexOf('(', start);
-                    dropdownAddress = Convert.ToInt32(item.Replace(":", "").Substring(start + 1, paren-start-1).Trim(), 16);
+                    dropdownAddress = Convert.ToInt32(item.Replace(":", "").Substring(start + 1, paren-start-2).Trim(), 16);
                 }
                 if (dropdownAddress != -1 && dropdownAddress == address)
                 {
