@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace FoenixIDE.Simulator.Devices
 {
-    public class DMA_JR : MemoryLocations.MemoryRAM
+
+    // DMA for all F256 class devices
+    // F256 Jr, F256K, F256Kc, F256Ke
+    public class DMA_F256 : MemoryLocations.MemoryRAM
     {
         private MemoryLocations.MemoryRAM System;
 
-        public DMA_JR(int StartAddress, int Length) : base(StartAddress, Length)
+        public DMA_F256(int StartAddress, int Length) : base(StartAddress, Length)
         {
         }
 

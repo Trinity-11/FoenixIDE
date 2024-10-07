@@ -1,8 +1,9 @@
 ﻿namespace FoenixIDE.MemoryLocations
 {
-    public class FlashJr : FoenixIDE.MemoryLocations.MemoryRAM
+    // Flash for all F256 Class devices
+    public class FlashF256 : FoenixIDE.MemoryLocations.MemoryRAM
     {
-        public FlashJr(int StartAddress, int Length) : base(StartAddress, Length)
+        public FlashF256(int StartAddress, int Length) : base(StartAddress, Length)
         {
         }
 

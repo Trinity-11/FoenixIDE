@@ -7,7 +7,7 @@ namespace FoenixIDE.Simulator.Devices
     /**
      * This class allows the F256 Junior to access 1MB of RAM/FLASH and provision 8k pages for the 6502 CPU
      */
-    public class MMU_JR : MemoryLocations.MemoryRAM
+    public class MMU_F256 : MemoryLocations.MemoryRAM
     {
         private byte activeLUT = 0;
         byte[] LUTs = { 0, 1, 2, 3, 4, 5, 6, 0x7F,
@@ -15,8 +15,14 @@ namespace FoenixIDE.Simulator.Devices
                         0, 1, 2, 3, 4, 5, 6, 0x7F,
                         0, 1, 2, 3, 4, 5, 6, 0x7F };
 
-        public MMU_JR(int StartAddress, int Length) : base(StartAddress, Length)
+        public int mode;
+        // added a mode to the MMU
+        // sorry about that!
+        // so, that the handling of addresses for the F256K2e can be similar to the F256K/c
+        // otherwise, it seems difficult to identify which mode we're in
+        public MMU_F256(int StartAddress, int Length, int mode_in) : base(StartAddress, Length)
         {
+            mode = mode_in;
         }
 
         public override byte ReadByte(int Address)

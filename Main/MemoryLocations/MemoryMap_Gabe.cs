@@ -22,7 +22,8 @@ namespace FoenixIDE.MemoryLocations
 
         // Dip switch Ports
         public const int DIPSWITCH = 0xAF_E804; // (R) $AFE804...$AFE807
-        public const int DIPSWITCH_JR = 0XD670;
+        public const int DIPSWITCH_F256_MMU = 0XD670;
+        public const int DIPSWITCH_F256_FLAT = 0XF0_1670;
 
         public const int SDCARD_START = 0xAF_E808;  // Start of SDCARD memory range
 
@@ -35,19 +36,28 @@ namespace FoenixIDE.MemoryLocations
         public const int SDCARD_CMD = 0xAF_E809;
         public const int SDCARD_STAT = 0xAF_E810;
 
-        // F256JR addresses
-        public const int SDCARD_JR = 0x00_DD00;
-        public const int MATH_JR = 0x00_DE00;
-        public const int SEEDL_JR = 0x00_D6A4;
-        public const int SEEDH_JR = 0x00_D6A5;
-        public const int RND_CTRL_JR = 0x00_D6A6;
-        public const int SOL_CTRL_JR = 0x00_D018;
+        // F256_MMU  addresses
+        public const int SDCARD_F256_MMU = 0x00_DD00;
+        public const int MATH_F256_MMU = 0x00_DE00;
+        public const int SEEDL_F256_MMU = 0x00_D6A4;
+        public const int SEEDH_F256_MMU = 0x00_D6A5;
+        public const int RND_CTRL_F256_MMU = 0x00_D6A6;
+        public const int SOL_CTRL_F256_MMU = 0x00_D018;
+
+        // F256_FLAT  addresses
+        public const int SDCARD_F256_FLAT = 0xF0_1D00;
+        public const int MATH_F256_FLAT = 0xF0_1E00;
+        public const int SEEDL_F256_FLAT = 0xF0_16A4;
+        public const int SEEDH_F256_FLAT = 0xF0_16A5;
+        public const int RND_CTRL_F256_FLAT = 0xF0_16A6;
+        public const int SOL_CTRL_F256_FLAT = 0xF0_1018;
 
         // Handling code in CODEC_RAM
         public const int CODEC_START = 0xAF_E820;     // Start of CODEC memory range
         public const int CODEC_SIZE = 0x04;           // Size of CODEC memory range
         public const int CODEC_WR_CTRL = 0xAF_E822;   // codec write address
-        public const int CODEC_WR_CTRL_JR = 0x00_D620;   // codec write address
+        public const int CODEC_WR_CTRL_F256_MMU = 0x00_D620;   // codec write address
+        public const int CODEC_WR_CTRL_F256_FLAT = 0xF0_1620;   // codec write address
 
         // GABE
         /* 

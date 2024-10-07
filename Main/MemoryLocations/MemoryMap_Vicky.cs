@@ -26,27 +26,41 @@ namespace FoenixIDE.MemoryLocations
         public const int VKY_TXT_CURSOR_CHAR_REG = 0xAF_0012;
         public const int VKY_TXT_CURSOR_X_REG = 0xAF_0014;
         public const int VKY_TXT_CURSOR_Y_REG = 0xAF_0016;
-        public const int VKY_TXT_CURSOR_CTRL_REG_JR = 0xD010;
-        public const int VKY_TXT_CURSOR_CHAR_REG_JR = 0xD012;
-        public const int VKY_TXT_CURSOR_X_REG_JR = 0xD014;
-        public const int VKY_TXT_CURSOR_Y_REG_JR = 0xD016;
+        public const int VKY_TXT_CURSOR_CTRL_F256_MMU = 0xD010;
+        public const int VKY_TXT_CURSOR_CHAR_F256_MMU = 0xD012;
+        public const int VKY_TXT_CURSOR_X_F256_MMU = 0xD014;
+        public const int VKY_TXT_CURSOR_Y_F256_MMU = 0xD016;
+
+        public const int VKY_TXT_CURSOR_CTRL_F256_FLAT = 0xF0_1010;
+        public const int VKY_TXT_CURSOR_CHAR_F256_FLAT = 0xF0_1012;
+        public const int VKY_TXT_CURSOR_X_F256_FLAT = 0xF0_1014;
+        public const int VKY_TXT_CURSOR_Y_F256_FLAT = 0xF0_1016;
 
         // Line Interrupt Registers
         public const int VKY_LINE_IRQ_CTRL_REG =  0xAF001B; // [0] - Enable Line 0, [1] -Enable Line 1
         public const int VKY_LINE0_CMP_VALUE_LO = 0xAF001C; // Write Only[7:0]
         public const int VKY_LINE1_CMP_VALUE_LO = 0xAF001E; // Write Only[7:0]
-        public const int VKY_LINE_IRQ_CTRL_REG_JR =   0xD018; // [0] - Enable Line 0, [1] -Enable Line 1
-        public const int VKY_LINE_CMP_VALUE_JR = 0xD019; // Write Only[7:0]
+        public const int VKY_LINE_IRQ_CTRL_F256_MMU = 0xD018; // [0] - Enable Line 0, [1] -Enable Line 1
+        public const int VKY_LINE_CMP_VALUE_F256_MMU = 0xD019; // Write Only[7:0]
+        public const int VKY_LINE_IRQ_CTRL_F256_FLAT = 0xF0_1018; // [0] - Enable Line 0, [1] -Enable Line 1
+        public const int VKY_LINE_CMP_VALUE_F256_FLAT = 0xF0_1019; // Write Only[7:0]
 
 
         public const int BITMAP_CONTROL_REGISTER_ADDR = 0xAF_0100; // 2 layers - 8 bytes
+        public const int BITMAP_CONTROL_REGISTER_ADDR_F256_MMU = 0xD100;
+        public const int BITMAP_CONTROL_REGISTER_ADDR_F256_FLAT = 0xF0_1100;
+
         public const int TILE_CONTROL_REGISTER_ADDR = 0xAF_0200; // 12 bytes for each tile layer
-        public const int TILE_CONTROL_REGISTER_ADDR_JR = 0xD200;
+        public const int TILE_CONTROL_REGISTER_ADDR_F256_MMU = 0xD200;
+        public const int TILE_CONTROL_REGISTER_ADDR_F256_FLAT = 0xF0_1200;
         public const int SPRITE_CONTROL_REGISTER_ADDR = 0xAF_0C00; // 8 bytes for each sprite
+        public const int SPRITE_CONTROL_REGISTER_ADDR_F256_MMU = 0xD900; 
+        public const int SPRITE_CONTROL_REGISTER_ADDR_F256_FLAT = 0xF0_1900;
 
         public const int VDMA_START = 0xAF_0400;
         public const int VDMA_SIZE = 0x31; // from $af:0400 to $af:0430
-        public const int DMA_START_JR = 0xDF00;
+        public const int DMA_START_F256_MMU = 0xDF00;
+        public const int DMA_START_F256_FLAT = 0xF0_1F00;
 
         public const int MOUSE_PTR_GRAP0 = 0xAF_0500; // image for pointer 0
         public const int MOUSE_PTR_GRAP1 = 0xAF_0600; // image for pointer 1
@@ -76,8 +90,13 @@ namespace FoenixIDE.MemoryLocations
         public const int RTC_CTRL = 0xAF_080E; // Control Register
         public const int RTC_CENTURY = 0xAF_080F; // Century Register
 
+        // Mouse Pointer
+        public const int MOUSE_POINTER_F256_MMU = 0xD6E0; 
+        public const int MOUSE_POINTER_F256_FLAT = 0xF0_16E0;
+
         // Junior RTC
-        public const int RTC_SEC_JR = 0x00_D690; // Seconds Register
+        public const int RTC_SEC_F256_MMU = 0x00_D690; // Seconds Register
+        public const int RTC_SEC_F256_FLAT = 0xF0_1690; // Seconds Register
 
         public const int SUPERIO_START = 0xAF_1000;
         public const int SUPERIO_END = 0xAF_13FF;
@@ -87,14 +106,18 @@ namespace FoenixIDE.MemoryLocations
         public const int KBD_DATA_BUF_U = 0xAF_1803;       // U Keyboard input, output buffer
         public const int KBD_STATUS_PORT_U = 0xAF_1807;    // U keyboard status port
 
-        public const int KBD_DATA_BUF_JR = 0x00_D640;       // JR Keyboard input, output buffer
-        public const int KBD_STATUS_PORT_JR = 0x00_D644;    // JR keyboard status port
+        public const int KBD_DATA_BUF_F256_MMU = 0x00_D640;       // JR Keyboard input, output buffer
+        public const int KBD_STATUS_PORT_F256_MMU = 0x00_D644;    // JR keyboard status port
+        public const int KBD_DATA_BUF_F256_FLAT = 0xF0_1640;       // JR Keyboard input, output buffer
+        public const int KBD_STATUS_PORT_F256_FLAT = 0xF0_1644;    // JR keyboard status port
 
         // FDC  - $AF:13F0
         // LPT1 - $AF:1378
         public const int UART1_REGISTERS = 0xAF_13F8;
         public const int UART2_REGISTERS = 0xAF_12F8;
-        public const int UART_REGISTERS_JR = 0x_D630;
+        public const int UART_REGISTERS_F256_MMU = 0x_D630;
+        public const int UART_REGISTERS_F256_FLAT = 0xF0_1630;
+
         // KBD  - $AF:1060
         // GAME - $AF:1200 - Not Connected
         // MPU  - $AF:1330
@@ -105,29 +128,38 @@ namespace FoenixIDE.MemoryLocations
 
         public const int FG_CHAR_LUT_PTR = 0xAF_1F40; // 15 color lookup table
         public const int BG_CHAR_LUT_PTR = 0xAF_1F80; // 15 color lookup table
-        public const int FG_CHAR_LUT_PTR_JR = 0xD800; // 15 color lookup table
-        public const int BG_CHAR_LUT_PTR_JR = 0xD840; // 15 color lookup table
+        public const int FG_CHAR_LUT_PTR_F256_MMU = 0xD800; // 15 color lookup table
+        public const int BG_CHAR_LUT_PTR_F256_MMU = 0xD840; // 15 color lookup table
+        public const int FG_CHAR_LUT_PTR_F256_FLAT = 0xF0_1800; // 15 color lookup table
+        public const int BG_CHAR_LUT_PTR_F256_FLAT = 0xF0_1840; // 15 color lookup table
 
         public const int GRP_LUT_BASE_ADDR = 0xAF_2000;  // room for 8 LUTs at 1024 bytes each (256 * 4 bytes per colour)
         public const int GAMMA_BASE_ADDR = 0xAF_4000;    // each 256 byte for B, G, R
-        public const int GAMMA_BASE_ADDR_JR = 0x00_C000;
-        public const int GRP_LUT_BASE_ADDR_JR = 0xD000;
+        public const int GAMMA_BASE_ADDR_F256_MMU = 0x00_C000;
+        public const int GAMMA_BASE_ADDR_F256_FLAT = 0xF0_0000;
+        public const int GRP_LUT_BASE_ADDR_F256_MMU = 0xD000;
+        public const int GRP_LUT_BASE_ADDR_F256_FLAT = 0xF0_3000;
 
         public const int TILESET_BASE_ADDR = 0xAF_0280; // 8 tileset addresses, 4 bytes - 3 bytes address of tileset, 1 byte configuration
-        public const int TILESET_BASE_ADDR_JR = 0xD280;
+        public const int TILESET_BASE_ADDR_F256_MMU = 0xD280;
+        public const int TILESET_BASE_ADDR_F256_FLAT = 0xF0_1280;
 
         public const int FONT0_MEMORY_BANK_START = 0xAF_8000;
         public const int FONT1_MEMORY_BANK_START = 0xAF_8800;
-        public const int FONT_MEMORY_BANK_START_JR = 0xC000;
+        public const int FONT_MEMORY_BANK_START_F256_MMU = 0xC000;
+        public const int FONT_MEMORY_BANK_START_F256_FLAT = 0xF0_2000;
 
         public const int SCREEN_PAGE0 = 0xAF_A000; // 8192 Bytes First page of display RAM. This is used at boot time to display the welcome screen and the BASIC or MONITOR command screens. 
         public const int SCREEN_PAGE1 = 0xAF_C000; // 8192 Bytes Additional page of display RAM. This can be used for page flipping or to handle multiple edit buffers. 
-        public const int SCREEN_PAGE_JR = 0xC000;
+        public const int SCREEN_PAGE_F256_MMU = 0xC000;
+        public const int SCREEN_PAGE_TEXT_F256_FLAT = 0xF0_4000;
+        public const int SCREEN_PAGE_COLOR_F256_FLAT = 0xF0_6000;
 
         public const int REVOFPCB_C = 0xAF_E805;
         public const int REVOFPCB_4 = 0xAF_E806;
         public const int REVOFPCB_A = 0xAF_E807;
-        public const int REVOFJR    = 0x00_D6A7;
+        public const int REVOF_F256_MMU  = 0x00_D6A7;
+        public const int REVOF_F256_FLAT = 0xF0_16A7;
         #endregion
     }
 }

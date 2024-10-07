@@ -51,15 +51,22 @@ namespace FoenixIDE
                     break;
                 case BoardVersion.RevJr_6502:
                 case BoardVersion.RevF256K_6502:
-                    memSize = 1024*1024; // Includes both RAM and flash.
-                    keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
+                    memSize = 1024 * 1024; // Includes both RAM and flash.
+                    keyboardAddress = MemoryMap.KBD_DATA_BUF_F256_MMU;
                     clock = 6293000;
                     is6502 = true;
                     break;
                 case BoardVersion.RevJr_65816:
                 case BoardVersion.RevF256K_65816:
                     memSize = 1024 * 1024;
-                    keyboardAddress = MemoryMap.KBD_DATA_BUF_JR;
+                    keyboardAddress = MemoryMap.KBD_DATA_BUF_F256_MMU;
+                    clock = 6293000;
+                    is6502 = false;
+                    break;
+                case BoardVersion.RevF256K2e:
+                    // needs more memory - 2M SRAM, 512K Flash, 128M DDR3 though DDR3 MMU
+                    memSize = 0x00200000;
+                    keyboardAddress = MemoryMap.KBD_DATA_BUF_F256_FLAT;
                     clock = 6293000;
                     is6502 = false;
                     break;
@@ -71,8 +78,16 @@ namespace FoenixIDE
             }
             else if (BoardVersionHelpers.IsF256(boardVersion))
             {
-                codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_JR, 3);  // unlike the FMX, this register is 16-bits in F256Jr
-                sdcard = new F256SDController(MemoryMap.SDCARD_JR, 2);
+                if (BoardVersionHelpers.IsF256_MMU(boardVersion))
+                {
+                    codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_F256_MMU, 3);  // unlike the FMX, this register is 16-bits in F256Jr
+                    sdcard = new F256SDController(MemoryMap.SDCARD_F256_MMU, 2);
+                }
+                else
+                {
+                    codec = new CodecRAM(MemoryMap.CODEC_WR_CTRL_F256_FLAT, 3);
+                    sdcard = new F256SDController(MemoryMap.SDCARD_F256_FLAT, 2);
+                }
             }
             else
             {
@@ -118,42 +133,80 @@ namespace FoenixIDE
             }
             else
             {
-                // Create the F256 DMA
-                DMA_JR dma = new DMA_JR(MemoryMap.DMA_START_JR, 20);
-                // This is a 6502 or 85816-based F256 machine; both have the same memory map
-                MemMgr = new MemoryManager
+                // see if this a Flat (65c816) Memory space or with MMU
+                if (BoardVersionHelpers.IsF256_Flat(boardVersion))
                 {
-                    RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
-                    FLASHJR = new FlashJr(MemoryMap.RAM_START, 0x08_0000),
-                    // vicky will store 4 pages of data
-                    VICKY = new MemoryRAM(0, 4 * 0x2000),
-                    PS2KEYBOARD = new PS2KeyboardRegisterSet2(keyboardAddress, 5),
-                    MATH = new MathCoproRegister_JR(MemoryMap.MATH_START_JR, MemoryMap.MATH_END_JR - MemoryMap.MATH_START_JR + 1), // 32 bytes
-                    SDCARD = sdcard,
-                    // Set to 4 bytes, just to be compatible with old boards and avoid exceptions in BreakOnIRQCheckBox_CheckedChanged
-                    INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_JR, 4),  
-                    UART1 = new UART(MemoryMap.UART_REGISTERS_JR, 8),
-                    DMA = dma,
-                    TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG_JR, 8),
-                    TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_JR, 8),
-                    RTC = new RTC(MemoryMap.RTC_SEC_JR, 16),
-                    CODEC = codec,
-                    MMU = new MMU_JR(0, 16),
-                    RNG = new RNGRegister(MemoryMap.SEEDL_JR, 3),
-                    SOLRegister = new SOL(MemoryMap.SOL_CTRL_JR, 4)
-                };
-                // Only the K machines have a matrix keyboard
-                if (boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816)
-                {
-                    MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
+                    // Create the F256 DMA
+                    DMA_F256 dma = new DMA_F256(MemoryMap.DMA_START_F256_FLAT, 20);
+                    // This is a 65816-based F256 machine with flat memory map
+                    MemMgr = new MemoryManager
+                    {
+                        RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
+                        FLASHF256 = new FlashF256(MemoryMap.FLASH_START_F256_FLAT, 0x08_0000),
+                        // vicky will store 4 pages of data
+                        VICKY = new MemoryRAM(MemoryMap.VICKY_START_F256_FLAT, 4 * 0x2000),
+                        PS2KEYBOARD = new PS2KeyboardRegisterSet2(keyboardAddress, 5),
+                        MATH = new MathCoproRegister_JR(MemoryMap.MATH_START_F256_FLAT, MemoryMap.MATH_END_F256_FLAT - MemoryMap.MATH_START_F256_FLAT + 1), // 32 bytes
+                        SDCARD = sdcard,
+                        // Set to 4 bytes, just to be compatible with old boards and avoid exceptions in BreakOnIRQCheckBox_CheckedChanged
+                        INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_F256_FLAT, 4),
+                        UART1 = new UART(MemoryMap.UART_REGISTERS_F256_FLAT, 8),
+                        DMA = dma,
+                        TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG_F256_FLAT, 8),
+                        TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_F256_FLAT, 8),
+                        RTC = new RTC(MemoryMap.RTC_SEC_F256_FLAT, 16),
+                        CODEC = codec,
+                        // don't have MMU in FLAT Mode
+                        MMU = new MMU_F256(0, 16, 1),
+                        RNG = new RNGRegister(MemoryMap.SEEDL_F256_FLAT, 3),
+                        SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_FLAT, 4)
+                    };
+                    dma.setSystemRam(MemMgr.RAM);
+
+                    // Only the K machines have a matrix keyboard
+                    MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B_F256_FLAT, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B_F256_FLAT, 4);
                 }
                 else
                 {
-                    MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4);
+                    // Create the F256 DMA
+                    DMA_F256 dma = new DMA_F256(MemoryMap.DMA_START_F256_MMU, 20);
+                    // This is a 6502 or 65816-based F256 machine; both have the same memory map
+                    MemMgr = new MemoryManager
+                    {
+                        RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
+                        FLASHF256 = new FlashF256(MemoryMap.RAM_START, 0x08_0000),
+                        // vicky will store 4 pages of data
+                        VICKY = new MemoryRAM(0, 4 * 0x2000),
+                        PS2KEYBOARD = new PS2KeyboardRegisterSet2(keyboardAddress, 5),
+                        MATH = new MathCoproRegister_JR(MemoryMap.MATH_START_F256_MMU, MemoryMap.MATH_END_F256_MMU - MemoryMap.MATH_START_F256_MMU + 1), // 32 bytes
+                        SDCARD = sdcard,
+                        // Set to 4 bytes, just to be compatible with old boards and avoid exceptions in BreakOnIRQCheckBox_CheckedChanged
+                        INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0_F256_MMU, 4),
+                        UART1 = new UART(MemoryMap.UART_REGISTERS_F256_MMU, 8),
+                        DMA = dma,
+                        TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG_F256_MMU, 8),
+                        TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_F256_MMU, 8),
+                        RTC = new RTC(MemoryMap.RTC_SEC_F256_MMU, 16),
+                        CODEC = codec,
+                        MMU = new MMU_F256(0, 16, 0),
+                        RNG = new RNGRegister(MemoryMap.SEEDL_F256_MMU, 3),
+                        SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_MMU, 4)
+                    };
+                    dma.setSystemRam(MemMgr.RAM);
+
+                    // Only the K machines have a matrix keyboard
+                    if (boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816)
+                    {
+                        MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
+                    }
+                    else
+                    {
+                        MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4);
+                    }
                 }
-                dma.setSystemRam(MemMgr.RAM);
+
             }
-            
+
             // Assign memory variables used by other processes
             CPU = new CPU(MemMgr, clock, is6502);
 
@@ -204,12 +257,16 @@ namespace FoenixIDE
                 // Set the Machine ID
                 if (boardVersion == BoardVersion.RevJr_6502 || boardVersion == BoardVersion.RevJr_65816)
                 {
-                    MemMgr.WriteByte(MemoryMap.REVOFJR, 0x2);
+                    MemMgr.WriteByte(MemoryMap.REVOF_F256_MMU, 0x2);
+                }
+                else if (boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816)
+                {
+                    MemMgr.WriteByte(MemoryMap.REVOF_F256_MMU, 0x12);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.Assert(boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816);
-                    MemMgr.WriteByte(MemoryMap.REVOFJR, 0x12);
+                    System.Diagnostics.Debug.Assert(boardVersion == BoardVersion.RevF256K2e);
+                    MemMgr.WriteByte(MemoryMap.REVOF_F256_FLAT, 0x13); // ID num?
                 }
                 // Set the MCR to be text mode
                 MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
@@ -245,7 +302,7 @@ namespace FoenixIDE
             }
             if (MemMgr.RTC.AlarmPeriodicInterruptDelegate == null)
             {
-                MemMgr.RTC.AlarmPeriodicInterruptDelegate  += RTCAlarmEvents;
+                MemMgr.RTC.AlarmPeriodicInterruptDelegate += RTCAlarmEvents;
             }
         }
 
@@ -253,7 +310,7 @@ namespace FoenixIDE
         {
             if (!BoardVersionHelpers.IsF256(boardVersion))
             {
-                byte mask =  MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
+                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0);
                 if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0.FNX0_INT02_TMR0) == (byte)Register0.FNX0_INT02_TMR0))
                 {
                     // Set the Timer0 Interrupt
@@ -265,11 +322,13 @@ namespace FoenixIDE
             }
             else
             {
-                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
+                int addr = BoardVersionHelpers.IsF256_MMU(boardVersion) ? MemoryLocations.MemoryMap.INT_MASK_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_MASK_REG0_F256_FLAT;
+                byte mask = MemMgr.ReadByte(addr);
                 if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0_JR.JR0_INT04_TMR0) == (byte)Register0_JR.JR0_INT04_TMR0))
                 {
                     // Set the Timer0 Interrupt
-                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    addr = BoardVersionHelpers.IsF256_MMU(boardVersion) ? MemoryLocations.MemoryMap.INT_PENDING_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_PENDING_REG0_F256_FLAT;
+                    byte IRQ0 = MemMgr.ReadByte(addr);
                     IRQ0 |= (byte)Register0_JR.JR0_INT04_TMR0;
                     MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                     CPU.Pins.IRQ = true;
@@ -292,11 +351,12 @@ namespace FoenixIDE
             }
             else
             {
-                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_MASK_REG0_JR - 0xC000);
+                int addr = BoardVersionHelpers.IsF256_MMU(boardVersion) ? MemoryLocations.MemoryMap.INT_MASK_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_MASK_REG0_F256_FLAT;
+                byte mask = MemMgr.ReadByte(addr);
                 if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register0_JR.JR0_INT05_TMR1) == (byte)Register0_JR.JR0_INT05_TMR1))
                 {
-                    // Set the Timer0 Interrupt
-                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR - 0xC000);
+                    addr = BoardVersionHelpers.IsF256_MMU(boardVersion) ? MemoryLocations.MemoryMap.INT_PENDING_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_PENDING_REG0_F256_FLAT;
+                    byte IRQ0 = MemMgr.ReadByte(addr);
                     IRQ0 |= (byte)Register0_JR.JR0_INT05_TMR1;
                     MemMgr.INTERRUPT.WriteFromGabe(0, IRQ0);
                     CPU.Pins.IRQ = true;
@@ -334,11 +394,13 @@ namespace FoenixIDE
             }
             else
             {
-                byte mask = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR + 1 - 0xC000);
+                int addr = BoardVersionHelpers.IsF256_MMU(boardVersion) ? MemoryLocations.MemoryMap.INT_PENDING_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_PENDING_REG0_F256_FLAT;
+                byte mask = MemMgr.ReadByte(addr + 1);
+
                 if (!CPU.DebugPause && !CPU.Flags.IrqDisable && ((~mask & (byte)Register1_JR.JR1_INT04_RTC) == (byte)Register1_JR.JR1_INT04_RTC))
                 {
                     // Set the Timer0 Interrupt
-                    byte IRQ0 = MemMgr.ReadByte(MemoryLocations.MemoryMap.INT_PENDING_REG0_JR + 1 - 0xC000);
+                    byte IRQ0 = MemMgr.ReadByte(addr);
                     IRQ0 |= (byte)Register1_JR.JR1_INT04_RTC;
                     MemMgr.INTERRUPT.WriteFromGabe(1, IRQ0);
                     CPU.Pins.IRQ = true;
@@ -386,7 +448,7 @@ namespace FoenixIDE
                 // check if the directory exists.  If it does, look for a bulk.csv file
                 string bulkCSV = Path.Combine(System.AppContext.BaseDirectory, "roms", "F256", "bulk.csv");
                 info = new FileInfo(bulkCSV);
-                
+
                 if (info.Exists)
                 {
                     LoadedKernel = bulkCSV;
@@ -433,15 +495,15 @@ namespace FoenixIDE
             string extension = info.Extension.ToUpper();
             if (info.Name.StartsWith("kernel"))
             {
-                if (BoardVersionHelpers.IsF256(boardVersion))
+                if (BoardVersionHelpers.IsF256_MMU(boardVersion))
                 {
                     MemMgr.MMU.Reset();
                 }
             }
             else
-            { 
+            {
                 // Ensure the first LUTs are set correctly - but don't overwrite the kernel.
-                if (BoardVersionHelpers.IsF256(boardVersion))
+                if (BoardVersionHelpers.IsF256_MMU(boardVersion))
                 {
                     MemMgr.MMU.SetActiveLUT(0);
                     MemMgr.MMU.WriteByte(0x8, 0);
@@ -457,7 +519,7 @@ namespace FoenixIDE
             }
             if (extension.Equals(".HEX"))
             {
-                if (HexFile.Load(MemMgr.RAM, MemMgr.FLASHJR, LoadedKernel, BasePageAddress, out _, out _) == -1)
+                if (HexFile.Load(MemMgr.RAM, MemMgr.FLASHF256, LoadedKernel, BasePageAddress, out _, out _) == -1)
                 {
                     return false;
                 }
@@ -591,7 +653,7 @@ namespace FoenixIDE
                     if (binOverlapsFlash)
                     {
                         int flashStart = DataStartAddress - 0x08_0000;
-                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, flashStart, flen);
+                        MemMgr.FLASHF256.CopyBuffer(DataBuffer, 0, flashStart, flen);
                     }
                 }
             }
@@ -611,12 +673,14 @@ namespace FoenixIDE
                         BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
                         byte[] DataBuffer = reader.ReadBytes(8192);
                         // Handle the case when the file is less than 8192 bytes.
-                        MemMgr.FLASHJR.CopyBuffer(DataBuffer, 0, address, DataBuffer.Length <= 8192 ? DataBuffer.Length : 8192);
-                        
+                        MemMgr.FLASHF256.CopyBuffer(DataBuffer, 0, address, DataBuffer.Length <= 8192 ? DataBuffer.Length : 8192);
+
                         reader.Close();
                     }
                 }
-                MemMgr.MMU.WriteByte(0xF, 0x7F);
+
+                if (BoardVersionHelpers.IsF256_MMU(boardVersion))
+                    MemMgr.MMU.WriteByte(0xF, 0x7F);
             }
 
             // Load the .LST file if it exists
@@ -675,7 +739,7 @@ namespace FoenixIDE
             // Reset the keyboards
             MemMgr.PS2KEYBOARD.WriteByte(0, 0);
             MemMgr.PS2KEYBOARD.WriteByte(4, 0);
-            
+
             if (MemMgr.VIAREGISTERS != null)
             {
                 MemMgr.VIAREGISTERS.VIA0.WriteByte(2, 0xFF);  // DDRB

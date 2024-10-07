@@ -41,7 +41,8 @@ namespace FoenixIDE.MemoryLocations
 
         // Math co-processor
         public const int MATH_START =    0x00_0100;
-        public const int MATH_START_JR = 0x00_DE00;
+        public const int MATH_START_F256_MMU = 0x00_DE00;
+        public const int MATH_START_F256_FLAT = 0xF0_1E00;
 
         /** Just for reference
         public const int MULTIPLIER_0 =  0x000100; // 0 Byte Unsigned multiplier
@@ -64,43 +65,51 @@ namespace FoenixIDE.MemoryLocations
         public const int D1_REMAINDER =  0x000116; // 2 Bytes Signed remainder of A/B ex: 1 in 7/2=3 r 1
         */
         public const int MATH_END =      0x00_012F;
-        public const int MATH_END_JR =   0x00_DE1F;
+        public const int MATH_END_F256_MMU =   0x00_DE1F;
+        public const int MATH_END_F256_FLAT = 0xF0_1E1F;
 
         // Pending Interrupt (Read and Write Back to Clear)
         public const int INT_PENDING_REG0 = 0x00_0140;
         public const int INT_PENDING_REG1 = 0x00_0141;
         public const int INT_PENDING_REG2 = 0x00_0142;
         public const int INT_PENDING_REG3 = 0x00_0143; // FMX Model
-        public const int INT_PENDING_REG0_JR = 0x00_D660;
+        public const int INT_PENDING_REG0_F256_MMU = 0x00_D660;
+        public const int INT_PENDING_REG0_F256_FLAT = 0xF0_1660;
 
         // Polarity Set
         public const int INT_POL_REG0 = 0x00_0144 ;
         public const int INT_POL_REG1 = 0x00_0145 ;
         public const int INT_POL_REG2 = 0x00_0146 ;
         public const int INT_POL_REG7 = 0x00_0147 ; // FMX Model
-        public const int INT_POL_REG0_JR = 0xD664;  // F256
+        public const int INT_POL_REG0_F256_MMU = 0xD664;  // F256
+        public const int INT_POL_REG0_F256_FLAT = 0xF0_1664;  // F256
 
         // Edge Detection Enable
         public const int INT_EDGE_REG0 = 0x00_0148;
         public const int INT_EDGE_REG1 = 0x00_0149;
         public const int INT_EDGE_REG2 = 0x00_014A;
         public const int INT_EDGE_REG3 = 0x00_014B; // FMX Model
-        public const int INT_EDGE_REG0_JR = 0xD668; // F256
+        public const int INT_EDGE_REG0_F256_MMU = 0xD668; // F256
+        public const int INT_EDGE_REG0_F256_FLAT = 0xF0_1668; // F256
+
         // Mask
         public const int INT_MASK_REG0 = 0x00_014C;
         public const int INT_MASK_REG1 = 0x00_014D;
         public const int INT_MASK_REG2 = 0x00_014E;
         public const int INT_MASK_REG3 = 0x00_014F;    // FMX Model
-        public const int INT_MASK_REG0_JR = 0xD66C; // F256
+        public const int INT_MASK_REG0_F256_MMU = 0xD66C; // F256
+        public const int INT_MASK_REG0_F256_FLAT = 0xF0_166C; // F256
 
         public const int TIMER0_CTRL_REG = 0x00_0160;
-        public const int TIMER0_CTRL_REG_JR = 0xD650;
+        public const int TIMER0_CTRL_REG_F256_MMU = 0xD650;
+        public const int TIMER0_CTRL_REG_F256_FLAT = 0xF0_1650;
         public const int TIMER0_CHARGE   = 0x00_0161;
         public const int TIMER0_CMP_REG  = 0x00_0164;
         public const int TIMER0_CMP      = 0x00_0165;
 
         public const int TIMER1_CTRL_REG = 0x00_0168;
-        public const int TIMER1_CTRL_REG_JR = 0xD658;
+        public const int TIMER1_CTRL_REG_F256_MMU = 0xD658;
+        public const int TIMER1_CTRL_REG_F256_FLAT = 0xF0_1658;
         public const int TIMER1_CHARGE   = 0x00_0169;
         public const int TIMER1_CMP_REG  = 0x00_016C;
         public const int TIMER1_CMP      = 0x00_016D;
@@ -172,6 +181,16 @@ namespace FoenixIDE.MemoryLocations
         public const int MATRIX_KEYBOARD_VIA1_PORT_A = 0xDB01;
         public const int MATRIX_KEYBOARD_VIA1_DATA_DIRECTION_B = 0xDB02;
         public const int MATRIX_KEYBOARD_VIA1_DATA_DIRECTION_A = 0xDB03;
+
+        public const int JOYSTICK_VIA0_PORT_B_F256_FLAT = 0xF0_1C00;
+        public const int JOYSTICK_VIA0_PORT_A_F256_FLAT = 0xF0_1C01;
+        public const int JOYSTICK_VIA0_DATA_DIRECTION_B_F256_FLAT = 0xF0_1C02;
+        public const int JOYSTICK_VIA0_DATA_DIRECTION_A_F256_FLAT = 0xF0_1C03;
+
+        public const int MATRIX_KEYBOARD_VIA1_PORT_B_F256_FLAT = 0xF0_1B00;
+        public const int MATRIX_KEYBOARD_VIA1_PORT_A_F256_FLAT = 0xF0_1B01;
+        public const int MATRIX_KEYBOARD_VIA1_DATA_DIRECTION_B_F256_FLAT = 0xF0_1B02;
+        public const int MATRIX_KEYBOARD_VIA1_DATA_DIRECTION_A_F256_FLAT = 0xF0_1B03;
 
         public const int TEST_BEGIN = 0x001000; // 28672 Bytes Test/diagnostic code for prototype.
         public const int TEST_END = 0x007FFF; // 0 Byte 

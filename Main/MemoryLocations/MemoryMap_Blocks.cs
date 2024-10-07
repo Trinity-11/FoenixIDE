@@ -17,7 +17,8 @@ namespace FoenixIDE.MemoryLocations
 
         // Beginning of Vicky Address Space
         public const int VICKY_START = VICKY_BASE_ADDR;            // Beginning of I/O Space
-        public const int VICKY_START_JR = 0xD000;                  // IO Page 0
+        public const int VICKY_START_F256_MMU = 0xD000;            // IO Page 0
+        public const int VICKY_START_F256_FLAT = 0xF0_0000;        // IO Page 0..3
         public const int VICKY_END = 0xAF_DFFF;                    // End of I/O Space
         public const int VICKY_SIZE = VICKY_END - VICKY_START + 1; // 64KB
 
@@ -29,6 +30,7 @@ namespace FoenixIDE.MemoryLocations
         public const int VIDEO_SIZE = 0x40_0000;  // 4MB Video RAM
 
         public const int FLASH_START = 0xF0_0000; // Beginning of FLASH
+        public const int FLASH_START_F256_FLAT = 0xF8_0000; // Beginning of FLASH
         public const int FLASH_USER_START = 0xF8_0000;
         public const int FLASH_END = 0xFF_FFFF; // End of 1MB FLASH 
         public const int FLASH_SIZE = 0x10_0000; // 1MB between the two FLASHES

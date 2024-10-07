@@ -1,6 +1,8 @@
-Release 0.7.0.11
+Release 0.7.0.12
 ----------------
-Fixed trivial bug where the directory list is empty if the SD Card folder has no sub-folders.
+Merged the F256K2e flat memory fork - https://github.com/RetroPM/FoenixIDE
+Fixed MemoryWindow issue for old machines, where paging would cause an uncaught exception.
+
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
@@ -12,7 +14,10 @@ Fixed trivial bug where the directory list is empty if the SD Card folder has no
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Support two joysticks and allow for multiple joystick buttons
-** TODO: Merge the flat memory PR - https://github.com/RetroPM/FoenixIDE
+
+Release 0.7.0.11
+----------------
+Fixed trivial bug where the directory list is empty if the SD Card folder has no sub-folders.
 
 Release 0.7.0.10
 ----------------

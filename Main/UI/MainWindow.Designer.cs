@@ -43,6 +43,7 @@ namespace FoenixIDE.UI
             this.revJr816ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.revF256KToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.revF256K816ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.revF256K2eToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dipSwitch = new System.Windows.Forms.ToolStripStatusLabel();
             this.ModeText = new System.Windows.Forms.ToolStripStatusLabel();
             this.lastKeyPressed = new System.Windows.Forms.ToolStripStatusLabel();
@@ -137,7 +138,8 @@ namespace FoenixIDE.UI
             this.revJrToolStripMenuItem,
             this.revJr816ToolStripMenuItem,
             this.revF256KToolStripMenuItem,
-            this.revF256K816ToolStripMenuItem});
+            this.revF256K816ToolStripMenuItem,
+            this.revF256K2eToolStripMenuItem});
             this.toolStripRevision.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripRevision.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.toolStripRevision.Name = "toolStripRevision";
@@ -216,8 +218,12 @@ namespace FoenixIDE.UI
             this.revF256K816ToolStripMenuItem.Name = "revF256K816ToolStripMenuItem";
             this.revF256K816ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.revF256K816ToolStripMenuItem.Text = "Rev F256K(816)";
-            this.revF256K816ToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.revF256K816ToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            // 
+            // revF256K2eToolStripMenuItem
+            // 
+            this.revF256K2eToolStripMenuItem.Name = "revF256K2eToolStripMenuItem";
+            this.revF256K2eToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.revF256K2eToolStripMenuItem.Text = "Rev F256K2e";
             // 
             // dipSwitch
             // 
@@ -285,7 +291,7 @@ namespace FoenixIDE.UI
             this.SDCardPath.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.SDCardPath.Name = "SDCardPath";
             this.SDCardPath.Overflow = System.Windows.Forms.ToolStripItemOverflow.Always;
-            this.SDCardPath.Size = new System.Drawing.Size(143, 25);
+            this.SDCardPath.Size = new System.Drawing.Size(174, 25);
             this.SDCardPath.Spring = true;
             this.SDCardPath.Text = "SD Card Disabled";
             this.SDCardPath.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -850,6 +856,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem revJrToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revF256KToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revF256K816ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem revF256K2eToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revUPlusToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revUToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revCToolStripMenuItem;

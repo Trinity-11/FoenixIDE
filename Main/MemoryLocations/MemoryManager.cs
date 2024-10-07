@@ -22,11 +22,11 @@ namespace FoenixIDE.MemoryLocations
         //public List<IMappable> devices = new List<IMappable>();
         public MemoryRAM RAM = null;
         public MemoryRAM FLASH = null;
-        public FlashJr FLASHJR = null;
+        public FlashF256 FLASHF256 = null;
         public MemoryRAM VIDEO = null;
         public MemoryRAM VICKY = null;
         public MemoryRAM GABE = null;
-        public MMU_JR MMU = null;
+        public MMU_F256 MMU = null;
         public MemoryRAM MATH = null;
         public MathFloatRegister FLOAT = null;
         public CodecRAM CODEC = null;
@@ -115,7 +115,7 @@ namespace FoenixIDE.MemoryLocations
                     DeviceAddress = Address - TIMER1.StartAddress;
                     return;
                 }
-                if (Address >= TIMER2.StartAddress && Address <= TIMER2.EndAddress)
+                if (TIMER2 != null && Address >= TIMER2.StartAddress && Address <= TIMER2.EndAddress)
                 {
                     Device = TIMER2;
                     DeviceAddress = Address - TIMER2.StartAddress;
@@ -224,7 +224,7 @@ namespace FoenixIDE.MemoryLocations
                     DeviceAddress = Address - VIDEO.StartAddress;
                     return;
                 }
-                if (Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)
+                if (FLASH != null && Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)
                 {
                     Device = FLASH;
                     DeviceAddress = Address - FLASH.StartAddress;
@@ -233,6 +233,11 @@ namespace FoenixIDE.MemoryLocations
             }
             else
             {
+
+                // check if MMU is really in use
+                if (MMU.mode == 0)
+                {
+
                 // Special case for the Memory Window again...
                 if (Address > 0xFFFF)
                 {
@@ -377,7 +382,7 @@ namespace FoenixIDE.MemoryLocations
 
                 if (page >= 0x40 && page <= 0x7F) // MMU entry points to FLASH
                 {
-                    Device = FLASHJR;
+                        Device = FLASHF256;
                     offset = (page - 0x40) * 8192;
                     DeviceAddress = offset + (Address & 0x1FFF);
                     return;
@@ -387,6 +392,143 @@ namespace FoenixIDE.MemoryLocations
                 offset = page * 8192;
                 DeviceAddress = offset + (Address & 0x1FFF);
                 return;
+                }
+
+                else
+                {
+                    // this is F256 Flat mode
+                    // Special case for the Memory Window again...
+                    //                    if (Address > 0xFFFF)
+                    //                    {
+                    //                       Device = RAM;
+                    //                        DeviceAddress = Address & 0xF_FFFF;
+                    //                        return;
+                    //                    }
+
+                    //                   if (Address < 2)
+                    //                    {
+                    //                        Device = MMU;
+                    //                        DeviceAddress = Address;
+                    //                        return;
+                    //                    }
+
+                    // Map Flash into upper 256 bytes of 1st 64K
+                    if (Address >= 0x00_FF00 && Address <= 0x00_FFFF)
+                        Address |= 0xFF_0000;
+
+                    if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)
+                    {
+                        Device = RAM;
+                        DeviceAddress = Address - RAM.StartAddress;
+                        return;
+                    }
+
+                    if (Address >= CODEC.StartAddress && Address <= CODEC.EndAddress)
+                    {
+                        Device = CODEC;
+                        DeviceAddress = Address - CODEC.StartAddress;
+                        return;
+                    }
+                    if (Address >= DMA.StartAddress && Address <= DMA.EndAddress)
+                    {
+                        Device = DMA;
+                        DeviceAddress = Address - DMA.StartAddress;
+                        return;
+                    }
+                    if (Address >= MATH.StartAddress && Address <= MATH.EndAddress)
+                    {
+                        Device = MATH;
+                        DeviceAddress = Address - MATH.StartAddress;
+                        return;
+                    }
+                    if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.EndAddress)
+                    {
+                        Device = INTERRUPT;
+                        DeviceAddress = Address - INTERRUPT.StartAddress;
+                        return;
+                    }
+                    if (Address >= TIMER0.StartAddress && Address <= TIMER0.EndAddress)
+                    {
+                        Device = TIMER0;
+                        DeviceAddress = Address - TIMER0.StartAddress;
+                        return;
+                    }
+                    if (Address >= TIMER1.StartAddress && Address <= TIMER1.EndAddress)
+                    {
+                        Device = TIMER1;
+                        DeviceAddress = Address - TIMER1.StartAddress;
+                        return;
+                    }
+                    if (Address >= RTC.StartAddress && Address <= RTC.EndAddress)
+                    {
+                        Device = RTC;
+                        DeviceAddress = Address - RTC.StartAddress;
+                        return;
+                    }
+                    if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
+                    {
+                        Device = PS2KEYBOARD;
+                        DeviceAddress = Address - PS2KEYBOARD.StartAddress;
+                        return;
+                    }
+                    if (VIAREGISTERS != null)
+                    {
+                        if (Address >= VIAREGISTERS.VIA0.StartAddress && Address <= VIAREGISTERS.VIA0.EndAddress)
+                        {
+                            Device = VIAREGISTERS.VIA0;
+                            DeviceAddress = Address - VIAREGISTERS.VIA0.StartAddress;
+                            return;
+                        }
+                        if (VIAREGISTERS.VIA1 != null && Address >= VIAREGISTERS.VIA1.StartAddress && Address <= VIAREGISTERS.VIA1.EndAddress)
+                        {
+                            Device = VIAREGISTERS.VIA1;
+                            DeviceAddress = Address - VIAREGISTERS.VIA1.StartAddress;
+                            return;
+                        }
+                    }
+                    if (RNG != null)
+                    {
+                        if (Address >= RNG.StartAddress && Address <= RNG.EndAddress)
+                        {
+                            Device = RNG;
+                            DeviceAddress = Address - RNG.StartAddress;
+                            return;
+                        }
+                    }
+                    if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
+                    {
+                        Device = UART1;
+                        DeviceAddress = Address - UART1.StartAddress;
+                        return;
+                    }
+                    if (Address >= SDCARD.StartAddress && Address <= SDCARD.EndAddress)
+                    {
+                        Device = SDCARD;
+                        DeviceAddress = Address - SDCARD.StartAddress;
+                        return;
+                    }
+                    if (Address >= SOLRegister.StartAddress && Address < SOLRegister.EndAddress)
+                    {
+                        Device = SOLRegister;
+                        DeviceAddress = Address - SOLRegister.StartAddress;
+                        return;
+                    }
+
+                    if (Address >= VICKY.StartAddress && Address <= VICKY.EndAddress)
+                    {
+                        Device = VICKY;
+                        DeviceAddress = Address - VICKY.StartAddress;
+                        return;
+                    }
+
+                    if (Address >= FLASHF256.StartAddress && Address <= FLASHF256.EndAddress)
+                    {
+                        Device = FLASHF256;
+                        DeviceAddress = Address - FLASHF256.StartAddress;
+                        return;
+                    }
+
+                }
             }
             
             // oops, we didn't map this to anything. 

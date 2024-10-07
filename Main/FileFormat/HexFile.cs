@@ -8,7 +8,7 @@ namespace FoenixIDE.Simulator.FileFormat
     public class HexFile
     {
 
-        static public int Load(MemoryRAM ram, FlashJr romJr, string Filename, int gabeAddressBank, out List<int> blocks, out List<int> blockLengths)
+        static public int Load(MemoryRAM ram, FlashF256 romJr, string Filename, int gabeAddressBank, out List<int> blocks, out List<int> blockLengths)
         {
             int bank = 0;
             int addrCursor = 0;

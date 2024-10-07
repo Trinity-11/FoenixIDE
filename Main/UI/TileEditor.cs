@@ -26,7 +26,7 @@ namespace FoenixIDE.Simulator.UI
         private Pen yellowPen = new Pen(Color.Yellow);
         private Pen redPen = new Pen(Color.Red);
         private Brush whiteBrush = new SolidBrush(Color.White);
-        private bool isJunior = false;
+        private bool is_F256_MMU = false; // need to check handling of this flag - need to check correct offset!
         private int tileRegistersBaseAddress;
         private int tilesetRegistersBaseAddress;
 
@@ -62,11 +62,12 @@ namespace FoenixIDE.Simulator.UI
         public void SetMemory(MemoryManager mm)
         {
             MemMgr = mm;
+            // need to check correct address in generated in F256_FLAT mode!
             if (mm.MMU != null)
             {
-                isJunior = true;
-                tileRegistersBaseAddress = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR_JR - 0xC000;
-                tilesetRegistersBaseAddress = MemoryLocations.MemoryMap.TILESET_BASE_ADDR_JR - 0xC000;
+                is_F256_MMU = true;
+                tileRegistersBaseAddress = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR_F256_MMU - 0xC000;
+                tilesetRegistersBaseAddress = MemoryLocations.MemoryMap.TILESET_BASE_ADDR_F256_MMU - 0xC000;
             }
             else
             {
@@ -111,7 +112,7 @@ namespace FoenixIDE.Simulator.UI
             int tileStride = tileSize * 16;
             int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16);
             MemoryRAM memRef = MemMgr.RAM;
-            if (!isJunior)
+            if (!is_F256_MMU)
             {
                 tilesetAddress = tilesetAddress - 0xB0_0000;
                 memRef = MemMgr.VIDEO;
@@ -196,7 +197,7 @@ namespace FoenixIDE.Simulator.UI
                     (selectedLeft / 16) * (Stride256Checkbox.Checked ? tileStride : 16 * size) * size + 
                     (selectedLeft % 16) * (Stride256Checkbox.Checked ? size : size * size);
                 MemoryRAM memRef = MemMgr.RAM;
-                if (!isJunior)
+                if (!is_F256_MMU)
                 {
                     tilesetAddress = tilesetAddress - 0xB0_0000;
                     memRef = MemMgr.VIDEO;
@@ -244,7 +245,7 @@ namespace FoenixIDE.Simulator.UI
                     (selectedRight / 16) * (Stride256Checkbox.Checked ? tileStride : 16 * size) * size +
                     (selectedRight % 16) * (Stride256Checkbox.Checked ? size : size * size);
                 MemoryRAM memRef = MemMgr.RAM;
-                if (!isJunior)
+                if (!is_F256_MMU)
                 {
                     tilesetAddress = tilesetAddress - 0xB0_0000;
                     memRef = MemMgr.VIDEO;
@@ -313,7 +314,7 @@ namespace FoenixIDE.Simulator.UI
             checkSmallTiles.Checked = (ControlReg & 0x10) != 0;
             // address in memory
             int tilemapAddr = MemMgr.VICKY.ReadLong(addrOffset + 1) & 0x3F_FFFF;
-            TilemapAddress.Text = (tilemapAddr + (isJunior?0:0xB0_0000)).ToString("X6");
+            TilemapAddress.Text = (tilemapAddr + (is_F256_MMU ? 0:0xB0_0000)).ToString("X6");
 
             int width = MemMgr.VICKY.ReadWord(addrOffset + 4) & 0x3FF;  // max 1024
             int height = MemMgr.VICKY.ReadWord(addrOffset + 6) & 0x3FF; // max 1024
@@ -334,7 +335,7 @@ namespace FoenixIDE.Simulator.UI
 
             int tilemapAddress = Convert.ToInt32(TilemapAddress.Text, 16);
             int tileSize = (checkSmallTiles.Checked ? 8 : 16);
-            if (isJunior)
+            if (is_F256_MMU)
             { 
                 tileSize *= 2;
             }
@@ -408,7 +409,7 @@ namespace FoenixIDE.Simulator.UI
             int tilesetBaseAddr = tilesetRegistersBaseAddress + TilesetList.SelectedIndex * 4;
             int newAddress = Convert.ToInt32(TilesetAddress.Text.Replace(":", ""), 16);
             int offsetAddress = newAddress;
-            if (!isJunior)
+            if (!is_F256_MMU)
             {
                 offsetAddress = newAddress - 0xB0_0000;
             }
@@ -501,7 +502,7 @@ namespace FoenixIDE.Simulator.UI
         {
             int tilesetBaseAddr = tilesetRegistersBaseAddress + TilesetList.SelectedIndex * 4;
             int tilesetAddr = MemMgr.VICKY.ReadLong(tilesetBaseAddr) & 0x3F_FFFF;
-            TilesetAddress.Text = (tilesetAddr + (isJunior?0:0xB0_0000)).ToString("X6");
+            TilesetAddress.Text = (tilesetAddr + (is_F256_MMU ? 0:0xB0_0000)).ToString("X6");
             int cfgReg = MemMgr.VICKY.ReadByte(tilesetBaseAddr + 3);
             Stride256Checkbox.Checked = (cfgReg & 8) != 0;
             LutList.SelectedIndex = cfgReg & 7;
