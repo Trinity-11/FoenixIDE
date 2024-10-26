@@ -485,7 +485,14 @@ namespace FoenixIDE.UI
                                     ];
                             }
                         }
-                        MemMgrRef.VIDEO.CopyBuffer(deinterlaced, 0, videoAddress, deinterlaced.Length);
+                        if (isF256)
+                        {
+                            MemMgrRef.RAM.CopyBuffer(deinterlaced, 0, videoAddress, deinterlaced.Length);
+                        }
+                        else
+                        {
+                            MemMgrRef.VIDEO.CopyBuffer(deinterlaced, 0, videoAddress, deinterlaced.Length);
+                        }
                     }
                     else
                     {

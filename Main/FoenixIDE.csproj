@@ -88,6 +88,7 @@
     <Compile Include="Devices\InterruptController.cs" />
     <Compile Include="Devices\Interrupts.cs" />
     <Compile Include="Devices\MathCoproRegister_JR.cs" />
+    <Compile Include="Devices\SNES.cs" />
     <Compile Include="Devices\VIARegisters.cs" />
     <Compile Include="Devices\PS2KeyboardRegister.cs" />
     <Compile Include="Devices\PS2KeyboardRegisterSet2.cs" />
@@ -367,7 +368,7 @@
     <EmbeddedResource Include="UI\WatchForm.resx">
       <DependentUpon>WatchForm.cs</DependentUpon>
     </EmbeddedResource>
-    <Compile Include="Devices\MMU_JR.cs" />
+    <Compile Include="Devices\MMU_F256.cs" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

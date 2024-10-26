@@ -1,7 +1,8 @@
-Release 0.7.0.12
+Release 0.7.0.13
 ----------------
-Merged the F256K2e flat memory fork - https://github.com/RetroPM/FoenixIDE
-Fixed MemoryWindow issue for old machines, where paging would cause an uncaught exception.
+Fixed annoying bug when importing sprites in Asset Window when in F256 mode.
+Added dummy SNES controller - it only return $FF for every byte.
+Adjusted tile scrolling for small tiles to account for overlap between SSX3 and X0.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -14,6 +15,11 @@ Fixed MemoryWindow issue for old machines, where paging would cause an uncaught 
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Support two joysticks and allow for multiple joystick buttons
+
+Release 0.7.0.12
+----------------
+Merged the F256K2e flat memory fork - https://github.com/RetroPM/FoenixIDE
+Fixed MemoryWindow issue for old machines, where paging would cause an uncaught exception.
 
 Release 0.7.0.11
 ----------------

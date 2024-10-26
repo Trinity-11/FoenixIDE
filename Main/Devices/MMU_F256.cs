@@ -15,14 +15,17 @@ namespace FoenixIDE.Simulator.Devices
                         0, 1, 2, 3, 4, 5, 6, 0x7F,
                         0, 1, 2, 3, 4, 5, 6, 0x7F };
 
-        public int mode;
-        // added a mode to the MMU
-        // sorry about that!
+        public bool flatMode;
+
+        //
+        // TODO: refactor this class - the "FlatMode" should not be exist and the F256Ke doesn't have an MMU.
+        //
+        // added a mode to the MMU - sorry about that!
         // so, that the handling of addresses for the F256K2e can be similar to the F256K/c
         // otherwise, it seems difficult to identify which mode we're in
-        public MMU_F256(int StartAddress, int Length, int mode_in) : base(StartAddress, Length)
+        public MMU_F256(int StartAddress, int Length, bool FlatMode) : base(StartAddress, Length)
         {
-            mode = mode_in;
+            flatMode = FlatMode;
         }
 
         public override byte ReadByte(int Address)

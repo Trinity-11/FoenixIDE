@@ -440,20 +440,20 @@ namespace FoenixIDE.Display
 
             int tileSize = (smallTiles ? 8 : 16);
             int strideLine = tileSize * 16;
-            byte scrollMask = (byte)(smallTiles ? 0xE : 0xF);
+            byte scrollMask = (byte)(smallTiles ? 0xF : 0xF);  // Tiny Vicky bug: this should be 0xE
 
             int tilemapWidth = VICKY.ReadWord(addrTileCtrlReg + 4) & 0x3FF;   // 10 bits
             //int tilemapHeight = VICKY.ReadWord(addrTileCtrlReg + 6) & 0x3FF;  // 10 bits
             int tilemapAddress = VICKY.ReadLong(addrTileCtrlReg + 1) & 0x3F_FFFF;
 
             // the tilemapWindowX is 10 bits and the scrollX is the lower 4 bits.  The IDE combines them.
-            // direction is bit 15.
+            // direction is bit 15.  Not implemented in Tiny Vicky
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
-            bool dirLeft = (tilemapWindowX & 0x8000) != 0;
+            bool dirLeft = (mode == 0) ? (tilemapWindowX & 0x8000) != 0 : true;
             byte scrollX = (byte)(((tilemapWindowX & scrollMask) * (dirLeft ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
-                tilemapWindowX = ((tilemapWindowX & 0x3FF0 + scrollX) >> 1) ;
+                tilemapWindowX = ((tilemapWindowX & 0x3FF0)  >> 1) + scrollX;
             }
             else
             {
@@ -468,7 +468,7 @@ namespace FoenixIDE.Display
             byte scrollY = (byte)(((tilemapWindowY & scrollMask) * (dirUp ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
-                tilemapWindowY = ((tilemapWindowY & 0x3FF0 + scrollY) >> 1);
+                tilemapWindowY = ((tilemapWindowY & 0x3FF0) >> 1) + scrollY;
             }
             else
             {

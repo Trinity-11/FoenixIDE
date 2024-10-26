@@ -156,8 +156,8 @@ namespace FoenixIDE
                         TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_F256_FLAT, 8),
                         RTC = new RTC(MemoryMap.RTC_SEC_F256_FLAT, 16),
                         CODEC = codec,
-                        // don't have MMU in FLAT Mode
-                        MMU = new MMU_F256(0, 16, 1),
+                        // don't have MMU in FLAT Mode - why have it then?
+                        MMU = new MMU_F256(0, 16, true),
                         RNG = new RNGRegister(MemoryMap.SEEDL_F256_FLAT, 3),
                         SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_FLAT, 4)
                     };
@@ -165,6 +165,8 @@ namespace FoenixIDE
 
                     // Only the K machines have a matrix keyboard
                     MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B_F256_FLAT, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B_F256_FLAT, 4);
+                    // Add the SNES Registers
+                    MemMgr.SNESController = new SNES(MemoryMap.SNES_CTRL_REG_FLAT, 16); // We are not implementing the SNES controller, so all values will return $FF
                 }
                 else
                 {
@@ -188,7 +190,7 @@ namespace FoenixIDE
                         TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_F256_MMU, 8),
                         RTC = new RTC(MemoryMap.RTC_SEC_F256_MMU, 16),
                         CODEC = codec,
-                        MMU = new MMU_F256(0, 16, 0),
+                        MMU = new MMU_F256(0, 16, false),
                         RNG = new RNGRegister(MemoryMap.SEEDL_F256_MMU, 3),
                         SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_MMU, 4)
                     };
@@ -203,6 +205,8 @@ namespace FoenixIDE
                     {
                         MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4);
                     }
+                    // Add the SNES Registers
+                    MemMgr.SNESController = new SNES(MemoryMap.SNES_CTRL_REG, 16); // We are not implementing the SNES controller, so all values will return $FF
                 }
 
             }

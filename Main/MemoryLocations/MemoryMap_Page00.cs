@@ -176,6 +176,8 @@ namespace FoenixIDE.MemoryLocations
         public const int JOYSTICK_VIA0_PORT_A = 0xDC01;
         public const int JOYSTICK_VIA0_DATA_DIRECTION_B = 0xDC02;
         public const int JOYSTICK_VIA0_DATA_DIRECTION_A = 0xDC03;
+        public const int SNES_CTRL_REG = 0xD880;
+        public const int SNES_CTRL_REG_FLAT = 0xF0_1880;
 
         public const int MATRIX_KEYBOARD_VIA1_PORT_B = 0xDB00;
         public const int MATRIX_KEYBOARD_VIA1_PORT_A = 0xDB01;

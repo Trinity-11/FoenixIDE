@@ -457,8 +457,13 @@ namespace FoenixIDE.Simulator.UI
             int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             if (WindowX.Text.Length > 0)
             {
-                int newValue = Convert.ToInt32(WindowX.Text) & 0x3FF;
-                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 8, newValue);
+                int newValue = Convert.ToInt32(WindowX.Text);
+                int combinedRegisters = newValue & 0x3FF;
+                if (checkSmallTiles.Checked)
+                {
+                    combinedRegisters = (newValue & 0x7) + ((newValue & 0x3F8) << 1);
+                }
+                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 8, combinedRegisters);
             }
         }
 
@@ -467,8 +472,13 @@ namespace FoenixIDE.Simulator.UI
             int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             if (WindowY.Text.Length > 0)
             {
-                int newValue = Convert.ToInt32(WindowY.Text) & 0x3FF;
-                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 10, newValue);
+                int newValue = Convert.ToInt32(WindowY.Text);
+                int combinedRegisters = newValue & 0x3FF;
+                if (checkSmallTiles.Checked)
+                {
+                    combinedRegisters = newValue & 0x7 + ((newValue & 0x3F8) << 1);
+                }
+                MemMgr.VICKY.WriteWord(tilemapBaseAddr + 10, combinedRegisters);
             }
         }
 
