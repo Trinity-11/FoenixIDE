@@ -4,6 +4,7 @@ Added loading of 16x16 and 8x8 sprites in asset loader.
 Fixed a bug with sprites not shown when posY >= height - spriteSize or posX >= width - spriteSize.  
 Fixed issue with WindowX and large tiles.  Also fixed the off by 1 issue with small tiles.
 When resetting the machine, reset the tilestride...
+Fixed SBC (substraction) bug when in decimal mode and the subtrahend is larger than the minuend (difference is negative).
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.

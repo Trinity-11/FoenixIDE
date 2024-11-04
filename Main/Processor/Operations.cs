@@ -1013,7 +1013,16 @@ namespace FoenixIDE.Processor
             int val = GetValue(addressMode, signature, cpu.A.Width);
             int nv;
             if (cpu.Flags.Decimal)
-                nv = HexVal(BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+            {
+                if (val < cpu.A.Value)
+                {
+                    nv = HexVal(BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                }
+                else
+                {
+                    nv = HexVal(0x64 + BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                }
+            }
             else
             {
                 nv = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;

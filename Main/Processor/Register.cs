@@ -32,7 +32,7 @@ namespace FoenixIDE.Processor
         {
             get
             {
-                return byteLength == 1 ? (int)(this._value & 0xff) : this._value;
+                return byteLength == 1 ? (int)(this._value & 0xff) : this._value & 0xffff;
             }
 
             set

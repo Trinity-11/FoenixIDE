@@ -435,5 +435,44 @@ namespace FoenixIDETester
             Assert.AreEqual(0x1235, cpu.A.Value);
         }
 
+        /** 
+         * Bug reported by @Minstrel Dragon on Discord
+         * 
+         * I'll perform the test in 6502 mode
+         * 
+         * sed
+         * sec
+         * lda #$55
+         * sbc #$61
+         * 
+         * A register should contain #$94 
+         */
+        [TestMethod]
+        public void SubstractNegative()
+        {
+            ClearCarry();
+            // SED - switch to decimal
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SED_Implied);
+            cpu.ExecuteNext();
+
+            // SEC - set the carry bit
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+
+            // LDA #$55
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x55);
+            cpu.ExecuteNext();
+
+            // SBC #$61
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x61);
+            cpu.ExecuteNext();
+
+            // The result should be #$94
+            Assert.AreEqual(0x94, cpu.A.Value);
+
+        }
+
     }
 }
