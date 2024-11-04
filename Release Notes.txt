@@ -1,8 +1,9 @@
-Release 0.7.0.13
+Release 0.7.0.14
 ----------------
-Fixed annoying bug when importing sprites in Asset Window when in F256 mode.
-Added dummy SNES controller - it only return $FF for every byte.
-Adjusted tile scrolling for small tiles to account for overlap between SSX3 and X0.
+Added loading of 16x16 and 8x8 sprites in asset loader.
+Fixed a bug with sprites not shown when posY >= height - spriteSize or posX >= width - spriteSize.  
+Fixed issue with WindowX and large tiles.  Also fixed the off by 1 issue with small tiles.
+When resetting the machine, reset the tilestride...
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -15,6 +16,12 @@ Adjusted tile scrolling for small tiles to account for overlap between SSX3 and 
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Support two joysticks and allow for multiple joystick buttons
+
+Release 0.7.0.13
+----------------
+Fixed annoying bug when importing sprites in Asset Window when in F256 mode.
+Added dummy SNES controller - it only return $FF for every byte.
+Adjusted tile scrolling for small tiles to account for overlap between SSX3 and X0.
 
 Release 0.7.0.12
 ----------------

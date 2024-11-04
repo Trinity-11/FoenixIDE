@@ -1035,6 +1035,11 @@ namespace FoenixIDE.UI
                     kernel.MemMgr.MMU.Reset();
                     kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                     kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+                    // reset the tile stride - for fnxsnake!!
+                    kernel.MemMgr.VICKY.WriteByte(0xD283 - 0xC000, 0);
+                    kernel.MemMgr.VICKY.WriteByte(0xD287 - 0xC000, 0);
+                    kernel.MemMgr.VICKY.WriteByte(0xD28B - 0xC000, 0);
+                    kernel.MemMgr.VICKY.WriteByte(0xD28F - 0xC000, 0);
                 }
                 memoryWindow.UpdateMCRButtons();
                 ResetSDCard();

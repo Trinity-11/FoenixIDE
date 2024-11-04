@@ -31,11 +31,14 @@ namespace FoenixIDE.UI
             FileTypesCombo.Items.Add("Bitmap");           //0
             FileTypesCombo.Items.Add("Tileset 16x16");    //1
             FileTypesCombo.Items.Add("Tileset   8x8");    //2
-            FileTypesCombo.Items.Add("Sprite");           //3
-            FileTypesCombo.Items.Add("Palette");          //4
-            FileTypesCombo.Items.Add("Cursor");           //5 - cursors are grayscale
-            FileTypesCombo.Items.Add("Tilemap");          //6
-            FileTypesCombo.Items.Add("Binary");           //7
+            FileTypesCombo.Items.Add("Sprite 32x32");     //3
+            FileTypesCombo.Items.Add("Sprite 16x16");     //4
+            FileTypesCombo.Items.Add("Sprite  8x8");      //5
+
+            FileTypesCombo.Items.Add("Palette");          //6
+            FileTypesCombo.Items.Add("Cursor");           //7 - cursors are grayscale
+            FileTypesCombo.Items.Add("Tilemap");          //8
+            FileTypesCombo.Items.Add("Binary");           //9
             FileTypesCombo.SelectedIndex = 0;
             LUTCombo.SelectedIndex = 0;
         }
@@ -61,17 +64,18 @@ namespace FoenixIDE.UI
          */
         private void FileTypesCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            bool LUTSelected = FileTypesCombo.SelectedIndex > 4;
+            bool LUTSelected = FileTypesCombo.SelectedIndex > 6;
             LUTCombo.Enabled = !LUTSelected;
             checkOverwriteLUT.Enabled = !LUTSelected;
-            if (FileTypesCombo.SelectedIndex == 4)
+            // For Palettes, reset to LUT0 
+            if (FileTypesCombo.SelectedIndex == 6)
             {
                 LUTCombo.SelectedIndex = 0;
             }
         }
         private void LUTCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (FileTypesCombo.SelectedIndex == 4)
+            if (FileTypesCombo.SelectedIndex == 6)
             {
                 // In F256, LUTs are stored in Page 4 of IO RAM
                 int lutAddress = isF256 ? 0x3000 + 0x400 * LUTCombo.SelectedIndex :  0xAF_2000 + 0x400 * LUTCombo.SelectedIndex;
@@ -109,22 +113,22 @@ namespace FoenixIDE.UI
                 FileSizeResultLabel.Text = FormatAddress((int)info.Length);
                 if (".pal".Equals(ExtLabel.Text.ToLower()))
                 {
-                    FileTypesCombo.SelectedIndex = 4;
+                    FileTypesCombo.SelectedIndex = 6;
                     LUTCombo.SelectedIndex = 0;
                     LUTCombo.Enabled = true;
                     LoadAddressTextBox.Text = "AF:2000";
                 }
                 else if (".tlm".Equals(ExtLabel.Text.ToLower()))
                 {
-                    FileTypesCombo.SelectedIndex = 6;
+                    FileTypesCombo.SelectedIndex = 8;
                 } 
                 else if (".bin".Equals(ExtLabel.Text.ToLower()))
                 {
-                    FileTypesCombo.SelectedIndex = 7;
+                    FileTypesCombo.SelectedIndex = 9;
                 }
                 else if (".hex".Equals(ExtLabel.Text.ToLower()))
                 {
-                    FileTypesCombo.SelectedIndex = 7;
+                    FileTypesCombo.SelectedIndex = 9;
                 }
                 StoreButton.Enabled = true;
             }
@@ -173,27 +177,39 @@ namespace FoenixIDE.UI
                     maxHeight = 128;
                     lutIndex = (byte)LUTCombo.SelectedIndex;
                     break;
-                case 3:  // sprites
+                case 3:  // sprites 32x32
                     operationType = ResourceType.sprite;
                     conversionStride = 32;
                     maxHeight = 256;
                     lutIndex = (byte)LUTCombo.SelectedIndex;
                     break;
-                case 4:  // palettes
+                case 4:  // sprites 16x16
+                    operationType = ResourceType.sprite;
+                    conversionStride = 16;
+                    maxHeight = 256;
+                    lutIndex = (byte)LUTCombo.SelectedIndex;
+                    break;
+                case 5:  // sprites 8x8
+                    operationType = ResourceType.sprite;
+                    conversionStride = 8;
+                    maxHeight = 256;
+                    lutIndex = (byte)LUTCombo.SelectedIndex;
+                    break;
+                case 6:  // palettes
                     operationType = ResourceType.lut;
                     ExtLabel.Text = ".pal";
                     break;
-                case 5:  // cursors
+                case 7:  // cursors
                     operationType = ResourceType.cursor;
                     conversionStride = 16;
                     maxHeight = 16;
                     lutIndex = 0xFF;
                     break;
-                case 6:  // tilemaps
+                case 8:  // tilemaps
                     operationType = ResourceType.tilemap;
                     ExtLabel.Text = ".tlm";
                     break;
-                case 7: // others
+                case 9: // others
                     operationType = ResourceType.raw;
                     break;
             }

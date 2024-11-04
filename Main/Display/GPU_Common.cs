@@ -449,11 +449,11 @@ namespace FoenixIDE.Display
             // the tilemapWindowX is 10 bits and the scrollX is the lower 4 bits.  The IDE combines them.
             // direction is bit 15.  Not implemented in Tiny Vicky
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
-            bool dirLeft = (mode == 0) ? (tilemapWindowX & 0x8000) != 0 : true;
+            bool dirLeft = (mode == 0) ? (tilemapWindowX & 0x8000) != 0 : false;
             byte scrollX = (byte)(((tilemapWindowX & scrollMask) * (dirLeft ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
-                tilemapWindowX = ((tilemapWindowX & 0x3FF0)  >> 1) + scrollX;
+                tilemapWindowX = ((tilemapWindowX & 0x3FF0)  >> 1) + scrollX + ((mode == 0) ? 0 : 8);
             }
             else
             {
@@ -464,7 +464,7 @@ namespace FoenixIDE.Display
             // the tilemapWindowY is 10 bits and the scrollY is the lower 4 bits.  The IDE combines them.
             // direction is bit 15.
             int tilemapWindowY = VICKY.ReadWord(addrTileCtrlReg + 10);
-            bool dirUp = (tilemapWindowY & 0x8000) != 0;
+            bool dirUp = (mode == 0) ? (tilemapWindowY & 0x8000) != 0 : false;
             byte scrollY = (byte)(((tilemapWindowY & scrollMask) * (dirUp ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
@@ -481,12 +481,19 @@ namespace FoenixIDE.Display
 
             // we always read tiles 0 to width/TILE_SIZE + 1 - this is to ensure we can display partial tiles, with X,Y offsets
             int tilemapItemCount = (dX ? width / 2 : width) / tileSize + 1;
-            // The + 2 below is to take an FPGA but in the F256Jr into account
-            byte[] tiles = new byte[tilemapItemCount * 2 + 2];
+            // The + 2 below is to take an FPGA bug in the F256Jr into account
+            int tlmSize = tilemapItemCount * 2 + 2;
+            byte[] tiles = new byte[tlmSize];
             int[] tilesetOffsets = new int[tilemapItemCount];
 
-            // The + 2 below is to take an FPGA but in the F256Jr into account
-            VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tilemapItemCount * 2 + 2, tiles);
+            // The + 2 below is to take an FPGA bug in the F256Jr into account
+            if (mode == 0)
+            {
+                VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tlmSize, tiles);
+            } else
+            {
+                VRAM.CopyIntoBuffer(tilemapAddress + (tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tlmSize, tiles);
+            }
 
             // cache of tilesetPointers
             int[] tilesetPointers = new int[8];
@@ -625,7 +632,7 @@ namespace FoenixIDE.Display
                         }
 
 
-                        if (posX >= (width - borderXSize) || posY >= (height - spriteSize) || (posX + spriteSize) < 0 || (posY + spriteSize) < 0)
+                        if (posX >= width || posY >= height || (posX + spriteSize) < 0 || (posY + spriteSize) < 0)
                         {
                             continue;
                         }

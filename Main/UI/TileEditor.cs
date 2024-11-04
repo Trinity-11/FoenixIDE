@@ -423,7 +423,11 @@ namespace FoenixIDE.Simulator.UI
         {
             int tilemapBaseAddr = tileRegistersBaseAddress + selectedTilemap * 12;
             int newAddress = Convert.ToInt32(TilemapAddress.Text.Replace(":", ""), 16);
-            int offsetAddress = newAddress - 0xB0_0000;
+            int offsetAddress = newAddress;
+            if (!is_F256_MMU)
+            {
+                offsetAddress = newAddress - 0xB0_0000;
+            }
             if (offsetAddress > -1)
             {
                 MemMgr.VICKY.WriteByte(tilemapBaseAddr + 1, (byte)(offsetAddress & 0xff));

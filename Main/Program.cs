@@ -115,7 +115,7 @@ namespace FoenixIDE
                             }
                             break;
                         }
-                    // Board Version B, C, U, U+, Jr, Jr816
+                    // Board Version B, C, U, U+, Jr, Jr816, F256K, F256K816
                     case "-b":
                     case "--board":
                         string verArg = args[i + 1];
@@ -195,7 +195,7 @@ namespace FoenixIDE
             Console.Out.WriteLine("   -r, --run: autorun true/false");
             Console.Out.WriteLine("   -i, --irq: disable IRQs true/false");
             Console.Out.WriteLine("   -x, --exec-breakpoint: address, in hex, at which to put an execution breakpoint");
-            Console.Out.WriteLine("   -b, --board: board revision b, c, u, u+, jr, jr816");
+            Console.Out.WriteLine("   -b, --board: board revision b, c, u, u+, jr, jr816, f256k, f256k816");
             Console.Out.WriteLine("   -h, --help, /?: show this usage");
             Console.Out.WriteLine("   -v, --version: show the version");
         }
