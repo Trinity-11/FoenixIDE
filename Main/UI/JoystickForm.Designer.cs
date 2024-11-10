@@ -49,6 +49,7 @@
             this.UpButton.Name = "UpButton";
             this.UpButton.Size = new System.Drawing.Size(30, 30);
             this.UpButton.TabIndex = 0;
+            this.UpButton.TabStop = false;
             this.UpButton.Tag = "1";
             this.UpButton.UseVisualStyleBackColor = true;
             this.UpButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.AllButtonsDown);
@@ -66,6 +67,7 @@
             this.DownButton.Name = "DownButton";
             this.DownButton.Size = new System.Drawing.Size(30, 30);
             this.DownButton.TabIndex = 1;
+            this.DownButton.TabStop = false;
             this.DownButton.Tag = "2";
             this.DownButton.UseVisualStyleBackColor = true;
             this.DownButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.AllButtonsDown);
@@ -83,6 +85,7 @@
             this.LeftButton.Name = "LeftButton";
             this.LeftButton.Size = new System.Drawing.Size(30, 30);
             this.LeftButton.TabIndex = 2;
+            this.LeftButton.TabStop = false;
             this.LeftButton.Tag = "4";
             this.LeftButton.UseVisualStyleBackColor = true;
             this.LeftButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.AllButtonsDown);
@@ -100,6 +103,7 @@
             this.RightButton.Name = "RightButton";
             this.RightButton.Size = new System.Drawing.Size(30, 30);
             this.RightButton.TabIndex = 3;
+            this.RightButton.TabStop = false;
             this.RightButton.Tag = "8";
             this.RightButton.UseVisualStyleBackColor = true;
             this.RightButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.AllButtonsDown);
@@ -119,6 +123,7 @@
             this.Fire2Button.Name = "Fire2Button";
             this.Fire2Button.Size = new System.Drawing.Size(30, 30);
             this.Fire2Button.TabIndex = 4;
+            this.Fire2Button.TabStop = false;
             this.Fire2Button.Tag = "32";
             this.Fire2Button.Text = "B";
             this.Fire2Button.UseVisualStyleBackColor = true;
@@ -139,6 +144,7 @@
             this.Fire1Button.Name = "Fire1Button";
             this.Fire1Button.Size = new System.Drawing.Size(30, 30);
             this.Fire1Button.TabIndex = 5;
+            this.Fire1Button.TabStop = false;
             this.Fire1Button.Tag = "16";
             this.Fire1Button.Text = "A";
             this.Fire1Button.UseVisualStyleBackColor = true;

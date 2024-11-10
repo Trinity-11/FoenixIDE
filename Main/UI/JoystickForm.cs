@@ -12,6 +12,7 @@ namespace FoenixIDE.Simulator.UI
         private int portAddress = 0;
         private int port = 0;
         private byte NO_BUTTON = 0xDF;
+        private byte memory = 0xDF;
         public JoystickForm()
         {
             InitializeComponent();
@@ -23,6 +24,7 @@ namespace FoenixIDE.Simulator.UI
             matrix = null;
             portAddress = address;
             this.port = port;
+            Text = port == 0 ? "Joystick A" : "Joystick B";
             NO_BUTTON = 0xDF;
         }
 
@@ -32,18 +34,19 @@ namespace FoenixIDE.Simulator.UI
             matrix = device;
             portAddress = address;
             this.port = port;
+            Text = port == 0 ? "Joystick A" : "Joystick B";
             NO_BUTTON = 0x3F;
         }
 
-        private void SendJoystickValue(byte value)
+        private void SendJoystickValue()
         {
             if (gabe != null)
             {
-                gabe.WriteByte(portAddress + port, value);
+                gabe.WriteByte(portAddress + port, memory);
             }
             if (matrix != null)
             {
-                matrix.JoystickCode((byte)port, value);
+                matrix.JoystickCode((byte)port, memory);
             }
         }
 
@@ -64,63 +67,73 @@ namespace FoenixIDE.Simulator.UI
             {
                 this.Close();
             }
-            byte value = 0;
             switch (e.KeyCode)
             {
                 case Keys.A:
-                    value = (byte)(NO_BUTTON ^ 4); // 0xDB;
+                case Keys.Left:
+                    memory = (byte)(memory & (NO_BUTTON ^ 4)); // 0xDB;
                     LeftButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.S:
-                    value = (byte)(NO_BUTTON ^ 2); // 0xDD;
+                case Keys.Down:
+                    memory = (byte)(memory & (NO_BUTTON ^ 2)); // 0xDD;
                     DownButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.D:
-                    value = (byte)(NO_BUTTON ^ 8); //  0xD7;
+                case Keys.Right:
+                    memory = (byte)(memory & (NO_BUTTON ^ 8)); //  0xD7;
                     RightButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.W:
-                    value = (byte)(NO_BUTTON ^ 1); // 0xDE;
+                case Keys.Up:
+                    memory = (byte)(memory & (NO_BUTTON ^ 1)); // 0xDE;
                     UpButton.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.Q:
-                    value = (byte)(NO_BUTTON ^ 0x10); // 0xCF;
+                    memory = (byte)(memory & (NO_BUTTON ^ 0x10)); // 0xCF;
                     Fire1Button.BackColor = SystemColors.ControlDark;
                     break;
                 case Keys.E:
-                    value = (byte)(NO_BUTTON ^ 0x20); // 0x5F;
+                    memory = (byte)(memory & (NO_BUTTON ^ 0x20)); // 0x5F;
                     Fire2Button.BackColor = SystemColors.ControlDark;
                     break;
             }
-            if (value != 0)
-            {
-                SendJoystickValue(value);
-            }
+            SendJoystickValue();
         }
         private void JoystickForm_KeyUp(object sender, KeyEventArgs e)
         {
-            SendJoystickValue(NO_BUTTON);
             switch (e.KeyCode)
             {
                 case Keys.A:
+                case Keys.Left:
+                    memory |= 4;
                     LeftButton.BackColor = SystemColors.Control;
                     break;
                 case Keys.S:
+                case Keys.Down:
+                    memory |= 2;
                     DownButton.BackColor = SystemColors.Control;
                     break;
                 case Keys.D:
+                case Keys.Right:
+                    memory |= 8;
                     RightButton.BackColor = SystemColors.Control;
                     break;
                 case Keys.W:
+                case Keys.Up:
+                    memory |= 1;
                     UpButton.BackColor = SystemColors.Control;
                     break;
                 case Keys.Q:
+                    memory |= 0x10;
                     Fire1Button.BackColor = SystemColors.Control;
                     break;
                 case Keys.E:
+                    memory |= 0x20;
                     Fire2Button.BackColor = SystemColors.Control;
                     break;
             }
+            SendJoystickValue();
         }
 
         /*
@@ -128,15 +141,20 @@ namespace FoenixIDE.Simulator.UI
          */
         private void AllButtonsUp(object sender, MouseEventArgs e)
         {
-            SendJoystickValue(NO_BUTTON);
+            if (sender is Control ctrl)
+            {
+                int buttonPressed = int.Parse((string)(ctrl.Tag));
+                memory = (byte)(memory | buttonPressed);
+                SendJoystickValue();
+            }
         }
         private void AllButtonsDown(object sender, MouseEventArgs e)
         {
             if (sender is Control ctrl)
             {
                 int buttonPressed = int.Parse((string)(ctrl.Tag));
-                byte value = (byte)(0xFF & ~buttonPressed);
-                SendJoystickValue(value);
+                memory = (byte)(memory & ~buttonPressed);
+                SendJoystickValue();
             }
         }
     }

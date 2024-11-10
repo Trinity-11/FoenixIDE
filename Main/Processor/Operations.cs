@@ -1017,16 +1017,24 @@ namespace FoenixIDE.Processor
                 if (val < cpu.A.Value)
                 {
                     nv = HexVal(BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                    cpu.Flags.Carry = true; // hack!
                 }
                 else
                 {
-                    nv = HexVal(0x64 + BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                    if (cpu.A.Width == 1)
+                    {
+                        nv = HexVal(100 + BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                    }
+                    else
+                    {
+                        nv = HexVal(10000 + BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                    }
+                    cpu.Flags.Carry = false; // hack!
                 }
             }
             else
             {
                 nv = cpu.A.Value - val - 1 + cpu.Flags.CarryBit;
-
                 if (cpu.A.Width == 1)
                 {
                     cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((0x100 - val - 1 + cpu.Flags.CarryBit) ^ nv) & 0x80) != 0;
@@ -1035,10 +1043,9 @@ namespace FoenixIDE.Processor
                 {
                     cpu.Flags.oVerflow = ((cpu.A.Value ^ nv) & ((0x10000 - val - 1 + cpu.Flags.CarryBit) ^ nv) & 0x8000) != 0;
                 }
+                cpu.Flags.Carry = (nv >= 0 && nv <= cpu.A.MaxUnsigned);
             }
-            cpu.Flags.Carry = (nv >= 0 && nv <= cpu.A.MaxUnsigned);
             cpu.Flags.SetNZ(nv, cpu.A.Width);
-
             cpu.A.Value = nv;
         }
 

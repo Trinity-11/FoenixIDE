@@ -102,6 +102,7 @@ namespace FoenixIDE.UI
             this.resolution_label2_640x400MenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.gpu = new FoenixIDE.Display.Gpu();
+            this.joystickSimulatorBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -153,7 +154,7 @@ namespace FoenixIDE.UI
             // 
             this.revBToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revBToolStripMenuItem.Name = "revBToolStripMenuItem";
-            this.revBToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revBToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revBToolStripMenuItem.Text = "Rev B";
             this.revBToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.revBToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -162,7 +163,7 @@ namespace FoenixIDE.UI
             // 
             this.revCToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revCToolStripMenuItem.Name = "revCToolStripMenuItem";
-            this.revCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revCToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revCToolStripMenuItem.Text = "Rev C";
             this.revCToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.revCToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -171,7 +172,7 @@ namespace FoenixIDE.UI
             // 
             this.revUToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revUToolStripMenuItem.Name = "revUToolStripMenuItem";
-            this.revUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revUToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revUToolStripMenuItem.Text = "Rev U";
             this.revUToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.revUToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -180,7 +181,7 @@ namespace FoenixIDE.UI
             // 
             this.revUPlusToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revUPlusToolStripMenuItem.Name = "revUPlusToolStripMenuItem";
-            this.revUPlusToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revUPlusToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revUPlusToolStripMenuItem.Text = "Rev U+";
             this.revUPlusToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.revUPlusToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -189,7 +190,7 @@ namespace FoenixIDE.UI
             // 
             this.revJrToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revJrToolStripMenuItem.Name = "revJrToolStripMenuItem";
-            this.revJrToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revJrToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revJrToolStripMenuItem.Text = "Rev Jr";
             this.revJrToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.revJrToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -198,7 +199,7 @@ namespace FoenixIDE.UI
             // 
             this.revJr816ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revJr816ToolStripMenuItem.Name = "revJr816ToolStripMenuItem";
-            this.revJr816ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revJr816ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revJr816ToolStripMenuItem.Text = "Rev Jr(816)";
             this.revJr816ToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.revJr816ToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -207,7 +208,7 @@ namespace FoenixIDE.UI
             // 
             this.revF256KToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revF256KToolStripMenuItem.Name = "revF256KToolStripMenuItem";
-            this.revF256KToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revF256KToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revF256KToolStripMenuItem.Text = "Rev F256K";
             this.revF256KToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.revF256KToolStripMenuItem.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -216,7 +217,7 @@ namespace FoenixIDE.UI
             // 
             this.revF256K816ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.revF256K816ToolStripMenuItem.Name = "revF256K816ToolStripMenuItem";
-            this.revF256K816ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.revF256K816ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.revF256K816ToolStripMenuItem.Text = "Rev F256K(816)";
             // 
             // revF256K2eToolStripMenuItem
@@ -378,6 +379,7 @@ namespace FoenixIDE.UI
             this.tileEditorToolStripMenuItem,
             this.characterEditorToolStripMenuItem,
             this.joystickSimulatorToolStripMenuItem,
+            this.joystickSimulatorBToolStripMenuItem,
             this.ConvertHexToPGXToolStripMenuItem,
             this.ConvertBinToPGXToolStripMenuItem,
             this.convertHexToPGZToolStripMenuItem,
@@ -425,7 +427,8 @@ namespace FoenixIDE.UI
             // 
             this.joystickSimulatorToolStripMenuItem.Name = "joystickSimulatorToolStripMenuItem";
             this.joystickSimulatorToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.joystickSimulatorToolStripMenuItem.Text = "Joystick Simulator";
+            this.joystickSimulatorToolStripMenuItem.Tag = "0";
+            this.joystickSimulatorToolStripMenuItem.Text = "Joystick Simulator A";
             this.joystickSimulatorToolStripMenuItem.Click += new System.EventHandler(this.JoystickSimulatorToolStripMenuItem_Click);
             // 
             // ConvertHexToPGXToolStripMenuItem
@@ -755,6 +758,14 @@ namespace FoenixIDE.UI
             this.gpu.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseMove);
             this.gpu.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Gpu_MouseUp);
             // 
+            // joystickSimulatorBToolStripMenuItem
+            // 
+            this.joystickSimulatorBToolStripMenuItem.Name = "joystickSimulatorBToolStripMenuItem";
+            this.joystickSimulatorBToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.joystickSimulatorBToolStripMenuItem.Tag = "1";
+            this.joystickSimulatorBToolStripMenuItem.Text = "Joystick Simulator B";
+            this.joystickSimulatorBToolStripMenuItem.Click += new System.EventHandler(this.JoystickSimulatorToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AllowDrop = true;
@@ -861,6 +872,7 @@ namespace FoenixIDE.UI
         private System.Windows.Forms.ToolStripMenuItem revUToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revCToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem revBToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem joystickSimulatorBToolStripMenuItem;
     }
 }
 

@@ -415,7 +415,16 @@ namespace FoenixIDE.Simulator.UI
             }
             if (offsetAddress > -1)
             {
-                MemMgr.WriteLong(tilesetBaseAddr, offsetAddress);
+                if (is_F256_MMU)
+                {
+                    MemMgr.VICKY.WriteByte(tilesetBaseAddr + 2, (byte)((offsetAddress & 0xFF_0000) >> 16));
+                    MemMgr.VICKY.WriteByte(tilesetBaseAddr + 1, (byte)((offsetAddress & 0x00_FF00) >> 8));
+                    MemMgr.VICKY.WriteByte(tilesetBaseAddr, (byte)((offsetAddress & 0x00_00FF)));
+                }
+                else
+                {
+                    MemMgr.WriteLong(tilesetBaseAddr, offsetAddress);
+                }
             }
         }
 

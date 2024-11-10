@@ -18,7 +18,6 @@ namespace FoenixIDE.UI
         public int topLeftPixelColor = 0;
         private bool isF256;
         private Display.Gpu GpuRef;
-        private int F256_LUT_STORE = 0x7_0000;
 
         public AssetLoader()
         {
@@ -116,7 +115,16 @@ namespace FoenixIDE.UI
                     FileTypesCombo.SelectedIndex = 6;
                     LUTCombo.SelectedIndex = 0;
                     LUTCombo.Enabled = true;
-                    LoadAddressTextBox.Text = "AF:2000";
+                    if (isF256)
+                    {
+                        
+                        LoadAddressTextBox.Text = "00:3000";
+                    }
+                    else
+                    {
+                        LoadAddressTextBox.Text = "AF:2000";
+                    }
+                    
                 }
                 else if (".tlm".Equals(ExtLabel.Text.ToLower()))
                 {
@@ -283,6 +291,27 @@ namespace FoenixIDE.UI
                         {
                             res.Length = -1;
                         }
+                    }
+                    break;
+                case ".pal":
+                    // Read the file as raw
+                    byte[] colorData = File.ReadAllBytes(FileNameTextBox.Text);
+                    // Check if there's a resource conflict
+                    res.Length = colorData.Length;
+                    if (ResChecker.Add(res))
+                    {
+                        if (isF256)
+                        {
+                            MemMgrRef.VICKY.CopyBuffer(colorData, 0, destAddress, colorData.Length);
+                        }
+                        else
+                        {
+                            MemMgrRef.CopyBuffer(colorData, 0, destAddress, colorData.Length);
+                        }
+                    }
+                    else
+                    {
+                        res.Length = -1;
                     }
                     break;
                 default:
@@ -549,7 +578,7 @@ namespace FoenixIDE.UI
                     if (!gray)
                     {
                         // Check if a LUT matching our index is present in the Resources, if so don't do anything.
-                        Resource resLut = ResChecker.Find(ResourceType.lut, isF256? lutBaseAddress + F256_LUT_STORE - 0x3000 : lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
+                        Resource resLut = ResChecker.Find(ResourceType.lut, isF256? lutBaseAddress : lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR);
                         if (resLut == null)
                         {
                             Resource lutPlaceholder = new Resource
@@ -557,7 +586,7 @@ namespace FoenixIDE.UI
                                 Length = 0x400,
                                 FileType = ResourceType.lut,
                                 Name = "Generated LUT",
-                                StartAddress = isF256 ? lutBaseAddress + F256_LUT_STORE - 0x3000 : lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
+                                StartAddress = isF256 ? lutBaseAddress : lutBaseAddress + MemoryLocations.MemoryMap.VICKY_BASE_ADDR
                             };
                             ResChecker.Add(lutPlaceholder);
                         }

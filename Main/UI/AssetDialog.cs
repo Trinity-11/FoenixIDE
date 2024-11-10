@@ -96,7 +96,14 @@ namespace FoenixIDE.UI
 
                             FileStream dataFile = File.Create(saveDlg.FileName, 0x800, FileOptions.SequentialScan);
                             byte[] buffer = new byte[res.Length];
-                            kernel_ref.MemMgr.CopyIntoBuffer(res.StartAddress, res.Length, buffer);
+                            if (res.FileType == ResourceType.lut && kernel_ref.MemMgr.MMU != null)
+                            {
+                                kernel_ref.MemMgr.VICKY.CopyIntoBuffer(res.StartAddress, res.Length, buffer);
+                            }
+                            else
+                            {
+                                kernel_ref.MemMgr.CopyIntoBuffer(res.StartAddress, res.Length, buffer);
+                            }
                             dataFile.Write(buffer, 0, res.Length);
                             dataFile.Close();
 

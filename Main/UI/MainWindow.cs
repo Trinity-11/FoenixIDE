@@ -30,7 +30,8 @@ namespace FoenixIDE.UI
         private TileEditor tileEditor;
         private CharEditorWindow charEditor;
         public SerialTerminal terminal;
-        private JoystickForm joystickWindow = new JoystickForm();
+        private JoystickForm joystickWindowA = new JoystickForm();
+        private JoystickForm joystickWindowB = new JoystickForm();
 
         // Local variables and events
         private byte previousGraphicMode;
@@ -239,7 +240,8 @@ namespace FoenixIDE.UI
                 String fontPath = Path.Combine(applicationDirectory, "Resources", "Bm437_PhoenixEGA_8x8.bin");
                 gpu.LoadFontSet("Foenix", fontPath, 0, CharacterSet.CharTypeCodes.ASCII_PET, CharacterSet.SizeCodes.Size8x8);
 
-                joystickWindow.SetGabe(kernel.MemMgr.GABE, MemoryLocations.MemoryMap.JOYSTICK0 - MemoryLocations.MemoryMap.GABE_START, 0);
+                joystickWindowA.SetGabe(kernel.MemMgr.GABE, MemoryLocations.MemoryMap.JOYSTICK0 - MemoryLocations.MemoryMap.GABE_START, 0);
+                joystickWindowB.SetGabe(kernel.MemMgr.GABE, MemoryLocations.MemoryMap.JOYSTICK1 - MemoryLocations.MemoryMap.GABE_START, 1);
 
                 gpu.SetMCRAddress(0);
                 gpu.SetFGLUTAddress(MemoryMap.FG_CHAR_LUT_PTR - gpu.VICKY.StartAddress);
@@ -270,7 +272,8 @@ namespace FoenixIDE.UI
                 gpu.VRAM = kernel.MemMgr.RAM;
 
                 // VIA Chip Port B is joystick 1
-                joystickWindow.SetMatrix(kernel.MemMgr.VIAREGISTERS, 0, 0);
+                joystickWindowA.SetMatrix(kernel.MemMgr.VIAREGISTERS, 0, 0);
+                joystickWindowB.SetMatrix(kernel.MemMgr.VIAREGISTERS, 0, 1);
 
                 // see if this a Flat (65c816) Memory space or with MMU
                 if (BoardVersionHelpers.IsF256_Flat(version))
@@ -1872,7 +1875,14 @@ namespace FoenixIDE.UI
 
         private void JoystickSimulatorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            joystickWindow.Show();
+            if (((ToolStripMenuItem)sender).Tag.Equals("0"))
+            {
+                joystickWindowA.Show();
+            }
+            else
+            {
+                joystickWindowB.Show();
+            }
         }
 
         private void MainWindow_DragEnter(object sender, DragEventArgs e)

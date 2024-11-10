@@ -880,10 +880,11 @@ namespace FoenixIDE.UI
                     {
                         IRQPC = kernel.CPU.PC;
                         kernel.CPU.ExecuteNext();
-                        kernel.CPU.Pins.IRQ = false;
                         nextPC = kernel.CPU.PC;
                         UpdateInterruptCheckboxes();
+                        
                         Invoke(new nullParamMethod(Refresh));
+                        kernel.CPU.Pins.IRQ = false;
                     }
                     if (line == null)
                     {
@@ -1169,7 +1170,7 @@ namespace FoenixIDE.UI
             ColorCheckBox[] row3 = { OPL3Checkbox, GabeInt0Check, GabeInt1Check, VDMACheck, V2TileColCheck, GabeInt2Check, ExtExpCheck, SDCardInsertCheck };
             for (int i = 0; i < 8; i++)
             {
-                if (row3[i].Checked && (reg1 & 1 << i) != 0)
+                if (row3[i].Checked && (reg2 & 1 << i) != 0)
                 {
                     return true;
                 }

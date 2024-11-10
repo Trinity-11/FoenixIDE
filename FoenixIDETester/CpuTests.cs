@@ -384,7 +384,7 @@ namespace FoenixIDETester
             cpu.ExecuteNext();
 
             Assert.AreEqual(2, cpu.X.Width);
-            
+
             cpu.X.Value = 0xFFFF;
             Assert.AreEqual(0xFFFF, cpu.X.Value);
             MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.INX_Implied);
@@ -438,7 +438,7 @@ namespace FoenixIDETester
         /** 
          * Bug reported by @Minstrel Dragon on Discord
          * 
-         * I'll perform the test in 6502 mode
+         * I'll perform the test in 6502 mode - Decimal Subtraction
          * 
          * sed
          * sec
@@ -448,7 +448,7 @@ namespace FoenixIDETester
          * A register should contain #$94 
          */
         [TestMethod]
-        public void SubstractNegative()
+        public void SubstractBCDNegative()
         {
             ClearCarry();
             // SED - switch to decimal
@@ -471,8 +471,126 @@ namespace FoenixIDETester
 
             // The result should be #$94
             Assert.AreEqual(0x94, cpu.A.Value);
-
         }
 
+        /** 
+         * Bug reported by @Minstrel Dragon on Discord
+         * 
+         * I'll perform the test in 6502 mode - Decimal Subtraction
+         * Need double byte to perform $200 - 1 = $199
+         * 
+         */
+        [TestMethod]
+        public void SubstractBCDWord200minus1()
+        {
+            ClearCarry();
+            // SED - switch to decimal
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SED_Implied);
+            cpu.ExecuteNext();
+
+            // SEC - set the carry bit
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+
+            // LDA #0
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x0);
+            cpu.ExecuteNext();
+
+            // SBC #1
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+
+            // The result should be #2
+            Assert.AreEqual(0x99, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry);
+
+            // So the carry should be forwarded to the next SBC operation
+            // LDA #2
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x2);
+            cpu.ExecuteNext();
+
+            // SBC #0
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x0);
+            cpu.ExecuteNext();
+            // The result should be #2
+            Assert.AreEqual(0x1, cpu.A.Value);
+        }
+        /** 
+         * Bug reported by @Minstrel Dragon on Discord
+         * 
+         * I'll perform the test in 6502 mode - Decimal Subtraction
+         * Need double byte to perform $100 - 1 = $99
+         * 
+         */
+        [TestMethod]
+        public void SubstractBCDWord100minus1()
+        {
+            ClearCarry();
+            // SED - switch to decimal
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SED_Implied);
+            cpu.ExecuteNext();
+
+            // SEC - set the carry bit
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+
+            // LDA #0
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x0);
+            cpu.ExecuteNext();
+
+            // SBC #1
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+
+            // The result should be #2
+            Assert.AreEqual(0x99, cpu.A.Value);
+            Assert.IsFalse(cpu.Flags.Carry);
+
+            // So the carry should be forwarded to the next SBC operation
+            // LDA #1
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+
+            // SBC #0
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x0);
+            cpu.ExecuteNext();
+            // The result should be #2
+            Assert.AreEqual(0x0, cpu.A.Value);
+        }
+
+        [TestMethod]
+        public void SubstractBCD55minus23()
+        {
+            ClearCarry();
+            // SED - switch to decimal
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SED_Implied);
+            cpu.ExecuteNext();
+
+            // SEC - set the carry bit
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+
+            // LDA #55
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x55);
+            cpu.ExecuteNext();
+
+            // SBC #23
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x23);
+            cpu.ExecuteNext();
+
+            // The result should be #2
+            Assert.AreEqual(0x32, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry);
+        }
     }
 }

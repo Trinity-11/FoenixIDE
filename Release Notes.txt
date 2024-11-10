@@ -1,10 +1,11 @@
-Release 0.7.0.14
+Release 0.7.0.15
 ----------------
-Added loading of 16x16 and 8x8 sprites in asset loader.
-Fixed a bug with sprites not shown when posY >= height - spriteSize or posX >= width - spriteSize.  
-Fixed issue with WindowX and large tiles.  Also fixed the off by 1 issue with small tiles.
-When resetting the machine, reset the tilestride...
-Fixed SBC (substraction) bug when in decimal mode and the subtrahend is larger than the minuend (difference is negative).
+Fixed issues with TileEditor not writing to the tileset address.
+Fixed asset loader issues with palettes in F256 mode.
+Added second joystick - now A and B are available from menu.
+Fixed issue with virtual joystick not accepting multiple buttons/key states.
+Fixed issue with CPU window breaking for incorrect IRQ.
+Second attempt at fixing BCD subtractions.  The carry flag wasn't correct before.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -16,7 +17,15 @@ Fixed SBC (substraction) bug when in decimal mode and the subtrahend is larger t
 ** TODO: Add remote debugging capability for Calypsi compiler.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
-** TODO: Support two joysticks and allow for multiple joystick buttons
+
+Release 0.7.0.14
+----------------
+Added loading of 16x16 and 8x8 sprites in asset loader.
+Fixed a bug with sprites not shown when posY >= height - spriteSize or posX >= width - spriteSize.  
+Fixed issue with WindowX and large tiles.  Also fixed the off by 1 issue with small tiles.
+When resetting the machine, reset the tilestride...
+Fixed SBC (substraction) bug when in decimal mode and the subtrahend is larger than the minuend (difference is negative).
+
 
 Release 0.7.0.13
 ----------------
