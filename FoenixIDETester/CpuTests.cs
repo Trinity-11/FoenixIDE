@@ -516,9 +516,57 @@ namespace FoenixIDETester
             MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
             MemMgr.RAM.WriteByte(cpu.PC + 1, 0x0);
             cpu.ExecuteNext();
-            // The result should be #2
+            // The result should be #1
             Assert.AreEqual(0x1, cpu.A.Value);
         }
+
+        /** 
+         * Bug reported by @Minstrel Dragon on Discord
+         * 
+         * I'll perform the test in 6502 mode - Decimal Subtraction
+         * Need double byte to perform $201 - 1 = $200
+         * 
+         */
+        [TestMethod]
+        public void SubstractBCDWord201minus1()
+        {
+            ClearCarry();
+            // SED - switch to decimal
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SED_Implied);
+            cpu.ExecuteNext();
+
+            // SEC - set the carry bit
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SEC_Implied);
+            cpu.ExecuteNext();
+
+            // LDA #1
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+
+            // SBC #1
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x1);
+            cpu.ExecuteNext();
+
+            // The result should be #0
+            Assert.AreEqual(0x0, cpu.A.Value);
+            Assert.IsTrue(cpu.Flags.Carry);
+
+            // So the carry should be forwarded to the next SBC operation
+            // LDA #2
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.LDA_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x2);
+            cpu.ExecuteNext();
+
+            // SBC #0
+            MemMgr.RAM.WriteByte(cpu.PC, OpcodeList.SBC_Immediate);
+            MemMgr.RAM.WriteByte(cpu.PC + 1, 0x0);
+            cpu.ExecuteNext();
+            // The result should be #2
+            Assert.AreEqual(0x2, cpu.A.Value);
+        }
+
         /** 
          * Bug reported by @Minstrel Dragon on Discord
          * 

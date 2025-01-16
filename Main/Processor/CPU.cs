@@ -58,8 +58,6 @@ namespace FoenixIDE.Processor
         public MemoryManager MemMgr = null;
         public Thread CPUThread = null;
 
-        public event Operations.SimulatorCommandEvent SimulatorCommand;
-
         public const int DefaultStackValueNative = 0xd6ff;
         public const int DefaultStackValueEmulation = 0x01ff;
         private bool is6502 = false;
@@ -100,24 +98,9 @@ namespace FoenixIDE.Processor
             clockSpeed = clock;
             clockCyles = 0;
             Operations operations = new Operations(this);
-            operations.SimulatorCommand += Operations_SimulatorCommand;
             opcodes = new OpcodeList(operations, this, is6502);
             this.is6502 = is6502;
             Flags.Emulation = true;
-        }
-
-        private void Operations_SimulatorCommand(int EventID)
-        {
-            switch (EventID)
-            {
-                case SimulatorCommands.WaitForInterrupt:
-                    break;
-                case SimulatorCommands.RefreshDisplay:
-                    SimulatorCommand?.Invoke(EventID);
-                    break;
-                default:
-                    break;
-            }
         }
 
         /// <summary>
@@ -156,8 +139,18 @@ namespace FoenixIDE.Processor
                 return false;
             }
 
+            
+            byte instruction = MemMgr.ReadByte(PC);
+            // TODO: find out if a switch would yield better performance
+            //switch (instruction)
+            //{
+            //    case OpcodeList.BRK_Interrupt:
+            //        Interrupt(InteruptTypes.BRK);
+            //        PC += 2;
+            //        break;
+            //}
             // TODO - if pc > RAM size, then throw an exception
-            CurrentOpcode = opcodes[MemMgr.ReadByte(PC)];
+            CurrentOpcode = opcodes[instruction];
             if (CurrentOpcode != null)
             {
                 OpcodeLength = CurrentOpcode.Length;

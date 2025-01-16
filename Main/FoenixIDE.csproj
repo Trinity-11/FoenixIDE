@@ -136,7 +136,6 @@
     <Compile Include="Processor\AddressingModeEnum.cs" />
     <Compile Include="Processor\OpCode.cs" />
     <Compile Include="Processor\OpcodeList.cs" />
-    <Compile Include="Processor\SimulatorCommands.cs" />
     <Compile Include="Processor\CPU.cs" />
     <Compile Include="Processor\CPU_Registers.cs" />
     <Compile Include="Processor\Flags.cs" />

@@ -24,16 +24,18 @@ namespace FoenixIDE.UI
 
         SerialPort serial = new SerialPort();
 
-        byte READ_BLOCK_CMD = 0;
-        byte WRITE_BLOCK_CMD = 1;
-        byte PROGRAM_FLASH_CMD = 0x10;
-        byte ERASE_FLASH_CMD = 0x11;
-        byte ERASE_FLASH_SECTOR_CMD = 0x12;
+        // Debug Port Commands
+        byte READ_BLOCK_CMD =           0x00;
+        byte WRITE_BLOCK_CMD =          0x01;
+        byte PROGRAM_FLASH_CMD =        0x10;
+        byte ERASE_FLASH_CMD =          0x11;
+        byte ERASE_FLASH_SECTOR_CMD =   0x12;
         byte PROGRAM_FLASH_SECTOR_CMD = 0x13;
-        byte DEBUG_MODE_CMD = 0x80;
-        byte NORMAL_MODE_CMD = 0x81;
-        byte BOOT_RAM_CMD = 0x90;
-        byte BOOT_FLASH_CMD = 0x91;
+        byte ENTER_DEBUG_MODE_CMD =     0x80;
+        byte EXIT_DEBUG_MODE_CMD =      0x81;
+        byte BOOT_RAM_CMD =             0x90;
+        byte BOOT_FLASH_CMD =           0x91;
+        byte FETCH_VERSION_CMD =        0xFE;
 
         // This is the file type selected in the file dialog (PGZ, HEX, CSV, etc)
         int SelectedFilterIndex = -1;
@@ -331,7 +333,7 @@ namespace FoenixIDE.UI
                     // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
                     if (DebugModeCheckbox.Checked)
                     {
-                        SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
+                        SendInterfaceCommand(ENTER_DEBUG_MODE_CMD, 0, 0);
                     }
                     string fileExtension = Path.GetExtension(FileNameTextBox.Text).ToUpper();
                     if (fileExtension.Equals(".BIN"))
@@ -527,8 +529,18 @@ namespace FoenixIDE.UI
                                 resetBuffer[0] = (byte)(FnxAddressPtr & 0xFF);
                                 resetBuffer[1] = (byte)((FnxAddressPtr >> 8) & 0xFF);
                                 PreparePacket2Write(resetBuffer, 0xFFFC, 0, 2);
+
+                                // Write the signature
+                                PreparePacket2Write(new byte[] { 0x43, 0x52, 0x4f, 0x53, 0x53, 0x44, 0x45, 0x56 }, 0x0080, 0, 8);
+                                PreparePacket2Write(resetBuffer, 0x0088, 0, 2);
+
+                                // # Pass 0 to the kernel args extlen, at least until someone implements argument passing
+                                PreparePacket2Write(new byte[] { 0, 0 }, 0x00FA, 0, 2);
                             }
                         }
+
+                        
+                       
                     }
                     else if (fileExtension.Equals(".HEX"))
                     {
@@ -638,7 +650,7 @@ namespace FoenixIDE.UI
                     if (DebugModeCheckbox.Checked)
                     {
                         // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
-                        SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
+                        SendInterfaceCommand(EXIT_DEBUG_MODE_CMD, 0, 0);
                     }
                     HideProgressBarAfter5Seconds("Transfer Done! System Reset!", true);
                 }
@@ -648,7 +660,7 @@ namespace FoenixIDE.UI
                 // Get into Debug mode (Reset the CPU and keep it in that state and Gavin will take control of the bus)
                 if (DebugModeCheckbox.Checked)
                 {
-                    SendInterfaceCommand(DEBUG_MODE_CMD ,0, 0);
+                    SendInterfaceCommand(ENTER_DEBUG_MODE_CMD ,0, 0);
                 }
                 int blockAddress = Convert.ToInt32(EmuSrcAddress.Text.Replace(":",""), 16);
                 // Read the data directly from emulator memory
@@ -668,7 +680,7 @@ namespace FoenixIDE.UI
                 if (DebugModeCheckbox.Checked)
                 {
                     // The Loading of the File is Done, Reset the FNX and Get out of Debug Mode
-                    SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
+                    SendInterfaceCommand(EXIT_DEBUG_MODE_CMD, 0, 0);
                 }
                 HideProgressBarAfter5Seconds("Transfer Done! System Reset!", true);
             }
@@ -704,9 +716,9 @@ namespace FoenixIDE.UI
                 DisconnectButton.Enabled = false;
                 btnBootToRAM.Enabled = false;
                 btnBootToFLASH.Enabled = false;
-                SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
+                SendInterfaceCommand(ENTER_DEBUG_MODE_CMD, 0, 0);
                 SendInterfaceCommand(BOOT_RAM_CMD, 0, 0);
-                SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
+                SendInterfaceCommand(EXIT_DEBUG_MODE_CMD, 0, 0);
                 SendBinaryButton.Enabled = SendButtonStatus;
                 DisconnectButton.Enabled = true;
                 btnBootToRAM.Enabled = true;
@@ -723,9 +735,9 @@ namespace FoenixIDE.UI
                 DisconnectButton.Enabled = false;
                 btnBootToRAM.Enabled = false;
                 btnBootToFLASH.Enabled = false;
-                SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
+                SendInterfaceCommand(ENTER_DEBUG_MODE_CMD, 0, 0);
                 SendInterfaceCommand(BOOT_FLASH_CMD, 0, 0);
-                SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
+                SendInterfaceCommand(EXIT_DEBUG_MODE_CMD, 0, 0);
                 SendBinaryButton.Enabled = SendButtonStatus;
                 DisconnectButton.Enabled = true;
                 btnBootToRAM.Enabled = true;
@@ -848,7 +860,7 @@ namespace FoenixIDE.UI
                 {
                     if (debugMode)
                     {
-                        SendInterfaceCommand(DEBUG_MODE_CMD, 0, 0);
+                        SendInterfaceCommand(ENTER_DEBUG_MODE_CMD, 0, 0);
                     }
                     
                     if (size < 2048)
@@ -881,7 +893,7 @@ namespace FoenixIDE.UI
 
                     if (debugMode)
                     {
-                        SendInterfaceCommand(NORMAL_MODE_CMD, 0, 0);
+                        SendInterfaceCommand(EXIT_DEBUG_MODE_CMD, 0, 0);
                     }
                     success = true;
                 }
@@ -996,7 +1008,7 @@ namespace FoenixIDE.UI
         private void SendMessage(byte[] command, byte[] data, int delay = 0)
         {
             //            int dwStartTime = System.Environment.TickCount;
-            byte byte_buffer;
+            byte byte_buffer = 0;
             Stopwatch stopWatch = new Stopwatch();
             serial.Write(command, 0, command.Length);
 
@@ -1027,7 +1039,13 @@ namespace FoenixIDE.UI
             stopWatch.Start();
             do
             {
-                byte_buffer = (byte)serial.ReadByte();
+                try
+                {
+                    byte_buffer = (byte)serial.ReadByte();
+                } catch
+                {
+                    break;
+                }
             }
             while (byte_buffer != 0xAA);
             stopWatch.Stop();

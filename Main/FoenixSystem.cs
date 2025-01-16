@@ -277,7 +277,7 @@ namespace FoenixIDE
                 // Set the layers??
                 MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
 
-                // Write the byte $9F in the joystick registers to mean they
+                // Write the byte $DF in the joystick registers to mean they are not present
                 MemMgr.VICKY.WriteWord(0xDC00 - 0xC000, 0xDFDF);
 
                 // Set the PCB Hardware Version

@@ -359,11 +359,30 @@ namespace FoenixIDE.Basic
         {
             byte[] result = new byte[up?2:1];
             int pos = 0;
-            if (up)
+            if (key == Keys.Up || key == Keys.Down || key == Keys.Left || key == Keys.Right)
             {
-                result[0] = sc2_key_released;
-                pos = 1;
+                result = new byte[up?3:2];
+                if (up)
+                {
+                    result[0] = 0xE0;
+                    result[1] = sc2_key_released;
+                    pos = 2;
+                }
+                else
+                {
+                    result[0] = 0xE0;
+                    pos = 1;
+                }
             }
+            else
+            {
+                if (up)
+                {
+                    result[0] = sc2_key_released;
+                    pos = 1;
+                }
+            }
+            
             switch (key)
             {
                 case Keys.D0:

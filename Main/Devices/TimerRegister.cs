@@ -10,6 +10,7 @@ namespace FoenixIDE.Simulator.Devices
         public delegate void RaiseInterruptFunction();
         public RaiseInterruptFunction TimerInterruptDelegate;
         const int CPU_FREQ = 14318000;
+        private bool interruptEnabled = false;
 
         public TimerRegister(int StartAddress, int Length) : base(StartAddress, Length)
         {
@@ -24,9 +25,10 @@ namespace FoenixIDE.Simulator.Devices
             if (Address == 0)
             {
                 bool enabled = (Value & 1) != 0;
+                interruptEnabled = (Value & 0x80) != 0;
                 if (enabled)
                 {
-                    hiresTimer.Start();
+                    hiresTimer.Enabled = true;
                 }
                 else
                 {
@@ -52,7 +54,10 @@ namespace FoenixIDE.Simulator.Devices
 
         void Timer_Tick(object sender, EventArgs e)
         {
-            TimerInterruptDelegate?.Invoke();
+            if (interruptEnabled)
+            {
+                TimerInterruptDelegate?.Invoke();
+            }
         }
 
         public void KillTimer()

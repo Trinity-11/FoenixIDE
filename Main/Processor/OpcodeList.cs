@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FoenixIDE.Processor
+﻿namespace FoenixIDE.Processor
 {
     public class OpcodeList
     {
         #region OPCODE constants
-
-        public const int PUSH2 = 16;
         public const int ADD1_16BIT = 32;
 
         public const int BRK_Interrupt = 0x00;

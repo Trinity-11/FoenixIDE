@@ -290,11 +290,12 @@ namespace FoenixIDE.Display
                 {
                     continue;
                 }
-                int offset = 0;
-                if (col < TextColumns)
-                {
-                    offset = TextColumns * txtline + col;
-                }
+                //int offset = 0;
+                //if (col < TextColumns)
+                //{
+                //    offset = TextColumns * txtline + col;
+                //}
+                int offset = TextColumns * txtline + col;
                 int textAddr = lineStartAddress + offset;
                 int colorAddr = colorStartAddress + offset;
                 // Each character will have foreground and background colors

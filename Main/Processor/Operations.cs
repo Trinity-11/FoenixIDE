@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-
-using System.Text;
-using System.Threading.Tasks;
-using FoenixIDE;
-using FoenixIDE.MemoryLocations;
 
 namespace FoenixIDE.Processor
 {
@@ -19,9 +13,6 @@ namespace FoenixIDE.Processor
         /// </summary>
         public const int ADDRESS_IMMEDIATE = 0xf000001;
         public const int ADDRESS_IMPLIED = 0xf000002;
-
-        public delegate void SimulatorCommandEvent(int EventID);
-        public event SimulatorCommandEvent SimulatorCommand;
 
         public Operations(CPU cPU)
         {
@@ -911,11 +902,6 @@ namespace FoenixIDE.Processor
             effectiveAddress = -1;
             switch (instruction)
             {
-                // WDM is a 2-byte NOP and an easter egg. William D Mensch designed the 6502 and 65816.
-                // We will use this to give the simulator commands
-                case OpcodeList.WDM_Implied:
-                    OnSimulatorCommand(signature);
-                    break;
                 case OpcodeList.NOP_Implied:
                     break;
                 case OpcodeList.STP_Implied: //stop
@@ -929,13 +915,6 @@ namespace FoenixIDE.Processor
                 default:
                     throw new NotImplementedException("ExecuteMisc() opcode not implemented: " + instruction.ToString("X2"));
             }
-        }
-
-        private void OnSimulatorCommand(int signature)
-        {
-            if (SimulatorCommand == null)
-                return;
-            SimulatorCommand(signature);
         }
 
         /// <summary>
@@ -1024,12 +1003,13 @@ namespace FoenixIDE.Processor
                     if (cpu.A.Width == 1)
                     {
                         nv = HexVal(100 + BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                        cpu.Flags.Carry = nv >= 0x100;
                     }
                     else
                     {
                         nv = HexVal(10000 + BCDVal(cpu.A.Value) - BCDVal(val + 1) + cpu.Flags.CarryBit);
+                        cpu.Flags.Carry = nv >= 0x10000;
                     }
-                    cpu.Flags.Carry = false; // hack!
                 }
             }
             else

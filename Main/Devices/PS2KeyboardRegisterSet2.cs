@@ -1,6 +1,4 @@
-﻿using FoenixIDE.Basic;
-using FoenixIDE.MemoryLocations;
-using System;
+﻿using System;
 
 namespace FoenixIDE.Simulator.Devices
 {
