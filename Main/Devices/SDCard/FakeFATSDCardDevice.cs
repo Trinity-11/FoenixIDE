@@ -54,7 +54,9 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // Read the first sector, if it starts with $eb, then it's a Boot Sector, otherwise it's a partition table (MBR)
                     byte[] firstSector = GetData_ISO(0);
-                    if (firstSector[0] != 0xeb && firstSector[0x1FE] == 0x55 && firstSector[0x1FF] == 0xAA && (firstSector[0x1BE] & 0x80) != 0)
+                    // Not sure that byte 0 needs to be firstSector[0] != 0xeb
+                    // The first partition record is at 0x1BE - bit 7 is active/boot partition
+                    if (firstSector[0x1FE] == 0x55 && firstSector[0x1FF] == 0xAA)
                     {
                         mbrPresent = true;
                         mbr = firstSector;
@@ -533,7 +535,7 @@ namespace FoenixIDE.Simulator.Devices
          */
         protected byte[] GetData_ISO(int page)
         {
-            if ((page >= 0) && (page < 512 * 4096)) // test if we are with in 256MB
+            if ((page >= 0) && (page < 512 * 4096)) // test if we are within 256MB
             {
                 byte[] buffer = new byte[512];
                 string path = GetSDCardPath();
@@ -542,6 +544,18 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     stream.Seek(page * 512, SeekOrigin.Begin);
                     stream.Read(buffer, 0, 512);
+                    //for (int i = 0; i < 16; i++)
+                    //{
+                    //    StringBuilder sbx = new StringBuilder();
+                    //    StringBuilder sbc = new StringBuilder();
+                    //    for (int j=0;j < 32; j++)
+                    //    {
+                    //        sbx.AppendFormat("{0:X2} ", buffer[i * 32 + j]);
+                    //        sbc.Append(((char)buffer[i * 32 + j]));
+                    //    }
+                    //    Console.WriteLine(sbx + "    " + sbc);
+                    //}
+                    
                     return buffer;
                 }
                 catch (Exception e)
