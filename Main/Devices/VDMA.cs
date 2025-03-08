@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FoenixIDE.Simulator.Devices
+﻿namespace FoenixIDE.Simulator.Devices
 {
     public class VDMA : MemoryLocations.MemoryRAM
     {

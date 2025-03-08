@@ -14,11 +14,7 @@
 
 #endregion
 
-#region Usings
-
 using System;
-
-#endregion
 
 namespace KGySoft.CoreLibraries
 {
