@@ -22,16 +22,13 @@ namespace FoenixIDE.MemoryLocations
         //public List<IMappable> devices = new List<IMappable>();
         public MemoryRAM RAM = null;
         public MemoryRAM FLASH = null;
-        public FlashF256 FLASHF256 = null;
         public MemoryRAM VIDEO = null;
         public MemoryRAM VICKY = null;
         public MemoryRAM GABE = null;
-        public MMU_F256 MMU = null;
         public MemoryRAM MATH = null;
         public MathFloatRegister FLOAT = null;
         public CodecRAM CODEC = null;
         public PS2KeyboardRegister PS2KEYBOARD = null;
-        public VIARegisters VIAREGISTERS = null;
         public SDCardDevice SDCARD = null;
         public InterruptController INTERRUPT = null;
         public UART UART1 = null;
@@ -48,7 +45,7 @@ namespace FoenixIDE.MemoryLocations
         // SOL Register handles the F256 write-only, read-only registers.
         public SOL SOLRegister = null;
 
-        public bool VectorPull = false;
+        //public bool VectorPull = false;
 
         public int StartAddress
         {
@@ -81,466 +78,137 @@ namespace FoenixIDE.MemoryLocations
         /// <param name="Address"></param>
         /// <param name="Device"></param>
         /// <param name="DeviceAddress"></param>
-        public void GetDeviceAt(int Address, out IMappable Device, out int DeviceAddress)
+        public virtual void GetDeviceAt(int Address, out IMappable Device, out int DeviceAddress)
         {
-            if (MMU == null)
+            if (Address >= CODEC.StartAddress && Address <= CODEC.EndAddress)
             {
-                if (Address >= CODEC.StartAddress && Address <= CODEC.EndAddress)
-                {
-                    Device = CODEC;
-                    DeviceAddress = Address - CODEC.StartAddress;
-                    return;
-                }
-                if (Address >= MATH.StartAddress && Address <= MATH.EndAddress)
-                {
-                    Device = MATH;
-                    DeviceAddress = Address - MATH.StartAddress;
-                    return;
-                }
-                if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.EndAddress)
-                {
-                    Device = INTERRUPT;
-                    DeviceAddress = Address - INTERRUPT.StartAddress;
-                    return;
-                }
-                if (Address >= TIMER0.StartAddress && Address <= TIMER0.EndAddress)
-                {
-                    Device = TIMER0;
-                    DeviceAddress = Address - TIMER0.StartAddress;
-                    return;
-                }
-                if (Address >= TIMER1.StartAddress && Address <= TIMER1.EndAddress)
-                {
-                    Device = TIMER1;
-                    DeviceAddress = Address - TIMER1.StartAddress;
-                    return;
-                }
-                if (TIMER2 != null && Address >= TIMER2.StartAddress && Address <= TIMER2.EndAddress)
-                {
-                    Device = TIMER2;
-                    DeviceAddress = Address - TIMER2.StartAddress;
-                    return;
-                }
-                if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)
-                {
-                    Device = RAM;
-                    DeviceAddress = Address - RAM.StartAddress;
-                    return;
-                }
+                Device = CODEC;
+                DeviceAddress = Address - CODEC.StartAddress;
+                return;
+            }
+            if (Address >= MATH.StartAddress && Address <= MATH.EndAddress)
+            {
+                Device = MATH;
+                DeviceAddress = Address - MATH.StartAddress;
+                return;
+            }
+            if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.EndAddress)
+            {
+                Device = INTERRUPT;
+                DeviceAddress = Address - INTERRUPT.StartAddress;
+                return;
+            }
+            if (Address >= TIMER0.StartAddress && Address <= TIMER0.EndAddress)
+            {
+                Device = TIMER0;
+                DeviceAddress = Address - TIMER0.StartAddress;
+                return;
+            }
+            if (Address >= TIMER1.StartAddress && Address <= TIMER1.EndAddress)
+            {
+                Device = TIMER1;
+                DeviceAddress = Address - TIMER1.StartAddress;
+                return;
+            }
+            if (TIMER2 != null && Address >= TIMER2.StartAddress && Address <= TIMER2.EndAddress)
+            {
+                Device = TIMER2;
+                DeviceAddress = Address - TIMER2.StartAddress;
+                return;
+            }
+            if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)
+            {
+                Device = RAM;
+                DeviceAddress = Address - RAM.StartAddress;
+                return;
+            }
 
-                if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
+            if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
+            {
+                Device = PS2KEYBOARD;
+                DeviceAddress = Address - PS2KEYBOARD.StartAddress;
+                return;
+            }
+            if (RNG != null)
+            {
+                if (Address >= RNG.StartAddress && Address <= RNG.EndAddress)
                 {
-                    Device = PS2KEYBOARD;
-                    DeviceAddress = Address - PS2KEYBOARD.StartAddress;
-                    return;
-                }
-                if (VIAREGISTERS != null)
-                {
-                    if (Address >= VIAREGISTERS.VIA0.StartAddress && Address <= VIAREGISTERS.VIA0.EndAddress)
-                    {
-                        Device = VIAREGISTERS.VIA0;
-                        DeviceAddress = Address - VIAREGISTERS.VIA0.StartAddress;
-                        return;
-                    }
-                    if (Address >= VIAREGISTERS.VIA1.StartAddress && Address <= VIAREGISTERS.VIA1.EndAddress)
-                    {
-                        Device = VIAREGISTERS.VIA1;
-                        DeviceAddress = Address - VIAREGISTERS.VIA1.StartAddress;
-                        return;
-                    }
-                }
-                if (RNG != null)
-                {
-                    if (Address >= RNG.StartAddress && Address <= RNG.EndAddress)
-                    {
-                        Device = RNG;
-                        DeviceAddress = Address - RNG.StartAddress;
-                        return;
-                    }
-                }
-                if (Address >= RTC.StartAddress && Address <= RTC.EndAddress)
-                {
-                    Device = RTC;
-                    DeviceAddress = Address - RTC.StartAddress;
-                    return;
-                }
-                if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
-                {
-                    Device = UART1;
-                    DeviceAddress = Address - MemoryMap.UART1_REGISTERS;
-                    return;
-                }
-                if (Address >= MemoryMap.UART2_REGISTERS && Address < MemoryMap.UART2_REGISTERS + 8)
-                {
-                    Device = UART2;
-                    DeviceAddress = Address - MemoryMap.UART2_REGISTERS;
-                    return;
-                }
-                if (Address >= MemoryMap.MPU401_DATA_REG && Address <= MemoryMap.MPU401_STATUS_REG)
-                {
-                    Device = MPU401;
-                    DeviceAddress = Address - MPU401.StartAddress;
-                    return;
-                }
-                if (Address >= SDCARD.StartAddress && Address <= SDCARD.EndAddress)
-                {
-                    Device = SDCARD;
-                    DeviceAddress = Address - SDCARD.StartAddress;
-                    return;
-                }
-                if (Address >= MemoryMap.FLOAT_START && Address <= MemoryMap.FLOAT_END)
-                {
-                    Device = FLOAT;
-                    DeviceAddress = Address - FLOAT.StartAddress;
-                    return;
-                }
-                if (Address >= MemoryMap.VDMA_START && Address < MemoryMap.VDMA_START + MemoryMap.VDMA_SIZE)
-                {
-                    Device = DMA;
-                    DeviceAddress = Address - MemoryMap.VDMA_START;
-                    return;
-                }
-                if (Address >= MemoryMap.VICKY_START && Address <= MemoryMap.VICKY_END)
-                {
-                    Device = VICKY;
-                    DeviceAddress = Address - VICKY.StartAddress;
-                    return;
-                }
-                if (Address >= MemoryMap.OPL2_S_BASE && Address <= MemoryMap.OPL2_S_BASE + 255)
-                {
-                    Device = OPL2;
-                    DeviceAddress = Address - OPL2.StartAddress;
-                    return;
-                }
-                if (Address >= MemoryMap.GABE_START && Address <= MemoryMap.GABE_END)
-                {
-                    Device = GABE;
-                    DeviceAddress = Address - GABE.StartAddress;
-                    return;
-                }
-                if (Address >= MemoryMap.VIDEO_START && Address < (MemoryMap.VIDEO_START + MemoryMap.VIDEO_SIZE))
-                {
-                    Device = VIDEO;
-                    DeviceAddress = Address - VIDEO.StartAddress;
-                    return;
-                }
-                if (FLASH != null && Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)
-                {
-                    Device = FLASH;
-                    DeviceAddress = Address - FLASH.StartAddress;
+                    Device = RNG;
+                    DeviceAddress = Address - RNG.StartAddress;
                     return;
                 }
             }
-            else
+            if (Address >= RTC.StartAddress && Address <= RTC.EndAddress)
             {
-
-                // check if MMU is really in use
-                if (!MMU.flatMode)
-                {
-
-                    // Special case for the Memory Window again...
-                    if (Address > 0xFFFF)
-                    {
-                        Device = RAM;
-                        DeviceAddress = Address & 0xF_FFFF;
-                        return;
-                    }
-
-                    if (Address < 2)
-                    {
-                        Device = MMU;
-                        DeviceAddress = Address;
-                        return;
-                    }
-
-                    byte MMURegister = MMU.ReadByte(0);
-                    byte IOPageRegister = MMU.ReadByte(1);
-                    int offset;
-                    if (IOPageRegister == 0)
-                    {
-                        if (Address >= CODEC.StartAddress && Address <= CODEC.EndAddress)
-                        {
-                            Device = CODEC;
-                            DeviceAddress = Address - CODEC.StartAddress;
-                            return;
-                        }
-                        if (Address >= DMA.StartAddress && Address <= DMA.EndAddress)
-                        {
-                            Device = DMA;
-                            DeviceAddress = Address - DMA.StartAddress;
-                            return;
-                        }
-                        if (Address >= MATH.StartAddress && Address <= MATH.EndAddress)
-                        {
-                            Device = MATH;
-                            DeviceAddress = Address - MATH.StartAddress;
-                            return;
-                        }
-                        if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.EndAddress)
-                        {
-                            Device = INTERRUPT;
-                            DeviceAddress = Address - INTERRUPT.StartAddress;
-                            return;
-                        }
-                        if (Address >= TIMER0.StartAddress && Address <= TIMER0.EndAddress)
-                        {
-                            Device = TIMER0;
-                            DeviceAddress = Address - TIMER0.StartAddress;
-                            return;
-                        }
-                        if (Address >= TIMER1.StartAddress && Address <= TIMER1.EndAddress)
-                        {
-                            Device = TIMER1;
-                            DeviceAddress = Address - TIMER1.StartAddress;
-                            return;
-                        }
-                        if (Address >= RTC.StartAddress && Address <= RTC.EndAddress)
-                        {
-                            Device = RTC;
-                            DeviceAddress = Address - RTC.StartAddress;
-                            return;
-                        }
-                        if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
-                        {
-                            Device = PS2KEYBOARD;
-                            DeviceAddress = Address - PS2KEYBOARD.StartAddress;
-                            return;
-                        }
-                        if (VIAREGISTERS != null)
-                        {
-                            if (Address >= VIAREGISTERS.VIA0.StartAddress && Address <= VIAREGISTERS.VIA0.EndAddress)
-                            {
-                                Device = VIAREGISTERS.VIA0;
-                                DeviceAddress = Address - VIAREGISTERS.VIA0.StartAddress;
-                                return;
-                            }
-                            if (VIAREGISTERS.VIA1 != null && Address >= VIAREGISTERS.VIA1.StartAddress && Address <= VIAREGISTERS.VIA1.EndAddress)
-                            {
-                                Device = VIAREGISTERS.VIA1;
-                                DeviceAddress = Address - VIAREGISTERS.VIA1.StartAddress;
-                                return;
-                            }
-                        }
-                        if (SNESController != null && Address >= SNESController.StartAddress && Address <= SNESController.EndAddress)
-                        {
-                            Device = SNESController;
-                            DeviceAddress = Address - SNESController.StartAddress;
-                            return;
-                        }
-                        if (RNG != null)
-                        {
-                            if (Address >= RNG.StartAddress && Address <= RNG.EndAddress)
-                            {
-                                Device = RNG;
-                                DeviceAddress = Address - RNG.StartAddress;
-                                return;
-                            }
-                        }
-                        if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
-                        {
-                            Device = UART1;
-                            DeviceAddress = Address - UART1.StartAddress;
-                            return;
-                        }
-                        if (Address >= SDCARD.StartAddress && Address <= SDCARD.EndAddress)
-                        {
-                            Device = SDCARD;
-                            DeviceAddress = Address - SDCARD.StartAddress;
-                            return;
-                        }
-                        if (Address >= 0xD018 && Address < 0xD01C)
-                        {
-                            Device = SOLRegister;
-                            DeviceAddress = Address - 0xD018;
-                            return;
-                        }
-                        // These addresses are hard-coded - this is done to store all text and LUT data in vicky
-                        if (Address >= 0xC000 && Address <= 0xDFFF)
-                        {
-                            Device = VICKY;
-                            DeviceAddress = Address - 0xC000;
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // For now, vicky stores this data
-                        if (IOPageRegister < 4 && Address >= 0xC000 && Address <= 0xDFFF)
-                        {
-                            Device = VICKY;
-                            offset = IOPageRegister * 8192;  // Page IO 0 is store at the beginning
-                            DeviceAddress = offset + Address - 0xC000;
-                            return;
-                        }
-                    }
-
-                    // bits 4 and 5 of MMURegister determine which LUT is being edited
-                    if ((MMURegister & 0x80) != 0 && Address >= 8 && Address <= 0xF)
-                    {
-                        Device = MMU;
-                        MMU.SetActiveLUT((byte)((MMURegister & 0x30) >> 4));
-                        DeviceAddress = Address;
-                        return;
-                    }
-
-                    byte segment = (byte)(Address >> 13);  // take the top 3 bits
-                    byte page = MMU.GetPage((byte)(MMURegister & 3), segment);
-
-                    if (page >= 0x40 && page <= 0x7F) // MMU entry points to FLASH
-                    {
-                        Device = FLASHF256;
-                        offset = (page - 0x40) * 8192;
-                        DeviceAddress = offset + (Address & 0x1FFF);
-                        return;
-                    }
-
-                    Device = RAM;
-                    offset = page * 8192;
-                    DeviceAddress = offset + (Address & 0x1FFF);
-                    return;
-                }
-                else
-                {
-                    // this is F256 Flat mode
-                    // Special case for the Memory Window again...
-                    //                    if (Address > 0xFFFF)
-                    //                    {
-                    //                       Device = RAM;
-                    //                        DeviceAddress = Address & 0xF_FFFF;
-                    //                        return;
-                    //                    }
-
-                    //                   if (Address < 2)
-                    //                    {
-                    //                        Device = MMU;
-                    //                        DeviceAddress = Address;
-                    //                        return;
-                    //                    }
-
-                    // Map Flash into upper 256 bytes of 1st 64K
-                    if (Address >= 0x00_FF00 && Address <= 0x00_FFFF)
-                    {
-                        Address |= 0xFF_0000;
-                    }
-
-                    if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)
-                    {
-                        Device = RAM;
-                        DeviceAddress = Address - RAM.StartAddress;
-                        return;
-                    }
-
-                    if (Address >= CODEC.StartAddress && Address <= CODEC.EndAddress)
-                    {
-                        Device = CODEC;
-                        DeviceAddress = Address - CODEC.StartAddress;
-                        return;
-                    }
-                    if (Address >= DMA.StartAddress && Address <= DMA.EndAddress)
-                    {
-                        Device = DMA;
-                        DeviceAddress = Address - DMA.StartAddress;
-                        return;
-                    }
-                    if (Address >= MATH.StartAddress && Address <= MATH.EndAddress)
-                    {
-                        Device = MATH;
-                        DeviceAddress = Address - MATH.StartAddress;
-                        return;
-                    }
-                    if (Address >= INTERRUPT.StartAddress && Address <= INTERRUPT.EndAddress)
-                    {
-                        Device = INTERRUPT;
-                        DeviceAddress = Address - INTERRUPT.StartAddress;
-                        return;
-                    }
-                    if (Address >= TIMER0.StartAddress && Address <= TIMER0.EndAddress)
-                    {
-                        Device = TIMER0;
-                        DeviceAddress = Address - TIMER0.StartAddress;
-                        return;
-                    }
-                    if (Address >= TIMER1.StartAddress && Address <= TIMER1.EndAddress)
-                    {
-                        Device = TIMER1;
-                        DeviceAddress = Address - TIMER1.StartAddress;
-                        return;
-                    }
-                    if (Address >= RTC.StartAddress && Address <= RTC.EndAddress)
-                    {
-                        Device = RTC;
-                        DeviceAddress = Address - RTC.StartAddress;
-                        return;
-                    }
-                    if (Address >= PS2KEYBOARD.StartAddress && Address <= PS2KEYBOARD.EndAddress)
-                    {
-                        Device = PS2KEYBOARD;
-                        DeviceAddress = Address - PS2KEYBOARD.StartAddress;
-                        return;
-                    }
-                    if (VIAREGISTERS != null)
-                    {
-                        if (Address >= VIAREGISTERS.VIA0.StartAddress && Address <= VIAREGISTERS.VIA0.EndAddress)
-                        {
-                            Device = VIAREGISTERS.VIA0;
-                            DeviceAddress = Address - VIAREGISTERS.VIA0.StartAddress;
-                            return;
-                        }
-                        if (VIAREGISTERS.VIA1 != null && Address >= VIAREGISTERS.VIA1.StartAddress && Address <= VIAREGISTERS.VIA1.EndAddress)
-                        {
-                            Device = VIAREGISTERS.VIA1;
-                            DeviceAddress = Address - VIAREGISTERS.VIA1.StartAddress;
-                            return;
-                        }
-                    }
-                    if (SNESController != null && Address >= SNESController.StartAddress && Address <= SNESController.EndAddress)
-                    {
-                        Device = SNESController;
-                        DeviceAddress = Address - SNESController.StartAddress;
-                        return;
-                    }
-                    if (RNG != null)
-                    {
-                        if (Address >= RNG.StartAddress && Address <= RNG.EndAddress)
-                        {
-                            Device = RNG;
-                            DeviceAddress = Address - RNG.StartAddress;
-                            return;
-                        }
-                    }
-                    if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
-                    {
-                        Device = UART1;
-                        DeviceAddress = Address - UART1.StartAddress;
-                        return;
-                    }
-                    if (Address >= SDCARD.StartAddress && Address <= SDCARD.EndAddress)
-                    {
-                        Device = SDCARD;
-                        DeviceAddress = Address - SDCARD.StartAddress;
-                        return;
-                    }
-                    if (Address >= SOLRegister.StartAddress && Address < SOLRegister.EndAddress)
-                    {
-                        Device = SOLRegister;
-                        DeviceAddress = Address - SOLRegister.StartAddress;
-                        return;
-                    }
-
-                    if (Address >= VICKY.StartAddress && Address <= VICKY.EndAddress)
-                    {
-                        Device = VICKY;
-                        DeviceAddress = Address - VICKY.StartAddress;
-                        return;
-                    }
-
-                    if (Address >= FLASHF256.StartAddress && Address <= FLASHF256.EndAddress)
-                    {
-                        Device = FLASHF256;
-                        DeviceAddress = Address - FLASHF256.StartAddress;
-                        return;
-                    }
-                }
+                Device = RTC;
+                DeviceAddress = Address - RTC.StartAddress;
+                return;
+            }
+            if (Address >= UART1.StartAddress && Address <= UART1.EndAddress)
+            {
+                Device = UART1;
+                DeviceAddress = Address - MemoryMap.UART1_REGISTERS;
+                return;
+            }
+            if (Address >= MemoryMap.UART2_REGISTERS && Address < MemoryMap.UART2_REGISTERS + 8)
+            {
+                Device = UART2;
+                DeviceAddress = Address - MemoryMap.UART2_REGISTERS;
+                return;
+            }
+            if (Address >= MemoryMap.MPU401_DATA_REG && Address <= MemoryMap.MPU401_STATUS_REG)
+            {
+                Device = MPU401;
+                DeviceAddress = Address - MPU401.StartAddress;
+                return;
+            }
+            if (Address >= SDCARD.StartAddress && Address <= SDCARD.EndAddress)
+            {
+                Device = SDCARD;
+                DeviceAddress = Address - SDCARD.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.FLOAT_START && Address <= MemoryMap.FLOAT_END)
+            {
+                Device = FLOAT;
+                DeviceAddress = Address - FLOAT.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.VDMA_START && Address < MemoryMap.VDMA_START + MemoryMap.VDMA_SIZE)
+            {
+                Device = DMA;
+                DeviceAddress = Address - MemoryMap.VDMA_START;
+                return;
+            }
+            if (Address >= MemoryMap.VICKY_START && Address <= MemoryMap.VICKY_END)
+            {
+                Device = VICKY;
+                DeviceAddress = Address - VICKY.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.OPL2_S_BASE && Address <= MemoryMap.OPL2_S_BASE + 255)
+            {
+                Device = OPL2;
+                DeviceAddress = Address - OPL2.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.GABE_START && Address <= MemoryMap.GABE_END)
+            {
+                Device = GABE;
+                DeviceAddress = Address - GABE.StartAddress;
+                return;
+            }
+            if (Address >= MemoryMap.VIDEO_START && Address < (MemoryMap.VIDEO_START + MemoryMap.VIDEO_SIZE))
+            {
+                Device = VIDEO;
+                DeviceAddress = Address - VIDEO.StartAddress;
+                return;
+            }
+            if (FLASH != null && Address >= MemoryMap.FLASH_START && Address <= MemoryMap.FLASH_END)
+            {
+                Device = FLASH;
+                DeviceAddress = Address - FLASH.StartAddress;
+                return;
             }
 
             // oops, we didn't map this to anything. 
@@ -566,6 +234,7 @@ namespace FoenixIDE.MemoryLocations
         /// </summary>
         public virtual byte ReadByte(int Address)
         {
+            //Console.WriteLine("ReadByte Address: " + Address);
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
             if (device == null)
                 return 0x40;
@@ -602,6 +271,7 @@ namespace FoenixIDE.MemoryLocations
 
         public virtual void WriteByte(int Address, byte Value)
         {
+            //Console.WriteLine("WriteByte Address: " + Address + "," + Value);
             GetDeviceAt(Address, out IMappable device, out int deviceAddress);
             if (device != null)
             {
