@@ -187,8 +187,8 @@ namespace FoenixIDE.Processor
 
         public void Reset()
         {
-            Pins.VectorPull = true;
-            MemMgr.VectorPull = true;
+            //Pins.VectorPull = true;
+            //MemMgr.VectorPull = true;
 
             SetEmulationMode();
             Flags.Value = 0;
@@ -206,8 +206,8 @@ namespace FoenixIDE.Processor
 
             Flags.IrqDisable = true;
             Pins.IRQ = false;
-            Pins.VectorPull = false;
-            MemMgr.VectorPull = false;
+            //Pins.VectorPull = false;
+            //MemMgr.VectorPull = false;
             Waiting = false;
         }
 

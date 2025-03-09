@@ -272,8 +272,8 @@ namespace FoenixIDE.UI
                 gpu.VRAM = kernel.MemMgr.RAM;
 
                 // VIA Chip Port B is joystick 1
-                joystickWindowA.SetMatrix(kernel.MemMgr.VIAREGISTERS, 0, 0);
-                joystickWindowB.SetMatrix(kernel.MemMgr.VIAREGISTERS, 0, 1);
+                joystickWindowA.SetMatrix(((MemoryManagerF256)kernel.MemMgr).VIAREGISTERS, 0, 0);
+                joystickWindowB.SetMatrix(((MemoryManagerF256)kernel.MemMgr).VIAREGISTERS, 0, 1);
 
                 // see if this a Flat (65c816) Memory space or with MMU
                 if (BoardVersionHelpers.IsF256_Flat(version))
@@ -806,10 +806,16 @@ namespace FoenixIDE.UI
             }
             else
             {
-                // Notify the F256K matrix keyboard
-                if (kernel.MemMgr.VIAREGISTERS != null && kernel.MemMgr.VIAREGISTERS.VIA1 != null)
+                // Notify the Jr PS/2 keyboard
+                if (version == BoardVersion.RevJr_6502 || version == BoardVersion.RevJr_65816)
                 {
-                    kernel.MemMgr.VIAREGISTERS.WriteScanCode(sc[0]);
+                    // Check if the Keyboard interrupt is allowed
+                    kernel.MemMgr.PS2KEYBOARD.WriteScanCodeSequence(sc, sc.Length);
+                }
+                // Notify the F256K matrix keyboard
+                else
+                { 
+                    ((MemoryManagerF256)kernel.MemMgr).VIAREGISTERS.WriteScanCode(sc[0]);
 
                     // Check if the Keyboard interrupt is allowed
                     int addr = BoardVersionHelpers.IsF256_MMU(version) ? MemoryLocations.MemoryMap.INT_MASK_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_MASK_REG0_F256_FLAT;
@@ -820,12 +826,6 @@ namespace FoenixIDE.UI
                         TriggerKeyboardInterrupt();
                     }
                 }
-                else
-                {
-                    // Check if the Keyboard interrupt is allowed
-                    kernel.MemMgr.PS2KEYBOARD.WriteScanCodeSequence(sc, sc.Length);
-                }
-                
             }
         }
         private void TriggerKeyboardInterrupt()
@@ -840,15 +840,7 @@ namespace FoenixIDE.UI
             }
             else
             {
-                if (kernel.MemMgr.VIAREGISTERS != null && kernel.MemMgr.VIAREGISTERS.VIA1 != null)
-                {
-                    // Set the Keyboard Interrupt
-                    byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(1);
-                    IrqVal |= (byte)Register1_JR.JR1_INT06_VIA1;
-                    kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IrqVal);
-                    kernel.CPU.Pins.IRQ = true;
-                }
-                else
+                if (version == BoardVersion.RevJr_6502 || version == BoardVersion.RevJr_65816)
                 {
                     int addr = BoardVersionHelpers.IsF256_MMU(version) ? MemoryLocations.MemoryMap.INT_MASK_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_MASK_REG0_F256_FLAT;
                     byte mask = kernel.MemMgr.ReadByte(addr);
@@ -860,6 +852,14 @@ namespace FoenixIDE.UI
                         kernel.MemMgr.INTERRUPT.WriteFromGabe(0, IrqVal);
                         kernel.CPU.Pins.IRQ = true;
                     }
+                }
+                else
+                {
+                    // Set the Keyboard Interrupt
+                    byte IrqVal = kernel.MemMgr.INTERRUPT.ReadByte(1);
+                    IrqVal |= (byte)Register1_JR.JR1_INT06_VIA1;
+                    kernel.MemMgr.INTERRUPT.WriteFromGabe(1, IrqVal);
+                    kernel.CPU.Pins.IRQ = true;
                 }
             }
         }
@@ -1010,9 +1010,9 @@ namespace FoenixIDE.UI
                 if (BoardVersionHelpers.IsF256(version))
                 {
                     // Now update other registers
-                    kernel.MemMgr.MMU.Reset();
-                    kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
-                    kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
+                    ((MemoryManagerF256)kernel.MemMgr).MMU.Reset();
+                    ((MemoryManagerF256)kernel.MemMgr).VICKY.WriteWord(0xD000 - 0xC000, 1);
+                    ((MemoryManagerF256)kernel.MemMgr).VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
                 }
                 memoryWindow.UpdateMCRButtons();
                 ResetSDCard();
@@ -1035,7 +1035,7 @@ namespace FoenixIDE.UI
                 if (BoardVersionHelpers.IsF256(version))
                 {
                     // Now update other registers
-                    kernel.MemMgr.MMU.Reset();
+                    ((MemoryManagerF256)kernel.MemMgr).MMU.Reset();
                     kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                     kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
                     // reset the tile stride - for fnxsnake!!
@@ -1144,7 +1144,7 @@ namespace FoenixIDE.UI
                     if (BoardVersionHelpers.IsF256(version))
                     {
                         // Now update other registers
-                        kernel.MemMgr.MMU.Reset();
+                        ((MemoryManagerF256)kernel.MemMgr).MMU.Reset();
                         kernel.MemMgr.VICKY.WriteWord(0xD000 - 0xC000, 1);
                         kernel.MemMgr.VICKY.WriteWord(0xD002 - 0xC000, 0x1540);
                     }
@@ -1240,7 +1240,7 @@ namespace FoenixIDE.UI
         {
             if (tileEditor == null)
             {
-                tileEditor = new TileEditor();
+                tileEditor = new TileEditor(BoardVersionHelpers.IsF256(kernel.GetVersion()));
                 tileEditor.SetMemory(kernel.MemMgr);
                 tileEditor.SetResourceChecker(kernel.ResCheckerRef);
                 gpu.TileEditorMode = true;

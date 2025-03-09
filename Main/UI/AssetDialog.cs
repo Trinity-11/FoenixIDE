@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoenixIDE.Simulator.Devices;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using static FoenixIDE.Simulator.FileFormat.ResourceChecker;
@@ -96,7 +97,7 @@ namespace FoenixIDE.UI
 
                             FileStream dataFile = File.Create(saveDlg.FileName, 0x800, FileOptions.SequentialScan);
                             byte[] buffer = new byte[res.Length];
-                            if (res.FileType == ResourceType.lut && kernel_ref.MemMgr.MMU != null)
+                            if (res.FileType == ResourceType.lut && BoardVersionHelpers.IsF256(kernel_ref.GetVersion()))
                             {
                                 kernel_ref.MemMgr.VICKY.CopyIntoBuffer(res.StartAddress, res.Length, buffer);
                             }

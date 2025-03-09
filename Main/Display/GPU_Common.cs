@@ -217,7 +217,7 @@ namespace FoenixIDE.Display
             int value = lc[lutIndex * 256 + color];
 
             if (value == 0)
-            {
+            {   
                 int lutAddress = lutBaseAddress + (lutIndex * 256 + color) * 4;
                 byte red = VICKY.ReadByte(lutAddress);
                 byte green = VICKY.ReadByte(lutAddress + 1);
@@ -427,7 +427,7 @@ namespace FoenixIDE.Display
             }
         }
 
-        private unsafe void DrawTiles(int* p, bool gammaCorrection, byte TextColumns, int layer, bool bkgrnd, in int borderXSize, in int line, in int width, bool dX, bool dY)
+        private unsafe void DrawTiles(int* p, bool gammaCorrection, int layer, bool bkgrnd, in int borderXSize, int line, int width, bool dX, bool dY)
         {
             // There are four possible tilemaps to choose from
             int addrTileCtrlReg = TileMapBaseAddress + layer * 12;
@@ -452,16 +452,6 @@ namespace FoenixIDE.Display
             int tilemapWindowX = VICKY.ReadWord(addrTileCtrlReg + 8);
             bool dirLeft = (mode == 0) ? (tilemapWindowX & 0x8000) != 0 : false;
             byte scrollX = (byte)(((tilemapWindowX & scrollMask) * (dirLeft ? -1 : 1)) & scrollMask);
-            if (smallTiles)
-            {
-                tilemapWindowX = ((tilemapWindowX & 0x3FF0)  >> 1) + scrollX + ((mode == 0) ? 0 : 8);
-            }
-            else
-            {
-                tilemapWindowX = (tilemapWindowX & 0x3FF0) + scrollX;
-            }
-            int tileXOffset = tilemapWindowX % tileSize;
-
             // the tilemapWindowY is 10 bits and the scrollY is the lower 4 bits.  The IDE combines them.
             // direction is bit 15.
             int tilemapWindowY = VICKY.ReadWord(addrTileCtrlReg + 10);
@@ -469,12 +459,15 @@ namespace FoenixIDE.Display
             byte scrollY = (byte)(((tilemapWindowY & scrollMask) * (dirUp ? -1 : 1)) & scrollMask);
             if (smallTiles)
             {
+                tilemapWindowX = ((tilemapWindowX & 0x3FF0)  >> 1) + scrollX + ((mode == 0) ? 0 : 8);
                 tilemapWindowY = ((tilemapWindowY & 0x3FF0) >> 1) + scrollY;
             }
             else
             {
+                tilemapWindowX = (tilemapWindowX & 0x3FF0) + scrollX;
                 tilemapWindowY = (tilemapWindowY & 0x3FF0) + scrollY;
             }
+            int tileXOffset = tilemapWindowX % tileSize;
 
             int tileRow = ((dY ? line / 2: line) + tilemapWindowY) / tileSize;
             int tileYOffset = ((dY ? line / 2 : line) + tilemapWindowY) % tileSize;
@@ -589,7 +582,7 @@ namespace FoenixIDE.Display
         const int screenOffset = 32;
         private unsafe void DrawSprites(int* p, bool gammaCorrection, byte layer, bool bkgrnd, int borderXSize, int borderYSize, int line, int width, int height, bool dX, bool dY)
         {
-            // There are 32 possible sprites to choose from.
+            // There are 64 possible sprites to choose from.
             for (int s = 63; s > -1; s--)
             {
                 int addrSprite = SpriteBaseAddress + s * 8;
@@ -622,8 +615,8 @@ namespace FoenixIDE.Display
                         // TODO Fix this when Vicky II fixes the LUT issue
                         byte lutIndex = (mode == 0) ? (byte)(((reg & 0xC) >> 1)) : (byte)(((reg & 6) >> 1));
             
-                        int lutAddress = lutBaseAddress + lutIndex * 1024;
-                        bool striding = (reg & 0x80) == 0x80;
+                        //int lutAddress = lutBaseAddress + lutIndex * 1024;
+                        //bool striding = (reg & 0x80) == 0x80;
 
                         int spriteAddress = VICKY.ReadLong(addrSprite + 1) & 0x3F_FFFF;
                         int posX = VICKY.ReadWord(addrSprite + 4) - screenOffset;

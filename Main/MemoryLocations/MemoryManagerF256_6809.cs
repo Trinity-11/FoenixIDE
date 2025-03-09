@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using FoenixIDE.Processor;
-using FoenixIDE.Display;
-using FoenixIDE.MemoryLocations;
-using FoenixIDE.Simulator.FileFormat;
-using FoenixIDE.Simulator.Devices;
+﻿using FoenixIDE.Simulator.Devices;
 
 namespace FoenixIDE.MemoryLocations
 {

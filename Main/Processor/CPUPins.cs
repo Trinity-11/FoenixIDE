@@ -47,7 +47,7 @@ namespace FoenixIDE.Processor
         /// <summary>
         /// When high, the CPU is reading interrupt/reset vectors
         /// </summary>
-        public bool VectorPull = false;
+        //public bool VectorPull = false;
 
         /// <summary>
         /// Helper method to let CPU class know an interrutp pin is high

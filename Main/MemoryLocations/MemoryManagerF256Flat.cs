@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using FoenixIDE.Processor;
-using FoenixIDE.Display;
-using FoenixIDE.MemoryLocations;
-using FoenixIDE.Simulator.FileFormat;
-using FoenixIDE.Simulator.Devices;
+﻿using FoenixIDE.Simulator.Devices;
 
 namespace FoenixIDE.MemoryLocations
 {
@@ -34,24 +26,10 @@ namespace FoenixIDE.MemoryLocations
             //                        return;
             //                    }
 
-            //                   if (Address < 2)
-            //                    {
-            //                        Device = MMU;
-            //                        DeviceAddress = Address;
-            //                        return;
-            //                    }
-
             // Map Flash into upper 256 bytes of 1st 64K
             if (Address >= 0x00_FF00 && Address <= 0x00_FFFF)
             {
                 Address |= 0xFF_0000;
-            }
-
-            if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)
-            {
-                Device = RAM;
-                DeviceAddress = Address - RAM.StartAddress;
-                return;
             }
 
             if (Address >= CODEC.StartAddress && Address <= CODEC.EndAddress)
@@ -165,6 +143,12 @@ namespace FoenixIDE.MemoryLocations
                 return;
             }
 
+            if (Address >= RAM.StartAddress && Address <= RAM.StartAddress + RAM.Length - 1)
+            {
+                Device = RAM;
+                DeviceAddress = Address - RAM.StartAddress;
+                return;
+            }
 
             // oops, we didn't map this to anything. 
             Device = null;

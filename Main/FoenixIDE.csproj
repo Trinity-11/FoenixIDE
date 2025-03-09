@@ -124,6 +124,9 @@
     <Compile Include="MemoryLocations\IMappable.cs" />
     <Compile Include="Devices\MathCoproRegister.cs" />
     <Compile Include="Devices\SDCard\SDCardDevice.cs" />
+    <Compile Include="MemoryLocations\MemoryManagerF256_6809.cs" />
+    <Compile Include="MemoryLocations\MemoryManagerF256.cs" />
+    <Compile Include="MemoryLocations\MemoryManagerF256Flat.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Gabe.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Vicky.cs" />
     <Compile Include="MemoryLocations\MemoryMap_Blocks.cs" />

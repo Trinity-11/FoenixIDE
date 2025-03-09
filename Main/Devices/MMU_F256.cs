@@ -9,7 +9,7 @@ namespace FoenixIDE.Simulator.Devices
      */
     public class MMU_F256 : MemoryLocations.MemoryRAM
     {
-        private byte activeLUT = 0;
+        private byte editLUT = 0;
         byte[] LUTs = { 0, 1, 2, 3, 4, 5, 6, 0x7F,
                         0, 1, 2, 3, 4, 5, 6, 0x7F,
                         0, 1, 2, 3, 4, 5, 6, 0x7F,
@@ -32,7 +32,7 @@ namespace FoenixIDE.Simulator.Devices
         {
             if (Address >= 8 && Address <= 0xF)
             {
-                return LUTs[activeLUT * 8 + Address - 8];
+                return LUTs[editLUT * 8 + Address - 8];
             }
             else
             {
@@ -44,7 +44,7 @@ namespace FoenixIDE.Simulator.Devices
         {
             if (Address >= 8 && Address <= 0xF)
             {
-                LUTs[activeLUT * 8 + Address - 8] = Value;
+                LUTs[editLUT * 8 + Address - 8] = Value;
             }
             else
             {
@@ -58,13 +58,9 @@ namespace FoenixIDE.Simulator.Devices
             return LUTs[LUT * 8 + segment];
         }
 
-        public void SetPage(byte LUT, byte segment, byte value)
-        {
-            LUTs[LUT * 8 + segment] = value;
-        }
         public void SetActiveLUT(byte LUT)
         {
-            activeLUT = LUT;
+            editLUT = LUT;
         }
 
         public void Reset()

@@ -1,9 +1,10 @@
-Release 0.7.0.16
+Release 0.7.0.17
 ----------------
-Another attempt at fixing pesky BCD substraction issue.
-Fix the Uploader dialog to send reset program signature when uploading PGZ files.
-Removed the Wingdings font from the CPU Window.
-Fixed the cursor keys for PS/2 keyboard with scan codes 2.
+Update F256 firmware to latest version.
+When loading a disk image as the SD card, don't expect it to be a bootable partition.
+Removed unused "using".
+Cleaned up the layers display - for each layer, only tile or bitmap is visible, not both.
+Refactored the MemoryManager, to reduce complexity. Now we have 3 descendant classes.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -15,6 +16,13 @@ Fixed the cursor keys for PS/2 keyboard with scan codes 2.
 ** TODO: Add remote debugging capability for Calypsi compiler.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
+
+Release 0.7.0.16
+----------------
+Another attempt at fixing pesky BCD substraction issue.
+Fix the Uploader dialog to send reset program signature when uploading PGZ files.
+Removed the Wingdings font from the CPU Window.
+Fixed the cursor keys for PS/2 keyboard with scan codes 2.
 
 Release 0.7.0.15
 ----------------

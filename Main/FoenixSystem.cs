@@ -123,8 +123,7 @@ namespace FoenixIDE
                     TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
                     TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8),
                     RTC = new RTC(MemoryMap.RTC_SEC, 16),
-                    CODEC = codec,
-                    MMU = null
+                    CODEC = codec
                 };
                 vdma.setVideoRam(MemMgr.VIDEO);
                 vdma.setSystemRam(MemMgr.RAM);
@@ -139,7 +138,7 @@ namespace FoenixIDE
                     // Create the F256 DMA
                     DMA_F256 dma = new DMA_F256(MemoryMap.DMA_START_F256_FLAT, 20);
                     // This is a 65816-based F256 machine with flat memory map
-                    MemMgr = new MemoryManager
+                    MemMgr = new MemoryManagerF256Flat
                     {
                         RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
                         FLASHF256 = new FlashF256(MemoryMap.FLASH_START_F256_FLAT, 0x08_0000),
@@ -156,15 +155,12 @@ namespace FoenixIDE
                         TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG_F256_FLAT, 8),
                         RTC = new RTC(MemoryMap.RTC_SEC_F256_FLAT, 16),
                         CODEC = codec,
-                        // don't have MMU in FLAT Mode - why have it then?
-                        MMU = new MMU_F256(0, 16, true),
                         RNG = new RNGRegister(MemoryMap.SEEDL_F256_FLAT, 3),
-                        SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_FLAT, 4)
-                    };
+                        SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_FLAT, 4),
+                        // Only the K machines have a matrix keyboard
+                        VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B_F256_FLAT, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B_F256_FLAT, 4)
+                };
                     dma.setSystemRam(MemMgr.RAM);
-
-                    // Only the K machines have a matrix keyboard
-                    MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B_F256_FLAT, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B_F256_FLAT, 4);
                     // Add the SNES Registers
                     MemMgr.SNESController = new SNES(MemoryMap.SNES_CTRL_REG_FLAT, 16); // We are not implementing the SNES controller, so all values will return $FF
                 }
@@ -173,7 +169,7 @@ namespace FoenixIDE
                     // Create the F256 DMA
                     DMA_F256 dma = new DMA_F256(MemoryMap.DMA_START_F256_MMU, 20);
                     // This is a 6502 or 65816-based F256 machine; both have the same memory map
-                    MemMgr = new MemoryManager
+                    MemMgr = new MemoryManagerF256
                     {
                         RAM = new MemoryRAM(MemoryMap.RAM_START, memSize),
                         FLASHF256 = new FlashF256(MemoryMap.RAM_START, 0x08_0000),
@@ -192,18 +188,15 @@ namespace FoenixIDE
                         CODEC = codec,
                         MMU = new MMU_F256(0, 16, false),
                         RNG = new RNGRegister(MemoryMap.SEEDL_F256_MMU, 3),
-                        SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_MMU, 4)
+                        SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_MMU, 4),
+                        VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4)
                     };
                     dma.setSystemRam(MemMgr.RAM);
 
-                    // Only the K machines have a matrix keyboard
-                    if (boardVersion == BoardVersion.RevF256K_6502 || boardVersion == BoardVersion.RevF256K_65816)
+                    // The F256jr only has one VIA chip
+                    if (boardVersion == BoardVersion.RevJr_6502 || boardVersion == BoardVersion.RevJr_65816)
                     {
-                        MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4);
-                    }
-                    else
-                    {
-                        MemMgr.VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4);
+                        ((MemoryManagerF256)MemMgr).VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4);
                     }
                     // Add the SNES Registers
                     MemMgr.SNESController = new SNES(MemoryMap.SNES_CTRL_REG, 16); // We are not implementing the SNES controller, so all values will return $FF
@@ -501,7 +494,7 @@ namespace FoenixIDE
             {
                 if (BoardVersionHelpers.IsF256_MMU(boardVersion))
                 {
-                    MemMgr.MMU.Reset();
+                    ((MemoryManagerF256)MemMgr).MMU.Reset();
                 }
             }
             else
@@ -509,21 +502,21 @@ namespace FoenixIDE
                 // Ensure the first LUTs are set correctly - but don't overwrite the kernel.
                 if (BoardVersionHelpers.IsF256_MMU(boardVersion))
                 {
-                    MemMgr.MMU.SetActiveLUT(0);
-                    MemMgr.MMU.WriteByte(0x8, 0);
-                    MemMgr.MMU.WriteByte(0x9, 1);
-                    MemMgr.MMU.WriteByte(0xA, 2);
-                    MemMgr.MMU.WriteByte(0xB, 3);
-                    MemMgr.MMU.WriteByte(0xC, 4);
-                    MemMgr.MMU.WriteByte(0xD, 5);
-                    MemMgr.MMU.WriteByte(0xE, 6);
-                    MemMgr.MMU.WriteByte(0xF, 7);
-                    MemMgr.MMU.WriteByte(0, 0);
+                    ((MemoryManagerF256)MemMgr).MMU.SetActiveLUT(0);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0x8, 0);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0x9, 1);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xA, 2);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xB, 3);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xC, 4);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xD, 5);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xE, 6);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xF, 7);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0, 0);
                 }
             }
             if (extension.Equals(".HEX"))
             {
-                if (HexFile.Load(MemMgr.RAM, MemMgr.FLASHF256, LoadedKernel, BasePageAddress, out _, out _) == -1)
+                if (HexFile.Load(MemMgr.RAM, BoardVersionHelpers.IsF256(boardVersion) ? ((MemoryManagerF256)MemMgr).FLASHF256 : null, LoadedKernel, BasePageAddress, out _, out _) == -1)
                 {
                     return false;
                 }
@@ -657,7 +650,7 @@ namespace FoenixIDE
                     if (binOverlapsFlash)
                     {
                         int flashStart = DataStartAddress - 0x08_0000;
-                        MemMgr.FLASHF256.CopyBuffer(DataBuffer, 0, flashStart, flen);
+                        ((MemoryManagerF256)MemMgr).FLASHF256.CopyBuffer(DataBuffer, 0, flashStart, flen);
                     }
                 }
             }
@@ -677,14 +670,14 @@ namespace FoenixIDE
                         BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
                         byte[] DataBuffer = reader.ReadBytes(8192);
                         // Handle the case when the file is less than 8192 bytes.
-                        MemMgr.FLASHF256.CopyBuffer(DataBuffer, 0, address, DataBuffer.Length <= 8192 ? DataBuffer.Length : 8192);
+                        ((MemoryManagerF256)MemMgr).FLASHF256.CopyBuffer(DataBuffer, 0, address, DataBuffer.Length <= 8192 ? DataBuffer.Length : 8192);
 
                         reader.Close();
                     }
                 }
 
                 if (BoardVersionHelpers.IsF256_MMU(boardVersion))
-                    MemMgr.MMU.WriteByte(0xF, 0x7F);
+                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xF, 0x7F);
             }
 
             // Load the .LST file if it exists
@@ -744,21 +737,21 @@ namespace FoenixIDE
             MemMgr.PS2KEYBOARD.WriteByte(0, 0);
             MemMgr.PS2KEYBOARD.WriteByte(4, 0);
 
-            if (MemMgr.VIAREGISTERS != null)
+            if (BoardVersionHelpers.IsF256(boardVersion))
             {
-                MemMgr.VIAREGISTERS.VIA0.WriteByte(2, 0xFF);  // DDRB
-                MemMgr.VIAREGISTERS.VIA0.WriteByte(3, 0xFF);  // DDRA
-                MemMgr.VIAREGISTERS.VIA0.WriteByte(0, 0xFF); // JOYSTICK 2
-                MemMgr.VIAREGISTERS.VIA0.WriteByte(1, 0xFF); // JOYSTICK 1
-                MemMgr.VIAREGISTERS.VIA0.WriteByte(2, 0);  // DDRB
-                MemMgr.VIAREGISTERS.VIA0.WriteByte(3, 0);  // DDRA
+                ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA0.WriteByte(2, 0xFF);  // DDRB
+                ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA0.WriteByte(3, 0xFF);  // DDRA
+                ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA0.WriteByte(0, 0xFF); // JOYSTICK 2
+                ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA0.WriteByte(1, 0xFF); // JOYSTICK 1
+                ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA0.WriteByte(2, 0);  // DDRB
+                ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA0.WriteByte(3, 0);  // DDRA
 
-                if (MemMgr.VIAREGISTERS.VIA1 != null)
+                if (boardVersion != BoardVersion.RevJr_6502 && boardVersion != BoardVersion.RevJr_65816)
                 {
-                    MemMgr.VIAREGISTERS.VIA1.WriteByte(0, 0);
-                    MemMgr.VIAREGISTERS.VIA1.WriteByte(1, 0);
-                    MemMgr.VIAREGISTERS.VIA1.WriteByte(2, 0);  // DDRB
-                    MemMgr.VIAREGISTERS.VIA1.WriteByte(3, 0);  // DDRA
+                    ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA1.WriteByte(0, 0);
+                    ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA1.WriteByte(1, 0);
+                    ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA1.WriteByte(2, 0);  // DDRB
+                    ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA1.WriteByte(3, 0);  // DDRA
                 }
             }
 

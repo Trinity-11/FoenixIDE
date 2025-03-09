@@ -30,9 +30,10 @@ namespace FoenixIDE.Simulator.UI
         private int tileRegistersBaseAddress;
         private int tilesetRegistersBaseAddress;
 
-        public TileEditor()
+        public TileEditor(bool isF256)
         {
             InitializeComponent();
+            is_F256_MMU = isF256;
         }
 
         private void TileEditor_Load(object sender, EventArgs e)
@@ -63,9 +64,8 @@ namespace FoenixIDE.Simulator.UI
         {
             MemMgr = mm;
             // need to check correct address in generated in F256_FLAT mode!
-            if (mm.MMU != null)
+            if (is_F256_MMU)
             {
-                is_F256_MMU = true;
                 tileRegistersBaseAddress = MemoryLocations.MemoryMap.TILE_CONTROL_REGISTER_ADDR_F256_MMU - 0xC000;
                 tilesetRegistersBaseAddress = MemoryLocations.MemoryMap.TILESET_BASE_ADDR_F256_MMU - 0xC000;
             }
