@@ -5,6 +5,7 @@ When loading a disk image as the SD card, don't expect it to be a bootable parti
 Removed unused "using".
 Cleaned up the layers display - for each layer, only tile or bitmap is visible, not both.
 Refactored the MemoryManager, to reduce complexity. Now we have 3 descendant classes.
+Fixed a bug in DirectPageIndirect addressing that cause the Carry to be incorrectly set in an addition (ADC).
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
