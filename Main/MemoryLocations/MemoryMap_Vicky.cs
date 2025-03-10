@@ -90,6 +90,9 @@ namespace FoenixIDE.MemoryLocations
         public const int RTC_CTRL = 0xAF_080E; // Control Register
         public const int RTC_CENTURY = 0xAF_080F; // Century Register
 
+        // IEC Register
+        public const int IEC_START = 0xD680;
+
         // Mouse Pointer
         public const int MOUSE_POINTER_F256_MMU = 0xD6E0; 
         public const int MOUSE_POINTER_F256_FLAT = 0xF0_16E0;

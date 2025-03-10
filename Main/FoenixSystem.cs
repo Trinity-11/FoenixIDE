@@ -189,7 +189,8 @@ namespace FoenixIDE
                         MMU = new MMU_F256(0, 16, false),
                         RNG = new RNGRegister(MemoryMap.SEEDL_F256_MMU, 3),
                         SOLRegister = new SOL(MemoryMap.SOL_CTRL_F256_MMU, 4),
-                        VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4)
+                        VIAREGISTERS = new VIARegisters(MemoryMap.JOYSTICK_VIA0_PORT_B, 4, MemoryMap.MATRIX_KEYBOARD_VIA1_PORT_B, 4),
+                        IECRegister = new IEC(MemoryMap.IEC_START, 2)
                     };
                     dma.setSystemRam(MemMgr.RAM);
 

@@ -11,6 +11,7 @@ namespace FoenixIDE.MemoryLocations
         public FlashF256 FLASHF256 = null;
         public MMU_F256 MMU = null;
         public VIARegisters VIAREGISTERS = null;
+        public IEC IECRegister = null;
 
         /// <summary>
         /// Determine whehter the address being read from or written to is an I/O device or a memory cell.
@@ -136,6 +137,12 @@ namespace FoenixIDE.MemoryLocations
                 {
                     Device = SOLRegister;
                     DeviceAddress = Address - 0xD018;
+                    return;
+                }
+                if (Address >= 0xD680 && Address < 0xD682)
+                {
+                    Device = IECRegister;
+                    DeviceAddress = Address - 0xD680;
                     return;
                 }
                 // These addresses are hard-coded - this is done to store all text and LUT data in vicky
