@@ -161,7 +161,7 @@ namespace FoenixIDE.Processor
                 case AddressModes.Accumulator:
                     return cpu.A.Value;
                 case AddressModes.Absolute:
-                    return GetAbsolute(signatureBytes, cpu.DataBank);
+                    return GetAbsolute(signatureBytes, cpu.DataBank, width);
                 case AddressModes.AbsoluteLong:
                     return GetAbsoluteLong(signatureBytes);
                 case AddressModes.JmpAbsoluteIndirect:
@@ -176,20 +176,20 @@ namespace FoenixIDE.Processor
                     return GetJumpAbsoluteIndexedIndirect(signatureBytes, cpu.X);
                 case AddressModes.AbsoluteIndexedWithX:
                     // LDA $2000,X
-                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.X);
+                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.X, width);
                 case AddressModes.AbsoluteLongIndexedWithX:
                     // LDA $12D080,X
                     return GetAbsoluteLongIndexed(signatureBytes, cpu.X);
                 case AddressModes.AbsoluteIndexedWithY:
-                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.Y);
+                    return GetIndexed(signatureBytes, cpu.DataBank, cpu.Y, width);
                 case AddressModes.AbsoluteLongIndexedWithY:
                     return GetAbsoluteLongIndexed(signatureBytes, cpu.Y);
                 case AddressModes.DirectPage:
-                    return GetAbsolute(signatureBytes, cpu.DirectPage);
+                    return GetAbsolute(signatureBytes, cpu.DirectPage, width);
                 case AddressModes.DirectPageIndexedWithX:
-                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.X);
+                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.X, width);
                 case AddressModes.DirectPageIndexedWithY:
-                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.Y);
+                    return GetIndexed(signatureBytes, cpu.DirectPage, cpu.Y, width);
                 case AddressModes.DirectPageIndexedIndirectWithX:
                     //LDA(dp, X)
                     return GetDirectIndexedIndirect(signatureBytes, cpu.X);
@@ -294,9 +294,9 @@ namespace FoenixIDE.Processor
         /// <param name="sig"></param>
         /// <param name="bank"></param>
         /// <returns></returns>
-        private int GetAbsolute(int sig, Register bank)
+        private int GetAbsolute(int sig, Register bank, int width)
         {
-            return (cpu.A.Width == 1) ? cpu.MemMgr.ReadByte(bank.GetLongAddress(sig)) : cpu.MemMgr.ReadWord(bank.GetLongAddress(sig));
+            return (width == 1) ? cpu.MemMgr.ReadByte(bank.GetLongAddress(sig)) : cpu.MemMgr.ReadWord(bank.GetLongAddress(sig));
         }
 
         /// <summary>
@@ -307,11 +307,11 @@ namespace FoenixIDE.Processor
         /// <param name="Index">The Index register - maybe short or long.</param>
         /// <param name="width">The width of the register requesting data</param>
         /// <returns></returns>
-        private int GetIndexed(int sig, Register bank, Register Index)
+        private int GetIndexed(int sig, Register bank, Register Index, int width)
         {
             int addr = bank.GetLongAddress(sig);
             addr += Index.Value;
-            return (cpu.A.Width == 1) ? cpu.MemMgr.ReadByte(addr) : cpu.MemMgr.ReadWord(addr);
+            return (width == 1) ? cpu.MemMgr.ReadByte(addr) : cpu.MemMgr.ReadWord(addr);
         }
 
         public int GetAbsoluteIndirectAddressLong(int sig)
