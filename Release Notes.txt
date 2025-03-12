@@ -1,6 +1,7 @@
 Release 0.7.0.18
 ----------------
 Added IEC class to fake the IEC bus.
+Updated the uploaded to allow for a file name zero.0 in bulk.csv to just erase the sector.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.

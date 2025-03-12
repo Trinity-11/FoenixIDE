@@ -393,34 +393,54 @@ namespace FoenixIDE.UI
                                 {
                                     CountdownLabel.Visible = true;
                                     this.Update();
-                                    string blockFile = Path.Combine(f.DirectoryName, split[1]);
-                                    FileInfo blockInfo = new FileInfo(blockFile);
                                     int blockNumber = Convert.ToInt32(split[0], 16);
                                     int address = blockNumber * 8192;
-                                    BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
-                                    byte[] DataBuffer = reader.ReadBytes(8192);
+                                    byte[] DataBuffer = { };
+                                    bool zeroOnly;
+                                    if (!split[1].Equals("zero.0"))
+                                    {
+                                        zeroOnly = false;
+                                        string blockFile = Path.Combine(f.DirectoryName, split[1]);
+                                        FileInfo blockInfo = new FileInfo(blockFile);
+                                        BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
+                                        DataBuffer = reader.ReadBytes(8192);
+                                        reader.Close();
+                                    }
+                                    else
+                                    {
+                                        zeroOnly = true;
+                                    }
+
                                     if (ReflashCheckbox.Checked)
                                     {
-                                        SendData(DataBuffer, 0, 8192);
+                                        if (!zeroOnly)
+                                        {
+                                            SendData(DataBuffer, 0, 8192);
+                                        }
                                         // Erase the flash sectors - a sector is 4K
                                         // High address byte is the number of sector to program
-                                        CountdownLabel.Text = "Erasing Flash Sector - " + blockNumber;
+                                        CountdownLabel.Text = "Erasing Flash Sector - 0x" + blockNumber.ToString("X2");
                                         this.Update();
                                         SendInterfaceCommand(ERASE_FLASH_SECTOR_CMD, (blockNumber * 2) << 16, 0);
+                                        // Wait 1 second
+                                        Thread.Sleep(1000);
                                         SendInterfaceCommand(ERASE_FLASH_SECTOR_CMD, (blockNumber * 2 + 1) << 16, 0);
                                         // Wait 1 second
                                         Thread.Sleep(1000);
                                         // Program the flash
-                                        CountdownLabel.Text = "Program Flash Sector - " + blockNumber + " - with " + split[1];
-                                        this.Update();
-                                        SendInterfaceCommand(PROGRAM_FLASH_SECTOR_CMD, (blockNumber * 2) << 16, 2_000);
+                                        if (!zeroOnly)
+                                        { 
+                                            CountdownLabel.Text = "Program Flash Sector - 0x" + blockNumber.ToString("X2") + " - with " + split[1];
+                                            this.Update();
+                                            SendInterfaceCommand(PROGRAM_FLASH_SECTOR_CMD, (blockNumber * 2) << 16, 2_000);
+                                        }
                                     }
                                     else
                                     {
                                         SendData(DataBuffer, address, 8192);
                                     }
 
-                                    reader.Close();
+                                    
                                 }
                             }
                         }

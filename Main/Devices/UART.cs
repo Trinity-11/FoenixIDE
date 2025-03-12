@@ -1,4 +1,6 @@
-﻿namespace FoenixIDE.Simulator.Devices
+﻿using System;
+
+namespace FoenixIDE.Simulator.Devices
 {
     public class UART: MemoryLocations.MemoryRAM
     {
@@ -40,6 +42,7 @@
         public override void WriteByte(int Address, byte Value)
         {
             data[Address] = Value;
+            Console.WriteLine("UART Write {0:X} {1:X}", Address, Value);
             switch (Address)
             {
                 case RxTxBuffer:
@@ -122,11 +125,14 @@
 
         public override byte ReadByte(int Address)
         {
-            switch(Address)
+            Console.Write("UART Read {0:X}", Address);
+            switch (Address)
             {
                 case LineStatus:
+                    Console.Write("{0:X}", 0x21);
                     return 0x21;
                 default:
+                    Console.Write("{0:X}", data[Address]);
                     return data[Address];
             }
         }

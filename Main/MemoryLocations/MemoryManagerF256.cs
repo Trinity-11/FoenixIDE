@@ -1,4 +1,5 @@
 ﻿using FoenixIDE.Simulator.Devices;
+using System;
 
 namespace FoenixIDE.MemoryLocations
 {

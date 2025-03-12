@@ -22,6 +22,7 @@ namespace FoenixIDE.Simulator.Devices
         {
             // Address 0 is control register
             data[Address] = Value;
+            Console.WriteLine("TimerX Write {0:X2} {1:X2}", Address, Value);
             if (Address == 0)
             {
                 bool enabled = (Value & 1) != 0;
