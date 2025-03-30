@@ -95,8 +95,7 @@ namespace FoenixIDE.UI
             foreach (string s in SerialPort.GetPortNames())
             {
                 COMPortComboBox.Items.Add(s);
-
-                Console.WriteLine("   {0}", s);
+                Console.WriteLine("COM:   {0}", s);
             }
             if (COMPortComboBox.Items.Count == 0)
             {
@@ -395,16 +394,18 @@ namespace FoenixIDE.UI
                                     this.Update();
                                     int blockNumber = Convert.ToInt32(split[0], 16);
                                     int address = blockNumber * 8192;
-                                    byte[] DataBuffer = { };
                                     bool zeroOnly;
+                                    byte[] DataBuffer = new byte[8192];
                                     if (!split[1].Equals("zero.0"))
                                     {
                                         zeroOnly = false;
                                         string blockFile = Path.Combine(f.DirectoryName, split[1]);
                                         FileInfo blockInfo = new FileInfo(blockFile);
                                         BinaryReader reader = new BinaryReader(blockInfo.OpenRead());
-                                        DataBuffer = reader.ReadBytes(8192);
+                                        // Changed how the buffer is loaded to allow for shorter blocks
+                                        byte[] buff = reader.ReadBytes((int)blockInfo.Length);
                                         reader.Close();
+                                        buff.CopyTo(DataBuffer, 0);
                                     }
                                     else
                                     {

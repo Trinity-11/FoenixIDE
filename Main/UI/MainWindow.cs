@@ -632,6 +632,8 @@ namespace FoenixIDE.UI
                     }
                 }
             }
+            // Do the PS/2 mouse poll
+            GenerateMouseInterrupt();
         }
 
         public void SOLRoutine()
@@ -1292,8 +1294,12 @@ namespace FoenixIDE.UI
             charEditor.Show();
         }
 
+        int MX = 0;
+        int MY = 0;
         private void Gpu_MouseMove(object sender, MouseEventArgs e)
         {
+            MX = e.X;
+            MY = e.Y;
             Point size = gpu.GetScreenSize();
             if (BoardVersionHelpers.IsF256(version))
             {
@@ -1319,18 +1325,18 @@ namespace FoenixIDE.UI
                         this.Cursor = Cursors.No;
                     }
                 }
-                else if (kernel.MemMgr != null)
-                {
-                    GenerateMouseInterrupt(e);
-                }
+                //else if (kernel.MemMgr != null)
+                //{
+                //    GenerateMouseInterrupt(e);
+                //}
             }
-            else
-            {
-                if (kernel.MemMgr != null)
-                {
-                    GenerateMouseInterrupt(e);
-                }
-            }
+            //else
+            //{
+            //    if (kernel.MemMgr != null)
+            //    {
+            //        GenerateMouseInterrupt(e);
+            //    }
+            //}
         }
 
         private void Gpu_MouseDown(object sender, MouseEventArgs e)
@@ -1359,10 +1365,10 @@ namespace FoenixIDE.UI
                 bool leftButton = e.Button == MouseButtons.Left;
                 TileClicked?.Invoke(new Point((int)(e.X / ratioW), (int)(e.Y / ratioH)), new PointF(ratioW, ratioH), leftButton);
             }
-            else
-            {
-                GenerateMouseInterrupt(e);
-            }
+            //else
+            //{
+            //    GenerateMouseInterrupt(e);
+            //}
         }
 
 
@@ -1380,30 +1386,52 @@ namespace FoenixIDE.UI
                     middle = false;
                     break;
             }
-            if (!gpu.TileEditorMode)
-            {
-                GenerateMouseInterrupt(e);
-            }
+            //if (!gpu.TileEditorMode)
+            //{
+            //    GenerateMouseInterrupt(e);
+            //}
         }
 
         // Remember the state of the mouse buttons
         bool left = false;
         bool right = false;
         bool middle = false;
+        int oldMX = 0;
+        int oldMY = 0;
+        byte oldStatus = 8;
 
-        private void GenerateMouseInterrupt(MouseEventArgs e)
+        private void GenerateMouseInterrupt()
         {
             Point size = gpu.GetScreenSize();
             if (BoardVersionHelpers.IsF256(version))
             {
                 size = gpu.GetScreenSize_F256();
+                size.X *= 2;
+                size.Y *= 2;
             }
             double ratioW = gpu.Width / (double)size.X;
             double ratioH = gpu.Height / (double)size.Y;
-            int X = (int)(e.X / ratioW);
-            int Y = (int)(e.Y / ratioH);
+            //int X = (int)(e.X / ratioW);
+            //int Y = (int)(e.Y / ratioH);
+            int X = (int)(MX / ratioW);
+            int Y = (int)(MY / ratioH);
+            int deltaX = (X - oldMX);
+            int deltaY = (oldMY - Y);
 
             byte buttons = (byte)((left ? 1 : 0) + (right ? 2 : 0) + (middle ? 4 : 0));
+            // ((deltaY & 0x100) != 0 ? 0x80 : 0) + ((deltaX & 0x100) != 0 ? 0x40:0)
+            byte statusPacket = (byte)( (Y > oldMY ? 0x20 : 0) + (X < oldMX ? 0x10 : 0) + 8 + buttons);
+            //byte statusPacket = (byte)(8 + buttons);
+            byte xPacket = (byte)((deltaX));
+            byte yPacket = (byte)((deltaY));
+            // if nothing has changed
+            if (oldStatus == statusPacket && xPacket ==0 && yPacket ==0)
+            {
+                return;
+            }
+            Console.WriteLine("Event X: {0}, Y: {1} - Delta X: {2}, Y: {3}, Packets S: {4}, X: {5}, Y: {6}", 
+                    MX, MY, deltaX, deltaY, statusPacket.ToString("X2"), xPacket.ToString("X2"), yPacket.ToString("X2"));
+            oldStatus = statusPacket;
             if (!BoardVersionHelpers.IsF256(version))
             {
                 kernel.MemMgr.VICKY.WriteWord(0x702, X);
@@ -1415,35 +1443,15 @@ namespace FoenixIDE.UI
                 // The PS/2 packet is byte0, xm, ym
                 if ((~mask & (byte)Register0.FNX0_INT07_MOUSE) == (byte)Register0.FNX0_INT07_MOUSE)
                 {
-                    kernel.MemMgr.PS2KEYBOARD.MousePackets((byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)), (byte)(X & 0xFF), (byte)(Y & 0xFF));
+                    kernel.MemMgr.PS2KEYBOARD.MousePackets(statusPacket, xPacket, yPacket);
                 }
             }
             else
             {
                 if (!BoardVersionHelpers.IsF256_MMU(version))
                 {
-                byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0xD6E0 - 0xC000);
-                bool mouseEnabled = (mouseReg & 1) != 0;
-                bool mouseMode1 = (mouseReg & 2) != 0;
-
-                if (mouseEnabled)
-                {
-                    if (mouseMode1)
-                    {
-                        kernel.MemMgr.VICKY.WriteWord(0xD6E6 - 0xC000, (byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)));
-                        kernel.MemMgr.VICKY.WriteWord(0xD6E7 - 0xC000, (byte)(X & 0xFF));
-                        kernel.MemMgr.VICKY.WriteWord(0xD6E8 - 0xC000, (byte)(Y & 0xFF));
-                    }
-                    else
-                    {
-                        kernel.MemMgr.VICKY.WriteWord(0xD6E2 - 0xC000, X);
-                        kernel.MemMgr.VICKY.WriteWord(0xD6E4 - 0xC000, Y);
-                    }
-                }
-                }
-                else
-                {
-                    byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0x16E0);
+                    // TODO Fix the address here for the extended memory
+                    byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0xD6E0 - 0xC000);
                     bool mouseEnabled = (mouseReg & 1) != 0;
                     bool mouseMode1 = (mouseReg & 2) != 0;
 
@@ -1451,28 +1459,64 @@ namespace FoenixIDE.UI
                     {
                         if (mouseMode1)
                         {
-                            kernel.MemMgr.VICKY.WriteWord(0x16E6, (byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)));
-                            kernel.MemMgr.VICKY.WriteWord(0x16E7, (byte)(X & 0xFF));
-                            kernel.MemMgr.VICKY.WriteWord(0x16E8, (byte)(Y & 0xFF));
+                            kernel.MemMgr.VICKY.WriteWord(0xD6E6 - 0xC000, statusPacket);
+                            kernel.MemMgr.VICKY.WriteWord(0xD6E7 - 0xC000, deltaX);
+                            kernel.MemMgr.VICKY.WriteWord(0xD6E8 - 0xC000, deltaY);
                         }
                         else
                         {
-                            kernel.MemMgr.VICKY.WriteWord(0x16E2, X);
-                            kernel.MemMgr.VICKY.WriteWord(0x16E4, Y);
+                            kernel.MemMgr.VICKY.WriteWord(0xD6E2 - 0xC000, X);
+                            kernel.MemMgr.VICKY.WriteWord(0xD6E4 - 0xC000, Y);
+                        }
+                    }
+                    else
+                    {
+                        // Generate three interrupts - to emulate how the PS/2 controller works
+                        int addr = MemoryLocations.MemoryMap.INT_MASK_REG0_F256_FLAT;
+                        byte mask = kernel.MemMgr.ReadByte(addr);
+                        // The PS/2 packet is byte0, xm, ym
+                        if ((~mask & (byte)Register0_JR.JR0_INT03_MOUSE) == (byte)Register0_JR.JR0_INT03_MOUSE)
+                        {
+                            kernel.MemMgr.PS2KEYBOARD.MousePackets(statusPacket, xPacket, yPacket);
                         }
                     }
                 }
-
-                // Generate three interrupts - to emulate how the PS/2 controller works
-                int addr = BoardVersionHelpers.IsF256_MMU(version) ? MemoryLocations.MemoryMap.INT_MASK_REG0_F256_MMU : MemoryLocations.MemoryMap.INT_MASK_REG0_F256_FLAT;
-                byte mask = kernel.MemMgr.ReadByte(addr);
-                // The PS/2 packet is byte0, xm, ym
-                if ((~mask & (byte)Register0_JR.JR0_INT03_MOUSE) == (byte)Register0_JR.JR0_INT03_MOUSE)
+                else
                 {
-                    kernel.MemMgr.PS2KEYBOARD.MousePackets((byte)(8 + (middle ? 4 : 0) + (right ? 2 : 0) + (left ? 1 : 0)), (byte)(X & 0xFF), (byte)(Y & 0xFF));
+                    byte mouseReg = kernel.MemMgr.VICKY.ReadByte(0xD6E0 - 0xC000);
+                    bool mouseEnabled = (mouseReg & 1) != 0;
+                    bool mouseMode1 = (mouseReg & 2) != 0;
+
+                    if (mouseEnabled)
+                    {
+                        //if (mouseMode1)
+                        //{
+                        //    kernel.MemMgr.VICKY.WriteWord(0xD6E6 - 0xC000, statusPacket);
+                        //    kernel.MemMgr.VICKY.WriteWord(0xD6E7 - 0xC000, xPacket);
+                        //    kernel.MemMgr.VICKY.WriteWord(0xD6E8 - 0xC000, yPacket);
+                        //}
+                        //else
+                        //{
+                        //    kernel.MemMgr.VICKY.WriteWord(0xD6E2 - 0xC000, X);
+                        //    kernel.MemMgr.VICKY.WriteWord(0xD6E4 - 0xC000, Y);
+                        //}
+                    }
+
+                    // Generate three interrupts - to emulate how the PS/2 controller works
+                    int addr = MemoryLocations.MemoryMap.INT_MASK_REG0_F256_MMU;
+                    byte mask = kernel.MemMgr.ReadByte(addr);
+                    // The PS/2 packet is byte0, xm, ym
+                    if ((~mask & (byte)Register0_JR.JR0_INT03_MOUSE) == (byte)Register0_JR.JR0_INT03_MOUSE)
+                    {
+                        kernel.MemMgr.PS2KEYBOARD.MousePackets(statusPacket, xPacket, yPacket);
+                    }
+
                 }
+
+                
             }
-            
+            oldMX = X;
+            oldMY = Y;
         }
 
         private void Gpu_MouseLeave(object sender, EventArgs e)
@@ -2145,7 +2189,7 @@ namespace FoenixIDE.UI
             }
             else
             {
-                Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+                Console.WriteLine("HTTP Request Failed: {0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
             }
 
             if (!done)

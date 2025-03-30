@@ -485,7 +485,7 @@ namespace FoenixIDE.Simulator.Devices
                             {
                                 // controller error
                                 data[5] = 1;
-                                System.Console.WriteLine(e.ToString());
+                                System.Console.WriteLine("Exception: " + e.ToString());
                             }
                             finally
                             {
@@ -529,7 +529,7 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // controller error
                     data[5] = 1;
-                    System.Console.WriteLine(e.ToString());
+                    System.Console.WriteLine("Exception: " + e.ToString());
                 }
                 finally
                 {
@@ -555,7 +555,7 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // controller error
                     data[5] = 1;
-                    System.Console.WriteLine(e.ToString());
+                    System.Console.WriteLine("Exception: " + e.ToString());
                     return;
                 }
                 finally

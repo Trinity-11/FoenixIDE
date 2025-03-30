@@ -562,7 +562,7 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // controller error
                     ReportError();
-                    System.Console.WriteLine(e.ToString());
+                    System.Console.WriteLine("GetDataISO Exception:" + e.ToString());
                     return null;
                 }
                 finally
@@ -653,7 +653,7 @@ namespace FoenixIDE.Simulator.Devices
                         {
                             // controller error
                             ReportError();
-                            System.Console.WriteLine(e.ToString());
+                            System.Console.WriteLine("GetData Exception" + e.ToString());
                             return null;
                         }
                         finally
@@ -882,7 +882,7 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // controller error
                     ReportError();
-                    System.Console.WriteLine(e.ToString());
+                    System.Console.WriteLine("SetData_ISO Exception:" + e.ToString());
                     return;
                 }
                 finally
@@ -1152,7 +1152,7 @@ namespace FoenixIDE.Simulator.Devices
                             {
                                 // controller error
                                 data[5] = 1;
-                                System.Console.WriteLine(e.ToString());
+                                System.Console.WriteLine("UpdateRootEntries Exception:" + e.ToString());
                             }
                             finally
                             {
@@ -1198,7 +1198,7 @@ namespace FoenixIDE.Simulator.Devices
                 {
                     // controller error
                     data[5] = 1;
-                    System.Console.WriteLine(e.ToString());
+                    System.Console.WriteLine("SetData Exception: " + e.ToString());
                 }
                 finally
                 {

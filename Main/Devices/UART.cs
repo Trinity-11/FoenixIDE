@@ -125,14 +125,14 @@ namespace FoenixIDE.Simulator.Devices
 
         public override byte ReadByte(int Address)
         {
-            Console.Write("UART Read {0:X}", Address);
+            Console.Write("UART Read {0:X} ", Address);
             switch (Address)
             {
                 case LineStatus:
-                    Console.Write("{0:X}", 0x21);
+                    Console.WriteLine("UART {0:X}", 0x21);
                     return 0x21;
                 default:
-                    Console.Write("{0:X}", data[Address]);
+                    Console.WriteLine("UART {0:X}", data[Address]);
                     return data[Address];
             }
         }

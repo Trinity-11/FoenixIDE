@@ -24,10 +24,10 @@ namespace FoenixIDE.Simulator.Devices
             switch (Address)
             {
                 case 0:
-                    Console.WriteLine(", data {0:X}", iec_in);
+                    Console.WriteLine(", IEC data {0:X}", iec_in);
                     return iec_in;
                 case 1:
-                    Console.WriteLine(", data {0:X}", iec_out);
+                    Console.WriteLine(", IEC data {0:X}", iec_out);
                     return iec_out;
                 default:
                     return 0;

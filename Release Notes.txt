@@ -2,6 +2,7 @@ Release 0.7.0.18
 ----------------
 Added IEC class to fake the IEC bus.
 Updated the uploaded to allow for a file name zero.0 in bulk.csv to just erase the sector.
+Updated the mouse tracking code for the F256 machines.  This is now done on SOF instead of using the MouseMove event.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -13,6 +14,7 @@ Updated the uploaded to allow for a file name zero.0 in bulk.csv to just erase t
 ** TODO: Add remote debugging capability for Calypsi compiler.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
+** TODO: Implement the mouse scroll wheel with a fourth PS/2 byte.
 
 Release 0.7.0.17
 ----------------

@@ -256,7 +256,7 @@ namespace FoenixIDE.Display
                 if (drawing)
                 {
                     // drop the frame
-                    System.Console.WriteLine("Skipped Frame");
+                    System.Console.WriteLine("GPU Skipped Frame");
                     return;
                 }
                 drawing = true;
