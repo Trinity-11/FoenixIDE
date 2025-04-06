@@ -111,11 +111,15 @@ namespace FoenixIDE.Simulator.UI
             int tileSize = checkSmallTiles.Checked ? 8 : 16;
             int tileStride = tileSize * 16;
             int tilesetAddress = Convert.ToInt32(TilesetAddress.Text, 16);
-            MemoryRAM memRef = MemMgr.RAM;
+            IMappable memRef;
             if (!is_F256_MMU)
             {
                 tilesetAddress = tilesetAddress - 0xB0_0000;
                 memRef = MemMgr.VIDEO;
+            }
+            else
+            {
+                MemMgr.GetDeviceAt(tilesetAddress, out memRef, out tilesetAddress);
             }
             for (int y = 0; y < 256; y++)
             {
@@ -471,7 +475,7 @@ namespace FoenixIDE.Simulator.UI
             if (WindowX.Text.Length > 0)
             {
                 int newValue = Convert.ToInt32(WindowX.Text);
-                int combinedRegisters = newValue & 0x3FF;
+                int combinedRegisters = newValue & 0x3FFF;
                 if (checkSmallTiles.Checked)
                 {
                     combinedRegisters = (newValue & 0x7) + ((newValue & 0x3F8) << 1);
@@ -486,7 +490,7 @@ namespace FoenixIDE.Simulator.UI
             if (WindowY.Text.Length > 0)
             {
                 int newValue = Convert.ToInt32(WindowY.Text);
-                int combinedRegisters = newValue & 0x3FF;
+                int combinedRegisters = newValue & 0x3FFF;
                 if (checkSmallTiles.Checked)
                 {
                     combinedRegisters = newValue & 0x7 + ((newValue & 0x3F8) << 1);

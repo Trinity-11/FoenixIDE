@@ -51,14 +51,14 @@ namespace FoenixIDE
                     break;
                 case BoardVersion.RevJr_6502:
                 case BoardVersion.RevF256K_6502:
-                    memSize = 1024 * 1024; // Includes both RAM and flash.
+                    memSize = 1536 * 1024; // Includes both RAM and flash + expansion cartridge
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_F256_MMU;
                     clock = 6293000;
                     is6502 = true;
                     break;
                 case BoardVersion.RevJr_65816:
                 case BoardVersion.RevF256K_65816:
-                    memSize = 1024 * 1024;
+                    memSize = 1536 * 1024; // Includes both RAM and flash + expansion cartridge
                     keyboardAddress = MemoryMap.KBD_DATA_BUF_F256_MMU;
                     clock = 6293000;
                     is6502 = false;
@@ -288,6 +288,11 @@ namespace FoenixIDE
                     byte[] fontBuffer = global::System.IO.File.ReadAllBytes(micahFontPath);
                     MemMgr.VICKY.CopyBuffer(fontBuffer, 0, 0x2000, 2048);
                 }
+
+                // Copy the Gamma table
+                MemMgr.VICKY.CopyBuffer(MemoryMap.GAMMA_1_8, 0, 0, 256);      // blue
+                MemMgr.VICKY.CopyBuffer(MemoryMap.GAMMA_1_8, 0, 0x400, 256);  // green
+                MemMgr.VICKY.CopyBuffer(MemoryMap.GAMMA_1_8, 0, 0x800, 256);  // red
             }
 
             if (MemMgr.TIMER0.TimerInterruptDelegate == null)

@@ -6,6 +6,7 @@
 05,sb04.bin
 06,dos.bin
 07,pexec.bin
+08,fcartld.bin
 0f,wget.bin
 0a,help.bin
 0b,docs_superbasic1.bin
@@ -19,6 +20,11 @@
 14,fm.04
 15,fm.05
 16,fm.06
+17,fm.07
+18,mless01.bin
+19,mless02.bin
+1a,mless03.bin
+1b,mless04.bin
 3b,3b.bin
 3c,3c.bin
 3d,3d.bin

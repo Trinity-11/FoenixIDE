@@ -234,10 +234,10 @@ namespace FoenixIDE.Display
                 byte ColumnsVisible = (byte)(res.X / CHAR_WIDTH); //byte ColumnsVisible = RAM.ReadByte(MemoryMap.COLS_VISIBLE);
                 byte LinesVisible = (byte)(res.Y / CHAR_HEIGHT); //byte LinesVisible = RAM.ReadByte(MemoryMap.LINES_VISIBLE);
 
-                if (MCRegister == 0 || (MCRegister & 0x80) == 0x80)
+                if (MCRegister == 0 || (MCRegister == 0x80))
                 {
                     g.DrawString("Graphics Mode disabled", this.Font, TextBrush, 0, 0);
-                    return;
+                     return;
                 }
                 else if ((MCRegister & 0x1) == 0x1)
                 {
@@ -528,7 +528,7 @@ namespace FoenixIDE.Display
                 //e.Graphics.DrawImageUnscaled(frameBuffer, rect);  // Use this to debug
                 drawing = false;
             }
-        }
+         }
 
         public bool IsMousePointerVisible()
         {

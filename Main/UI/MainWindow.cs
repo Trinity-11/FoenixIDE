@@ -1258,17 +1258,18 @@ namespace FoenixIDE.UI
                 {
                     if (!BoardVersionHelpers.IsF256_MMU(version))
                     {
-	                    previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0xD000 - 0xC000);
-	                    kernel.MemMgr.VICKY.WriteByte(0x1000, 0x10);
+                        // TODO - replace these values with the flat memory values
+	                    previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0x0);
+	                    kernel.MemMgr.VICKY.WriteByte(0x0, 0x10);
 	                    // Enable borders
-	                    kernel.MemMgr.VICKY.WriteByte(0x1004, 1);
+	                    kernel.MemMgr.VICKY.WriteByte(0x4, 1);
 	                }
                     else
                     {
-                        previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0);
-                        kernel.MemMgr.VICKY.WriteByte(0x00, 0x10);
+                        previousGraphicMode = kernel.MemMgr.VICKY.ReadByte(0xD000 - 0xC000);
+                        kernel.MemMgr.VICKY.WriteByte(0xD000 - 0xC000, 0x10);
                         // Enable borders
-                        kernel.MemMgr.VICKY.WriteByte(0x04, 1);
+                        kernel.MemMgr.VICKY.WriteByte(0xD004 - 0xC000, 1);
                     }
                 }
                 CenterForm(tileEditor);
