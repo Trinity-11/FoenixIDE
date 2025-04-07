@@ -1,8 +1,6 @@
-Release 0.7.0.19
+Release 0.7.0.20
 ----------------
-Updated the firmware to 01.04.2025.
-Fixed the Window X and Window Y fields in the Tile Editor.
-Added Gamma correction table on load of the machine.
+Included missing bin files in setup application.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -15,6 +13,12 @@ Added Gamma correction table on load of the machine.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Implement the mouse scroll wheel with a fourth PS/2 byte.
+
+Release 0.7.0.19
+----------------
+Updated the firmware to 01.04.2025.
+Fixed the Window X and Window Y fields in the Tile Editor.
+Added Gamma correction table on load of the machine.
 
 Release 0.7.0.18
 ----------------

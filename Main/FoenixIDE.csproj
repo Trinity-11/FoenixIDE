@@ -444,13 +444,27 @@
     <None Include="roms\F256\fcartld.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="roms\F256\fm.00" />
-    <None Include="roms\F256\fm.01" />
-    <None Include="roms\F256\fm.02" />
-    <None Include="roms\F256\fm.03" />
-    <None Include="roms\F256\fm.04" />
-    <None Include="roms\F256\fm.05" />
-    <None Include="roms\F256\fm.06" />
+    <None Include="roms\F256\fm.00">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\fm.01">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\fm.02">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\fm.03">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\fm.04">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\fm.05">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="roms\F256\fm.06">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="roms\F256\fm.07">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -487,7 +501,9 @@
     <None Include="roms\F256\sb04.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="roms\F256\wget.bin" />
+    <None Include="roms\F256\wget.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="roms\F256\xdev.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
