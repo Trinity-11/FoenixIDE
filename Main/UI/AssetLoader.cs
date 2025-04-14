@@ -96,7 +96,7 @@ namespace FoenixIDE.UI
             {
                 Title = "Load Asset",
                 DefaultExt = ".bin",
-                Filter = "Asset Files (*.bmp *.png *.bin *.data *.pal *.tlm *.hex)|*.bmp;*.png;*.bin;*.data;*.pal;*.tlm;*.hex|Binary Files (*.bin)|*.bin|Hex Files (*.hex)|*.hex|Palette Files (*.pal)|*.pal|Bitmap Files (*.bmp *.png)|*.bmp;*.png|Data Files|*.data|Tilemap Files (*.tlm)|*.tlm|Any File|*.*"
+                Filter = "Asset Files (*.bmp *.png *.gif *.jpg *.bin *.data *.pal *.tlm *.hex)|*.bmp;*.png;*.gif;*.jpg ;*.bin;*.data;*.pal;*.tlm;*.hex|Binary Files (*.bin)|*.bin|Hex Files (*.hex)|*.hex|Palette Files (*.pal)|*.pal|Bitmap Files (*.bmp *.png *.gif *.jpg )|*.bmp;*.png;*.gif;*.jpg |Data Files|*.data|Tilemap Files (*.tlm)|*.tlm|Any File|*.*"
             };
 
             // Load content of file in a TextBlock
@@ -105,7 +105,7 @@ namespace FoenixIDE.UI
                 FileNameTextBox.Text = openFileDlg.FileName;
                 FileInfo info = new FileInfo(FileNameTextBox.Text);
                 ExtLabel.Text = info.Extension;
-                if (".png".Equals(ExtLabel.Text.ToLower()) || ".bmp".Equals(ExtLabel.Text.ToLower()))
+                if (".png".Equals(ExtLabel.Text.ToLower()) || ".bmp".Equals(ExtLabel.Text.ToLower()) || ".gif".Equals(ExtLabel.Text.ToLower()) || ".jpg".Equals(ExtLabel.Text.ToLower()))
                 {
                     GetTopLeftPixelColor(FileNameTextBox.Text);
                 }
@@ -234,6 +234,9 @@ namespace FoenixIDE.UI
             switch (ExtLabel.Text.ToLower())
             {
                 case ".png":
+                case ".gif":
+                case ".bmp":
+                case ".jpg":
                     Bitmap png = new Bitmap(FileNameTextBox.Text, false);
                     if (FileTypesCombo.SelectedIndex == 1)
                     {
@@ -253,26 +256,6 @@ namespace FoenixIDE.UI
                     }
 
                     ConvertBitmapToRaw(png, res, lutIndex, conversionStride, maxHeight);
-                    break;
-                case ".bmp":
-                    Bitmap bmp = new Bitmap(FileNameTextBox.Text, false);
-                    if (FileTypesCombo.SelectedIndex == 1)
-                    {
-                        if (bmp.Width == 16)
-                        {
-                            conversionStride = 16;
-                            maxHeight = 256 * 16;
-                        }
-                    }
-                    else if (FileTypesCombo.SelectedIndex == 2)
-                    {
-                        if (bmp.Width == 8)
-                        {
-                            conversionStride = 8;
-                            maxHeight = 256 * 8;
-                        }
-                    }
-                    ConvertBitmapToRaw(bmp, res, lutIndex, conversionStride, maxHeight);
                     break;
                 case ".hex":
                     MemoryRAM memory = new MemoryRAM(0, FoenixSystem.TextAddressToInt(FileSizeResultLabel.Text) );

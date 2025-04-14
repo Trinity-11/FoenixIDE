@@ -1,6 +1,6 @@
-Release 0.7.0.20
+Release 0.7.0.21
 ----------------
-Included missing bin files in setup application.
+Add GIF and JPG asset loading.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -13,6 +13,11 @@ Included missing bin files in setup application.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Implement the mouse scroll wheel with a fourth PS/2 byte.
+
+
+Release 0.7.0.20
+----------------
+Included missing bin files in setup application.
 
 Release 0.7.0.19
 ----------------
