@@ -1,6 +1,6 @@
-Release 0.7.0.21
+Release 0.7.0.22
 ----------------
-Add GIF and JPG asset loading.
+Fix timers such that the "timer()" function in BASIC works.  If the period doesn't match 1000/clock, then the increment is adjusted based on frequency.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implemented the various cursor modes and rates.
@@ -14,6 +14,9 @@ Add GIF and JPG asset loading.
 ** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Implement the mouse scroll wheel with a fourth PS/2 byte.
 
+Release 0.7.0.21
+----------------
+Add GIF and JPG asset loading.
 
 Release 0.7.0.20
 ----------------

@@ -21,9 +21,9 @@ namespace FoenixIDETester
                 CODEC = new CodecRAM(MemoryMap.CODEC_START_FMX, 4),
                 MATH = new MathCoproRegister(MemoryMap.MATH_START, MemoryMap.MATH_END - MemoryMap.MATH_START + 1),
                 INTERRUPT = new InterruptController(MemoryMap.INT_PENDING_REG0, 4),
-                TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8),
-                TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8),
-                TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8)
+                TIMER0 = new TimerRegister(MemoryMap.TIMER0_CTRL_REG, 8, 1000),
+                TIMER1 = new TimerRegister(MemoryMap.TIMER1_CTRL_REG, 8, 1000),
+                TIMER2 = new TimerRegister(MemoryMap.TIMER2_CTRL_REG, 8, 1000)
             };
             cpu = new CPU(MemMgr, 14_000_000, false);
             cpu.SetEmulationMode();

@@ -1430,8 +1430,8 @@ namespace FoenixIDE.UI
             {
                 return;
             }
-            Console.WriteLine("Event X: {0}, Y: {1} - Delta X: {2}, Y: {3}, Packets S: {4}, X: {5}, Y: {6}", 
-                    MX, MY, deltaX, deltaY, statusPacket.ToString("X2"), xPacket.ToString("X2"), yPacket.ToString("X2"));
+            // Console.WriteLine("Event X: {0}, Y: {1} - Delta X: {2}, Y: {3}, Packets S: {4}, X: {5}, Y: {6}", 
+            //        MX, MY, deltaX, deltaY, statusPacket.ToString("X2"), xPacket.ToString("X2"), yPacket.ToString("X2"));
             oldStatus = statusPacket;
             if (!BoardVersionHelpers.IsF256(version))
             {
