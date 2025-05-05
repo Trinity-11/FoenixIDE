@@ -523,6 +523,48 @@ namespace FoenixIDE.Display
                     }
 
                 }
+                // blank lines
+                int blanks = 45;
+                if (res.Y == 400)
+                {
+                    blanks = 50;
+                }
+                for (int line = res.Y; line < res.Y + blanks; line++)
+                {
+                    // Handle SOL interrupts
+                    if (mode == 0)
+                    {
+                        byte SOLRegister = VICKY.ReadByte(SOLRegAddr);
+                        if ((SOLRegister & 1) != 0)
+                        {
+                            int SOLLine0 = VICKY.ReadWord(SOLLine0Addr);
+                            if (line == SOLLine0)
+                            {
+                                StartOfLine?.Invoke();
+                            }
+                        }
+                        if ((SOLRegister & 2) != 0)
+                        {
+                            int SOLLine1 = VICKY.ReadWord(SOLLine1Addr);
+                            if (line == SOLLine1)
+                            {
+                                StartOfLine?.Invoke();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        F256SOLReg.SetRasterRow(line);
+                        if (F256SOLReg.IsInterruptEnabled())
+                        {
+                            if (line == F256SOLReg.GetSOLLineNumber())
+                            {
+                                StartOfLine?.Invoke();
+                            }
+                        }
+                    }
+
+                }
                 frameBuffer.UnlockBits(bitmapData);
                 g.DrawImage(frameBuffer, ClientRectangle, rect, GraphicsUnit.Pixel);
                 //e.Graphics.DrawImageUnscaled(frameBuffer, rect);  // Use this to debug

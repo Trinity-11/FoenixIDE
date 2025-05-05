@@ -1,3 +1,8 @@
+Release 0.7.0.23
+----------------
+Fix sprite aliasing when X position is below 32. https://github.com/Trinity-11/FoenixIDE/issues/57
+Added vertical "blank" lines in the GPU rendering to simulate all the SOL lines.
+
 Release 0.7.0.22
 ----------------
 Fix timers such that the "timer()" function in BASIC works.  If the period doesn't match 1000/clock, then the increment is adjusted based on frequency.

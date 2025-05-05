@@ -625,8 +625,7 @@ namespace FoenixIDE.Display
                             posX *= 2;
                         }
 
-
-                        if (posX >= width || posY >= height || (posX + spriteSize) < 0 || (posY + spriteSize) < 0)
+                        if (posX >= width || posY >= height || (posX + (dX ? spriteSize * 2:spriteSize)) < 0 || (posY + (dY ? spriteSize * 2 : spriteSize)) < 0)
                         {
                             continue;
                         }
@@ -636,6 +635,10 @@ namespace FoenixIDE.Display
                         if (posX < borderXSize)
                         {
                             xOffset = borderXSize - posX;
+                            if (dX)
+                            {
+                                xOffset /= 2;
+                            }
                             posX = borderXSize;
                             spriteWidth = spriteSize - xOffset;
                             if (spriteWidth == 0)
@@ -659,7 +662,7 @@ namespace FoenixIDE.Display
                         int sline = actualLine - posY;
                         int lineOffset = line * STRIDE;
                         int* ptr = p + lineOffset;
-                        int cols = spriteSize;
+                        int cols = spriteWidth;
                         if (posX + (dX ? spriteSize*2:spriteSize) >= width - borderXSize)
                         {
                             cols = width - borderXSize - posX;
@@ -668,17 +671,17 @@ namespace FoenixIDE.Display
                                 cols /= 2;
                             }
                         }
-                        for (int col = xOffset; col < xOffset + cols; col++)
+                        for (int col = 0; col < cols; col++)
                         {
                             // Lookup the pixel in the tileset - if the value is 0, it's transparent
-                            pixVal = VRAM.ReadByte(spriteAddress + col + sline * spriteSize);
+                            pixVal = VRAM.ReadByte(spriteAddress + col + xOffset + sline * spriteSize);
                             if (pixVal != 0)
                             {
                                 clrVal = GetLUTValue(lutIndex, pixVal, gammaCorrection);
-                                ptr[(dX ? col * 2: col) - xOffset + posX] = clrVal;
+                                ptr[(dX ? col * 2: col) + posX] = clrVal;
                                 if (dX)
                                 {
-                                    ptr[col * 2 +1 - xOffset + posX] = clrVal;
+                                    ptr[col * 2 + 1 + posX] = clrVal;
                                 }
                             }
                         }
