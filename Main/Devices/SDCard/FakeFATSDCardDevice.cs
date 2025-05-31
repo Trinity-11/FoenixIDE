@@ -963,7 +963,7 @@ namespace FoenixIDE.Simulator.Devices
         {
             StringBuilder sb = new StringBuilder();
             int[] indices = { 1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24 };
-            for (int k = 0; k < indices.Length; ++k)
+            for (int k = 0; k < indices.Length; k++)
             {
                 byte ch0 = writeBlock[blockStartIndex + indices[k]];
                 byte ch1 = writeBlock[blockStartIndex + indices[k] + 1];
@@ -1033,7 +1033,7 @@ namespace FoenixIDE.Simulator.Devices
             int ffCntr = 0;
             if (firstPtr == -1 && lastPtr == -1)
             {
-                for (int i = 0; i < 512; i++)
+                for (int i = page == 0 ? 4:0; i < 512; i++)
                 {
                     if (firstPtr == -1)
                     {
@@ -1062,7 +1062,7 @@ namespace FoenixIDE.Simulator.Devices
                 }
             }
             // Determine how many clusters have been added.
-            if (firstPtr != -1 && lastPtr != -1)
+            else if (firstPtr != -1 && lastPtr != -1)
             {
                 clusterCount = (lastPtr - firstPtr + 1) / 4;
                 // Create a new file entry
@@ -1115,7 +1115,7 @@ namespace FoenixIDE.Simulator.Devices
                             File.Delete(entry.fqpn);
                             FAT.Remove(key);
                             lastEntryWasLfn = false;
-                            continue;
+                            break;
                         }
 
                         string name;
@@ -1147,6 +1147,7 @@ namespace FoenixIDE.Simulator.Devices
                                 }
                                 entry.fqpn = newFileName;
                                 entry.shortname = name;
+                                entry.size = entry.clusters * 512;
                             }
                             catch (Exception e)
                             {
@@ -1219,7 +1220,8 @@ namespace FoenixIDE.Simulator.Devices
             voidEntry = new FileEntry
             {
                 fqpn = filename,
-                clusters = clusterCount
+                clusters = clusterCount,
+                size = size
             };
 
 

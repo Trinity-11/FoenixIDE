@@ -21,6 +21,7 @@ namespace vgm_reader
             YM2612_P0 = 0x52,
             YM2612_P1 = 0x53,
             YM2151 = 0x54,
+            YM2203 = 0x55,
             YM2608_P0 = 0x56,
             YM2608_P1 = 0x57,
             YM2610_P0 = 0x58,
@@ -49,7 +50,8 @@ namespace vgm_reader
             WAIT_15 = 0x7E,
             WAIT_16 = 0x7F,
             AY8910 = 0xA0,
-            SEGA_PCM = 0xC0
+            SEGA_PCM = 0xC0,
+            SCC1 = 0xD2,
         }
         public VGMForm()
         {
@@ -177,6 +179,11 @@ namespace vgm_reader
                                     reg = buffer[ptr++];
                                     val = buffer[ptr++];
                                     sb.AppendFormat("OPL3[{0}.{1:X2}]:{2:X2} ", command & 1, reg, val);
+                                    break;
+                                case (byte)VGM_Commands.YM2203:
+                                    reg = buffer[ptr++];
+                                    val = buffer[ptr++];
+                                    sb.AppendFormat("OPN[{0:X2}]:{1:X2} ", reg, val);
                                     break;
                             }
                             break;
@@ -313,6 +320,13 @@ namespace vgm_reader
                                     sb.Append("3BC{" + command.ToString("X2") + "}[" + addr.ToString("X4") + "]:" + val.ToString("X2") + " ");
                                     break;
                             }
+                            break;
+                        case 0xd:
+                            byte port = buffer[ptr++];
+                            reg = buffer[ptr++];
+                            val = buffer[ptr++];
+                            sb.Append(command.ToString("X2") + ": {" + port.ToString("X2") + "}[" + reg.ToString("X2") + "]:" + val.ToString("X2") + " ");
+
                             break;
                         case 0xe:
                             // 4 bytes

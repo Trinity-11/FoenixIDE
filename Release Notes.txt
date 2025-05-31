@@ -2,13 +2,10 @@ Release 0.7.0.23
 ----------------
 Fix sprite aliasing when X position is below 32. https://github.com/Trinity-11/FoenixIDE/issues/57
 Added vertical "blank" lines in the GPU rendering to simulate all the SOL lines.
-
-Release 0.7.0.22
-----------------
-Fix timers such that the "timer()" function in BASIC works.  If the period doesn't match 1000/clock, then the increment is adjusted based on frequency.
+Attempt to fix crashes when saving files from BASIC to SD card.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
-** TODO: Implemented the various cursor modes and rates.
+** TODO: Implement the various cursor modes and rates.
 ** TODO: Implement an IEC interface to connect via USB to XUM1541 (try using the SerialPort class?).
 ** TODO: Implement the joystick using a USB joystick (try using the SerialPort class?).
 ** TODO: Add resolution modes for Rev C and U/U+ machines, when switching board with the list.
@@ -16,8 +13,12 @@ Fix timers such that the "timer()" function in BASIC works.  If the period doesn
 ** TODO: Implement Timers using the number of CPU cycles that have elapsed.  E.g. 16kHz == 393 cycles (6,293,750 / 16,0000).
 ** TODO: Add remote debugging capability for Calypsi compiler.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
-** TODO: Saving basic files to emulated SD card often doesn't work or crashes the emulator.
 ** TODO: Implement the mouse scroll wheel with a fourth PS/2 byte.
+** TODO: Renaming files (in DOS) - doesn't work.
+
+Release 0.7.0.22
+----------------
+Fix timers such that the "timer()" function in BASIC works.  If the period doesn't match 1000/clock, then the increment is adjusted based on frequency.
 
 Release 0.7.0.21
 ----------------

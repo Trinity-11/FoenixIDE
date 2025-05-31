@@ -594,7 +594,10 @@ namespace FoenixIDE
 
                     } while (reader.BaseStream.Position < info.Length);
                     reader.Close();
-
+                    if (FnxAddressPtr == -1)
+                    {
+                        MessageBox.Show("The PGZ file does not contain a start address", "PGZ File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                     if (!BoardVersionHelpers.IsF256(boardVersion))
                     {
                         // This is pretty messed up... ERESET points to $FF00, which has simple load routine.
