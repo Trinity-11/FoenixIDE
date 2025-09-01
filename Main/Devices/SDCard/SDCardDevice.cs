@@ -74,7 +74,6 @@ namespace FoenixIDE.Simulator.Devices
         {
             return fsType;
         }
-
         public abstract void ResetMbrBootSector();
     }
 }

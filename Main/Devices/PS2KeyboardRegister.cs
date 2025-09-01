@@ -37,7 +37,7 @@ namespace FoenixIDE.Simulator.Devices
             throw new NotImplementedException();
         }
 
-        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer)
+        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer, int offset)
         {
             throw new NotImplementedException();
         }

@@ -426,6 +426,8 @@ namespace FoenixIDE
         // return true if the CPU was reset and the program was loaded
         public bool ResetCPU(string filename)
         {
+            int FnxAddressPtr = -1;  // if the application PGZ, PGX sets the RESET_VECTOR
+
             if (CPU != null)
             {
                 CPU.DebugPause = true;
@@ -508,16 +510,7 @@ namespace FoenixIDE
                 // Ensure the first LUTs are set correctly - but don't overwrite the kernel.
                 if (BoardVersionHelpers.IsF256_MMU(boardVersion))
                 {
-                    ((MemoryManagerF256)MemMgr).MMU.SetActiveLUT(0);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0x8, 0);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0x9, 1);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xA, 2);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xB, 3);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xC, 4);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xD, 5);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xE, 6);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0xF, 7);
-                    ((MemoryManagerF256)MemMgr).MMU.WriteByte(0, 0);
+                    ((MemoryManagerF256)MemMgr).MMU.Reset();
                 }
             }
             if (extension.Equals(".HEX"))
@@ -536,7 +529,7 @@ namespace FoenixIDE
                 if (header[0] == 'P' && header[1] == 'G' && header[2] == 'X')
                 {
                     // The next four bytes contain the start address
-                    int FnxAddressPtr = reader.ReadInt32();
+                    FnxAddressPtr = reader.ReadInt32();
                     // The rest of the file is data
                     byte[] DataBuffer = reader.ReadBytes(flen);
                     MemMgr.CopyBuffer(DataBuffer, 0, FnxAddressPtr, flen);
@@ -558,12 +551,13 @@ namespace FoenixIDE
             }
             else if (extension.Equals(".PGZ"))
             {
+                // set MMU Page 3
+                ((MemoryManagerF256)MemMgr).MMU.WriteByte(0, 3);
                 BinaryReader reader = new BinaryReader(info.OpenRead());
                 byte header = reader.ReadByte();  // this should be Z for 24-bits and z for 32-bits
                 if (header == 'Z' || header == 'z')
                 {
                     int size = header == 'z' ? 4 : 3;
-                    int FnxAddressPtr = -1;
 
                     do
                     {
@@ -605,10 +599,6 @@ namespace FoenixIDE
                         MemMgr.WriteLong(0xFF00, 0x78FB18);  // CLC, XCE, SEI
                         MemMgr.WriteByte(0xFF03, 0x5C);      // JML
                         MemMgr.WriteLong(0xFF04, FnxAddressPtr);
-                    }
-                    else
-                    {
-                        MemMgr.WriteWord(MemoryMap.VECTOR_ERESET, FnxAddressPtr);
                     }
                 }
             }
@@ -761,6 +751,11 @@ namespace FoenixIDE
                     ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA1.WriteByte(1, 0);
                     ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA1.WriteByte(2, 0);  // DDRB
                     ((MemoryManagerF256)MemMgr).VIAREGISTERS.VIA1.WriteByte(3, 0);  // DDRA
+                }
+
+                if (FnxAddressPtr != -1  && (extension.Equals(".PGZ") || extension.Equals(".PGX")))
+                {
+                    CPU.PC = FnxAddressPtr;
                 }
             }
 

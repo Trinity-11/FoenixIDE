@@ -83,7 +83,7 @@
                     {
                         // Copy the memory from source to destination
                         byte[] buffer = new byte[size1DTransfer];
-                        System.CopyIntoBuffer(srcAddr, size1DTransfer, buffer);
+                        System.CopyIntoBuffer(srcAddr, size1DTransfer, buffer, 0);
                         System.CopyBuffer(buffer, 0, destAddr, size1DTransfer);
                     }
                 }

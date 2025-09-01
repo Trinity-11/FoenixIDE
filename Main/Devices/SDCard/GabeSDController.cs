@@ -435,135 +435,135 @@ namespace FoenixIDE.Simulator.Devices
         // - A new file was created,
         // - A file was deleted
         // - A file was moved
-        private void UpdateRootEntries()
-        {
-            // Detect what changed - each entry is 32 bytes
-            for (int i = 0; i < 512; i += 0x20)
-            {
-                byte byte0 = writeBlock[i];
-                byte attrs = writeBlock[i + 0xB];
-                if (attrs != 8)
-                {
-                    // Get the cluster
-                    int key = writeBlock[i + 0x1a] + (writeBlock[i + 0x1b] << 8);
-                    if (GetFSType() == FSType.FAT32)
-                    {
-                        key += (writeBlock[i + 0x14] << 16) + (writeBlock[i + 0x15] << 24);
-                    }
-                    int size = writeBlock[i + 0x1c] + (writeBlock[i + 0x1d] << 8) + (writeBlock[i + 0x1e] << 16) + (writeBlock[i + 0x1f] << 24);
-                    if (FAT.ContainsKey(key))
-                    {
-                        FileEntry entry = FAT[key];
-                        // check if the file has been deleted
-                        if (byte0 == 0xE5 && entry != null)
-                        {
-                            File.Delete(entry.fqpn);
-                            FAT.Remove(key);
-                            continue;
-                        }
-                        string name = System.Text.Encoding.UTF8.GetString(writeBlock, i, 8);
-                        string ext = System.Text.Encoding.UTF8.GetString(writeBlock, i + 8, 3);
-                        if (byte0 != 0xE5 && entry == voidEntry)
-                        {
-                            entry.size = size;
-                            FileInfo info = new FileInfo(entry.fqpn);
-                            string newFileName = Path.Combine(info.DirectoryName, name.Trim() + "." + ext.Trim());
-                            FileStream readStream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
-                            FileStream writeStream = new FileStream(newFileName, FileMode.CreateNew);
-                            try
-                            {
-                                byte[] buffer = new byte[512];
-                                for (int cluster = 0; cluster < entry.clusters; cluster++)
-                                {
-                                    readStream.Read(buffer, cluster * 512, 512);
-                                    writeStream.Write(buffer, cluster * 512, (cluster == entry.clusters - 1) ? size % 512 : 512);
-                                }
-                                entry.fqpn = newFileName;
-                                entry.shortname = name; 
-                            }
-                            catch (Exception e)
-                            {
-                                // controller error
-                                data[5] = 1;
-                                System.Console.WriteLine("Exception: " + e.ToString());
-                            }
-                            finally
-                            {
-                                writeStream.Close();
-                                readStream.Close();
-                            }
-                            File.Delete(info.FullName);
-                        }
+        //private void UpdateRootEntries()
+        //{
+        //    // Detect what changed - each entry is 32 bytes
+        //    for (int i = 0; i < 512; i += 0x20)
+        //    {
+        //        byte byte0 = writeBlock[i];
+        //        byte attrs = writeBlock[i + 0xB];
+        //        if (attrs != 8)
+        //        {
+        //            // Get the cluster
+        //            int key = writeBlock[i + 0x1a] + (writeBlock[i + 0x1b] << 8);
+        //            if (GetFSType() == FSType.FAT32)
+        //            {
+        //                key += (writeBlock[i + 0x14] << 16) + (writeBlock[i + 0x15] << 24);
+        //            }
+        //            int size = writeBlock[i + 0x1c] + (writeBlock[i + 0x1d] << 8) + (writeBlock[i + 0x1e] << 16) + (writeBlock[i + 0x1f] << 24);
+        //            if (FAT.ContainsKey(key))
+        //            {
+        //                FileEntry entry = FAT[key];
+        //                // check if the file has been deleted
+        //                if (byte0 == 0xE5 && entry != null)
+        //                {
+        //                    File.Delete(entry.fqpn);
+        //                    FAT.Remove(key);
+        //                    continue;
+        //                }
+        //                string name = System.Text.Encoding.UTF8.GetString(writeBlock, i, 8);
+        //                string ext = System.Text.Encoding.UTF8.GetString(writeBlock, i + 8, 3);
+        //                if (byte0 != 0xE5 && entry == voidEntry)
+        //                {
+        //                    entry.size = size;
+        //                    FileInfo info = new FileInfo(entry.fqpn);
+        //                    string newFileName = Path.Combine(info.DirectoryName, name.Trim() + "." + ext.Trim());
+        //                    FileStream readStream = new FileStream(entry.fqpn, FileMode.Open, FileAccess.Read);
+        //                    FileStream writeStream = new FileStream(newFileName, FileMode.CreateNew);
+        //                    try
+        //                    {
+        //                        byte[] buffer = new byte[512];
+        //                        for (int cluster = 0; cluster < entry.clusters; cluster++)
+        //                        {
+        //                            readStream.Read(buffer, cluster * 512, 512);
+        //                            writeStream.Write(buffer, cluster * 512, (cluster == entry.clusters - 1) ? size % 512 : 512);
+        //                        }
+        //                        entry.fqpn = newFileName;
+        //                        entry.shortname = name; 
+        //                    }
+        //                    catch (Exception e)
+        //                    {
+        //                        // controller error
+        //                        data[5] = 1;
+        //                        System.Console.WriteLine("Exception: " + e.ToString());
+        //                    }
+        //                    finally
+        //                    {
+        //                        writeStream.Close();
+        //                        readStream.Close();
+        //                    }
+        //                    File.Delete(info.FullName);
+        //                }
 
-                    }
-                }
-            }
-            Array.Copy(writeBlock, 0, root, blockPtr, 512);
-        }
+        //            }
+        //        }
+        //    }
+        //    Array.Copy(writeBlock, 0, root, blockPtr, 512);
+        //}
 
-        private void SetData(int page, byte[] buffer)
-        {
-            // Find the file in FAT
-            FileEntry fEntry = null;
-            int writeStartCluster = 0;
-            foreach (int key in FAT.Keys)
-            {
-                FileEntry entry = FAT[key];
-                if (page >= key && page <= key + entry.clusters)
-                {
-                    fEntry = entry;
-                    writeStartCluster = key;
-                    break;
-                }
-            }
+        //private void SetData(int page, byte[] buffer)
+        //{
+        //    // Find the file in FAT
+        //    FileEntry fEntry = null;
+        //    int writeStartCluster = 0;
+        //    foreach (int key in FAT.Keys)
+        //    {
+        //        FileEntry entry = FAT[key];
+        //        if (page >= key && page <= key + entry.clusters)
+        //        {
+        //            fEntry = entry;
+        //            writeStartCluster = key;
+        //            break;
+        //        }
+        //    }
 
-            if (fEntry != null)
-            {
-                FileStream stream = new FileStream(fEntry.fqpn, FileMode.Open, FileAccess.Write);
-                try
-                {
-                    stream.Seek((page - writeStartCluster) * 512, SeekOrigin.Begin);
-                    stream.Write(buffer, 0, 512);
-                }
-                catch (Exception e)
-                {
-                    // controller error
-                    data[5] = 1;
-                    System.Console.WriteLine("Exception: " + e.ToString());
-                }
-                finally
-                {
-                    stream.Close();
-                }
-            }
-        }
+        //    if (fEntry != null)
+        //    {
+        //        FileStream stream = new FileStream(fEntry.fqpn, FileMode.Open, FileAccess.Write);
+        //        try
+        //        {
+        //            stream.Seek((page - writeStartCluster) * 512, SeekOrigin.Begin);
+        //            stream.Write(buffer, 0, 512);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            // controller error
+        //            data[5] = 1;
+        //            System.Console.WriteLine("Exception: " + e.ToString());
+        //        }
+        //        finally
+        //        {
+        //            stream.Close();
+        //        }
+        //    }
+        //}
 
 
-        private void SetData_ISO(int page, byte[] buffer)
-        {
-            if ((page >= 0) && (page < 512 * 4096)) // test if we are with in 256MB
-            {
-                string path = GetSDCardPath();
-                FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Write);
-                try
-                {
-                    stream.Seek(page * 512, SeekOrigin.Begin);
-                    stream.Write(buffer, 0, 512);
-                    return;
-                }
-                catch (Exception e)
-                {
-                    // controller error
-                    data[5] = 1;
-                    System.Console.WriteLine("Exception: " + e.ToString());
-                    return;
-                }
-                finally
-                {
-                    stream.Close();
-                }
-            }
-            return;
-        }
+        //private void SetData_ISO(int page, byte[] buffer)
+        //{
+        //    if ((page >= 0) && (page < 512 * 4096)) // test if we are with in 256MB
+        //    {
+        //        string path = GetSDCardPath();
+        //        FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Write);
+        //        try
+        //        {
+        //            stream.Seek(page * 512, SeekOrigin.Begin);
+        //            stream.Write(buffer, 0, 512);
+        //            return;
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            // controller error
+        //            data[5] = 1;
+        //            System.Console.WriteLine("Exception: " + e.ToString());
+        //            return;
+        //        }
+        //        finally
+        //        {
+        //            stream.Close();
+        //        }
+        //    }
+        //    return;
+        //}
     }
 }

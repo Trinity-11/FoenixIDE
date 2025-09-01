@@ -1609,6 +1609,7 @@ namespace FoenixIDE.UI
                     kernel.MemMgr.SDCARD.SetFSType(FSType.FAT32);
                 }
                 kernel.MemMgr.SDCARD.ResetMbrBootSector();
+                exportSDCardToIMGToolStripMenuItem.Enabled = !kernel.MemMgr.SDCARD.GetISOMode();
             }
             if (typeof(CH376SRegister) == kernel.MemMgr.SDCARD.GetType())
             {
@@ -1986,7 +1987,7 @@ namespace FoenixIDE.UI
                     string outputFileName = Path.ChangeExtension(dialog.FileName, "PGX");
 
                     byte[] buffer = new byte[DataLength[0]];
-                    temporaryRAM.CopyIntoBuffer(DataStartAddress[0], DataLength[0], buffer);
+                    temporaryRAM.CopyIntoBuffer(DataStartAddress[0], DataLength[0], buffer, 0);
                     using (BinaryWriter writer = new BinaryWriter(File.Open(outputFileName, FileMode.Create)))
                     {
                         // 8 byte header
@@ -2055,7 +2056,7 @@ namespace FoenixIDE.UI
                         buffer = PrepareHeader(DataStartAddress[i], DataLength[i]);
                         writer.Write(buffer);
                         buffer = new byte[DataLength[i]];
-                        temporaryRAM.CopyIntoBuffer(DataStartAddress[i], DataLength[i], buffer);
+                        temporaryRAM.CopyIntoBuffer(DataStartAddress[i], DataLength[i], buffer, 0);
                         writer.Write(buffer);
                     }
 
@@ -2294,6 +2295,35 @@ namespace FoenixIDE.UI
             CommonScaleMenuItemClick(sender);
             gpu.SetViewScaling(4.0f, 640, 400);
             SetF256_400LinesMode(true);
+        }
+
+        private void exportSDCardToIMGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (kernel.MemMgr.SDCARD.isPresent && !kernel.MemMgr.SDCARD.GetISOMode())
+            {
+                SaveFileDialog saveDlg = new SaveFileDialog
+                {
+                    Title = "Save SD Card to File",
+                    FileName = "FoenixIDE.img",
+                    Filter = "Disk Image File (*.img)|*.img"
+            };
+                if (saveDlg.ShowDialog() == DialogResult.OK)
+                {
+                    FileStream dataFile = File.Create(saveDlg.FileName);
+                    // Write all sectors to file
+                    int sectors = kernel.MemMgr.SDCARD.GetCapacity() * 2048;
+                    for (int i = 0; i < sectors; i++)
+                    {
+                        dataFile.Write( ((FakeFATSDCardDevice)kernel.MemMgr.SDCARD).ReadBlock(i), 0, 512);
+                    }
+                    dataFile.Flush();
+                    dataFile.Close();
+                }
+            }
+            else
+            {
+                MessageBox.Show("The SD Card is already in ISO format!", "Export SDCard to IMG", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

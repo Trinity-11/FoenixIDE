@@ -67,8 +67,8 @@ namespace FoenixIDE.Simulator.Devices
         {
             data[0] = 0;
             data[1] = 0;
-            LUTs = new byte[]{ 0, 1, 2, 3, 4, 5, 6, 0x7F,
-                               0, 1, 2, 3, 4, 5, 6, 0x7F,
+            LUTs = new byte[]{ 6, 0, 0x7B, 0x7C, 0x7D, 0x7E, 6, 0x7F,
+                               6, 7, 0x7B, 0x7C, 0x7D, 0x7E, 6, 0x7F,
                                0, 1, 2, 3, 4, 5, 6, 0x7F,
                                0, 1, 2, 3, 4, 5, 6, 0x7F };
         }

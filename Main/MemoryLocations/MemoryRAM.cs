@@ -96,10 +96,10 @@ namespace FoenixIDE.MemoryLocations
             System.Array.Copy(d, SourceAddress, d, DestAddress, Length);
         }
 
-        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer)
+        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer, int offset)
         {
             var d = data;
-            System.Array.Copy(d, srcAddress, buffer, 0, srcLength);
+            System.Array.Copy(d, srcAddress, buffer, offset, srcLength);
         }
 
         // Copy data from a buffer to RAM

@@ -267,7 +267,7 @@ namespace FoenixIDE.UI
                         if (ResChecker.Add(res))
                         {
                             byte[] buffer = new byte[blockSizes[0]];
-                            memory.CopyIntoBuffer(0, buffer.Length, buffer);
+                            memory.CopyIntoBuffer(0, buffer.Length, buffer, 0);
                             MemMgrRef.CopyBuffer(buffer, 0, destAddress, buffer.Length);
                         }
                         else

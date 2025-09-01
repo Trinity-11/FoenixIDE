@@ -403,7 +403,7 @@ namespace FoenixIDE.Display
             byte pixVal = 0;
             if (!dX)
             {
-                VRAM.CopyIntoBuffer(offsetAddress, width, pixVals);
+                VRAM.CopyIntoBuffer(offsetAddress, width, pixVals, 0);
             }
             else
             {
@@ -483,10 +483,10 @@ namespace FoenixIDE.Display
             // The + 2 below is to take an FPGA bug in the F256Jr into account
             if (mode == 0)
             {
-                VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tlmSize, tiles);
+                VRAM.CopyIntoBuffer(tilemapAddress + (1 + tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tlmSize, tiles, 0);
             } else
             {
-                VRAM.CopyIntoBuffer(tilemapAddress + (tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tlmSize, tiles);
+                VRAM.CopyIntoBuffer(tilemapAddress + (tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tlmSize, tiles, 0);
             }
 
             // cache of tilesetPointers
@@ -551,7 +551,7 @@ namespace FoenixIDE.Display
                 //int lutAddress = MemoryMap.GRP_LUT_BASE_ADDR - VICKY.StartAddress + lutIndex * 1024;
                 int tilesetOffsetAddress = tilesetOffsets[t];  // + startOffset
 
-                VRAM.CopyIntoBuffer(tilesetOffsetAddress, tileSize, tilepix);
+                VRAM.CopyIntoBuffer(tilesetOffsetAddress, tileSize, tilepix, 0);
                 do
                 {
                     byte pixVal = tilepix[startOffset];

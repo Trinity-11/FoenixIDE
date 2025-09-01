@@ -309,6 +309,18 @@ namespace FoenixIDE.Simulator.Devices
             }
         }
 
+        bool AlreadyExists(string fn)
+        {
+            foreach (FileEntry entry in FAT.Values)
+            {
+                if (entry.shortname.Equals(fn))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /**
          * Should probably make this a recursive function.
          */
@@ -348,17 +360,72 @@ namespace FoenixIDE.Simulator.Devices
                 // Don't write a record for the root folder
                 if (rootDirCount == 0)
                 {
-                    string dirname = dirInfo.Name.Replace(" ", "").ToUpper();
+                    string originalDirName = dirInfo.Name;
+                    string dirname = originalDirName.Replace(" ", "").ToUpper();
                     if (dirname.Length < 8)
                     {
                         dirname += spaces.Substring(0, 8 - dirname.Length);
                     }
+                    if (dirname.Length > 8)
+                    {
+                        int count = 1;
+                        string shortDirName = null;
+                        do
+                        {
+                            shortDirName = dirname.Substring(0, 6) + "~" + count++;
+                        }
+                        while (AlreadyExists(shortDirName) && count < 10);
+                        dirname = shortDirName;
+                    }
+                    // at this point dirname has 8 characters
+                    dirname += "   ";
                     directory = new byte[0x4000];  // we reserving all this space for a new directory
                     subdirectories.Add(dirname, directory);
 
+                    // write the .. entry
+                    Array.Copy(Encoding.ASCII.GetBytes("..      "), 0, directory, 0, 8);
+                    Array.Copy(Encoding.ASCII.GetBytes("   "), 0, directory, 8, 3);
+
+                    // Create the Long Filename Entries for F256 - LFN entries must precede the file entry
+                    if (vfat & (originalDirName.Length > 8 ))
+                    {
+                        // Compute the checksum of filename
+                        byte chksum = LFNCheckSum(dirname, 11);  // the checksum must use padded spaces to 11
+                        byte[] UCS2FN = Encoding.Unicode.GetBytes(originalDirName);
+                        // The filename needs to end with 0x0000
+                        int records = (UCS2FN.Length + 2) / 26 + 1;
+                        byte[] buffer = new byte[26 * records]; // I want an array that's always long enough to not raise errors
+                        for (int i = 0; i < 26 * records; i++)
+                        {
+                            buffer[i] = 0xFF;
+                        }
+                        Array.Copy(UCS2FN, buffer, UCS2FN.Length);
+                        buffer[UCS2FN.Length] = 0;
+                        buffer[UCS2FN.Length + 1] = 0;
+                        // records are written in reverse order
+                        for (int seq = records; seq > 0; seq--)
+                        {
+                            int offset = (seq - 1) * 26;
+                            // Copy 26 bytes - or 13 UCS-2 characters
+                            Array.Copy(buffer, offset, root, pointer + 1, 10);
+                            Array.Copy(buffer, offset + 10, root, pointer + 0xE, 12);
+                            Array.Copy(buffer, offset + 22, root, pointer + 0x1C, 4);
+
+                            // The first byte is the sequence number - if this is the last record, set bit 6.
+                            root[pointer] = (byte)((seq == records ? 0x40 : 0) + seq);
+                            root[pointer + 0xb] = 0xf;  // lfn record
+                            root[pointer + 0xc] = 0;
+                            root[pointer + 0xd] = chksum;
+                            root[pointer + 0x1a] = 0;
+
+                            // increase the root buffer pointer
+                            pointer += 32;
+                            //recordCount++;
+                        }
+                    }
                     Array.Copy(Encoding.ASCII.GetBytes(dirname), 0, root, pointer, 8);
                     Array.Copy(Encoding.ASCII.GetBytes("   "), 0, root, pointer+8, 3);
-                    root[pointer + 11] = 0x10;
+                    root[pointer + 11] = 0x10; // directory
 
                     // each directory uses a new cluster - the number of files in the cluster determines the number of clusters
                     // the starting cluster of directories is beyond the root files
@@ -383,8 +450,11 @@ namespace FoenixIDE.Simulator.Devices
                 }
 
                 // We need to get the number of entries, because F256K may use long filenames
-                int entries = BuildFileRecordsToDirectory(files, currentCluster, directory, 32 * (dirCount + rootDirCount), out int oCluster);
+                int entries = BuildFileRecordsToDirectory(files, currentCluster, directory, 32, out int oCluster);
+                //int entries = BuildFileRecordsToDirectory(files, currentCluster, directory, 32 * (dirCount + rootDirCount), out int oCluster);
                 currentCluster = oCluster;
+
+                pointer += entries * 32;
 
                 // number of entries in the Root area is 1 + dirs + files - we're not storing long file names
                 // we can put 16 entries per sector (512 bytes / 32)
@@ -397,18 +467,6 @@ namespace FoenixIDE.Simulator.Devices
 
         private int BuildFileRecordsToDirectory(string[] files, int cluster, byte[] dirBuffer, int dirPointer, out int outCluster)
         {
-            bool AlreadyExists(string fn)
-            {
-                foreach (FileEntry entry in FAT.Values)
-                {
-                    if (entry.shortname.Equals(fn))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
             int recordCount = 0;
             foreach (string file in files)
             {
@@ -459,10 +517,10 @@ namespace FoenixIDE.Simulator.Devices
 
                 FAT.Add(cluster, entry);
                 // Create the Long Filename Entries for F256 - LFN entries must precede the file entry
-                if (vfat & (originalFilename.Length > 12 | originalExtension.Length > 3))
+                if (vfat & (originalFilename.Length > 12 | originalExtension.Length > 4))
                 {
                     // Compute the checksum of filename
-                    byte chksum = LFNCheckSum(filename + extension);
+                    byte chksum = LFNCheckSum(filename + extension, 11);
                     byte[] UCS2FN = Encoding.Unicode.GetBytes(originalFilename);
                     // The filename needs to end with 0x0000
                     int records = (UCS2FN.Length + 2) / 26 + 1;
@@ -518,11 +576,11 @@ namespace FoenixIDE.Simulator.Devices
             return recordCount;
         }
 
-        public static byte LFNCheckSum(string v)
+        public static byte LFNCheckSum(string v, int length)
         {
             int sum = 0;
             byte[] buffer = Encoding.ASCII.GetBytes(v);
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < length; i++)
             {
                 sum = (((sum & 1) << 7) | ((sum & 0xFE) >> 1)) + buffer[i];
             }
@@ -573,6 +631,28 @@ namespace FoenixIDE.Simulator.Devices
             return null;
         }
 
+        public byte[] ReadBlock(int block)
+        {
+            GetReadBlock(block * 512);
+            if (readBlock == null)
+            {
+                return new byte[512];
+            }
+            else
+            {
+                if (blockPtr == 0)
+                {
+                    return readBlock;
+                }
+                else
+                {
+                    byte[] buffer = new byte[512];
+                    Array.Copy(readBlock, blockPtr, buffer, 0, 512);
+                    return buffer;
+                }
+               
+            }
+        }
         protected void GetReadBlock(int readAddress)
         {
             if (GetISOMode())

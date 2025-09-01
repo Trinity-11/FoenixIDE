@@ -9,7 +9,7 @@ namespace FoenixIDETester
         [TestMethod]
         public void TestCheckSumWithKnownValue()
         {
-            byte chksum = FakeFATSDCardDevice.LFNCheckSum("ADLIBA~1RAD");
+            byte chksum = FakeFATSDCardDevice.LFNCheckSum("ADLIBA~1RAD", 11);
             Assert.AreEqual(0xab, chksum);
         }
     }

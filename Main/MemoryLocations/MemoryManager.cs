@@ -334,16 +334,34 @@ namespace FoenixIDE.MemoryLocations
             GetDeviceAt(destAddress, out IMappable device, out int deviceAddress);
             if (device != null)
             {
-                device.CopyBuffer(src, srcAddress, deviceAddress, length);
+                if (device.Length < length)
+                {
+                    device.CopyBuffer(src, srcAddress, deviceAddress, device.Length);
+                    // Continue copying buffer to the next device
+                    CopyBuffer(src, srcAddress + device.Length, destAddress + device.Length, length - device.Length);
+                }
+                else
+                {
+                    device.CopyBuffer(src, srcAddress, deviceAddress, length);
+                }
             }
         }
 
-        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer)
+        public void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer, int offset)
         {
             GetDeviceAt(srcAddress, out IMappable device, out int deviceAddress);
             if (device != null)
             {
-                device.CopyIntoBuffer(deviceAddress, srcLength, buffer);
+                if (device.Length < srcLength)
+                {
+                    device.CopyIntoBuffer(deviceAddress, device.Length, buffer, offset);
+                    // Continue copying buffer to the next device
+                    CopyIntoBuffer(srcAddress + device.Length, srcLength - device.Length, buffer, offset + device.Length);
+                }
+                else
+                {
+                    device.CopyIntoBuffer(deviceAddress, srcLength, buffer, offset);
+                }
             }
         }
     }

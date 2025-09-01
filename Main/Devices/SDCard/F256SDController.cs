@@ -386,7 +386,7 @@ namespace FoenixIDE.Simulator.Devices
             // TODO: Have reported errors be returned up as command codes. For now, this is a temporary measure to divert error handling
             // from the GabeSDController path, since it returns errors through its memory-mapped register where there isn't an equivalent
             // for this memory-mapped range.
-            System.Diagnostics.Debugger.Break();
+            //System.Diagnostics.Debugger.Break();
 #endif
             if (CurrentCommand != null)
             {

@@ -22,7 +22,7 @@ namespace FoenixIDE.MemoryLocations
         int EndAddress { get; }
 
         void CopyBuffer(byte[] src, int srcAddress, int destAddress, int length);
-        void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer);
+        void CopyIntoBuffer(int srcAddress, int srcLength, byte[] buffer, int offset);
 
     }
 }

@@ -3,6 +3,9 @@ Release 0.7.0.23
 Fix sprite aliasing when X position is below 32. https://github.com/Trinity-11/FoenixIDE/issues/57
 Added vertical "blank" lines in the GPU rendering to simulate all the SOL lines.
 Attempt to fix crashes when saving files from BASIC to SD card.
+Made the Save button in Memory Window visible.
+Added exporting SD Card to .img file.
+Fixed the issue with long directory name.
 
 ** TODO: Users can now modify the CPU registers when in debug mode. The registers have a white background when editable.
 ** TODO: Implement the various cursor modes and rates.

@@ -99,11 +99,11 @@ namespace FoenixIDE.UI
                             byte[] buffer = new byte[res.Length];
                             if (res.FileType == ResourceType.lut && BoardVersionHelpers.IsF256(kernel_ref.GetVersion()))
                             {
-                                kernel_ref.MemMgr.VICKY.CopyIntoBuffer(res.StartAddress, res.Length, buffer);
+                                kernel_ref.MemMgr.VICKY.CopyIntoBuffer(res.StartAddress, res.Length, buffer, 0);
                             }
                             else
                             {
-                                kernel_ref.MemMgr.CopyIntoBuffer(res.StartAddress, res.Length, buffer);
+                                kernel_ref.MemMgr.CopyIntoBuffer(res.StartAddress, res.Length, buffer, 0);
                             }
                             dataFile.Write(buffer, 0, res.Length);
                             dataFile.Close();

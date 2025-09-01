@@ -617,10 +617,19 @@ namespace FoenixIDE.UI
             if (SaveDialog.ShowDialog() == DialogResult.OK)
             {
                 FileStream outputFile = File.Create(SaveDialog.FileName);
-                MemoryRAM ram = (MemoryRAM)Memory;
-                byte[] buffer = new byte[ram.Length];
-                ram.CopyIntoBuffer(0, ram.Length, buffer);
-                outputFile.Write(buffer, 0, buffer.Length);
+                if ("MemoryManagerF256".Equals(Memory.GetType().Name))
+                {
+                    byte[] buffer = new byte[0x10_0000];
+                    Memory.CopyIntoBuffer(0, 0x10_0000, buffer, 0);
+                    outputFile.Write(buffer, 0, buffer.Length);
+                }
+                else
+                {
+                    MemoryRAM ram = (MemoryRAM)Memory;
+                    byte[] buffer = new byte[ram.Length];
+                    ram.CopyIntoBuffer(0, ram.Length, buffer, 0);
+                    outputFile.Write(buffer, 0, buffer.Length);
+                }
                 outputFile.Flush();
                 outputFile.Close();
             }
