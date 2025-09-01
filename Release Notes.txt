@@ -1,8 +1,5 @@
-Release 0.7.0.23
+Release 0.7.0.24
 ----------------
-Fix sprite aliasing when X position is below 32. https://github.com/Trinity-11/FoenixIDE/issues/57
-Added vertical "blank" lines in the GPU rendering to simulate all the SOL lines.
-Attempt to fix crashes when saving files from BASIC to SD card.
 Made the Save button in Memory Window visible.
 Added exporting SD Card to .img file.
 Fixed the issue with long directory name.
@@ -18,6 +15,12 @@ Fixed the issue with long directory name.
 ** TODO: Try to sort out the issue with the character sets in non-unicode installation.
 ** TODO: Implement the mouse scroll wheel with a fourth PS/2 byte.
 ** TODO: Renaming files (in DOS) - doesn't work.
+
+Release 0.7.0.23
+----------------
+Fix sprite aliasing when X position is below 32. https://github.com/Trinity-11/FoenixIDE/issues/57
+Added vertical "blank" lines in the GPU rendering to simulate all the SOL lines.
+Attempt to fix crashes when saving files from BASIC to SD card.
 
 Release 0.7.0.22
 ----------------
